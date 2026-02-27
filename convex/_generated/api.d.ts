@@ -11,6 +11,7 @@
 import type * as courses from "../courses.js";
 import type * as majors from "../majors.js";
 import type * as resources from "../resources.js";
+import type * as seed from "../seed.js";
 import type * as universities from "../universities.js";
 
 import type {
@@ -23,6 +24,7 @@ declare const fullApi: ApiFromModules<{
   courses: typeof courses;
   majors: typeof majors;
   resources: typeof resources;
+  seed: typeof seed;
   universities: typeof universities;
 }>;
 

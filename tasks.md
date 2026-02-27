@@ -6,14 +6,14 @@ Set up the core infrastructure: Convex schema, database indexes, seed data utili
 
 ### Tasks
 
-- [ ] 1.1 — Initialize Convex in the project (`npx convex init`), connect to a Convex dev deployment, and verify `npx convex dev` runs successfully.
-- [ ] 1.2 — Define the Convex schema (`convex/schema.ts`) with all 6 tables: `universities`, `majors`, `courses`, `resources`, `users`, `permissions`. Include all fields, types, and validators as specified in the PRD.
-- [ ] 1.3 — Add database indexes: `resources` by `courseId`, `courses` by `majorId`, `majors` by `universityId`, `permissions` by `userId`, `users` by `email`, `universities` by `slug`, `majors` by `slug`, `courses` by `slug`.
-- [ ] 1.4 — Configure the Next.js root layout for RTL: set `dir="rtl"` and `lang="ar"` on `<html>`, load IBM Plex Arabic via `next/font`, and apply it globally.
-- [ ] 1.5 — Set up Tailwind CSS with RTL support using logical properties (`ms-`, `me-`, `ps-`, `pe-`) or the RTL plugin. Verify utility classes render correctly in RTL.
-- [ ] 1.6 — Create a base app shell layout: header with site name, main content area, and footer. All text in Arabic. Ensure the shell is responsive and mobile-first.
-- [ ] 1.7 — Set up the Convex client provider in the Next.js app so both server and client components can call Convex queries/mutations.
-- [ ] 1.8 — Write basic Convex query functions for each table (e.g., `listUniversities`, `getUniversityBySlug`) to validate the schema is correctly deployed and queryable.
+- [x] 1.1 — Initialize Convex in the project (`npx convex init`), connect to a Convex dev deployment, and verify `npx convex dev` runs successfully.
+- [x] 1.2 — Define the Convex schema (`convex/schema.ts`) with all 6 tables: `universities`, `majors`, `courses`, `resources`, `users`, `permissions`. Include all fields, types, and validators as specified in the PRD.
+- [x] 1.3 — Add database indexes: `resources` by `courseId`, `courses` by `majorId`, `majors` by `universityId`, `permissions` by `userId`, `users` by `email`, `universities` by `slug`, `majors` by `slug`, `courses` by `slug`.
+- [x] 1.4 — Configure the Next.js root layout for RTL: set `dir="rtl"` and `lang="ar"` on `<html>`, load IBM Plex Arabic via `next/font`, and apply it globally.
+- [x] 1.5 — Set up Tailwind CSS with RTL support using logical properties (`ms-`, `me-`, `ps-`, `pe-`) or the RTL plugin. Verify utility classes render correctly in RTL.
+- [x] 1.6 — Create a base app shell layout: header with site name, main content area, and footer. All text in Arabic. Ensure the shell is responsive and mobile-first.
+- [x] 1.7 — Set up the Convex client provider in the Next.js app so both server and client components can call Convex queries/mutations.
+- [x] 1.8 — Write basic Convex query functions for each table (e.g., `listUniversities`, `getUniversityBySlug`) to validate the schema is correctly deployed and queryable.
 
 ---
 
@@ -23,14 +23,14 @@ Build the four public pages — Home, University, Major, Course — as server-re
 
 ### Tasks
 
-- [ ] 2.1 — Build the **Home page** (`/`): hero section with Arabic text explaining Aoun, grid of 4 university cards (logo, name). Each card links to `/[universitySlug]`. Use semantic HTML (`<main>`, `<h1>`).
-- [ ] 2.2 — Build the **University page** (`/[universitySlug]`): fetch university by slug, display list of majors as cards/links. Handle 404 if slug not found. Use `<h1>` for university name.
-- [ ] 2.3 — Build the **Major page** (`/[universitySlug]/[majorSlug]`): fetch major by slug within university, display study plan view with courses grouped by semester/year. Each course is a clickable card showing name and course code. Handle 404.
-- [ ] 2.4 — Build the **Course page** (`/[universitySlug]/[majorSlug]/[courseSlug]`): fetch course by slug within major, display resources organized by category (notes, exams, videos, summaries, tips, other) as tabs or sections. Link resources open in new tab. Rich-text resources render inline. Hide empty categories. Handle 404.
-- [ ] 2.5 — Write all required Convex query functions for public pages: `getUniversityBySlug`, `getMajorsByUniversity`, `getMajorBySlug`, `getCoursesByMajor`, `getCourseBySlug`, `getResourcesByCourse`.
-- [ ] 2.6 — Add dynamic `<title>` and `<meta description>` in Arabic for each page using Next.js `generateMetadata`. Include course name + university name where applicable.
-- [ ] 2.7 — Implement a breadcrumb component (University > Major > Course) on University, Major, and Course pages. Use semantic `<nav>` with structured data for Google.
-- [ ] 2.8 — Ensure all pages are fully responsive: mobile-first layout, cards stack vertically on small screens, proper spacing and font sizes for all breakpoints.
+- [x] 2.1 — Build the **Home page** (`/`): hero section with Arabic text explaining Aoun, grid of 4 university cards (logo, name). Each card links to `/[universitySlug]`. Use semantic HTML (`<main>`, `<h1>`).
+- [x] 2.2 — Build the **University page** (`/[universitySlug]`): fetch university by slug, display list of majors as cards/links. Handle 404 if slug not found. Use `<h1>` for university name.
+- [x] 2.3 — Build the **Major page** (`/[universitySlug]/[majorSlug]`): fetch major by slug within university, display study plan view with courses grouped by semester/year. Each course is a clickable card showing name and course code. Handle 404.
+- [x] 2.4 — Build the **Course page** (`/[universitySlug]/[majorSlug]/[courseSlug]`): fetch course by slug within major, display resources organized by category (notes, exams, videos, summaries, tips, other) as tabs or sections. Link resources open in new tab. Rich-text resources render inline. Hide empty categories. Handle 404.
+- [x] 2.5 — Write all required Convex query functions for public pages: `getUniversityBySlug`, `getMajorsByUniversity`, `getMajorBySlug`, `getCoursesByMajor`, `getCourseBySlug`, `getResourcesByCourse`.
+- [x] 2.6 — Add dynamic `<title>` and `<meta description>` in Arabic for each page using Next.js `generateMetadata`. Include course name + university name where applicable.
+- [x] 2.7 — Implement a breadcrumb component (University > Major > Course) on University, Major, and Course pages. Use semantic `<nav>` with structured data for Google.
+- [x] 2.8 — Ensure all pages are fully responsive: mobile-first layout, cards stack vertically on small screens, proper spacing and font sizes for all breakpoints.
 
 ---
 

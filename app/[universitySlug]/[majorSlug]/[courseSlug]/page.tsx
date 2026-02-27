@@ -1,0 +1,222 @@
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+import { notFound } from "next/navigation";
+import { Breadcrumb } from "@/components/breadcrumb";
+import type { Metadata } from "next";
+
+type Params = {
+  universitySlug: string;
+  majorSlug: string;
+  courseSlug: string;
+};
+
+const categoryConfig = {
+  notes: { label: "ملاحظات", icon: "📝" },
+  exams: { label: "امتحانات", icon: "📋" },
+  videos: { label: "فيديوهات", icon: "🎬" },
+  summaries: { label: "ملخصات", icon: "📖" },
+  tips: { label: "نصائح", icon: "💡" },
+  other: { label: "أخرى", icon: "📎" },
+} as const;
+
+const categoryOrder: (keyof typeof categoryConfig)[] = [
+  "summaries",
+  "notes",
+  "exams",
+  "videos",
+  "tips",
+  "other",
+];
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { universitySlug, majorSlug, courseSlug } = await params;
+  const university = await fetchQuery(api.universities.getBySlug, {
+    slug: universitySlug,
+  });
+  if (!university) return {};
+  const major = await fetchQuery(api.majors.getBySlug, { slug: majorSlug });
+  if (!major || major.universityId !== university._id) return {};
+  const course = await fetchQuery(api.courses.getBySlug, { slug: courseSlug });
+  if (!course || course.majorId !== major._id) return {};
+  return {
+    title: `${course.name} — ${major.name} — ${university.name} — عون`,
+    description: `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}. ملخصات، امتحانات، وفيديوهات.`,
+  };
+}
+
+export default async function CoursePage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { universitySlug, majorSlug, courseSlug } = await params;
+
+  const university = await fetchQuery(api.universities.getBySlug, {
+    slug: universitySlug,
+  });
+  if (!university) notFound();
+
+  const major = await fetchQuery(api.majors.getBySlug, { slug: majorSlug });
+  if (!major || major.universityId !== university._id) notFound();
+
+  const course = await fetchQuery(api.courses.getBySlug, { slug: courseSlug });
+  if (!course || course.majorId !== major._id) notFound();
+
+  const resources = await fetchQuery(api.resources.listByCourse, {
+    courseId: course._id,
+  });
+
+  // Group resources by category, only include non-empty categories
+  const grouped = new Map<string, typeof resources>();
+  for (const resource of resources) {
+    if (!grouped.has(resource.category)) grouped.set(resource.category, []);
+    grouped.get(resource.category)!.push(resource);
+  }
+
+  // Sort within each category by order
+  for (const [, items] of grouped) {
+    items.sort((a, b) => a.order - b.order);
+  }
+
+  // Filter to only categories that have resources, in display order
+  const activeCategories = categoryOrder.filter((cat) => grouped.has(cat));
+
+  return (
+    <div>
+      {/* Course Header */}
+      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <Breadcrumb
+            items={[
+              { label: "الرئيسية", href: "/" },
+              { label: university.name, href: `/${universitySlug}` },
+              {
+                label: major.name,
+                href: `/${universitySlug}/${majorSlug}`,
+              },
+              { label: course.name },
+            ]}
+          />
+          <h1 className="text-2xl font-bold text-surface-900 sm:text-3xl lg:text-4xl">
+            {course.name}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-surface-500">
+            {course.courseCode && (
+              <span className="rounded-md bg-surface-100 px-2.5 py-1 text-sm font-medium text-surface-600">
+                {course.courseCode}
+              </span>
+            )}
+            <span>
+              {major.name} · {university.name}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Resources */}
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        {activeCategories.length > 0 ? (
+          <div className="space-y-10">
+            {activeCategories.map((cat) => {
+              const config = categoryConfig[cat];
+              const items = grouped.get(cat)!;
+
+              return (
+                <div key={cat}>
+                  <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 sm:text-xl">
+                    <span className="text-xl">{config.icon}</span>
+                    {config.label}
+                    <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500">
+                      {items.length}
+                    </span>
+                  </h2>
+
+                  <div className="space-y-3">
+                    {items.map((resource) => (
+                      <div
+                        key={resource._id}
+                        className="rounded-xl border border-surface-200 bg-white shadow-sm"
+                      >
+                        {resource.type === "link" && resource.url ? (
+                          <a
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center gap-3 p-4 transition-colors hover:bg-surface-50"
+                          >
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100">
+                              <svg
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                                />
+                              </svg>
+                            </div>
+                            <span className="min-w-0 flex-1 truncate font-medium text-surface-800 group-hover:text-primary-600">
+                              {resource.title}
+                            </span>
+                            <svg
+                              className="h-4 w-4 shrink-0 text-surface-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          </a>
+                        ) : (
+                          <div className="p-5">
+                            <h3 className="mb-3 font-semibold text-surface-800">
+                              {resource.title}
+                            </h3>
+                            {resource.content && (
+                              <div
+                                className="prose prose-sm max-w-none text-surface-700"
+                                style={{ direction: "rtl" }}
+                                dangerouslySetInnerHTML={{
+                                  __html: resource.content,
+                                }}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-surface-200 bg-white p-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-100 text-3xl">
+              📚
+            </div>
+            <p className="text-lg font-medium text-surface-700">
+              لا توجد مصادر بعد
+            </p>
+            <p className="mt-1 text-sm text-surface-500">
+              ستُضاف المصادر قريباً. ترقبوا التحديثات!
+            </p>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
