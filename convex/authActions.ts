@@ -1,0 +1,71 @@
+"use node";
+
+import { v } from "convex/values";
+import { action } from "./_generated/server";
+import { api } from "./_generated/api";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+
+// ── Login action ────────────────────────────────────────────────────────
+export const login = action({
+  args: {
+    email: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, { email, password }) => {
+    const user = await ctx.runQuery(api.auth.getUserByEmail, { email });
+
+    if (!user) {
+      throw new Error("INVALID_CREDENTIALS");
+    }
+
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) {
+      throw new Error("INVALID_CREDENTIALS");
+    }
+
+    // Generate session token
+    const token = crypto.randomUUID();
+    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+
+    await ctx.runMutation(api.auth.createSession, {
+      userId: user._id,
+      token,
+      expiresAt,
+    });
+
+    return {
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  },
+});
+
+// ── Seed admin user ─────────────────────────────────────────────────────
+export const seedAdmin = action({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, { name, email, password }) => {
+    const existing = await ctx.runQuery(api.auth.getUserByEmail, { email });
+    if (existing) return "Admin already exists";
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    await ctx.runMutation(api.auth.createUser, {
+      name,
+      email,
+      role: "admin",
+      passwordHash,
+    });
+
+    return "Admin created successfully";
+  },
+});

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
+import { HeaderAuth } from "@/components/header-auth";
+import { getSessionToken } from "@/app/actions/auth";
 import "./globals.css";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -16,15 +18,17 @@ export const metadata: Metadata = {
     "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const sessionToken = await getSessionToken();
+
   return (
     <html lang="ar" dir="rtl">
       <body className={`${ibmPlexArabic.variable} font-sans antialiased`}>
-        <ConvexClientProvider>
+        <ConvexClientProvider sessionToken={sessionToken}>
           <div className="flex min-h-screen flex-col">
             <header className="sticky top-0 z-50 border-b border-surface-200 bg-white/80 backdrop-blur-md">
               <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -33,13 +37,14 @@ export default function RootLayout({
                     عون
                   </span>
                 </a>
-                <nav className="flex items-center gap-6 text-sm font-medium text-surface-600">
+                <nav className="flex items-center gap-4 text-sm font-medium text-surface-600">
                   <a
                     href="/"
                     className="transition-colors hover:text-primary-600"
                   >
                     الرئيسية
                   </a>
+                  <HeaderAuth />
                 </nav>
               </div>
             </header>

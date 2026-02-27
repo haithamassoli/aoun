@@ -60,4 +60,10 @@ export default defineSchema({
     userId: v.id("users"),
     majorId: v.id("majors"),
   }).index("by_userId", ["userId"]),
+
+  sessions: defineTable({
+    userId: v.id("users"),
+    token: v.string(),
+    expiresAt: v.number(),
+  }).index("by_token", ["token"]),
 });

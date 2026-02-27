@@ -40,14 +40,14 @@ Implement email + password login with hashed credentials, session management, an
 
 ### Tasks
 
-- [ ] 3.1 — Implement password hashing utilities in Convex (use `bcrypt` or equivalent). Create a Convex mutation to seed an initial admin user with a hashed password.
-- [ ] 3.2 — Create a Convex `login` mutation: accepts email + password, verifies credentials against the `users` table, returns a session token (JWT or Convex-native auth token).
-- [ ] 3.3 — Implement session management: store session tokens, validate them on subsequent requests, and handle expiration. Use Convex auth or a custom session table.
-- [ ] 3.4 — Build the `/login` page: Arabic form with email and password fields, submit button, error messages for invalid credentials. RTL-styled, mobile-friendly.
-- [ ] 3.5 — Create a `getCurrentUser` Convex query that resolves the authenticated user from the session token. Returns `null` if not authenticated.
-- [ ] 3.6 — Add auth context/provider on the client side so components can access the current user and auth state (logged in/out).
-- [ ] 3.7 — Implement logout functionality: clear session token on client, invalidate server-side if applicable.
-- [ ] 3.8 — Protect dashboard routes with middleware or layout-level auth checks — redirect unauthenticated users to `/login`.
+- [x] 3.1 — Implement password hashing utilities in Convex (use `bcrypt` or equivalent). Create a Convex mutation to seed an initial admin user with a hashed password.
+- [x] 3.2 — Create a Convex `login` mutation: accepts email + password, verifies credentials against the `users` table, returns a session token (JWT or Convex-native auth token).
+- [x] 3.3 — Implement session management: store session tokens, validate them on subsequent requests, and handle expiration. Use Convex auth or a custom session table.
+- [x] 3.4 — Build the `/login` page: Arabic form with email and password fields, submit button, error messages for invalid credentials. RTL-styled, mobile-friendly.
+- [x] 3.5 — Create a `getCurrentUser` Convex query that resolves the authenticated user from the session token. Returns `null` if not authenticated.
+- [x] 3.6 — Add auth context/provider on the client side so components can access the current user and auth state (logged in/out).
+- [x] 3.7 — Implement logout functionality: clear session token on client, invalidate server-side if applicable.
+- [x] 3.8 — Protect dashboard routes with middleware or layout-level auth checks — redirect unauthenticated users to `/login`.
 
 ---
 
