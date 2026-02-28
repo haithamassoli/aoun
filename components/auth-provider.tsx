@@ -55,6 +55,15 @@ export function AuthProvider({
     window.location.href = "/login";
   }, []);
 
+  // Auto-logout when session is invalid (token exists but user is null)
+  useEffect(() => {
+    if (sessionToken && currentUser === null && !isLoggingOut) {
+      logoutAction().then(() => {
+        window.location.href = "/login";
+      });
+    }
+  }, [sessionToken, currentUser, isLoggingOut]);
+
   return (
     <AuthContext.Provider
       value={{

@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, isLoading, sessionToken, logout } = useAuth();
   const majors = useQuery(
     api.dashboard.getMyMajors,
-    sessionToken ? { token: sessionToken } : "skip"
+    user && sessionToken ? { token: sessionToken } : "skip"
   );
 
   const pathname = usePathname();

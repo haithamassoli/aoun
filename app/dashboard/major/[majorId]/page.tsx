@@ -10,17 +10,17 @@ import { useState } from "react";
 import { Toast, useToast } from "@/components/toast";
 
 export default function MajorCoursesPage() {
-  const { sessionToken } = useAuth();
+  const { user, sessionToken } = useAuth();
   const { majorId } = useParams<{ majorId: string }>();
   const toast = useToast();
 
   const major = useQuery(
     api.dashboard.getMajorWithUniversity,
-    sessionToken ? { token: sessionToken, majorId: majorId as Id<"majors"> } : "skip"
+    user && sessionToken ? { token: sessionToken, majorId: majorId as Id<"majors"> } : "skip"
   );
   const courses = useQuery(
     api.dashboard.getCoursesForMajor,
-    sessionToken ? { token: sessionToken, majorId: majorId as Id<"majors"> } : "skip"
+    user && sessionToken ? { token: sessionToken, majorId: majorId as Id<"majors"> } : "skip"
   );
 
   const addCourse = useMutation(api.courses.add);

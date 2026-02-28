@@ -45,17 +45,17 @@ const EMPTY_FORM: ResourceFormData = {
 };
 
 export default function CourseResourcesPage() {
-  const { sessionToken } = useAuth();
+  const { user, sessionToken } = useAuth();
   const { majorId, courseId } = useParams<{ majorId: string; courseId: string }>();
   const toast = useToast();
 
   const course = useQuery(
     api.dashboard.getCourseWithMajor,
-    sessionToken ? { token: sessionToken, courseId: courseId as Id<"courses"> } : "skip"
+    user && sessionToken ? { token: sessionToken, courseId: courseId as Id<"courses"> } : "skip"
   );
   const resources = useQuery(
     api.dashboard.getResourcesForCourse,
-    sessionToken ? { token: sessionToken, courseId: courseId as Id<"courses"> } : "skip"
+    user && sessionToken ? { token: sessionToken, courseId: courseId as Id<"courses"> } : "skip"
   );
 
   const addResource = useMutation(api.resources.add);

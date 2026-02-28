@@ -71,6 +71,68 @@ export const seedAdmin = action({
   },
 });
 
+// ── Seed accounts: admin + contributors with permissions ─────────────
+export const seedAccounts = action({
+  args: {},
+  handler: async (ctx) => {
+    const results: string[] = [];
+
+    // 1. Create admin
+    const adminEmail = "admin@aoun.jo";
+    const existingAdmin = await ctx.runQuery(internal.auth.getUserByEmail, {
+      email: adminEmail,
+    });
+    if (!existingAdmin) {
+      const adminHash = await bcrypt.hash("Admin@123", 12);
+      await ctx.runMutation(internal.auth.createUser, {
+        name: "مدير النظام",
+        email: adminEmail,
+        role: "admin",
+        passwordHash: adminHash,
+      });
+      results.push("Admin created: admin@aoun.jo");
+    } else {
+      results.push("Admin already exists");
+    }
+
+    // 2. Create contributors (one per university)
+    const contributors = [
+      { name: "أحمد الأردني", email: "ahmad@aoun.jo", password: "Contributor@123", uniSlug: "ju" },
+      { name: "سارة اليرموك", email: "sara@aoun.jo", password: "Contributor@123", uniSlug: "yu" },
+      { name: "محمد الهاشمي", email: "mohammad@aoun.jo", password: "Contributor@123", uniSlug: "hu" },
+      { name: "لينا التكنو", email: "lina@aoun.jo", password: "Contributor@123", uniSlug: "just" },
+    ];
+
+    for (const contrib of contributors) {
+      const existing = await ctx.runQuery(internal.auth.getUserByEmail, {
+        email: contrib.email,
+      });
+      if (existing) {
+        results.push(`Contributor ${contrib.email} already exists`);
+        continue;
+      }
+
+      const hash = await bcrypt.hash(contrib.password, 12);
+      const userId = await ctx.runMutation(internal.auth.createUser, {
+        name: contrib.name,
+        email: contrib.email,
+        role: "contributor",
+        passwordHash: hash,
+      });
+
+      // Assign permissions for all majors in their university
+      await ctx.runMutation(internal.seed.assignContributorPermissions, {
+        userId,
+        universitySlug: contrib.uniSlug,
+      });
+
+      results.push(`Contributor ${contrib.email} created with permissions for ${contrib.uniSlug}`);
+    }
+
+    return results.join("\n");
+  },
+});
+
 // ── Create contributor (admin only, needs bcrypt) ───────────────────────
 export const createContributor = action({
   args: {

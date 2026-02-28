@@ -9,7 +9,7 @@ export default function DashboardPage() {
   const { user, sessionToken } = useAuth();
   const majors = useQuery(
     api.dashboard.getMyMajors,
-    sessionToken ? { token: sessionToken } : "skip"
+    user && sessionToken ? { token: sessionToken } : "skip"
   );
 
   if (!user) return null;

@@ -109,13 +109,13 @@ Populate the 4 universities, their majors, study plans, and initial course entri
 
 ### Tasks
 
-- [ ] 7.1 — Create a Convex seed script that populates the 4 universities with Arabic names, slugs, logos, and display order.
-- [ ] 7.2 — Populate majors for each university with Arabic names, slugs, and display order. Coordinate with real university data for accuracy.
-- [ ] 7.3 — Populate courses for each major: Arabic names, slugs, course codes, semester assignments, and display order. Follow actual study plans.
-- [ ] 7.4 — Create the initial admin account via the seed script with a secure hashed password.
-- [ ] 7.5 — Create initial contributor accounts and assign major permissions via seed script or direct database operations.
-- [ ] 7.6 — End-to-end QA: walk through every public page (Home → University → Major → Course) and verify content renders correctly, links work, RTL is consistent, and no layout issues exist on mobile and desktop.
-- [ ] 7.7 — End-to-end QA: log in as contributor, add a resource (link and rich text), verify it appears on the public course page. Log in as admin, verify full access.
-- [ ] 7.8 — Deploy Next.js to Vercel: configure environment variables (Convex deployment URL), verify SSR works in production, test all routes.
-- [ ] 7.9 — Deploy Convex to production: push schema and functions, verify production queries return correct data, confirm real-time updates work.
-- [ ] 7.10 — Final smoke test on production: verify sitemap, OG tags, login flow, resource creation, and page load performance.
+- [x] 7.1 — Create a Convex seed script that populates the 4 universities with Arabic names, slugs, logos, and display order.
+- [x] 7.2 — Populate majors for each university with Arabic names, slugs, and display order. Coordinate with real university data for accuracy.
+- [x] 7.3 — Populate courses for each major: Arabic names, slugs, course codes, semester assignments, and display order. Follow actual study plans.
+- [x] 7.4 — Create the initial admin account via the seed script with a secure hashed password.
+- [x] 7.5 — Create initial contributor accounts and assign major permissions via seed script or direct database operations.
+- [x] 7.6 — End-to-end QA: walk through every public page (Home → University → Major → Course) and verify content renders correctly, links work, RTL is consistent, and no layout issues exist on mobile and desktop.
+- [x] 7.7 — End-to-end QA: log in as contributor, add a resource (link and rich text), verify it appears on the public course page. Log in as admin, verify full access.
+- [x] 7.8 — Deploy Next.js to Vercel: configure environment variables (Convex deployment URL), verify SSR works in production, test all routes.
+- [x] 7.9 — Deploy Convex to production: push schema and functions, verify production queries return correct data, confirm real-time updates work.
+- [x] 7.10 — Final smoke test on production: verify sitemap, OG tags, login flow, resource creation, and page load performance.
