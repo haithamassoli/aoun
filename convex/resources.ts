@@ -6,6 +6,18 @@ import {
   assertCanEditResource,
 } from "./helpers";
 
+function assertSafeUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      throw new Error("INVALID_URL_PROTOCOL");
+    }
+  } catch (e) {
+    if (e instanceof Error && e.message === "INVALID_URL_PROTOCOL") throw e;
+    throw new Error("INVALID_URL");
+  }
+}
+
 export const listByCourse = query({
   args: { courseId: v.id("courses") },
   handler: async (ctx, args) => {
@@ -38,6 +50,8 @@ export const add = mutation({
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditCourse(ctx, user._id, args.courseId);
+
+    if (args.url) assertSafeUrl(args.url);
 
     const now = Date.now();
     return await ctx.db.insert("resources", {
@@ -79,6 +93,8 @@ export const update = mutation({
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditResource(ctx, user._id, args.resourceId);
+
+    if (args.url) assertSafeUrl(args.url);
 
     const { token: _, resourceId, ...updates } = args;
     const filtered = Object.fromEntries(

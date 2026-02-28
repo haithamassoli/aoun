@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "الصفحة غير موجودة",
+  description: "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+};
+
 export default function NotFound() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-20">

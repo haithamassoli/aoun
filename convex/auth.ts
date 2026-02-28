@@ -1,9 +1,9 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
 import { authenticateUser, assertAdmin } from "./helpers";
 
-// ── Get user by email ───────────────────────────────────────────────────
-export const getUserByEmail = query({
+// ── Get user by email (internal only — prevents password hash leakage) ──
+export const getUserByEmail = internalQuery({
   args: { email: v.string() },
   handler: async (ctx, { email }) => {
     return await ctx.db
@@ -13,8 +13,8 @@ export const getUserByEmail = query({
   },
 });
 
-// ── Create session ──────────────────────────────────────────────────────
-export const createSession = mutation({
+// ── Create session (internal only — prevents token forgery) ─────────────
+export const createSession = internalMutation({
   args: {
     userId: v.id("users"),
     token: v.string(),
@@ -66,8 +66,8 @@ export const logout = mutation({
   },
 });
 
-// ── Create user (used internally by seedAdmin action) ───────────────────
-export const createUser = mutation({
+// ── Create user (internal only — prevents unauthenticated account creation) ──
+export const createUser = internalMutation({
   args: {
     name: v.string(),
     email: v.string(),

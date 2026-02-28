@@ -12,10 +12,31 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   display: "swap",
 });
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aoun.jo";
+
 export const metadata: Metadata = {
-  title: "عون — مصادر أكاديمية للجامعات الأردنية",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "عون — مصادر أكاديمية للجامعات الأردنية",
+    template: "%s — عون",
+  },
   description:
     "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
+  openGraph: {
+    type: "website",
+    locale: "ar_JO",
+    siteName: "عون",
+    title: "عون — مصادر أكاديمية للجامعات الأردنية",
+    description:
+      "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
+    url: BASE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "عون — مصادر أكاديمية للجامعات الأردنية",
+    description:
+      "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
+  },
 };
 
 export default async function RootLayout({
@@ -37,7 +58,7 @@ export default async function RootLayout({
                     عون
                   </span>
                 </a>
-                <nav className="flex items-center gap-4 text-sm font-medium text-surface-600">
+                <nav aria-label="التنقل الرئيسي" className="flex items-center gap-4 text-sm font-medium text-surface-600">
                   <a
                     href="/"
                     className="transition-colors hover:text-primary-600"

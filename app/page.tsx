@@ -1,5 +1,19 @@
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "عون — مصادر أكاديمية للجامعات الأردنية",
+  description:
+    "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية. اختر جامعتك وابدأ بتصفح المواد.",
+  openGraph: {
+    title: "عون — مصادر أكاديمية للجامعات الأردنية",
+    description:
+      "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية.",
+    url: "/",
+    type: "website",
+  },
+};
 
 export default async function Home() {
   let universities: Awaited<ReturnType<typeof fetchQuery<typeof api.universities.list>>> = [];

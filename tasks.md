@@ -92,14 +92,14 @@ Generate `sitemap.xml` from Convex data, add Open Graph tags, structured breadcr
 
 ### Tasks
 
-- [ ] 6.1 — Generate a dynamic `sitemap.xml` route (`/sitemap.xml`) that fetches all universities, majors, and courses from Convex and outputs valid sitemap XML with all public URLs.
-- [ ] 6.2 — Add Open Graph meta tags (`og:title`, `og:description`, `og:url`, `og:type`, `og:image`) to all public pages for proper social media sharing.
-- [ ] 6.3 — Add structured data (JSON-LD) for breadcrumbs on University, Major, and Course pages so Google renders breadcrumb trails in search results.
-- [ ] 6.4 — Audit and verify all `<title>` and `<meta description>` tags are unique, descriptive, and in Arabic for every public route.
-- [ ] 6.5 — Performance audit: test all pages with Lighthouse targeting < 2s load on simulated 3G. Optimize images (logos), minimize client JS, verify SSR is working correctly.
-- [ ] 6.6 — Accessibility audit: verify proper heading hierarchy (`h1` → `h2` → `h3`), color contrast ratios meet WCAG AA, all interactive elements are keyboard-navigable, and focus states are visible.
-- [ ] 6.7 — Security audit: verify all Convex mutations enforce auth, HTML content is sanitized with DOMPurify before rendering, no XSS vectors exist in rich-text output, and no sensitive data leaks in client bundles.
-- [ ] 6.8 — Add a custom 404 page in Arabic for unmatched routes. Ensure slug-based 404s (invalid university/major/course) show a friendly Arabic error message.
+- [x] 6.1 — Generate a dynamic `sitemap.xml` route (`/sitemap.xml`) that fetches all universities, majors, and courses from Convex and outputs valid sitemap XML with all public URLs.
+- [x] 6.2 — Add Open Graph meta tags (`og:title`, `og:description`, `og:url`, `og:type`, `og:image`) to all public pages for proper social media sharing.
+- [x] 6.3 — Add structured data (JSON-LD) for breadcrumbs on University, Major, and Course pages so Google renders breadcrumb trails in search results.
+- [x] 6.4 — Audit and verify all `<title>` and `<meta description>` tags are unique, descriptive, and in Arabic for every public route.
+- [x] 6.5 — Performance audit: test all pages with Lighthouse targeting < 2s load on simulated 3G. Optimize images (logos), minimize client JS, verify SSR is working correctly.
+- [x] 6.6 — Accessibility audit: verify proper heading hierarchy (`h1` → `h2` → `h3`), color contrast ratios meet WCAG AA, all interactive elements are keyboard-navigable, and focus states are visible.
+- [x] 6.7 — Security audit: verify all Convex mutations enforce auth, HTML content is sanitized with DOMPurify before rendering, no XSS vectors exist in rich-text output, and no sensitive data leaks in client bundles.
+- [x] 6.8 — Add a custom 404 page in Arabic for unmatched routes. Ensure slug-based 404s (invalid university/major/course) show a friendly Arabic error message.
 
 ---
 

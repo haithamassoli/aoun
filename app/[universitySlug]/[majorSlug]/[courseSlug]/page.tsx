@@ -2,6 +2,7 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
+import DOMPurify from "isomorphic-dompurify";
 import type { Metadata } from "next";
 
 type Params = {
@@ -42,9 +43,17 @@ export async function generateMetadata({
   if (!major || major.universityId !== university._id) return {};
   const course = await fetchQuery(api.courses.getBySlug, { slug: courseSlug });
   if (!course || course.majorId !== major._id) return {};
+  const title = `${course.name} — ${major.name} — ${university.name}`;
+  const description = `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}. ملخصات، امتحانات، وفيديوهات.`;
   return {
-    title: `${course.name} — ${major.name} — ${university.name} — عون`,
-    description: `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}. ملخصات، امتحانات، وفيديوهات.`,
+    title,
+    description,
+    openGraph: {
+      title: `${title} — عون`,
+      description,
+      url: `/${universitySlug}/${majorSlug}/${courseSlug}`,
+      type: "article",
+    },
   };
 }
 
@@ -190,7 +199,7 @@ export default async function CoursePage({
                                 className="prose prose-sm max-w-none text-surface-700"
                                 style={{ direction: "rtl" }}
                                 dangerouslySetInnerHTML={{
-                                  __html: resource.content,
+                                  __html: DOMPurify.sanitize(resource.content),
                                 }}
                               />
                             )}

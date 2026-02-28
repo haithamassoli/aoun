@@ -16,9 +16,17 @@ export async function generateMetadata({
     slug: universitySlug,
   });
   if (!university) return {};
+  const title = university.name;
+  const description = `تصفح التخصصات والمواد الأكاديمية في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
   return {
-    title: `${university.name} — عون`,
-    description: `تصفح التخصصات والمواد الأكاديمية في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`,
+    title,
+    description,
+    openGraph: {
+      title: `${title} — عون`,
+      description,
+      url: `/${universitySlug}`,
+      type: "website",
+    },
   };
 }
 

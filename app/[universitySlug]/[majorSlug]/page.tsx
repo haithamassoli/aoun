@@ -18,9 +18,17 @@ export async function generateMetadata({
   if (!university) return {};
   const major = await fetchQuery(api.majors.getBySlug, { slug: majorSlug });
   if (!major || major.universityId !== university._id) return {};
+  const title = `${major.name} — ${university.name}`;
+  const description = `الخطة الدراسية والمواد الأكاديمية لتخصص ${major.name} في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
   return {
-    title: `${major.name} — ${university.name} — عون`,
-    description: `الخطة الدراسية والمواد الأكاديمية لتخصص ${major.name} في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`,
+    title,
+    description,
+    openGraph: {
+      title: `${title} — عون`,
+      description,
+      url: `/${universitySlug}/${majorSlug}`,
+      type: "website",
+    },
   };
 }
 

@@ -3,6 +3,7 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
 import { api } from "./_generated/api";
+import { internal } from "./_generated/api";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
@@ -13,7 +14,7 @@ export const login = action({
     password: v.string(),
   },
   handler: async (ctx, { email, password }) => {
-    const user = await ctx.runQuery(api.auth.getUserByEmail, { email });
+    const user = await ctx.runQuery(internal.auth.getUserByEmail, { email });
 
     if (!user) {
       throw new Error("INVALID_CREDENTIALS");
@@ -28,7 +29,7 @@ export const login = action({
     const token = crypto.randomUUID();
     const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
 
-    await ctx.runMutation(api.auth.createSession, {
+    await ctx.runMutation(internal.auth.createSession, {
       userId: user._id,
       token,
       expiresAt,
@@ -54,12 +55,12 @@ export const seedAdmin = action({
     password: v.string(),
   },
   handler: async (ctx, { name, email, password }) => {
-    const existing = await ctx.runQuery(api.auth.getUserByEmail, { email });
+    const existing = await ctx.runQuery(internal.auth.getUserByEmail, { email });
     if (existing) return "Admin already exists";
 
     const passwordHash = await bcrypt.hash(password, 12);
 
-    await ctx.runMutation(api.auth.createUser, {
+    await ctx.runMutation(internal.auth.createUser, {
       name,
       email,
       role: "admin",
@@ -85,12 +86,12 @@ export const createContributor = action({
       throw new Error("ADMIN_REQUIRED");
     }
 
-    const existing = await ctx.runQuery(api.auth.getUserByEmail, { email });
+    const existing = await ctx.runQuery(internal.auth.getUserByEmail, { email });
     if (existing) throw new Error("EMAIL_ALREADY_EXISTS");
 
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const userId = await ctx.runMutation(api.auth.createUser, {
+    const userId = await ctx.runMutation(internal.auth.createUser, {
       name,
       email,
       role: "contributor",
