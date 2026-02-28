@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HeaderAuth } from "@/components/header-auth";
 import { getSessionToken } from "@/app/actions/auth";
+import { PWARegister } from "@/components/pwa-register";
 import "./globals.css";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -24,6 +25,12 @@ export const metadata: Metadata = {
   },
   description:
     "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "عون",
+  },
   openGraph: {
     type: "website",
     locale: "ar_JO",
@@ -41,6 +48,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#4f46e5",
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -51,6 +62,7 @@ export default async function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${ibmPlexArabic.variable} font-sans antialiased`}>
+        <PWARegister />
         <ThemeProvider>
           <ConvexClientProvider sessionToken={sessionToken}>
             <div className="flex min-h-screen flex-col">
