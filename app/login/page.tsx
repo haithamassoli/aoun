@@ -39,20 +39,20 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600 text-2xl font-bold text-white">
             عـ
           </div>
-          <h1 className="text-2xl font-bold text-surface-900">
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
             تسجيل الدخول
           </h1>
-          <p className="mt-2 text-sm text-surface-500">
+          <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
             سجّل دخولك للوصول إلى لوحة التحكم
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="rounded-2xl border border-surface-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-2xl border border-surface-200 bg-white p-6 shadow-sm dark:border-surface-700 dark:bg-surface-900 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Error Alert */}
             {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
                 {error}
               </div>
             )}
@@ -61,7 +61,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="mb-1.5 block text-sm font-medium text-surface-700"
+                className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
               >
                 البريد الإلكتروني
               </label>
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@email.com"
-                className="w-full rounded-xl border border-surface-300 bg-surface-50 px-4 py-3 text-surface-900 placeholder:text-surface-400 focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+                className="w-full rounded-xl border border-surface-300 bg-surface-50 px-4 py-3 text-surface-900 placeholder:text-surface-400 focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:outline-none dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:bg-surface-800"
                 dir="ltr"
               />
             </div>
@@ -81,7 +81,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-1.5 block text-sm font-medium text-surface-700"
+                className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
               >
                 كلمة المرور
               </label>
@@ -92,7 +92,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-surface-300 bg-surface-50 px-4 py-3 text-surface-900 placeholder:text-surface-400 focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+                className="w-full rounded-xl border border-surface-300 bg-surface-50 px-4 py-3 text-surface-900 placeholder:text-surface-400 focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:outline-none dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:bg-surface-800"
                 dir="ltr"
               />
             </div>
@@ -134,7 +134,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-xs text-surface-400">
+        <p className="mt-6 text-center text-xs text-surface-400 dark:text-surface-500">
           ليس لديك حساب؟ تواصل مع مدير النظام.
         </p>
       </div>

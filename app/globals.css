@@ -42,6 +42,10 @@ body {
   background: var(--color-surface-50);
   color: var(--color-surface-900);
 }
+.dark body {
+  background: var(--color-surface-950);
+  color: var(--color-surface-100);
+}
 
 /* Accessible focus styles */
 a:focus-visible,
@@ -87,6 +91,9 @@ textarea:focus-visible {
 .tiptap a {
   color: var(--color-primary-600);
   text-decoration: underline;
+}
+.dark .tiptap a {
+  color: var(--color-primary-400);
 }
 .tiptap p.is-editor-empty:first-child::before {
   color: var(--color-surface-400);

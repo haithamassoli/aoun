@@ -93,16 +93,16 @@ export default function MajorCoursesPage() {
   if (major === undefined || courses === undefined) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-surface-200" />
-        <div className="h-64 animate-pulse rounded-2xl border border-surface-200 bg-white" />
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-surface-200 dark:bg-surface-700" />
+        <div className="h-64 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900" />
       </div>
     );
   }
 
   if (!major) {
     return (
-      <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center">
-        <p className="text-sm text-surface-500">التخصص غير موجود</p>
+      <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+        <p className="text-sm text-surface-500 dark:text-surface-400">التخصص غير موجود</p>
       </div>
     );
   }
@@ -112,19 +112,19 @@ export default function MajorCoursesPage() {
       <Toast toast={toast} />
 
       {/* Breadcrumb */}
-      <nav className="mb-4 flex items-center gap-2 text-sm text-surface-500">
-        <Link href="/dashboard" className="hover:text-primary-600">لوحة التحكم</Link>
+      <nav className="mb-4 flex items-center gap-2 text-sm text-surface-500 dark:text-surface-400">
+        <Link href="/dashboard" className="hover:text-primary-600 dark:hover:text-primary-400">لوحة التحكم</Link>
         <svg className="h-3.5 w-3.5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-        <span className="font-medium text-surface-900">{major.name}</span>
+        <span className="font-medium text-surface-900 dark:text-surface-50">{major.name}</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">{major.name}</h1>
-          <p className="text-sm text-surface-500">{major.universityName}</p>
+          <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">{major.name}</h1>
+          <p className="text-sm text-surface-500 dark:text-surface-400">{major.universityName}</p>
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
@@ -139,62 +139,62 @@ export default function MajorCoursesPage() {
 
       {/* Add/Edit form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5">
-          <h3 className="mb-4 text-sm font-semibold text-surface-800">
+        <form onSubmit={handleSubmit} className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30">
+          <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
             {editingId ? "تعديل المادة" : "إضافة مادة جديدة"}
           </h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600">اسم المادة *</label>
+              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">اسم المادة *</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => {
                   setFormData({ ...formData, name: e.target.value, slug: editingId ? formData.slug : generateSlug(e.target.value) });
                 }}
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                 required
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600">الرابط (slug) *</label>
+              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">الرابط (slug) *</label>
               <input
                 type="text"
                 dir="ltr"
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                 required
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600">رمز المادة</label>
+              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">رمز المادة</label>
               <input
                 type="text"
                 dir="ltr"
                 value={formData.courseCode}
                 onChange={(e) => setFormData({ ...formData, courseCode: e.target.value })}
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                 placeholder="CS101"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600">الفصل الدراسي</label>
+              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">الفصل الدراسي</label>
               <input
                 type="number"
                 value={formData.semester}
                 onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                 min="1"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600">الترتيب</label>
+              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">الترتيب</label>
               <input
                 type="number"
                 value={formData.order}
                 onChange={(e) => setFormData({ ...formData, order: e.target.value })}
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                 min="0"
               />
             </div>
@@ -210,7 +210,7 @@ export default function MajorCoursesPage() {
             <button
               type="button"
               onClick={resetForm}
-              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50"
+              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
               إلغاء
             </button>
@@ -220,33 +220,33 @@ export default function MajorCoursesPage() {
 
       {/* Courses list */}
       {courses.length === 0 ? (
-        <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100">
+        <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800">
             <svg className="h-6 w-6 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-surface-700">لا توجد مواد</p>
-          <p className="mt-1 text-xs text-surface-400">أضف مادة جديدة للبدء</p>
+          <p className="text-sm font-medium text-surface-700 dark:text-surface-200">لا توجد مواد</p>
+          <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">أضف مادة جديدة للبدء</p>
         </div>
       ) : (
         <div className="space-y-3">
           {courses.map((course) => (
             <div
               key={course._id}
-              className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300"
+              className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
             >
               <Link
                 href={`/dashboard/major/${majorId}/course/${course._id}`}
                 className="min-w-0 flex-1"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
                     {course.courseCode || "#"}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="truncate text-sm font-semibold text-surface-900">{course.name}</h3>
-                    <div className="flex items-center gap-2 text-xs text-surface-500">
+                    <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">{course.name}</h3>
+                    <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
                       {course.semester && <span>الفصل {course.semester}</span>}
                       <span>{course.resourceCount} مصدر</span>
                     </div>
@@ -256,7 +256,7 @@ export default function MajorCoursesPage() {
               <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                 <button
                   onClick={() => handleEdit(course)}
-                  className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600"
+                  className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
                   title="تعديل"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -265,7 +265,7 @@ export default function MajorCoursesPage() {
                 </button>
                 <Link
                   href={`/dashboard/major/${majorId}/course/${course._id}`}
-                  className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600"
+                  className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
                   title="المصادر"
                 >
                   <svg className="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

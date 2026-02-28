@@ -165,16 +165,16 @@ export default function CourseResourcesPage() {
   if (course === undefined || resources === undefined) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-surface-200" />
-        <div className="h-64 animate-pulse rounded-2xl border border-surface-200 bg-white" />
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-surface-200 dark:bg-surface-700" />
+        <div className="h-64 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900" />
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center">
-        <p className="text-sm text-surface-500">المادة غير موجودة</p>
+      <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+        <p className="text-sm text-surface-500 dark:text-surface-400">المادة غير موجودة</p>
       </div>
     );
   }
@@ -195,23 +195,23 @@ export default function CourseResourcesPage() {
       <Toast toast={toast} />
 
       {/* Breadcrumb */}
-      <nav className="mb-4 flex items-center gap-2 text-sm text-surface-500">
-        <Link href="/dashboard" className="hover:text-primary-600">لوحة التحكم</Link>
+      <nav className="mb-4 flex items-center gap-2 text-sm text-surface-500 dark:text-surface-400">
+        <Link href="/dashboard" className="hover:text-primary-600 dark:hover:text-primary-400">لوحة التحكم</Link>
         <svg className="h-3.5 w-3.5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-        <Link href={`/dashboard/major/${majorId}`} className="hover:text-primary-600">{course.majorName}</Link>
+        <Link href={`/dashboard/major/${majorId}`} className="hover:text-primary-600 dark:hover:text-primary-400">{course.majorName}</Link>
         <svg className="h-3.5 w-3.5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-        <span className="font-medium text-surface-900">{course.name}</span>
+        <span className="font-medium text-surface-900 dark:text-surface-50">{course.name}</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">{course.name}</h1>
-          <p className="text-sm text-surface-500">
+          <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">{course.name}</h1>
+          <p className="text-sm text-surface-500 dark:text-surface-400">
             {course.courseCode && <span className="me-2 font-mono text-xs">{course.courseCode}</span>}
             {resources.length} مصدر
           </p>
@@ -229,29 +229,29 @@ export default function CourseResourcesPage() {
 
       {/* Resource editor form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5">
-          <h3 className="mb-4 text-sm font-semibold text-surface-800">
+        <form onSubmit={handleSubmit} className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30">
+          <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
             {editingId ? "تعديل المصدر" : "إضافة مصدر جديد"}
           </h3>
           <div className="space-y-4">
             {/* Title + Category row */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-surface-600">عنوان المصدر *</label>
+                <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">عنوان المصدر *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                  className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                   required
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-surface-600">التصنيف *</label>
+                <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">التصنيف *</label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as CategoryValue })}
-                  className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                  className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -262,7 +262,7 @@ export default function CourseResourcesPage() {
 
             {/* Type toggle */}
             <div>
-              <label className="mb-2 block text-xs font-medium text-surface-600">نوع المصدر</label>
+              <label className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-300">نوع المصدر</label>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -270,7 +270,7 @@ export default function CourseResourcesPage() {
                   className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                     formData.type === "link"
                       ? "bg-primary-600 text-white"
-                      : "border border-surface-300 bg-white text-surface-600 hover:bg-surface-50"
+                      : "border border-surface-300 bg-white text-surface-600 hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
                   }`}
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -284,7 +284,7 @@ export default function CourseResourcesPage() {
                   className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                     formData.type === "richtext"
                       ? "bg-primary-600 text-white"
-                      : "border border-surface-300 bg-white text-surface-600 hover:bg-surface-50"
+                      : "border border-surface-300 bg-white text-surface-600 hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
                   }`}
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -298,19 +298,19 @@ export default function CourseResourcesPage() {
             {/* Conditional: URL or Rich text */}
             {formData.type === "link" ? (
               <div>
-                <label className="mb-1 block text-xs font-medium text-surface-600">الرابط *</label>
+                <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">الرابط *</label>
                 <input
                   type="url"
                   dir="ltr"
                   value={formData.url}
                   onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                  className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                  className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                   placeholder="https://..."
                 />
               </div>
             ) : (
               <div>
-                <label className="mb-1 block text-xs font-medium text-surface-600">المحتوى *</label>
+                <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">المحتوى *</label>
                 <TiptapEditor
                   content={formData.content}
                   onChange={(html) => setFormData({ ...formData, content: html })}
@@ -320,12 +320,12 @@ export default function CourseResourcesPage() {
 
             {/* Order */}
             <div className="w-32">
-              <label className="mb-1 block text-xs font-medium text-surface-600">الترتيب</label>
+              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">الترتيب</label>
               <input
                 type="number"
                 value={formData.order}
                 onChange={(e) => setFormData({ ...formData, order: e.target.value })}
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
                 min="0"
               />
             </div>
@@ -342,7 +342,7 @@ export default function CourseResourcesPage() {
             <button
               type="button"
               onClick={resetForm}
-              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50"
+              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
               إلغاء
             </button>
@@ -358,7 +358,7 @@ export default function CourseResourcesPage() {
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               activeCategory === "all"
                 ? "bg-primary-600 text-white"
-                : "bg-surface-100 text-surface-600 hover:bg-surface-200"
+                : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             }`}
           >
             الكل ({resources.length})
@@ -370,7 +370,7 @@ export default function CourseResourcesPage() {
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeCategory === group.value
                   ? "bg-primary-600 text-white"
-                  : "bg-surface-100 text-surface-600 hover:bg-surface-200"
+                  : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
               }`}
             >
               {group.label} ({group.resources.length})
@@ -381,37 +381,37 @@ export default function CourseResourcesPage() {
 
       {/* Resources list */}
       {resources.length === 0 ? (
-        <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100">
+        <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800">
             <svg className="h-6 w-6 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-surface-700">لا توجد مصادر</p>
-          <p className="mt-1 text-xs text-surface-400">أضف مصدرا جديدا للبدء</p>
+          <p className="text-sm font-medium text-surface-700 dark:text-surface-200">لا توجد مصادر</p>
+          <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">أضف مصدرا جديدا للبدء</p>
         </div>
       ) : filteredResources.length === 0 ? (
-        <div className="rounded-2xl border border-surface-200 bg-white p-8 text-center">
-          <p className="text-sm text-surface-500">لا توجد مصادر في هذا التصنيف</p>
+        <div className="rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
+          <p className="text-sm text-surface-500 dark:text-surface-400">لا توجد مصادر في هذا التصنيف</p>
         </div>
       ) : (
         <div className="space-y-3">
           {filteredResources.map((resource) => (
             <div
               key={resource._id}
-              className="group rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300"
+              className="group rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-semibold text-surface-900">{resource.title}</h3>
-                    <span className="rounded-md bg-surface-100 px-2 py-0.5 text-[10px] font-medium text-surface-500">
+                    <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">{resource.title}</h3>
+                    <span className="rounded-md bg-surface-100 px-2 py-0.5 text-[10px] font-medium text-surface-500 dark:bg-surface-800 dark:text-surface-400">
                       {CATEGORY_LABELS[resource.category as CategoryValue]}
                     </span>
                     <span className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${
                       resource.type === "link"
-                        ? "bg-blue-50 text-blue-600"
-                        : "bg-purple-50 text-purple-600"
+                        ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                        : "bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400"
                     }`}>
                       {resource.type === "link" ? "رابط" : "نص منسق"}
                     </span>
@@ -422,14 +422,14 @@ export default function CourseResourcesPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       dir="ltr"
-                      className="text-xs text-primary-600 hover:underline"
+                      className="text-xs text-primary-600 hover:underline dark:text-primary-400"
                     >
                       {resource.url}
                     </a>
                   )}
                   {resource.type === "richtext" && resource.content && (
                     <div
-                      className="prose prose-sm mt-2 max-w-none text-surface-600"
+                      className="prose prose-sm mt-2 max-w-none text-surface-600 dark:text-surface-300"
                       dir="rtl"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(resource.content),
@@ -440,7 +440,7 @@ export default function CourseResourcesPage() {
                 <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                   <button
                     onClick={() => handleEdit(resource as Parameters<typeof handleEdit>[0])}
-                    className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600"
+                    className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
                     title="تعديل"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -450,7 +450,7 @@ export default function CourseResourcesPage() {
                   <button
                     onClick={() => handleDelete(resource._id)}
                     disabled={deleting === resource._id}
-                    className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                    className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"
                     title="حذف"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

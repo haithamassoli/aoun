@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import DOMPurify from "isomorphic-dompurify";
 import type { Metadata } from "next";
+import * as motion from "motion/react-client";
 
 type Params = {
   universitySlug: string;
@@ -97,7 +98,7 @@ export default async function CoursePage({
   return (
     <div>
       {/* Course Header */}
-      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-16 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             items={[
@@ -110,19 +111,29 @@ export default async function CoursePage({
               { label: course.name },
             ]}
           />
-          <h1 className="text-2xl font-bold text-surface-900 sm:text-3xl lg:text-4xl">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl lg:text-4xl"
+          >
             {course.name}
-          </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-surface-500">
+          </motion.h1>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mt-2 flex flex-wrap items-center gap-3 text-surface-500 dark:text-surface-400"
+          >
             {course.courseCode && (
-              <span className="rounded-md bg-surface-100 px-2.5 py-1 text-sm font-medium text-surface-600">
+              <span className="rounded-md bg-surface-100 px-2.5 py-1 text-sm font-medium text-surface-600 dark:bg-surface-800 dark:text-surface-300">
                 {course.courseCode}
               </span>
             )}
             <span>
               {major.name} · {university.name}
             </span>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -130,16 +141,21 @@ export default async function CoursePage({
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         {activeCategories.length > 0 ? (
           <div className="space-y-10">
-            {activeCategories.map((cat) => {
+            {activeCategories.map((cat, catIndex) => {
               const config = categoryConfig[cat];
               const items = grouped.get(cat)!;
 
               return (
-                <div key={cat}>
-                  <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 sm:text-xl">
+                <motion.div
+                  key={cat}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 + catIndex * 0.1 }}
+                >
+                  <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 dark:text-surface-100 sm:text-xl">
                     <span className="text-xl">{config.icon}</span>
                     {config.label}
-                    <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500">
+                    <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500 dark:bg-surface-800 dark:text-surface-400">
                       {items.length}
                     </span>
                   </h2>
@@ -148,16 +164,16 @@ export default async function CoursePage({
                     {items.map((resource) => (
                       <div
                         key={resource._id}
-                        className="rounded-xl border border-surface-200 bg-white shadow-sm"
+                        className="rounded-xl border border-surface-200 bg-white shadow-sm dark:border-surface-700 dark:bg-surface-900"
                       >
                         {resource.type === "link" && resource.url ? (
                           <a
                             href={resource.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center gap-3 p-4 transition-colors hover:bg-surface-50"
+                            className="group flex items-center gap-3 p-4 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
                           >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
                               <svg
                                 className="h-5 w-5"
                                 fill="none"
@@ -172,7 +188,7 @@ export default async function CoursePage({
                                 />
                               </svg>
                             </div>
-                            <span className="min-w-0 flex-1 truncate font-medium text-surface-800 group-hover:text-primary-600">
+                            <span className="min-w-0 flex-1 truncate font-medium text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">
                               {resource.title}
                             </span>
                             <svg
@@ -191,12 +207,12 @@ export default async function CoursePage({
                           </a>
                         ) : (
                           <div className="p-5">
-                            <h3 className="mb-3 font-semibold text-surface-800">
+                            <h3 className="mb-3 font-semibold text-surface-800 dark:text-surface-100">
                               {resource.title}
                             </h3>
                             {resource.content && (
                               <div
-                                className="prose prose-sm max-w-none text-surface-700"
+                                className="prose prose-sm max-w-none text-surface-700 dark:text-surface-300"
                                 style={{ direction: "rtl" }}
                                 dangerouslySetInnerHTML={{
                                   __html: DOMPurify.sanitize(resource.content),
@@ -208,19 +224,19 @@ export default async function CoursePage({
                       </div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         ) : (
-          <div className="rounded-xl border border-surface-200 bg-white p-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-100 text-3xl">
+          <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-100 text-3xl dark:bg-surface-800">
               📚
             </div>
-            <p className="text-lg font-medium text-surface-700">
+            <p className="text-lg font-medium text-surface-700 dark:text-surface-200">
               لا توجد مصادر بعد
             </p>
-            <p className="mt-1 text-sm text-surface-500">
+            <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
               ستُضاف المصادر قريباً. ترقبوا التحديثات!
             </p>
           </div>

@@ -22,12 +22,12 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <nav aria-label="مسار التنقل" className="mb-6">
-        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-surface-500">
+        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-surface-500 dark:text-surface-400">
           {items.map((item, index) => (
             <li key={index} className="flex items-center gap-1.5">
               {index > 0 && (
                 <svg
-                  className="h-3.5 w-3.5 shrink-0 rotate-180 text-surface-400"
+                  className="h-3.5 w-3.5 shrink-0 rotate-180 text-surface-400 dark:text-surface-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -43,12 +43,12 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
               {item.href ? (
                 <a
                   href={item.href}
-                  className="transition-colors hover:text-primary-600"
+                  className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
                 >
                   {item.label}
                 </a>
               ) : (
-                <span className="font-medium text-surface-800">
+                <span className="font-medium text-surface-800 dark:text-surface-100">
                   {item.label}
                 </span>
               )}

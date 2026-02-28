@@ -3,6 +3,7 @@ import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import type { Metadata } from "next";
+import * as motion from "motion/react-client";
 
 type Params = { universitySlug: string; majorSlug: string };
 
@@ -82,7 +83,7 @@ export default async function MajorPage({
   return (
     <div>
       {/* Major Header */}
-      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-16 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             items={[
@@ -91,27 +92,37 @@ export default async function MajorPage({
               { label: major.name },
             ]}
           />
-          <h1 className="text-2xl font-bold text-surface-900 sm:text-3xl lg:text-4xl">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl lg:text-4xl"
+          >
             {major.name}
-          </h1>
-          <p className="mt-2 text-surface-500">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mt-2 text-surface-500 dark:text-surface-400"
+          >
             {university.name} ·{" "}
             {courses.length > 0
               ? `${courses.length} مادة`
               : "لا توجد مواد حالياً"}
-          </p>
+          </motion.p>
         </div>
       </section>
 
       {/* Study Plan */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <h2 className="mb-8 text-xl font-bold text-surface-800 sm:text-2xl">
+        <h2 className="mb-8 text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
           الخطة الدراسية
         </h2>
 
         {courses.length > 0 ? (
           <div className="space-y-10">
-            {sortedKeys.map((semesterKey) => {
+            {sortedKeys.map((semesterKey, sIndex) => {
               const semesterCourses = grouped
                 .get(semesterKey)!
                 .sort((a, b) => a.order - b.order);
@@ -121,9 +132,14 @@ export default async function MajorPage({
                   : "مواد أخرى";
 
               return (
-                <div key={semesterKey ?? "other"}>
-                  <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-surface-700">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-sm font-bold text-primary-700">
+                <motion.div
+                  key={semesterKey ?? "other"}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 + sIndex * 0.1 }}
+                >
+                  <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-surface-700 dark:text-surface-200">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
                       {semesterKey ?? "—"}
                     </span>
                     {label}
@@ -133,10 +149,10 @@ export default async function MajorPage({
                       <a
                         key={course._id}
                         href={`/${universitySlug}/${majorSlug}/${course.slug}`}
-                        className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-primary-300 hover:shadow-md"
+                        className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
                       >
                         <div className="min-w-0 flex-1">
-                          <h4 className="truncate font-semibold text-surface-800 group-hover:text-primary-600">
+                          <h4 className="truncate font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">
                             {course.name}
                           </h4>
                           {course.courseCode && (
@@ -161,13 +177,13 @@ export default async function MajorPage({
                       </a>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         ) : (
-          <div className="rounded-xl border border-surface-200 bg-white p-12 text-center">
-            <p className="text-surface-500">
+          <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+            <p className="text-surface-500 dark:text-surface-400">
               لم تُضاف مواد بعد. ترقبوا التحديثات!
             </p>
           </div>
