@@ -22,12 +22,14 @@ type User = {
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
+  sessionToken: string | null;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
+  sessionToken: null,
   logout: async () => {},
 });
 
@@ -58,6 +60,7 @@ export function AuthProvider({
       value={{
         user: isLoggingOut ? null : user,
         isLoading: isLoggingOut ? false : isLoading,
+        sessionToken,
         logout,
       }}
     >

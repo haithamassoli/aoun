@@ -42,3 +42,45 @@ body {
   background: var(--color-surface-50);
   color: var(--color-surface-900);
 }
+
+/* Tiptap editor styles */
+.tiptap {
+  min-height: 200px;
+  padding: 0.75rem;
+  outline: none;
+}
+.tiptap p {
+  margin: 0.5em 0;
+}
+.tiptap h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0.75em 0 0.5em;
+}
+.tiptap h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.25em;
+}
+.tiptap ul,
+.tiptap ol {
+  padding-inline-start: 1.5em;
+  margin: 0.5em 0;
+}
+.tiptap ul {
+  list-style: disc;
+}
+.tiptap ol {
+  list-style: decimal;
+}
+.tiptap a {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--color-surface-400);
+  content: "اكتب المحتوى هنا...";
+  float: right;
+  height: 0;
+  pointer-events: none;
+}

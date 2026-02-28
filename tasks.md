@@ -73,16 +73,16 @@ Create the `/dashboard` route. Contributors see their assigned majors, courses, 
 
 ### Tasks
 
-- [ ] 5.1 — Build the `/dashboard` layout: sidebar or tab navigation showing the user's assigned majors (contributors) or all entities (admin). Arabic UI, RTL, responsive.
-- [ ] 5.2 — Build the **major list view** in the dashboard: contributors see only their permitted majors, admin sees all. Each major links to its course management view.
-- [ ] 5.3 — Build the **course management view**: list courses under a major with add/edit/reorder capabilities. Form fields: name, slug, courseCode, semester, order.
-- [ ] 5.4 — Build the **resource list view** for a course: display resources grouped by category, with add/edit/delete buttons. Show title, type badge (link/richtext), and category.
-- [ ] 5.5 — Build the **resource editor form**: title input, category dropdown (notes, exams, videos, summaries, tips, other), type toggle (link vs rich text). If link: URL input. If rich text: Tiptap editor.
-- [ ] 5.6 — Integrate Tiptap rich-text editor with RTL support. Configure basic formatting toolbar (bold, italic, headings, lists, links). Ensure output is clean HTML.
-- [ ] 5.7 — Implement HTML sanitization using DOMPurify: sanitize on the server before storing in Convex, and sanitize again before rendering with `dangerouslySetInnerHTML` on public pages.
-- [ ] 5.8 — Write Convex mutations for resource CRUD: `addResource`, `updateResource`, `deleteResource`. All enforce auth + permission checks from Milestone 4.
-- [ ] 5.9 — Write Convex mutations for course CRUD: `addCourse`, `updateCourse`. Enforce permission checks.
-- [ ] 5.10 — Add loading states, success/error toasts, and form validation to all dashboard forms. Validate required fields, URL format, and slug uniqueness.
+- [x] 5.1 — Build the `/dashboard` layout: sidebar or tab navigation showing the user's assigned majors (contributors) or all entities (admin). Arabic UI, RTL, responsive.
+- [x] 5.2 — Build the **major list view** in the dashboard: contributors see only their permitted majors, admin sees all. Each major links to its course management view.
+- [x] 5.3 — Build the **course management view**: list courses under a major with add/edit/reorder capabilities. Form fields: name, slug, courseCode, semester, order.
+- [x] 5.4 — Build the **resource list view** for a course: display resources grouped by category, with add/edit/delete buttons. Show title, type badge (link/richtext), and category.
+- [x] 5.5 — Build the **resource editor form**: title input, category dropdown (notes, exams, videos, summaries, tips, other), type toggle (link vs rich text). If link: URL input. If rich text: Tiptap editor.
+- [x] 5.6 — Integrate Tiptap rich-text editor with RTL support. Configure basic formatting toolbar (bold, italic, headings, lists, links). Ensure output is clean HTML.
+- [x] 5.7 — Implement HTML sanitization using DOMPurify: sanitize on the server before storing in Convex, and sanitize again before rendering with `dangerouslySetInnerHTML` on public pages.
+- [x] 5.8 — Write Convex mutations for resource CRUD: `addResource`, `updateResource`, `deleteResource`. All enforce auth + permission checks from Milestone 4.
+- [x] 5.9 — Write Convex mutations for course CRUD: `addCourse`, `updateCourse`. Enforce permission checks.
+- [x] 5.10 — Add loading states, success/error toasts, and form validation to all dashboard forms. Validate required fields, URL format, and slug uniqueness.
 
 ---
 
