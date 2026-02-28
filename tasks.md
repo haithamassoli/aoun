@@ -57,13 +57,13 @@ Build the permission model: `getPermissions` helper, role checks on every mutati
 
 ### Tasks
 
-- [ ] 4.1 — Implement a `getPermissions(userId)` helper in Convex that returns the list of `majorId`s a contributor is allowed to manage. Admin role returns a flag indicating full access.
-- [ ] 4.2 — Create an `assertCanEditMajor(userId, majorId)` helper that throws if the user is not an admin and doesn't have a permission record for that major.
-- [ ] 4.3 — Create an `assertCanEditCourse(userId, courseId)` helper that resolves the course's `majorId` and delegates to `assertCanEditMajor`.
-- [ ] 4.4 — Create an `assertCanEditResource(userId, courseId)` helper that follows the same chain: resource → course → major → permission check.
-- [ ] 4.5 — Add auth + permission checks to all existing and future Convex mutations: `addResource`, `updateResource`, `deleteResource`, `addCourse`, `updateCourse`. Each mutation must call the appropriate assertion helper before writing.
-- [ ] 4.6 — Restrict admin-only mutations: `addUniversity`, `updateUniversity`, `addMajor`, `updateMajor`, `deleteAny`, `manageUsers`, `managePermissions`. These must assert `role === "admin"`.
-- [ ] 4.7 — Write unit tests or manual test scripts to verify: contributor can edit resources in assigned major, contributor is blocked from editing other majors, admin can edit everything, unauthenticated requests are rejected.
+- [x] 4.1 — Implement a `getPermissions(userId)` helper in Convex that returns the list of `majorId`s a contributor is allowed to manage. Admin role returns a flag indicating full access.
+- [x] 4.2 — Create an `assertCanEditMajor(userId, majorId)` helper that throws if the user is not an admin and doesn't have a permission record for that major.
+- [x] 4.3 — Create an `assertCanEditCourse(userId, courseId)` helper that resolves the course's `majorId` and delegates to `assertCanEditMajor`.
+- [x] 4.4 — Create an `assertCanEditResource(userId, courseId)` helper that follows the same chain: resource → course → major → permission check.
+- [x] 4.5 — Add auth + permission checks to all existing and future Convex mutations: `addResource`, `updateResource`, `deleteResource`, `addCourse`, `updateCourse`. Each mutation must call the appropriate assertion helper before writing.
+- [x] 4.6 — Restrict admin-only mutations: `addUniversity`, `updateUniversity`, `addMajor`, `updateMajor`, `deleteAny`, `manageUsers`, `managePermissions`. These must assert `role === "admin"`.
+- [x] 4.7 — Write unit tests or manual test scripts to verify: contributor can edit resources in assigned major, contributor is blocked from editing other majors, admin can edit everything, unauthenticated requests are rejected.
 
 ---
 

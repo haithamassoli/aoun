@@ -69,3 +69,34 @@ export const seedAdmin = action({
     return "Admin created successfully";
   },
 });
+
+// ── Create contributor (admin only, needs bcrypt) ───────────────────────
+export const createContributor = action({
+  args: {
+    token: v.string(),
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, { token, name, email, password }) => {
+    // Verify admin via getCurrentUser
+    const currentUser = await ctx.runQuery(api.auth.getCurrentUser, { token });
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new Error("ADMIN_REQUIRED");
+    }
+
+    const existing = await ctx.runQuery(api.auth.getUserByEmail, { email });
+    if (existing) throw new Error("EMAIL_ALREADY_EXISTS");
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const userId = await ctx.runMutation(api.auth.createUser, {
+      name,
+      email,
+      role: "contributor",
+      passwordHash,
+    });
+
+    return userId;
+  },
+});
