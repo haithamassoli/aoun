@@ -61,7 +61,7 @@ export default async function RootLayout({
 
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body className={`${ibmPlexArabic.variable} font-sans antialiased`}>
+      <body className={`${ibmPlexArabic.className} font-sans antialiased`}>
         <PWARegister />
         <ThemeProvider>
           <ConvexClientProvider sessionToken={sessionToken}>
@@ -73,7 +73,10 @@ export default async function RootLayout({
                       عون
                     </span>
                   </a>
-                  <nav aria-label="التنقل الرئيسي" className="flex items-center gap-4 text-sm font-medium text-surface-600 dark:text-surface-300">
+                  <nav
+                    aria-label="التنقل الرئيسي"
+                    className="flex items-center gap-4 text-sm font-medium text-surface-600 dark:text-surface-300"
+                  >
                     <a
                       href="/"
                       className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
