@@ -182,12 +182,12 @@ export default function CourseResourcesPage() {
   const filteredResources =
     activeCategory === "all"
       ? resources
-      : resources.filter((r) => r.category === activeCategory);
+      : resources.filter((r: { category: CategoryValue }) => r.category === activeCategory);
 
   // Group resources by category for display
   const categoryGroups = CATEGORIES.map((cat) => ({
     ...cat,
-    resources: resources.filter((r) => r.category === cat.value),
+    resources: resources.filter((r: { category: CategoryValue }) => r.category === cat.value),
   })).filter((g) => g.resources.length > 0);
 
   return (
@@ -396,7 +396,14 @@ export default function CourseResourcesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredResources.map((resource) => (
+          {filteredResources.map((resource: {
+            _id: string;
+            title: string;
+            category: CategoryValue;
+            type: "link" | "richtext";
+            url?: string;
+            content?: string;
+          }) => (
             <div
               key={resource._id}
               className="group rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"

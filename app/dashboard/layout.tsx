@@ -76,7 +76,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               ) : majors.length === 0 ? (
                 <div className="px-3 py-2 text-xs text-surface-400 dark:text-surface-500">لا توجد تخصصات</div>
               ) : (
-                majors.map((major) => {
+                majors.map((major: { _id: string; name: string }) => {
                   const isActive = pathname.startsWith(`/dashboard/major/${major._id}`);
                   return (
                     <Link

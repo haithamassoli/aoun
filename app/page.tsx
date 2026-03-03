@@ -1,6 +1,8 @@
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import * as motion from "motion/react-client";
 
 export const metadata: Metadata = {
@@ -23,6 +25,9 @@ export default async function Home() {
   } catch {
     // Convex may not have data yet
   }
+  const sortedUniversities = universities.toSorted(
+    (a: { order: number }, b: { order: number }) => a.order - b.order
+  );
 
   return (
     <div>
@@ -70,21 +75,34 @@ export default async function Home() {
 
         {universities.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {universities
-              .sort((a, b) => a.order - b.order)
-              .map((uni, index) => (
-                <motion.a
+            {sortedUniversities.map(
+              (
+                uni: {
+                  _id: string;
+                  slug: string;
+                  logoUrl?: string;
+                  name: string;
+                },
+                index: number
+              ) => (
+                <motion.div
                   key={uni._id}
-                  href={`/${uni.slug}`}
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-                  className="group flex flex-col items-center gap-4 rounded-2xl border border-surface-200 bg-white p-8 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
+                >
+                  <Link
+                    href={`/${uni.slug}`}
+                    className="group flex flex-col items-center gap-4 rounded-2xl border border-surface-200 bg-white p-8 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
                 >
                   {uni.logoUrl && (
-                    <img
+                    <Image
                       src={uni.logoUrl}
                       alt={uni.name}
+                      width={80}
+                      height={80}
+                      unoptimized
+                      sizes="80px"
                       className="h-20 w-20 rounded-xl object-contain"
                     />
                   )}
@@ -96,8 +114,10 @@ export default async function Home() {
                   <h3 className="text-center text-lg font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">
                     {uni.name}
                   </h3>
-                </motion.a>
-              ))}
+                  </Link>
+                </motion.div>
+              )
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

@@ -63,9 +63,11 @@ export const update = mutation({
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditCourse(ctx, user._id, args.courseId);
 
-    const { token: _, courseId, ...updates } = args;
+    const { courseId, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
-      Object.entries(updates).filter(([, v]) => v !== undefined)
+      Object.entries(rawUpdates).filter(
+        ([key, value]) => key !== "token" && value !== undefined
+      )
     );
 
     await ctx.db.patch(courseId, filtered);

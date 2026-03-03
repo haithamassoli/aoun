@@ -36,13 +36,15 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, majorSlug, courseSlug } = await params;
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
-  });
+  const [university, major, course] = await Promise.all([
+    fetchQuery(api.universities.getBySlug, {
+      slug: universitySlug,
+    }),
+    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
+    fetchQuery(api.courses.getBySlug, { slug: courseSlug }),
+  ]);
   if (!university) return {};
-  const major = await fetchQuery(api.majors.getBySlug, { slug: majorSlug });
   if (!major || major.universityId !== university._id) return {};
-  const course = await fetchQuery(api.courses.getBySlug, { slug: courseSlug });
   if (!course || course.majorId !== major._id) return {};
   const title = `${course.name} — ${major.name} — ${university.name}`;
   const description = `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}. ملخصات، امتحانات، وفيديوهات.`;
@@ -65,15 +67,15 @@ export default async function CoursePage({
 }) {
   const { universitySlug, majorSlug, courseSlug } = await params;
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
-  });
+  const [university, major, course] = await Promise.all([
+    fetchQuery(api.universities.getBySlug, {
+      slug: universitySlug,
+    }),
+    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
+    fetchQuery(api.courses.getBySlug, { slug: courseSlug }),
+  ]);
   if (!university) notFound();
-
-  const major = await fetchQuery(api.majors.getBySlug, { slug: majorSlug });
   if (!major || major.universityId !== university._id) notFound();
-
-  const course = await fetchQuery(api.courses.getBySlug, { slug: courseSlug });
   if (!course || course.majorId !== major._id) notFound();
 
   const resources = await fetchQuery(api.resources.listByCourse, {
@@ -88,8 +90,13 @@ export default async function CoursePage({
   }
 
   // Sort within each category by order
-  for (const [, items] of grouped) {
-    items.sort((a, b) => a.order - b.order);
+  for (const [category, items] of grouped) {
+    grouped.set(
+      category,
+      items.toSorted(
+        (a: { order: number }, b: { order: number }) => a.order - b.order
+      )
+    );
   }
 
   // Filter to only categories that have resources, in display order
@@ -161,7 +168,14 @@ export default async function CoursePage({
                   </h2>
 
                   <div className="space-y-3">
-                    {items.map((resource) => (
+                    {items.map(
+                      (resource: {
+                        _id: string;
+                        type: "link" | "richtext";
+                        url?: string;
+                        title: string;
+                        content?: string;
+                      }) => (
                       <div
                         key={resource._id}
                         className="rounded-xl border border-surface-200 bg-white shadow-sm dark:border-surface-700 dark:bg-surface-900"
@@ -222,7 +236,8 @@ export default async function CoursePage({
                           </div>
                         )}
                       </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </motion.div>
               );

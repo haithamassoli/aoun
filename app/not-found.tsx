@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "الصفحة غير موجودة",
@@ -16,12 +17,12 @@ export default function NotFound() {
         <p className="mt-2 text-surface-500 dark:text-surface-400">
           الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
         </p>
-        <a
+        <Link
           href="/"
           className="mt-6 inline-block rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
         >
           العودة للرئيسية
-        </a>
+        </Link>
       </div>
     </div>
   );

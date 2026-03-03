@@ -1,5 +1,6 @@
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 
 // ── Seed all data: universities, majors, courses ─────────────────────
 export const seedAll = internalMutation({
@@ -17,11 +18,10 @@ export const seedAll = internalMutation({
       { name: "جامعة العلوم والتكنولوجيا الأردنية", slug: "just", order: 4 },
     ];
 
-    const uniIds: Record<string, typeof uniId> = {};
-    let uniId;
+    const uniIds: Record<string, Id<"universities">> = {};
     for (const uni of universities) {
-      uniId = await ctx.db.insert("universities", uni);
-      uniIds[uni.slug] = uniId;
+      const universityId = await ctx.db.insert("universities", uni);
+      uniIds[uni.slug] = universityId;
     }
 
     // ── Majors per university ─────────────────────────────────────────

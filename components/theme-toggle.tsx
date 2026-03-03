@@ -1,20 +1,23 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return <div className="h-9 w-9" />;
+  if (!mounted) return <div className="h-9 w-9" aria-hidden="true" />;
 
   const isDark = theme === "dark";
 
   return (
     <button
+      type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="rounded-lg p-2 text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-700 dark:text-surface-400 dark:hover:bg-surface-800 dark:hover:text-surface-200"
       aria-label={isDark ? "تفعيل الوضع الفاتح" : "تفعيل الوضع الداكن"}

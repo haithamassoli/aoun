@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import Link from "next/link";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -68,21 +69,21 @@ export default async function RootLayout({
             <div className="flex min-h-screen flex-col">
               <header className="sticky top-0 z-50 border-b border-surface-200 bg-white/80 backdrop-blur-md dark:border-surface-700 dark:bg-surface-950/80">
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                  <a href="/" className="flex items-center gap-2">
+                  <Link href="/" className="flex items-center gap-2">
                     <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                       عون
                     </span>
-                  </a>
+                  </Link>
                   <nav
                     aria-label="التنقل الرئيسي"
                     className="flex items-center gap-4 text-sm font-medium text-surface-600 dark:text-surface-300"
                   >
-                    <a
+                    <Link
                       href="/"
                       className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
                     >
                       الرئيسية
-                    </a>
+                    </Link>
                     <HeaderAuth />
                     <ThemeToggle />
                   </nav>

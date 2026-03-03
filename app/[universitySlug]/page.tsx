@@ -3,6 +3,8 @@ import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import * as motion from "motion/react-client";
 
 type Params = { universitySlug: string };
@@ -46,6 +48,9 @@ export default async function UniversityPage({
   const majors = await fetchQuery(api.majors.listByUniversity, {
     universityId: university._id,
   });
+  const sortedMajors = majors.toSorted(
+    (a: { order: number }, b: { order: number }) => a.order - b.order
+  );
 
   return (
     <div>
@@ -65,9 +70,13 @@ export default async function UniversityPage({
             className="flex items-center gap-5"
           >
             {university.logoUrl ? (
-              <img
+              <Image
                 src={university.logoUrl}
                 alt={university.name}
+                width={80}
+                height={80}
+                unoptimized
+                sizes="(max-width: 640px) 64px, 80px"
                 className="h-16 w-16 rounded-xl object-contain sm:h-20 sm:w-20"
               />
             ) : (
@@ -97,17 +106,21 @@ export default async function UniversityPage({
 
         {majors.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {majors
-              .sort((a, b) => a.order - b.order)
-              .map((major, index) => (
-                <motion.a
+            {sortedMajors.map(
+              (
+                major: { _id: string; name: string; slug: string },
+                index: number
+              ) => (
+                <motion.div
                   key={major._id}
-                  href={`/${universitySlug}/${major.slug}`}
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
-                  className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
                 >
+                  <Link
+                    href={`/${universitySlug}/${major.slug}`}
+                    className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
+                  >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-lg font-bold text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
                     {major.name.charAt(0)}
                   </div>
@@ -129,8 +142,10 @@ export default async function UniversityPage({
                       d="M9 5l7 7-7 7"
                     />
                   </svg>
-                </motion.a>
-              ))}
+                  </Link>
+                </motion.div>
+              )
+            )}
           </div>
         ) : (
           <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">

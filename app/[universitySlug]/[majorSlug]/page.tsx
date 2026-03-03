@@ -3,6 +3,7 @@ import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import type { Metadata } from "next";
+import Link from "next/link";
 import * as motion from "motion/react-client";
 
 type Params = { universitySlug: string; majorSlug: string };
@@ -13,11 +14,13 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, majorSlug } = await params;
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
-  });
+  const [university, major] = await Promise.all([
+    fetchQuery(api.universities.getBySlug, {
+      slug: universitySlug,
+    }),
+    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
+  ]);
   if (!university) return {};
-  const major = await fetchQuery(api.majors.getBySlug, { slug: majorSlug });
   if (!major || major.universityId !== university._id) return {};
   const title = `${major.name} — ${university.name}`;
   const description = `الخطة الدراسية والمواد الأكاديمية لتخصص ${major.name} في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
@@ -53,12 +56,13 @@ export default async function MajorPage({
 }) {
   const { universitySlug, majorSlug } = await params;
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
-  });
+  const [university, major] = await Promise.all([
+    fetchQuery(api.universities.getBySlug, {
+      slug: universitySlug,
+    }),
+    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
+  ]);
   if (!university) notFound();
-
-  const major = await fetchQuery(api.majors.getBySlug, { slug: majorSlug });
   if (!major || major.universityId !== university._id) notFound();
 
   const courses = await fetchQuery(api.courses.listByMajor, {
@@ -125,7 +129,10 @@ export default async function MajorPage({
             {sortedKeys.map((semesterKey, sIndex) => {
               const semesterCourses = grouped
                 .get(semesterKey)!
-                .sort((a, b) => a.order - b.order);
+                .toSorted(
+                  (a: { order: number }, b: { order: number }) =>
+                    a.order - b.order
+                );
               const label =
                 semesterKey !== null
                   ? semesterLabels[semesterKey] || `الفصل ${semesterKey}`
@@ -145,8 +152,14 @@ export default async function MajorPage({
                     {label}
                   </h3>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {semesterCourses.map((course) => (
-                      <a
+                    {semesterCourses.map(
+                      (course: {
+                        _id: string;
+                        slug: string;
+                        name: string;
+                        courseCode?: string;
+                      }) => (
+                      <Link
                         key={course._id}
                         href={`/${universitySlug}/${majorSlug}/${course.slug}`}
                         className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
@@ -174,8 +187,9 @@ export default async function MajorPage({
                             d="M9 5l7 7-7 7"
                           />
                         </svg>
-                      </a>
-                    ))}
+                      </Link>
+                      )
+                    )}
                   </div>
                 </motion.div>
               );

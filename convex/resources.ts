@@ -96,9 +96,11 @@ export const update = mutation({
 
     if (args.url) assertSafeUrl(args.url);
 
-    const { token: _, resourceId, ...updates } = args;
+    const { resourceId, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
-      Object.entries(updates).filter(([, v]) => v !== undefined)
+      Object.entries(rawUpdates).filter(
+        ([key, value]) => key !== "token" && value !== undefined
+      )
     );
 
     await ctx.db.patch(resourceId, {

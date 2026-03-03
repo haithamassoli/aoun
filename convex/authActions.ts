@@ -4,6 +4,7 @@ import { v } from "convex/values";
 import { action } from "./_generated/server";
 import { api } from "./_generated/api";
 import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
@@ -13,8 +14,27 @@ export const login = action({
     email: v.string(),
     password: v.string(),
   },
-  handler: async (ctx, { email, password }) => {
-    const user = await ctx.runQuery(internal.auth.getUserByEmail, { email });
+  handler: async (
+    ctx,
+    { email, password }
+  ): Promise<{
+    token: string;
+    user: {
+      _id: Id<"users">;
+      name: string;
+      email: string;
+      role: "admin" | "contributor";
+    };
+  }> => {
+    const user = (await ctx.runQuery(internal.auth.getUserByEmail, {
+      email,
+    })) as {
+      _id: Id<"users">;
+      name: string;
+      email: string;
+      role: "admin" | "contributor";
+      passwordHash: string;
+    } | null;
 
     if (!user) {
       throw new Error("INVALID_CREDENTIALS");
@@ -141,9 +161,13 @@ export const createContributor = action({
     email: v.string(),
     password: v.string(),
   },
-  handler: async (ctx, { token, name, email, password }) => {
-    // Verify admin via getCurrentUser
-    const currentUser = await ctx.runQuery(api.auth.getCurrentUser, { token });
+  handler: async (
+    ctx,
+    { token, name, email, password }
+  ): Promise<string> => {
+    const currentUser = (await ctx.runQuery(api.auth.getCurrentUser, {
+      token,
+    })) as { _id: string; role: "admin" | "contributor" } | null;
     if (!currentUser || currentUser.role !== "admin") {
       throw new Error("ADMIN_REQUIRED");
     }

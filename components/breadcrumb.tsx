@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface BreadcrumbItem {
   label: string;
   href?: string;
@@ -41,12 +43,12 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
                 </svg>
               )}
               {item.href ? (
-                <a
+                <Link
                   href={item.href}
                   className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
                 >
                   {item.label}
-                </a>
+                </Link>
               ) : (
                 <span className="font-medium text-surface-800 dark:text-surface-100">
                   {item.label}

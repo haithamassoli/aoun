@@ -231,7 +231,15 @@ export default function MajorCoursesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {courses.map((course) => (
+          {courses.map((course: {
+            _id: string;
+            name: string;
+            courseCode?: string;
+            semester?: number;
+            resourceCount: number;
+            slug: string;
+            order: number;
+          }) => (
             <div
               key={course._id}
               className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"

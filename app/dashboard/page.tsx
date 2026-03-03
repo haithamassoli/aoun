@@ -43,7 +43,7 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {majors.map((major) => (
+          {majors.map((major: { _id: string; name: string; universityName: string }) => (
             <Link
               key={major._id}
               href={`/dashboard/major/${major._id}`}
