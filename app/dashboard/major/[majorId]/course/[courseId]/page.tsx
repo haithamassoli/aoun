@@ -9,7 +9,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Toast, useToast } from "@/components/toast";
 import { TiptapEditor } from "@/components/tiptap-editor";
-import DOMPurify from "isomorphic-dompurify";
+import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 
 const CATEGORIES = [
   { value: "notes", label: "ملاحظات" },
@@ -127,7 +127,7 @@ export default function CourseResourcesPage() {
     try {
       // Sanitize HTML content before storing
       const sanitizedContent =
-        formData.type === "richtext" ? DOMPurify.sanitize(formData.content) : undefined;
+        formData.type === "richtext" ? sanitizeRichText(formData.content) : undefined;
 
       if (editingId) {
         await updateResource({
@@ -439,7 +439,7 @@ export default function CourseResourcesPage() {
                       className="prose prose-sm mt-2 max-w-none text-surface-600 dark:text-surface-300"
                       dir="rtl"
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(resource.content),
+                        __html: sanitizeRichText(resource.content),
                       }}
                     />
                   )}
