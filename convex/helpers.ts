@@ -1,35 +1,45 @@
-import { QueryCtx, MutationCtx } from "./_generated/server";
+import { ConvexError } from "convex/values";
 import { Id } from "./_generated/dataModel";
+import { MutationCtx, QueryCtx } from "./_generated/server";
 
 // ── Authenticate user from session token ──────────────────────────────
 export async function authenticateUser(
   ctx: QueryCtx | MutationCtx,
   token?: string
 ) {
-  if (!token) throw new Error("NOT_AUTHENTICATED");
+  if (!token) {
+    throw new ConvexError({ code: "NOT_AUTHENTICATED" });
+  }
 
   const session = await ctx.db
     .query("sessions")
     .withIndex("by_token", (q) => q.eq("token", token))
     .first();
 
-  if (!session) throw new Error("NOT_AUTHENTICATED");
-  if (session.expiresAt < Date.now()) throw new Error("SESSION_EXPIRED");
+  if (!session) {
+    throw new ConvexError({ code: "NOT_AUTHENTICATED" });
+  }
+  if (session.expiresAt < Date.now()) {
+    throw new ConvexError({ code: "SESSION_EXPIRED" });
+  }
 
-  const user = await ctx.db.get(session.userId);
-  if (!user) throw new Error("NOT_AUTHENTICATED");
+  const user = await ctx.db.get("users", session.userId);
+  if (!user) {
+    throw new ConvexError({ code: "NOT_AUTHENTICATED" });
+  }
 
   return user;
 }
 
-// ── Get permissions for a user ────────────────────────────────────────
 // Returns { fullAccess: true } for admins, or { fullAccess: false, majorIds: [...] } for contributors
 export async function getPermissions(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users">
 ) {
-  const user = await ctx.db.get(userId);
-  if (!user) throw new Error("USER_NOT_FOUND");
+  const user = await ctx.db.get("users", userId);
+  if (!user) {
+    throw new ConvexError({ code: "USER_NOT_FOUND" });
+  }
 
   if (user.role === "admin") {
     return { fullAccess: true as const, majorIds: [] as Id<"majors">[] };
@@ -46,7 +56,6 @@ export async function getPermissions(
   };
 }
 
-// ── Assert user can edit a major ──────────────────────────────────────
 export async function assertCanEditMajor(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users">,
@@ -55,42 +64,43 @@ export async function assertCanEditMajor(
   const perms = await getPermissions(ctx, userId);
   if (perms.fullAccess) return;
 
-  if (!perms.majorIds.some((id) => id === majorId)) {
-    throw new Error("FORBIDDEN");
+  if (!perms.majorIds.includes(majorId)) {
+    throw new ConvexError({ code: "FORBIDDEN" });
   }
 }
 
-// ── Assert user can edit a course (resolves course → major) ───────────
 export async function assertCanEditCourse(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users">,
   courseId: Id<"courses">
 ) {
-  const course = await ctx.db.get(courseId);
-  if (!course) throw new Error("COURSE_NOT_FOUND");
+  const course = await ctx.db.get("courses", courseId);
+  if (!course) {
+    throw new ConvexError({ code: "COURSE_NOT_FOUND" });
+  }
 
   await assertCanEditMajor(ctx, userId, course.majorId);
 }
 
-// ── Assert user can edit a resource (resolves resource → course → major)
 export async function assertCanEditResource(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users">,
   resourceId: Id<"resources">
 ) {
-  const resource = await ctx.db.get(resourceId);
-  if (!resource) throw new Error("RESOURCE_NOT_FOUND");
+  const resource = await ctx.db.get("resources", resourceId);
+  if (!resource) {
+    throw new ConvexError({ code: "RESOURCE_NOT_FOUND" });
+  }
 
   await assertCanEditCourse(ctx, userId, resource.courseId);
 }
 
-// ── Assert user is admin ──────────────────────────────────────────────
 export async function assertAdmin(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users">
 ) {
-  const user = await ctx.db.get(userId);
+  const user = await ctx.db.get("users", userId);
   if (!user || user.role !== "admin") {
-    throw new Error("ADMIN_REQUIRED");
+    throw new ConvexError({ code: "ADMIN_REQUIRED" });
   }
 }

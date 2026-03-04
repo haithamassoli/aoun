@@ -1,13 +1,25 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+const resourceType = v.union(v.literal("link"), v.literal("richtext"));
+const resourceCategory = v.union(
+  v.literal("notes"),
+  v.literal("exams"),
+  v.literal("videos"),
+  v.literal("summaries"),
+  v.literal("tips"),
+  v.literal("other")
+);
+
 export default defineSchema({
   universities: defineTable({
     name: v.string(),
     slug: v.string(),
     logoUrl: v.optional(v.string()),
     order: v.number(),
-  }).index("by_slug", ["slug"]),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_order", ["order"]),
 
   majors: defineTable({
     universityId: v.id("universities"),
@@ -16,6 +28,8 @@ export default defineSchema({
     order: v.number(),
   })
     .index("by_universityId", ["universityId"])
+    .index("by_universityId_order", ["universityId", "order"])
+    .index("by_universityId_slug", ["universityId", "slug"])
     .index("by_slug", ["slug"]),
 
   courses: defineTable({
@@ -27,19 +41,14 @@ export default defineSchema({
     order: v.number(),
   })
     .index("by_majorId", ["majorId"])
+    .index("by_majorId_order", ["majorId", "order"])
+    .index("by_majorId_slug", ["majorId", "slug"])
     .index("by_slug", ["slug"]),
 
   resources: defineTable({
     courseId: v.id("courses"),
-    type: v.union(v.literal("link"), v.literal("richtext")),
-    category: v.union(
-      v.literal("notes"),
-      v.literal("exams"),
-      v.literal("videos"),
-      v.literal("summaries"),
-      v.literal("tips"),
-      v.literal("other")
-    ),
+    type: resourceType,
+    category: resourceCategory,
     title: v.string(),
     url: v.optional(v.string()),
     content: v.optional(v.string()),
@@ -47,7 +56,9 @@ export default defineSchema({
     createdBy: v.id("users"),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_courseId", ["courseId"]),
+  })
+    .index("by_courseId", ["courseId"])
+    .index("by_courseId_order", ["courseId", "order"]),
 
   users: defineTable({
     name: v.string(),
@@ -59,11 +70,15 @@ export default defineSchema({
   permissions: defineTable({
     userId: v.id("users"),
     majorId: v.id("majors"),
-  }).index("by_userId", ["userId"]),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_majorId", ["userId", "majorId"]),
 
   sessions: defineTable({
     userId: v.id("users"),
     token: v.string(),
     expiresAt: v.number(),
-  }).index("by_token", ["token"]),
+  })
+    .index("by_token", ["token"])
+    .index("by_userId", ["userId"]),
 });

@@ -1,52 +1,73 @@
-import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 import {
-  authenticateUser,
   assertCanEditCourse,
   assertCanEditResource,
+  authenticateUser,
 } from "./helpers";
+
+const resourceType = v.union(v.literal("link"), v.literal("richtext"));
+const resourceCategory = v.union(
+  v.literal("notes"),
+  v.literal("exams"),
+  v.literal("videos"),
+  v.literal("summaries"),
+  v.literal("tips"),
+  v.literal("other")
+);
+
+const resourceDoc = v.object({
+  _id: v.id("resources"),
+  _creationTime: v.number(),
+  courseId: v.id("courses"),
+  type: resourceType,
+  category: resourceCategory,
+  title: v.string(),
+  url: v.optional(v.string()),
+  content: v.optional(v.string()),
+  order: v.number(),
+  createdBy: v.id("users"),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+});
 
 function assertSafeUrl(url: string) {
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-      throw new Error("INVALID_URL_PROTOCOL");
+      throw new ConvexError({ code: "INVALID_URL_PROTOCOL" });
     }
-  } catch (e) {
-    if (e instanceof Error && e.message === "INVALID_URL_PROTOCOL") throw e;
-    throw new Error("INVALID_URL");
+  } catch (error) {
+    if (error instanceof ConvexError) {
+      throw error;
+    }
+    throw new ConvexError({ code: "INVALID_URL" });
   }
 }
 
 export const listByCourse = query({
   args: { courseId: v.id("courses") },
+  returns: v.array(resourceDoc),
   handler: async (ctx, args) => {
     return await ctx.db
       .query("resources")
-      .withIndex("by_courseId", (q) => q.eq("courseId", args.courseId))
+      .withIndex("by_courseId_order", (q) => q.eq("courseId", args.courseId))
       .collect();
   },
 });
 
-// ── Add resource (auth + permission) ──────────────────────────────────
 export const add = mutation({
   args: {
     token: v.string(),
     courseId: v.id("courses"),
-    type: v.union(v.literal("link"), v.literal("richtext")),
-    category: v.union(
-      v.literal("notes"),
-      v.literal("exams"),
-      v.literal("videos"),
-      v.literal("summaries"),
-      v.literal("tips"),
-      v.literal("other")
-    ),
+    type: resourceType,
+    category: resourceCategory,
     title: v.string(),
     url: v.optional(v.string()),
     content: v.optional(v.string()),
     order: v.number(),
   },
+  returns: v.id("resources"),
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditCourse(ctx, user._id, args.courseId);
@@ -69,27 +90,18 @@ export const add = mutation({
   },
 });
 
-// ── Update resource (auth + permission) ───────────────────────────────
 export const update = mutation({
   args: {
     token: v.string(),
     resourceId: v.id("resources"),
     title: v.optional(v.string()),
-    category: v.optional(
-      v.union(
-        v.literal("notes"),
-        v.literal("exams"),
-        v.literal("videos"),
-        v.literal("summaries"),
-        v.literal("tips"),
-        v.literal("other")
-      )
-    ),
-    type: v.optional(v.union(v.literal("link"), v.literal("richtext"))),
+    category: v.optional(resourceCategory),
+    type: v.optional(resourceType),
     url: v.optional(v.string()),
     content: v.optional(v.string()),
     order: v.optional(v.number()),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditResource(ctx, user._id, args.resourceId);
@@ -98,28 +110,31 @@ export const update = mutation({
 
     const { resourceId, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
-      Object.entries(rawUpdates).filter(
-        ([key, value]) => key !== "token" && value !== undefined
-      )
+      Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
     );
 
-    await ctx.db.patch(resourceId, {
-      ...filtered,
-      updatedAt: Date.now(),
-    });
+    if (Object.keys(filtered).length > 0) {
+      await ctx.db.patch("resources", resourceId, {
+        ...filtered,
+        updatedAt: Date.now(),
+      });
+    }
+
+    return null;
   },
 });
 
-// ── Delete resource (auth + permission) ───────────────────────────────
 export const remove = mutation({
   args: {
     token: v.string(),
     resourceId: v.id("resources"),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditResource(ctx, user._id, args.resourceId);
 
-    await ctx.db.delete(args.resourceId);
+    await ctx.db.delete("resources", args.resourceId);
+    return null;
   },
 });

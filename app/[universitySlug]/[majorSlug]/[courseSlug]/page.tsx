@@ -36,15 +36,19 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, majorSlug, courseSlug } = await params;
-  const [university, major, course] = await Promise.all([
-    fetchQuery(api.universities.getBySlug, {
-      slug: universitySlug,
-    }),
-    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
-    fetchQuery(api.courses.getBySlug, { slug: courseSlug }),
-  ]);
+  const university = await fetchQuery(api.universities.getBySlug, {
+    slug: universitySlug,
+  });
   if (!university) return {};
+  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
+    universityId: university._id,
+    slug: majorSlug,
+  });
   if (!major || major.universityId !== university._id) return {};
+  const course = await fetchQuery(api.courses.getByMajorAndSlug, {
+    majorId: major._id,
+    slug: courseSlug,
+  });
   if (!course || course.majorId !== major._id) return {};
   const title = `${course.name} — ${major.name} — ${university.name}`;
   const description = `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}. ملخصات، امتحانات، وفيديوهات.`;
@@ -67,15 +71,19 @@ export default async function CoursePage({
 }) {
   const { universitySlug, majorSlug, courseSlug } = await params;
 
-  const [university, major, course] = await Promise.all([
-    fetchQuery(api.universities.getBySlug, {
-      slug: universitySlug,
-    }),
-    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
-    fetchQuery(api.courses.getBySlug, { slug: courseSlug }),
-  ]);
+  const university = await fetchQuery(api.universities.getBySlug, {
+    slug: universitySlug,
+  });
   if (!university) notFound();
+  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
+    universityId: university._id,
+    slug: majorSlug,
+  });
   if (!major || major.universityId !== university._id) notFound();
+  const course = await fetchQuery(api.courses.getByMajorAndSlug, {
+    majorId: major._id,
+    slug: courseSlug,
+  });
   if (!course || course.majorId !== major._id) notFound();
 
   const resources = await fetchQuery(api.resources.listByCourse, {

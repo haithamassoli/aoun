@@ -1,5 +1,5 @@
 import { internalMutation } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 
 // ── Seed all data: universities, majors, courses ─────────────────────
@@ -367,7 +367,7 @@ export const assignContributorPermissions = internalMutation({
       .withIndex("by_slug", (q) => q.eq("slug", universitySlug))
       .first();
 
-    if (!university) throw new Error(`University ${universitySlug} not found`);
+    if (!university) throw new ConvexError({ code: "UNIVERSITY_NOT_FOUND", universitySlug });
 
     const majors = await ctx.db
       .query("majors")
@@ -405,7 +405,7 @@ export const clearAll = internalMutation({
     for (const table of tables) {
       const docs = await ctx.db.query(table).collect();
       for (const doc of docs) {
-        await ctx.db.delete(doc._id);
+        await ctx.db.delete(table, doc._id);
       }
       total += docs.length;
     }

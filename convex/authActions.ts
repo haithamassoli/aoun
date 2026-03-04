@@ -1,53 +1,42 @@
 "use node";
 
-import { v } from "convex/values";
-import { action } from "./_generated/server";
-import { api } from "./_generated/api";
-import { internal } from "./_generated/api";
-import type { Id } from "./_generated/dataModel";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { ConvexError, v } from "convex/values";
+import { api, internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
+import { action } from "./_generated/server";
 
-// ── Login action ────────────────────────────────────────────────────────
+const userRole = v.union(v.literal("admin"), v.literal("contributor"));
+
 export const login = action({
   args: {
     email: v.string(),
     password: v.string(),
   },
-  handler: async (
-    ctx,
-    { email, password }
-  ): Promise<{
-    token: string;
-    user: {
-      _id: Id<"users">;
-      name: string;
-      email: string;
-      role: "admin" | "contributor";
-    };
-  }> => {
-    const user = (await ctx.runQuery(internal.auth.getUserByEmail, {
-      email,
-    })) as {
-      _id: Id<"users">;
-      name: string;
-      email: string;
-      role: "admin" | "contributor";
-      passwordHash: string;
-    } | null;
+  returns: v.object({
+    token: v.string(),
+    user: v.object({
+      _id: v.id("users"),
+      name: v.string(),
+      email: v.string(),
+      role: userRole,
+    }),
+  }),
+  handler: async (ctx, { email, password }) => {
+    const user = await ctx.runQuery(internal.auth.getUserByEmail, { email });
 
     if (!user) {
-      throw new Error("INVALID_CREDENTIALS");
+      throw new ConvexError({ code: "INVALID_CREDENTIALS" });
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
-      throw new Error("INVALID_CREDENTIALS");
+      throw new ConvexError({ code: "INVALID_CREDENTIALS" });
     }
 
-    // Generate session token
     const token = crypto.randomUUID();
-    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
 
     await ctx.runMutation(internal.auth.createSession, {
       userId: user._id,
@@ -67,13 +56,13 @@ export const login = action({
   },
 });
 
-// ── Seed admin user ─────────────────────────────────────────────────────
 export const seedAdmin = action({
   args: {
     name: v.string(),
     email: v.string(),
     password: v.string(),
   },
+  returns: v.string(),
   handler: async (ctx, { name, email, password }) => {
     const existing = await ctx.runQuery(internal.auth.getUserByEmail, { email });
     if (existing) return "Admin already exists";
@@ -91,13 +80,12 @@ export const seedAdmin = action({
   },
 });
 
-// ── Seed accounts: admin + contributors with permissions ─────────────
 export const seedAccounts = action({
   args: {},
+  returns: v.string(),
   handler: async (ctx) => {
     const results: string[] = [];
 
-    // 1. Create admin
     const adminEmail = "admin@aoun.jo";
     const existingAdmin = await ctx.runQuery(internal.auth.getUserByEmail, {
       email: adminEmail,
@@ -115,7 +103,6 @@ export const seedAccounts = action({
       results.push("Admin already exists");
     }
 
-    // 2. Create contributors (one per university)
     const contributors = [
       { name: "أحمد الأردني", email: "ahmad@aoun.jo", password: "Contributor@123", uniSlug: "ju" },
       { name: "سارة اليرموك", email: "sara@aoun.jo", password: "Contributor@123", uniSlug: "yu" },
@@ -140,7 +127,6 @@ export const seedAccounts = action({
         passwordHash: hash,
       });
 
-      // Assign permissions for all majors in their university
       await ctx.runMutation(internal.seed.assignContributorPermissions, {
         userId,
         universitySlug: contrib.uniSlug,
@@ -153,7 +139,6 @@ export const seedAccounts = action({
   },
 });
 
-// ── Create contributor (admin only, needs bcrypt) ───────────────────────
 export const createContributor = action({
   args: {
     token: v.string(),
@@ -161,29 +146,27 @@ export const createContributor = action({
     email: v.string(),
     password: v.string(),
   },
-  handler: async (
-    ctx,
-    { token, name, email, password }
-  ): Promise<string> => {
-    const currentUser = (await ctx.runQuery(api.auth.getCurrentUser, {
+  returns: v.id("users"),
+  handler: async (ctx, { token, name, email, password }): Promise<Id<"users">> => {
+    const currentUser = await ctx.runQuery(api.auth.getCurrentUser, {
       token,
-    })) as { _id: string; role: "admin" | "contributor" } | null;
+    });
     if (!currentUser || currentUser.role !== "admin") {
-      throw new Error("ADMIN_REQUIRED");
+      throw new ConvexError({ code: "ADMIN_REQUIRED" });
     }
 
     const existing = await ctx.runQuery(internal.auth.getUserByEmail, { email });
-    if (existing) throw new Error("EMAIL_ALREADY_EXISTS");
+    if (existing) {
+      throw new ConvexError({ code: "EMAIL_ALREADY_EXISTS" });
+    }
 
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const userId = await ctx.runMutation(internal.auth.createUser, {
+    return await ctx.runMutation(internal.auth.createUser, {
       name,
       email,
       role: "contributor",
       passwordHash,
     });
-
-    return userId;
   },
 });

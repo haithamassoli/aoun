@@ -14,13 +14,14 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, majorSlug } = await params;
-  const [university, major] = await Promise.all([
-    fetchQuery(api.universities.getBySlug, {
-      slug: universitySlug,
-    }),
-    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
-  ]);
+  const university = await fetchQuery(api.universities.getBySlug, {
+    slug: universitySlug,
+  });
   if (!university) return {};
+  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
+    universityId: university._id,
+    slug: majorSlug,
+  });
   if (!major || major.universityId !== university._id) return {};
   const title = `${major.name} — ${university.name}`;
   const description = `الخطة الدراسية والمواد الأكاديمية لتخصص ${major.name} في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
@@ -56,13 +57,14 @@ export default async function MajorPage({
 }) {
   const { universitySlug, majorSlug } = await params;
 
-  const [university, major] = await Promise.all([
-    fetchQuery(api.universities.getBySlug, {
-      slug: universitySlug,
-    }),
-    fetchQuery(api.majors.getBySlug, { slug: majorSlug }),
-  ]);
+  const university = await fetchQuery(api.universities.getBySlug, {
+    slug: universitySlug,
+  });
   if (!university) notFound();
+  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
+    universityId: university._id,
+    slug: majorSlug,
+  });
   if (!major || major.universityId !== university._id) notFound();
 
   const courses = await fetchQuery(api.courses.listByMajor, {

@@ -1,91 +1,137 @@
-import { query } from "./_generated/server";
 import { v } from "convex/values";
-import { authenticateUser, getPermissions } from "./helpers";
+import { query } from "./_generated/server";
+import {
+  assertCanEditCourse,
+  assertCanEditMajor,
+  authenticateUser,
+  getPermissions,
+} from "./helpers";
 
-// Get majors accessible to the current user, enriched with university name
+const majorWithUniversity = v.object({
+  _id: v.id("majors"),
+  _creationTime: v.number(),
+  universityId: v.id("universities"),
+  name: v.string(),
+  slug: v.string(),
+  order: v.number(),
+  universityName: v.string(),
+});
+
+const courseWithResourceCount = v.object({
+  _id: v.id("courses"),
+  _creationTime: v.number(),
+  majorId: v.id("majors"),
+  name: v.string(),
+  slug: v.string(),
+  courseCode: v.optional(v.string()),
+  semester: v.optional(v.number()),
+  order: v.number(),
+  resourceCount: v.number(),
+});
+
+const resourceDoc = v.object({
+  _id: v.id("resources"),
+  _creationTime: v.number(),
+  courseId: v.id("courses"),
+  type: v.union(v.literal("link"), v.literal("richtext")),
+  category: v.union(
+    v.literal("notes"),
+    v.literal("exams"),
+    v.literal("videos"),
+    v.literal("summaries"),
+    v.literal("tips"),
+    v.literal("other")
+  ),
+  title: v.string(),
+  url: v.optional(v.string()),
+  content: v.optional(v.string()),
+  order: v.number(),
+  createdBy: v.id("users"),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+});
+
 export const getMyMajors = query({
   args: { token: v.string() },
+  returns: v.array(majorWithUniversity),
   handler: async (ctx, { token }) => {
     const user = await authenticateUser(ctx, token);
     const perms = await getPermissions(ctx, user._id);
 
-    let majors;
-    if (perms.fullAccess) {
-      majors = await ctx.db.query("majors").collect();
-    } else {
-      majors = [];
-      for (const majorId of perms.majorIds) {
-        const major = await ctx.db.get(majorId);
-        if (major) majors.push(major);
-      }
-    }
+    const majors = perms.fullAccess
+      ? await ctx.db.query("majors").collect()
+      : (
+          await Promise.all(
+            perms.majorIds.map((majorId) => ctx.db.get("majors", majorId))
+          )
+        ).filter((major) => major !== null);
 
-    // Enrich with university names
-    const result = [];
-    for (const major of majors) {
-      const university = await ctx.db.get(major.universityId);
-      result.push({
-        ...major,
-        universityName: university?.name ?? "",
-      });
-    }
+    const enriched = await Promise.all(
+      majors.map(async (major) => {
+        const university = await ctx.db.get("universities", major.universityId);
+        return {
+          ...major,
+          universityName: university?.name ?? "",
+        };
+      })
+    );
 
-    return result.sort((a, b) => a.order - b.order);
+    return enriched.toSorted((a, b) => a.order - b.order);
   },
 });
 
-// Get courses for a major (dashboard view with resource count)
 export const getCoursesForMajor = query({
   args: { token: v.string(), majorId: v.id("majors") },
+  returns: v.array(courseWithResourceCount),
   handler: async (ctx, { token, majorId }) => {
-    await authenticateUser(ctx, token);
+    const user = await authenticateUser(ctx, token);
+    await assertCanEditMajor(ctx, user._id, majorId);
 
     const courses = await ctx.db
       .query("courses")
-      .withIndex("by_majorId", (q) => q.eq("majorId", majorId))
+      .withIndex("by_majorId_order", (q) => q.eq("majorId", majorId))
       .collect();
 
-    const result = [];
-    for (const course of courses) {
-      const resources = await ctx.db
-        .query("resources")
-        .withIndex("by_courseId", (q) => q.eq("courseId", course._id))
-        .collect();
-      result.push({
-        ...course,
-        resourceCount: resources.length,
-      });
-    }
-
-    return result.sort((a, b) => a.order - b.order);
+    return await Promise.all(
+      courses.map(async (course) => {
+        const resources = await ctx.db
+          .query("resources")
+          .withIndex("by_courseId", (q) => q.eq("courseId", course._id))
+          .collect();
+        return {
+          ...course,
+          resourceCount: resources.length,
+        };
+      })
+    );
   },
 });
 
-// Get resources for a course (dashboard view)
 export const getResourcesForCourse = query({
   args: { token: v.string(), courseId: v.id("courses") },
+  returns: v.array(resourceDoc),
   handler: async (ctx, { token, courseId }) => {
-    await authenticateUser(ctx, token);
+    const user = await authenticateUser(ctx, token);
+    await assertCanEditCourse(ctx, user._id, courseId);
 
-    const resources = await ctx.db
+    return await ctx.db
       .query("resources")
-      .withIndex("by_courseId", (q) => q.eq("courseId", courseId))
+      .withIndex("by_courseId_order", (q) => q.eq("courseId", courseId))
       .collect();
-
-    return resources.sort((a, b) => a.order - b.order);
   },
 });
 
-// Get a single major with university info
 export const getMajorWithUniversity = query({
   args: { token: v.string(), majorId: v.id("majors") },
+  returns: v.union(v.null(), majorWithUniversity),
   handler: async (ctx, { token, majorId }) => {
-    await authenticateUser(ctx, token);
+    const user = await authenticateUser(ctx, token);
+    await assertCanEditMajor(ctx, user._id, majorId);
 
-    const major = await ctx.db.get(majorId);
+    const major = await ctx.db.get("majors", majorId);
     if (!major) return null;
 
-    const university = await ctx.db.get(major.universityId);
+    const university = await ctx.db.get("universities", major.universityId);
     return {
       ...major,
       universityName: university?.name ?? "",
@@ -93,20 +139,33 @@ export const getMajorWithUniversity = query({
   },
 });
 
-// Get a single course with major info
 export const getCourseWithMajor = query({
   args: { token: v.string(), courseId: v.id("courses") },
+  returns: v.union(
+    v.null(),
+    v.object({
+      _id: v.id("courses"),
+      _creationTime: v.number(),
+      majorId: v.id("majors"),
+      name: v.string(),
+      slug: v.string(),
+      courseCode: v.optional(v.string()),
+      semester: v.optional(v.number()),
+      order: v.number(),
+      majorName: v.string(),
+    })
+  ),
   handler: async (ctx, { token, courseId }) => {
-    await authenticateUser(ctx, token);
+    const user = await authenticateUser(ctx, token);
+    await assertCanEditCourse(ctx, user._id, courseId);
 
-    const course = await ctx.db.get(courseId);
+    const course = await ctx.db.get("courses", courseId);
     if (!course) return null;
 
-    const major = await ctx.db.get(course.majorId);
+    const major = await ctx.db.get("majors", course.majorId);
     return {
       ...course,
       majorName: major?.name ?? "",
-      majorId: course.majorId,
     };
   },
 });
