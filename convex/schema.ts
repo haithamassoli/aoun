@@ -11,26 +11,46 @@ const resourceCategory = v.union(
   v.literal("other")
 );
 
+// Shared soft-delete fields used by all entities
+const softDeleteFields = {
+  deletedAt: v.optional(v.number()),
+  deletedBy: v.optional(v.id("users")),
+};
+
 export default defineSchema({
   universities: defineTable({
     name: v.string(),
     slug: v.string(),
     logoUrl: v.optional(v.string()),
     order: v.number(),
+    alias: v.optional(v.string()),
+    searchToken: v.optional(v.string()),
+    ...softDeleteFields,
   })
     .index("by_slug", ["slug"])
-    .index("by_order", ["order"]),
+    .index("by_order", ["order"])
+    .searchIndex("search_token", {
+      searchField: "searchToken",
+      filterFields: ["deletedAt"],
+    }),
 
   majors: defineTable({
     universityId: v.id("universities"),
     name: v.string(),
     slug: v.string(),
     order: v.number(),
+    alias: v.optional(v.string()),
+    searchToken: v.optional(v.string()),
+    ...softDeleteFields,
   })
     .index("by_universityId", ["universityId"])
     .index("by_universityId_order", ["universityId", "order"])
     .index("by_universityId_slug", ["universityId", "slug"])
-    .index("by_slug", ["slug"]),
+    .index("by_slug", ["slug"])
+    .searchIndex("search_token", {
+      searchField: "searchToken",
+      filterFields: ["universityId", "deletedAt"],
+    }),
 
   courses: defineTable({
     majorId: v.id("majors"),
@@ -39,11 +59,18 @@ export default defineSchema({
     courseCode: v.optional(v.string()),
     semester: v.optional(v.number()),
     order: v.number(),
+    alias: v.optional(v.string()),
+    searchToken: v.optional(v.string()),
+    ...softDeleteFields,
   })
     .index("by_majorId", ["majorId"])
     .index("by_majorId_order", ["majorId", "order"])
     .index("by_majorId_slug", ["majorId", "slug"])
-    .index("by_slug", ["slug"]),
+    .index("by_slug", ["slug"])
+    .searchIndex("search_token", {
+      searchField: "searchToken",
+      filterFields: ["majorId", "deletedAt"],
+    }),
 
   resources: defineTable({
     courseId: v.id("courses"),
@@ -56,6 +83,7 @@ export default defineSchema({
     createdBy: v.id("users"),
     createdAt: v.number(),
     updatedAt: v.number(),
+    ...softDeleteFields,
   })
     .index("by_courseId", ["courseId"])
     .index("by_courseId_order", ["courseId", "order"]),
@@ -65,11 +93,13 @@ export default defineSchema({
     email: v.string(),
     role: v.union(v.literal("admin"), v.literal("contributor")),
     passwordHash: v.string(),
+    ...softDeleteFields,
   }).index("by_email", ["email"]),
 
   permissions: defineTable({
     userId: v.id("users"),
     majorId: v.id("majors"),
+    ...softDeleteFields,
   })
     .index("by_userId", ["userId"])
     .index("by_userId_majorId", ["userId", "majorId"]),

@@ -3,6 +3,7 @@
 This file contains the task-level execution plan for each milestone in `docs/v2/PRD.md`.
 
 ## M1 — Data Model and Migration Foundation
+
 1. `M1-T1` Update Convex schema for all entities with soft-delete fields: `deletedAt`, `deletedBy`.
 2. `M1-T2` Add `alias` and `searchToken` fields to `universities`, `majors`, `courses`.
 3. `M1-T3` Implement shared normalization utility with PRD rules for Arabic and English processing.
@@ -11,11 +12,11 @@ This file contains the task-level execution plan for each milestone in `docs/v2/
 6. `M1-T6` Add/confirm relation indexes required for scoping queries by `universityId` and `majorId`.
 7. `M1-T7` Create migration/backfill script for `alias`, `searchToken`, and null soft-delete defaults.
 8. `M1-T8` Run migration in dev and verify document counts before/after migration are stable.
-9. `M1-T9` Write tests for normalization and token generation edge cases.
-10. `M1-T10` Document migration run order and rollback notes.
-11. `M1-GATE` Schema deployed, indexes built, and all existing universities/majors/courses have valid `searchToken`.
+9. `M1-T10` Document migration run order and rollback notes.
+10. `M1-GATE` Schema deployed, indexes built, and all existing universities/majors/courses have valid `searchToken`.
 
 ## M2 — Authorization and Soft Delete Enforcement
+
 1. `M2-T1` Refactor RBAC helper(s) to centralize role checks for admin and contributor.
 2. `M2-T2` Implement admin full CRUD permissions for `universities`, `majors`, `courses`, `resources`, `users`, `permissions`.
 3. `M2-T3` Keep contributor restrictions exactly as v1 for assigned-major operations.
@@ -23,10 +24,10 @@ This file contains the task-level execution plan for each milestone in `docs/v2/
 5. `M2-T5` Add default non-deleted filters to all read queries used by public and dashboard screens.
 6. `M2-T6` Update uniqueness checks to ignore soft-deleted rows for `slug` and `courseCode` collisions.
 7. `M2-T7` Ensure relation lookup queries exclude soft-deleted records by default.
-8. `M2-T8` Add automated RBAC and soft-delete behavior tests.
-9. `M2-GATE` Permission matrix passes and deleted rows are hidden across read/search/analytics paths.
+8. `M2-GATE` Permission matrix passes and deleted rows are hidden across read/search/analytics paths.
 
 ## M3 — Admin Dashboard CRUD Completion
+
 1. `M3-T1` Build/finish admin list pages for all six entities with default non-deleted data.
 2. `M3-T2` Build/finish create and edit forms for all six entities.
 3. `M3-T3` Add `alias` form fields for universities, majors, and courses.
@@ -34,10 +35,10 @@ This file contains the task-level execution plan for each milestone in `docs/v2/
 5. `M3-T5` Update relation pickers (university, major, course, user) to show only non-deleted options.
 6. `M3-T6` Add form validation and server error handling messages for duplicate/invalid input.
 7. `M3-T7` Verify contributor dashboard behavior remains scoped and unchanged.
-8. `M3-T8` Add dashboard smoke tests for create, edit, and soft-delete flows.
-9. `M3-GATE` Admin can manage all in-scope entities end-to-end from dashboard.
+8. `M3-GATE` Admin can manage all in-scope entities end-to-end from dashboard.
 
 ## M4 — Public Search Experience
+
 1. `M4-T1` Add shared search query contract (input, debounce timing, empty-query behavior).
 2. `M4-T2` Implement universities page search input and result binding.
 3. `M4-T3` Implement majors page search scoped to selected university.
@@ -45,10 +46,10 @@ This file contains the task-level execution plan for each milestone in `docs/v2/
 5. `M4-T5` Wire all three pages to Convex Search Indexes only.
 6. `M4-T6` Ensure empty query falls back to current default list ordering.
 7. `M4-T7` Add loading, empty, and no-result states for each search UI.
-8. `M4-T8` Add tests for scope filtering and Arabic normalization matching behavior.
-9. `M4-GATE` Public search returns only scoped, non-deleted, normalized matches.
+8. `M4-GATE` Public search returns only scoped, non-deleted, normalized matches.
 
 ## M5 — Student Progress and Return Flow
+
 1. `M5-T1` Define Local Storage key strategy for course status and last-major persistence.
 2. `M5-T2` Implement status model by `courseId` with enum values `completed`, `in_progress`, `none`.
 3. `M5-T3` Add UI controls to set and update course status on course card/page.
@@ -56,20 +57,20 @@ This file contains the task-level execution plan for each milestone in `docs/v2/
 5. `M5-T5` Persist last visited major on major page entry.
 6. `M5-T6` Implement root-path-only redirect check on `/`.
 7. `M5-T7` Validate stored last-major target against current non-deleted major/university data before redirect.
-8. `M5-T8` Add tests for redirect rules, invalid stored values, and deleted target edge cases.
-9. `M5-GATE` Status persistence and `/` redirect behavior match PRD rules.
+8. `M5-GATE` Status persistence and `/` redirect behavior match PRD rules.
 
 ## M6 — Analytics Dashboard
+
 1. `M6-T1` Implement admin-only analytics query for total non-deleted universities.
 2. `M6-T2` Implement admin-only analytics query for total non-deleted majors.
 3. `M6-T3` Implement admin-only analytics query for total non-deleted courses.
 4. `M6-T4` Build KPI card UI for the three totals.
 5. `M6-T5` Build a single bar chart using those three totals as the only dataset.
 6. `M6-T6` Ensure analytics updates reactively with Convex query updates.
-7. `M6-T7` Add tests to verify deleted rows never affect KPI/chart totals.
-8. `M6-GATE` Analytics view is admin-only and numerically correct.
+7. `M6-GATE` Analytics view is admin-only and numerically correct.
 
 ## M7 — Validation, Hardening, and Release
+
 1. `M7-T1` Create PRD acceptance criteria checklist and map each criterion to test coverage.
 2. `M7-T2` Run end-to-end validation for admin CRUD, search scope, soft delete, analytics, and local storage flows.
 3. `M7-T3` Validate migration behavior on a production-like dataset copy.
