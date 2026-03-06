@@ -16,6 +16,12 @@ const CATEGORIES = [
   { value: "videos", label: "فيديوهات" },
   { value: "summaries", label: "ملخصات" },
   { value: "tips", label: "نصائح" },
+  { value: "course_intro", label: "التعريف بالمادة" },
+  { value: "comprehensive_post", label: "البوست الشامل" },
+  { value: "textbook", label: "الكتاب" },
+  { value: "previous_years", label: "السنوات السابقة" },
+  { value: "explanations_notebooks", label: "الشروحات والدفاتر" },
+  { value: "course_drive", label: "درايف المادة" },
   { value: "other", label: "أخرى" },
 ] as const;
 

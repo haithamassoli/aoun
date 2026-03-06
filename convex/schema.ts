@@ -8,6 +8,12 @@ const resourceCategory = v.union(
   v.literal("videos"),
   v.literal("summaries"),
   v.literal("tips"),
+  v.literal("course_intro"),
+  v.literal("comprehensive_post"),
+  v.literal("textbook"),
+  v.literal("previous_years"),
+  v.literal("explanations_notebooks"),
+  v.literal("course_drive"),
   v.literal("other")
 );
 

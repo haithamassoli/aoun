@@ -14,6 +14,12 @@ type Params = {
 };
 
 const categoryConfig = {
+  course_intro: { label: "التعريف بالمادة", icon: "🧭" },
+  comprehensive_post: { label: "البوست الشامل", icon: "🧩" },
+  textbook: { label: "الكتاب", icon: "📘" },
+  previous_years: { label: "السنوات السابقة", icon: "🗂️" },
+  explanations_notebooks: { label: "الشروحات والدفاتر", icon: "📒" },
+  course_drive: { label: "درايف المادة", icon: "☁️" },
   notes: { label: "ملاحظات", icon: "📝" },
   exams: { label: "امتحانات", icon: "📋" },
   videos: { label: "فيديوهات", icon: "🎬" },
@@ -23,6 +29,12 @@ const categoryConfig = {
 } as const;
 
 const categoryOrder: (keyof typeof categoryConfig)[] = [
+  "course_intro",
+  "comprehensive_post",
+  "textbook",
+  "previous_years",
+  "explanations_notebooks",
+  "course_drive",
   "summaries",
   "notes",
   "exams",
