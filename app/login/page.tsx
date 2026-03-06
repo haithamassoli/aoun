@@ -135,7 +135,16 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-surface-400 dark:text-surface-500">
-          ليس لديك حساب؟ تواصل مع مدير النظام.
+          ليس لديك حساب؟ تواصل مع مدير النظام عبر{" "}
+          <a
+            href="https://wa.me/+962776193666"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-primary-600 hover:underline dark:text-primary-400"
+          >
+            واتساب
+          </a>
+          .
         </p>
       </div>
     </div>
