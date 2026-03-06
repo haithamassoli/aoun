@@ -27,6 +27,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     localStorage.setItem("dashboardSidebarCollapsed", nextValue ? "1" : "0");
   };
 
+  const closeSidebarOnSmallScreens = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setIsSidebarCollapsed(true);
+      localStorage.setItem("dashboardSidebarCollapsed", "1");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center py-20">
@@ -90,6 +97,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <nav className="space-y-1">
             <Link
               href="/dashboard"
+              onClick={closeSidebarOnSmallScreens}
               className={`flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                 pathname === "/dashboard"
                   ? "bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-300"
@@ -120,6 +128,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     <Link
                       key={item.href}
                       href={item.href}
+                      onClick={closeSidebarOnSmallScreens}
                       className={`flex items-center rounded-xl px-3 py-2 text-sm transition-colors ${
                         isActive
                           ? "bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-300"
@@ -156,6 +165,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     <Link
                       key={major._id}
                       href={`/dashboard/major/${major._id}`}
+                      onClick={closeSidebarOnSmallScreens}
                       className={`flex items-center rounded-xl px-3 py-2 text-sm transition-colors ${
                         isActive
                           ? "bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-300"
@@ -178,7 +188,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           {/* Logout */}
           <div className="mt-4 border-t border-surface-100 pt-4 dark:border-surface-800">
             <button
-              onClick={logout}
+              onClick={() => {
+                closeSidebarOnSmallScreens();
+                logout();
+              }}
               className={`flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950 ${
                 isSidebarExpanded ? "gap-2" : "justify-center"
               }`}

@@ -155,7 +155,7 @@ export function PWAInstallBanner() {
                   onClick={handleInstall}
                   className="inline-flex h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-xs font-semibold text-white transition-colors hover:bg-primary-700"
                 >
-                  Install App
+                  ثبت التطبيق
                 </button>
               ) : null}
 

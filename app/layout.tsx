@@ -80,12 +80,6 @@ export default async function RootLayout({
                     aria-label="التنقل الرئيسي"
                     className="flex items-center gap-4 text-sm font-medium text-surface-600 dark:text-surface-300"
                   >
-                    <Link
-                      href="/"
-                      className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
-                    >
-                      الرئيسية
-                    </Link>
                     <HeaderAuth />
                     <ThemeToggle />
                   </nav>
