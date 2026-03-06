@@ -5,6 +5,7 @@ import {
   assertCanEditMajor,
   authenticateUser,
   getPermissions,
+  isNotDeleted,
 } from "./helpers";
 
 const majorWithUniversity = v.object({
@@ -59,12 +60,14 @@ export const getMyMajors = query({
     const perms = await getPermissions(ctx, user._id);
 
     const majors = perms.fullAccess
-      ? await ctx.db.query("majors").collect()
+      ? (await ctx.db.query("majors").collect()).filter(isNotDeleted)
       : (
           await Promise.all(
             perms.majorIds.map((majorId) => ctx.db.get("majors", majorId))
           )
-        ).filter((major) => major !== null);
+        ).filter((major): major is NonNullable<typeof major> =>
+          major !== null && isNotDeleted(major)
+        );
 
     const enriched = await Promise.all(
       majors.map(async (major) => {
@@ -93,14 +96,14 @@ export const getCoursesForMajor = query({
       .collect();
 
     return await Promise.all(
-      courses.map(async (course) => {
+      courses.filter(isNotDeleted).map(async (course) => {
         const resources = await ctx.db
           .query("resources")
           .withIndex("by_courseId", (q) => q.eq("courseId", course._id))
           .collect();
         return {
           ...course,
-          resourceCount: resources.length,
+          resourceCount: resources.filter(isNotDeleted).length,
         };
       })
     );
@@ -114,10 +117,11 @@ export const getResourcesForCourse = query({
     const user = await authenticateUser(ctx, token);
     await assertCanEditCourse(ctx, user._id, courseId);
 
-    return await ctx.db
+    const resources = await ctx.db
       .query("resources")
       .withIndex("by_courseId_order", (q) => q.eq("courseId", courseId))
       .collect();
+    return resources.filter(isNotDeleted);
   },
 });
 
@@ -129,7 +133,7 @@ export const getMajorWithUniversity = query({
     await assertCanEditMajor(ctx, user._id, majorId);
 
     const major = await ctx.db.get("majors", majorId);
-    if (!major) return null;
+    if (!major || major.deletedAt !== undefined) return null;
 
     const university = await ctx.db.get("universities", major.universityId);
     return {
@@ -160,7 +164,7 @@ export const getCourseWithMajor = query({
     await assertCanEditCourse(ctx, user._id, courseId);
 
     const course = await ctx.db.get("courses", courseId);
-    if (!course) return null;
+    if (!course || course.deletedAt !== undefined) return null;
 
     const major = await ctx.db.get("majors", course.majorId);
     return {

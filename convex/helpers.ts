@@ -24,7 +24,7 @@ export async function authenticateUser(
   }
 
   const user = await ctx.db.get("users", session.userId);
-  if (!user) {
+  if (!user || user.deletedAt !== undefined) {
     throw new ConvexError({ code: "NOT_AUTHENTICATED" });
   }
 
@@ -37,7 +37,7 @@ export async function getPermissions(
   userId: Id<"users">
 ) {
   const user = await ctx.db.get("users", userId);
-  if (!user) {
+  if (!user || user.deletedAt !== undefined) {
     throw new ConvexError({ code: "USER_NOT_FOUND" });
   }
 
@@ -52,7 +52,9 @@ export async function getPermissions(
 
   return {
     fullAccess: false as const,
-    majorIds: permissions.map((p) => p.majorId),
+    majorIds: permissions
+      .filter((p) => p.deletedAt === undefined)
+      .map((p) => p.majorId),
   };
 }
 
@@ -75,7 +77,7 @@ export async function assertCanEditCourse(
   courseId: Id<"courses">
 ) {
   const course = await ctx.db.get("courses", courseId);
-  if (!course) {
+  if (!course || course.deletedAt !== undefined) {
     throw new ConvexError({ code: "COURSE_NOT_FOUND" });
   }
 
@@ -88,7 +90,7 @@ export async function assertCanEditResource(
   resourceId: Id<"resources">
 ) {
   const resource = await ctx.db.get("resources", resourceId);
-  if (!resource) {
+  if (!resource || resource.deletedAt !== undefined) {
     throw new ConvexError({ code: "RESOURCE_NOT_FOUND" });
   }
 
@@ -100,7 +102,20 @@ export async function assertAdmin(
   userId: Id<"users">
 ) {
   const user = await ctx.db.get("users", userId);
-  if (!user || user.role !== "admin") {
+  if (!user || user.deletedAt !== undefined || user.role !== "admin") {
     throw new ConvexError({ code: "ADMIN_REQUIRED" });
   }
+}
+
+// ── Soft delete helper ────────────────────────────────────────────────
+export function softDeleteFields(userId: Id<"users">) {
+  return {
+    deletedAt: Date.now(),
+    deletedBy: userId,
+  };
+}
+
+// ── Non-deleted filter for use with .filter() ─────────────────────────
+export function isNotDeleted<T extends { deletedAt?: number }>(doc: T): boolean {
+  return doc.deletedAt === undefined;
 }

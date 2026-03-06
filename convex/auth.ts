@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
-import { assertAdmin, authenticateUser } from "./helpers";
+import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 
 const userRole = v.union(v.literal("admin"), v.literal("contributor"));
 const publicUser = v.object({
@@ -31,10 +31,12 @@ export const getUserByEmail = internalQuery({
     })
   ),
   handler: async (ctx, { email }) => {
-    return await ctx.db
+    const user = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", email))
       .first();
+    if (!user || user.deletedAt !== undefined) return null;
+    return user;
   },
 });
 
@@ -67,7 +69,7 @@ export const getCurrentUser = query({
     }
 
     const user = await ctx.db.get("users", session.userId);
-    if (!user) {
+    if (!user || user.deletedAt !== undefined) {
       return null;
     }
 
@@ -106,12 +108,12 @@ export const createUser = internalMutation({
   },
   returns: v.id("users"),
   handler: async (ctx, args) => {
+    // Uniqueness check ignoring soft-deleted rows
     const existing = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
-      .first();
-
-    if (existing) {
+      .collect();
+    if (existing.some(isNotDeleted)) {
       throw new ConvexError({ code: "EMAIL_ALREADY_EXISTS" });
     }
 
@@ -127,12 +129,14 @@ export const listUsers = query({
     await assertAdmin(ctx, user._id);
 
     const users = await ctx.db.query("users").collect();
-    return users.map((u) => ({
-      _id: u._id,
-      name: u.name,
-      email: u.email,
-      role: u.role,
-    }));
+    return users
+      .filter(isNotDeleted)
+      .map((u) => ({
+        _id: u._id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+      }));
   },
 });
 
@@ -150,21 +154,31 @@ export const deleteUser = mutation({
       throw new ConvexError({ code: "CANNOT_DELETE_SELF" });
     }
 
+    const targetUser = await ctx.db.get("users", args.userId);
+    if (!targetUser || targetUser.deletedAt !== undefined) {
+      return null;
+    }
+
+    // Soft-delete the user's permissions
     const permissions = await ctx.db
       .query("permissions")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .collect();
     await Promise.all(
-      permissions.map((perm) => ctx.db.delete("permissions", perm._id))
+      permissions
+        .filter(isNotDeleted)
+        .map((perm) => ctx.db.patch("permissions", perm._id, softDeleteFields(admin._id)))
     );
 
+    // Invalidate sessions (hard delete - sessions don't have soft delete)
     const sessions = await ctx.db
       .query("sessions")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .collect();
     await Promise.all(sessions.map((session) => ctx.db.delete("sessions", session._id)));
 
-    await ctx.db.delete("users", args.userId);
+    // Soft-delete the user
+    await ctx.db.patch("users", args.userId, softDeleteFields(admin._id));
     return null;
   },
 });
@@ -179,10 +193,11 @@ export const getUserPermissions = query({
     const admin = await authenticateUser(ctx, args.token);
     await assertAdmin(ctx, admin._id);
 
-    return await ctx.db
+    const permissions = await ctx.db
       .query("permissions")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .collect();
+    return permissions.filter(isNotDeleted);
   },
 });
 
@@ -197,14 +212,14 @@ export const addPermission = mutation({
     const admin = await authenticateUser(ctx, args.token);
     await assertAdmin(ctx, admin._id);
 
+    // Uniqueness check ignoring soft-deleted rows
     const existing = await ctx.db
       .query("permissions")
       .withIndex("by_userId_majorId", (q) =>
         q.eq("userId", args.userId).eq("majorId", args.majorId)
       )
-      .unique();
-
-    if (existing) {
+      .collect();
+    if (existing.some(isNotDeleted)) {
       throw new ConvexError({ code: "PERMISSION_ALREADY_EXISTS" });
     }
 
@@ -225,7 +240,12 @@ export const removePermission = mutation({
     const admin = await authenticateUser(ctx, args.token);
     await assertAdmin(ctx, admin._id);
 
-    await ctx.db.delete("permissions", args.permissionId);
+    const permission = await ctx.db.get("permissions", args.permissionId);
+    if (!permission || permission.deletedAt !== undefined) {
+      return null;
+    }
+
+    await ctx.db.patch("permissions", args.permissionId, softDeleteFields(admin._id));
     return null;
   },
 });
@@ -249,7 +269,7 @@ export const getMyPermissions = query({
     if (!session || session.expiresAt < Date.now()) return null;
 
     const user = await ctx.db.get("users", session.userId);
-    if (!user) return null;
+    if (!user || user.deletedAt !== undefined) return null;
 
     if (user.role === "admin") {
       return { fullAccess: true, majorIds: [] };
@@ -262,7 +282,9 @@ export const getMyPermissions = query({
 
     return {
       fullAccess: false,
-      majorIds: permissions.map((p) => p.majorId),
+      majorIds: permissions
+        .filter(isNotDeleted)
+        .map((p) => p.majorId),
     };
   },
 });

@@ -4,6 +4,8 @@ import {
   assertCanEditCourse,
   assertCanEditResource,
   authenticateUser,
+  isNotDeleted,
+  softDeleteFields,
 } from "./helpers";
 
 const resourceType = v.union(v.literal("link"), v.literal("richtext"));
@@ -49,10 +51,11 @@ export const listByCourse = query({
   args: { courseId: v.id("courses") },
   returns: v.array(resourceDoc),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const all = await ctx.db
       .query("resources")
       .withIndex("by_courseId_order", (q) => q.eq("courseId", args.courseId))
       .collect();
+    return all.filter(isNotDeleted);
   },
 });
 
@@ -108,7 +111,7 @@ export const update = mutation({
 
     if (args.url) assertSafeUrl(args.url);
 
-    const { resourceId, ...rawUpdates } = args;
+    const { resourceId, token: _token, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
       Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
     );
@@ -134,7 +137,12 @@ export const remove = mutation({
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditResource(ctx, user._id, args.resourceId);
 
-    await ctx.db.delete("resources", args.resourceId);
+    const resource = await ctx.db.get("resources", args.resourceId);
+    if (!resource || resource.deletedAt !== undefined) {
+      return null;
+    }
+
+    await ctx.db.patch("resources", args.resourceId, softDeleteFields(user._id));
     return null;
   },
 });

@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { assertAdmin, authenticateUser } from "./helpers";
+import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
+import { buildUniversitySearchToken } from "./searchUtils";
 
 const universityDoc = v.object({
   _id: v.id("universities"),
@@ -9,13 +10,15 @@ const universityDoc = v.object({
   slug: v.string(),
   logoUrl: v.optional(v.string()),
   order: v.number(),
+  alias: v.optional(v.string()),
 });
 
 export const list = query({
   args: {},
   returns: v.array(universityDoc),
   handler: async (ctx) => {
-    return await ctx.db.query("universities").withIndex("by_order").collect();
+    const all = await ctx.db.query("universities").withIndex("by_order").collect();
+    return all.filter(isNotDeleted);
   },
 });
 
@@ -23,10 +26,12 @@ export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(v.null(), universityDoc),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const university = await ctx.db
       .query("universities")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .unique();
+      .first();
+    if (!university || university.deletedAt !== undefined) return null;
+    return university;
   },
 });
 
@@ -37,25 +42,35 @@ export const add = mutation({
     slug: v.string(),
     logoUrl: v.optional(v.string()),
     order: v.number(),
+    alias: v.optional(v.string()),
   },
   returns: v.id("universities"),
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertAdmin(ctx, user._id);
 
+    // Uniqueness check ignoring soft-deleted rows
     const existing = await ctx.db
       .query("universities")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .first();
-    if (existing) {
+      .collect();
+    if (existing.some(isNotDeleted)) {
       throw new ConvexError({ code: "UNIVERSITY_SLUG_EXISTS" });
     }
+
+    const searchToken = buildUniversitySearchToken({
+      name: args.name,
+      slug: args.slug,
+      alias: args.alias,
+    });
 
     return await ctx.db.insert("universities", {
       name: args.name,
       slug: args.slug,
       logoUrl: args.logoUrl,
       order: args.order,
+      alias: args.alias,
+      searchToken,
     });
   },
 });
@@ -68,30 +83,51 @@ export const update = mutation({
     slug: v.optional(v.string()),
     logoUrl: v.optional(v.string()),
     order: v.optional(v.number()),
+    alias: v.optional(v.string()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertAdmin(ctx, user._id);
 
+    const current = await ctx.db.get("universities", args.universityId);
+    if (!current || current.deletedAt !== undefined) {
+      throw new ConvexError({ code: "UNIVERSITY_NOT_FOUND" });
+    }
+
     if (args.slug) {
+      const slug = args.slug;
       const conflicting = await ctx.db
         .query("universities")
-        .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-        .first();
-      if (conflicting && conflicting._id !== args.universityId) {
+        .withIndex("by_slug", (q) => q.eq("slug", slug))
+        .collect();
+      const conflict = conflicting.find(
+        (u) => isNotDeleted(u) && u._id !== args.universityId
+      );
+      if (conflict) {
         throw new ConvexError({ code: "UNIVERSITY_SLUG_EXISTS" });
       }
     }
 
-    const { universityId, ...rawUpdates } = args;
+    // Recompute searchToken
+    const newName = args.name ?? current.name;
+    const newSlug = args.slug ?? current.slug;
+    const newAlias = args.alias !== undefined ? args.alias : current.alias;
+    const searchToken = buildUniversitySearchToken({
+      name: newName,
+      slug: newSlug,
+      alias: newAlias,
+    });
+
+    const { universityId, token: _token, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
       Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
     );
 
-    if (Object.keys(filtered).length > 0) {
-      await ctx.db.patch("universities", universityId, filtered);
-    }
+    await ctx.db.patch("universities", universityId, {
+      ...filtered,
+      searchToken,
+    });
 
     return null;
   },
@@ -107,7 +143,12 @@ export const remove = mutation({
     const user = await authenticateUser(ctx, args.token);
     await assertAdmin(ctx, user._id);
 
-    await ctx.db.delete("universities", args.universityId);
+    const university = await ctx.db.get("universities", args.universityId);
+    if (!university || university.deletedAt !== undefined) {
+      return null; // already deleted, idempotent
+    }
+
+    await ctx.db.patch("universities", args.universityId, softDeleteFields(user._id));
     return null;
   },
 });

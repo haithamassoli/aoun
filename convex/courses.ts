@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { assertCanEditCourse, assertCanEditMajor, authenticateUser } from "./helpers";
+import { assertCanEditCourse, assertCanEditMajor, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
+import { buildCourseSearchToken } from "./searchUtils";
 
 const courseDoc = v.object({
   _id: v.id("courses"),
@@ -11,28 +12,31 @@ const courseDoc = v.object({
   courseCode: v.optional(v.string()),
   semester: v.optional(v.number()),
   order: v.number(),
+  alias: v.optional(v.string()),
 });
 
 export const listByMajor = query({
   args: { majorId: v.id("majors") },
   returns: v.array(courseDoc),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const all = await ctx.db
       .query("courses")
       .withIndex("by_majorId_order", (q) => q.eq("majorId", args.majorId))
       .collect();
+    return all.filter(isNotDeleted);
   },
 });
 
-// Backward-compatible but ambiguous if slugs repeat across majors.
 export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(v.null(), courseDoc),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const course = await ctx.db
       .query("courses")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
+    if (!course || course.deletedAt !== undefined) return null;
+    return course;
   },
 });
 
@@ -43,12 +47,14 @@ export const getByMajorAndSlug = query({
   },
   returns: v.union(v.null(), courseDoc),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const results = await ctx.db
       .query("courses")
       .withIndex("by_majorId_slug", (q) =>
         q.eq("majorId", args.majorId).eq("slug", args.slug)
       )
-      .unique();
+      .collect();
+    const course = results.find(isNotDeleted);
+    return course ?? null;
   },
 });
 
@@ -61,22 +67,30 @@ export const add = mutation({
     courseCode: v.optional(v.string()),
     semester: v.optional(v.number()),
     order: v.number(),
+    alias: v.optional(v.string()),
   },
   returns: v.id("courses"),
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditMajor(ctx, user._id, args.majorId);
 
+    // Uniqueness check ignoring soft-deleted rows
     const existing = await ctx.db
       .query("courses")
       .withIndex("by_majorId_slug", (q) =>
         q.eq("majorId", args.majorId).eq("slug", args.slug)
       )
-      .unique();
-
-    if (existing) {
+      .collect();
+    if (existing.some(isNotDeleted)) {
       throw new ConvexError({ code: "COURSE_SLUG_EXISTS" });
     }
+
+    const searchToken = buildCourseSearchToken({
+      name: args.name,
+      slug: args.slug,
+      alias: args.alias,
+      courseCode: args.courseCode,
+    });
 
     return await ctx.db.insert("courses", {
       majorId: args.majorId,
@@ -85,6 +99,8 @@ export const add = mutation({
       courseCode: args.courseCode,
       semester: args.semester,
       order: args.order,
+      alias: args.alias,
+      searchToken,
     });
   },
 });
@@ -98,6 +114,7 @@ export const update = mutation({
     courseCode: v.optional(v.string()),
     semester: v.optional(v.number()),
     order: v.optional(v.number()),
+    alias: v.optional(v.string()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -105,31 +122,68 @@ export const update = mutation({
     await assertCanEditCourse(ctx, user._id, args.courseId);
 
     const current = await ctx.db.get("courses", args.courseId);
-    if (!current) {
+    if (!current || current.deletedAt !== undefined) {
       throw new ConvexError({ code: "COURSE_NOT_FOUND" });
     }
 
     if (args.slug) {
+      const slug = args.slug;
       const conflicting = await ctx.db
         .query("courses")
         .withIndex("by_majorId_slug", (q) =>
-          q.eq("majorId", current.majorId).eq("slug", args.slug)
+          q.eq("majorId", current.majorId).eq("slug", slug)
         )
-        .unique();
-      if (conflicting && conflicting._id !== args.courseId) {
+        .collect();
+      const conflict = conflicting.find(
+        (c) => isNotDeleted(c) && c._id !== args.courseId
+      );
+      if (conflict) {
         throw new ConvexError({ code: "COURSE_SLUG_EXISTS" });
       }
     }
 
-    const { courseId, ...rawUpdates } = args;
+    // Recompute searchToken
+    const newName = args.name ?? current.name;
+    const newSlug = args.slug ?? current.slug;
+    const newAlias = args.alias !== undefined ? args.alias : current.alias;
+    const newCourseCode = args.courseCode !== undefined ? args.courseCode : current.courseCode;
+    const searchToken = buildCourseSearchToken({
+      name: newName,
+      slug: newSlug,
+      alias: newAlias,
+      courseCode: newCourseCode,
+    });
+
+    const { courseId, token: _token, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
       Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
     );
 
-    if (Object.keys(filtered).length > 0) {
-      await ctx.db.patch("courses", courseId, filtered);
+    await ctx.db.patch("courses", courseId, {
+      ...filtered,
+      searchToken,
+    });
+
+    return null;
+  },
+});
+
+export const remove = mutation({
+  args: {
+    token: v.string(),
+    courseId: v.id("courses"),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await authenticateUser(ctx, args.token);
+    await assertCanEditCourse(ctx, user._id, args.courseId);
+
+    const course = await ctx.db.get("courses", args.courseId);
+    if (!course || course.deletedAt !== undefined) {
+      return null;
     }
 
+    await ctx.db.patch("courses", args.courseId, softDeleteFields(user._id));
     return null;
   },
 });

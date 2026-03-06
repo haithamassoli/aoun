@@ -1,11 +1,12 @@
 import { query } from "./_generated/server";
+import { isNotDeleted } from "./helpers";
 
 export const getAllPublicUrls = query({
   args: {},
   handler: async (ctx) => {
-    const universities = await ctx.db.query("universities").collect();
-    const majors = await ctx.db.query("majors").collect();
-    const courses = await ctx.db.query("courses").collect();
+    const universities = (await ctx.db.query("universities").collect()).filter(isNotDeleted);
+    const majors = (await ctx.db.query("majors").collect()).filter(isNotDeleted);
+    const courses = (await ctx.db.query("courses").collect()).filter(isNotDeleted);
 
     // Build lookup maps
     const uniMap = new Map(universities.map((u) => [u._id, u]));

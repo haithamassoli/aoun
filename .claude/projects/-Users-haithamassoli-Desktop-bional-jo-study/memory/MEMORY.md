@@ -34,3 +34,10 @@
 - M1-T7: DONE - Migration/backfill script in convex/migrations.ts
 - M1-T8: DONE - Need to deploy schema and run migrations
 - M1-T10: DONE - Migration docs
+- M2-T1: DONE - RBAC helpers updated (filter soft-deleted perms, reject deleted users)
+- M2-T2: DONE - Admin full CRUD already worked; added searchToken computation on create/update
+- M2-T3: DONE - Contributor restrictions unchanged (assertCanEditMajor/Course/Resource)
+- M2-T4: DONE - All delete mutations now soft-delete (patch deletedAt/deletedBy)
+- M2-T5: DONE - All read queries filter non-deleted (isNotDeleted helper)
+- M2-T6: DONE - Uniqueness checks use .collect() + isNotDeleted filter
+- M2-T7: DONE - Relation lookups (assertCanEditCourse/Resource, getPermissions) exclude deleted
