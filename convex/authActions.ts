@@ -170,3 +170,48 @@ export const createContributor = action({
     });
   },
 });
+
+export const createUser = action({
+  args: {
+    token: v.string(),
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+    role: userRole,
+  },
+  returns: v.id("users"),
+  handler: async (ctx, { token, name, email, password, role }): Promise<Id<"users">> => {
+    const currentUser = await ctx.runQuery(api.auth.getCurrentUser, {
+      token,
+    });
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new ConvexError({ code: "ADMIN_REQUIRED" });
+    }
+
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (normalizedName.length === 0) {
+      throw new ConvexError({ code: "INVALID_NAME" });
+    }
+    if (password.length < 8) {
+      throw new ConvexError({ code: "WEAK_PASSWORD" });
+    }
+
+    const existing = await ctx.runQuery(internal.auth.getUserByEmail, {
+      email: normalizedEmail,
+    });
+    if (existing) {
+      throw new ConvexError({ code: "EMAIL_ALREADY_EXISTS" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    return await ctx.runMutation(internal.auth.createUser, {
+      name: normalizedName,
+      email: normalizedEmail,
+      role,
+      passwordHash,
+    });
+  },
+});
