@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { HeaderAuth } from "@/components/header-auth";
 import { getSessionToken } from "@/app/actions/auth";
 import { PWARegister } from "@/components/pwa-register";
+import { PWAInstallBanner } from "@/components/pwa-install-banner";
 import "./globals.css";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -64,6 +65,7 @@ export default async function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${ibmPlexArabic.className} font-sans antialiased`}>
         <PWARegister />
+        <PWAInstallBanner />
         <ThemeProvider>
           <ConvexClientProvider sessionToken={sessionToken}>
             <div className="flex min-h-screen flex-col">

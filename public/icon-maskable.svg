@@ -1,4 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" fill="#4f46e5"/>
-  <text x="256" y="320" text-anchor="middle" font-family="sans-serif" font-size="220" font-weight="bold" fill="#ffffff">عون</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(320)">
+      <stop stop-color="#38BDF8" />
+      <stop offset="1" stop-color="#1E40AF" />
+    </radialGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="180" fill="#F0F9FF" opacity="0.2" />
+
+  <path d="M148 325C148 273 190 231 242 231H352V328C352 380 310 422 258 422H242C190 422 148 380 148 328V325Z" fill="#E0F2FE" opacity="0.96" />
+  <path d="M208 168C235.74 140.26 280.67 140.26 308.41 168L359 218.59L308.41 269.17C280.67 296.91 235.74 296.91 208 269.17C180.26 241.43 180.26 196.5 208 168Z" fill="white" />
+
+  <text x="256" y="323" text-anchor="middle" font-size="144" font-weight="700" font-family="'IBM Plex Sans Arabic','Noto Kufi Arabic','Tahoma',sans-serif" fill="#1E3A8A">ع</text>
 </svg>

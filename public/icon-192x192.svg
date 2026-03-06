@@ -1,4 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <rect width="192" height="192" rx="40" fill="#4f46e5"/>
-  <text x="96" y="120" text-anchor="middle" font-family="sans-serif" font-size="100" font-weight="bold" fill="#ffffff">عون</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="20" y1="12" x2="170" y2="188" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1D4ED8" />
+      <stop offset="1" stop-color="#0EA5E9" />
+    </linearGradient>
+    <linearGradient id="glow" x1="142" y1="34" x2="168" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A" />
+      <stop offset="1" stop-color="#FB7185" />
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="176" height="176" rx="42" fill="url(#bg)" />
+  <circle cx="154" cy="46" r="12" fill="url(#glow)" opacity="0.95" />
+  <circle cx="40" cy="150" r="10" fill="#BFDBFE" opacity="0.8" />
+
+  <path d="M49 122C49 102.67 64.67 87 84 87H123V123C123 142.33 107.33 158 88 158H84C64.67 158 49 142.33 49 123V122Z" fill="#E0F2FE" opacity="0.92" />
+  <path d="M71 64C81.3 53.7 97.99 53.7 108.29 64L127 82.71L108.29 101.41C97.99 111.71 81.3 111.71 71 101.41C60.7 91.11 60.7 74.4 71 64Z" fill="white" />
+
+  <text x="96" y="122" text-anchor="middle" font-size="52" font-weight="700" font-family="'IBM Plex Sans Arabic','Noto Kufi Arabic','Tahoma',sans-serif" fill="#1E3A8A">ع</text>
 </svg>

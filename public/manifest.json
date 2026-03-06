@@ -1,13 +1,32 @@
 {
+  "id": "/?source=pwa",
   "name": "عون — مصادر أكاديمية للجامعات الأردنية",
   "short_name": "عون",
   "description": "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
   "dir": "rtl",
   "lang": "ar",
+  "categories": ["education", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "تصفح الجامعات",
+      "short_name": "الجامعات",
+      "description": "ابحث عن جامعتك وتصفح تخصصاتها",
+      "url": "/"
+    },
+    {
+      "name": "لوحة التحكم",
+      "short_name": "اللوحة",
+      "description": "افتح لوحة التحكم لإدارة المحتوى",
+      "url": "/dashboard"
+    }
+  ],
   "icons": [
     {
       "src": "/icon-192x192.svg",
@@ -27,5 +46,6 @@
       "type": "image/svg+xml",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
