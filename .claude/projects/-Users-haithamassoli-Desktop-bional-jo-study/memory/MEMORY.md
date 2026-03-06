@@ -41,3 +41,10 @@
 - M2-T5: DONE - All read queries filter non-deleted (isNotDeleted helper)
 - M2-T6: DONE - Uniqueness checks use .collect() + isNotDeleted filter
 - M2-T7: DONE - Relation lookups (assertCanEditCourse/Resource, getPermissions) exclude deleted
+- M3-T1: DONE - Admin list pages for all 6 entities (app/dashboard/admin/{universities,majors,courses,resources,users})
+- M3-T2: DONE - Create/edit forms for all 6 entities with inline form pattern
+- M3-T3: DONE - Alias fields added to university, major, course forms (admin + contributor)
+- M3-T4: DONE - Soft-delete action wired in UI for all entities
+- M3-T5: DONE - Relation pickers (university, major, course, user) show only non-deleted options
+- M3-T6: DONE - Form validation + server error messages for duplicates (slug, email, permission)
+- M3-T7: DONE - Contributor dashboard unchanged; alias field added to contributor course form

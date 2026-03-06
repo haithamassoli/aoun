@@ -140,6 +140,47 @@ export const listUsers = query({
   },
 });
 
+export const updateUser = mutation({
+  args: {
+    token: v.string(),
+    userId: v.id("users"),
+    name: v.optional(v.string()),
+    email: v.optional(v.string()),
+    role: v.optional(userRole),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const admin = await authenticateUser(ctx, args.token);
+    await assertAdmin(ctx, admin._id);
+
+    const targetUser = await ctx.db.get("users", args.userId);
+    if (!targetUser || targetUser.deletedAt !== undefined) {
+      throw new ConvexError({ code: "USER_NOT_FOUND" });
+    }
+
+    if (args.email && args.email !== targetUser.email) {
+      const existing = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.email!))
+        .collect();
+      if (existing.some(isNotDeleted)) {
+        throw new ConvexError({ code: "EMAIL_ALREADY_EXISTS" });
+      }
+    }
+
+    const { userId, token: _token, ...rawUpdates } = args;
+    const filtered = Object.fromEntries(
+      Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
+    );
+
+    if (Object.keys(filtered).length > 0) {
+      await ctx.db.patch("users", userId, filtered);
+    }
+
+    return null;
+  },
+});
+
 export const deleteUser = mutation({
   args: {
     token: v.string(),
