@@ -106,7 +106,7 @@ export function UniversitiesSearchSection({
                 />
               ) : (
                 <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-primary-100 text-3xl font-bold text-primary-600 dark:bg-primary-950 dark:text-primary-400">
-                  {uni.name.charAt(0)}
+                  {uni.slug.toUpperCase().slice(0, 4)}
                 </div>
               )}
               <h3 className="text-center text-lg font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">

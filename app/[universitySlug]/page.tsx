@@ -49,7 +49,7 @@ export default async function UniversityPage({
     universityId: university._id,
   });
   const sortedMajors = majors.toSorted(
-    (a: { order: number }, b: { order: number }) => a.order - b.order
+    (a: { order: number }, b: { order: number }) => a.order - b.order,
   );
 
   return (
@@ -81,7 +81,7 @@ export default async function UniversityPage({
               />
             ) : (
               <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary-100 text-3xl font-bold text-primary-600 dark:bg-primary-950 dark:text-primary-400 sm:h-20 sm:w-20">
-                {university.name.charAt(0)}
+                {university.slug.toUpperCase().slice(0, 4)}
               </div>
             )}
             <div>
