@@ -16,6 +16,7 @@ const majorWithUniversity = v.object({
   name: v.string(),
   slug: v.string(),
   order: v.number(),
+  alias: v.optional(v.string()),
   universityName: v.string(),
 });
 
@@ -28,6 +29,7 @@ const courseWithResourceCount = v.object({
   courseCode: v.optional(v.string()),
   semester: v.optional(v.number()),
   order: v.number(),
+  alias: v.optional(v.string()),
   resourceCount: v.number(),
 });
 
@@ -80,7 +82,13 @@ export const getMyMajors = query({
       majors.map(async (major) => {
         const university = await ctx.db.get("universities", major.universityId);
         return {
-          ...major,
+          _id: major._id,
+          _creationTime: major._creationTime,
+          universityId: major.universityId,
+          name: major.name,
+          slug: major.slug,
+          order: major.order,
+          alias: major.alias,
           universityName: university?.name ?? "",
         };
       })
@@ -109,7 +117,15 @@ export const getCoursesForMajor = query({
           .withIndex("by_courseId", (q) => q.eq("courseId", course._id))
           .collect();
         return {
-          ...course,
+          _id: course._id,
+          _creationTime: course._creationTime,
+          majorId: course.majorId,
+          name: course.name,
+          slug: course.slug,
+          courseCode: course.courseCode,
+          semester: course.semester,
+          order: course.order,
+          alias: course.alias,
           resourceCount: resources.filter(isNotDeleted).length,
         };
       })
@@ -144,7 +160,13 @@ export const getMajorWithUniversity = query({
 
     const university = await ctx.db.get("universities", major.universityId);
     return {
-      ...major,
+      _id: major._id,
+      _creationTime: major._creationTime,
+      universityId: major.universityId,
+      name: major.name,
+      slug: major.slug,
+      order: major.order,
+      alias: major.alias,
       universityName: university?.name ?? "",
     };
   },
@@ -329,6 +351,7 @@ export const getCourseWithMajor = query({
       courseCode: v.optional(v.string()),
       semester: v.optional(v.number()),
       order: v.number(),
+      alias: v.optional(v.string()),
       majorName: v.string(),
     })
   ),
@@ -341,7 +364,15 @@ export const getCourseWithMajor = query({
 
     const major = await ctx.db.get("majors", course.majorId);
     return {
-      ...course,
+      _id: course._id,
+      _creationTime: course._creationTime,
+      majorId: course.majorId,
+      name: course.name,
+      slug: course.slug,
+      courseCode: course.courseCode,
+      semester: course.semester,
+      order: course.order,
+      alias: course.alias,
       majorName: major?.name ?? "",
     };
   },
