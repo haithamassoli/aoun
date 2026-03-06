@@ -22,6 +22,7 @@ type CourseListItem = {
   semester?: number;
   order: number;
 };
+type CourseStatusFilter = "all" | CourseProgressStatus;
 
 const semesterLabels: Record<number, string> = {
   1: "الفصل الأول",
@@ -35,6 +36,85 @@ const semesterLabels: Record<number, string> = {
   9: "الفصل التاسع",
   10: "الفصل العاشر",
 };
+const STATUS_FILTER_STORAGE_KEY = "aoun:student:course-filter:v1";
+const statusFilterOptions: {
+  value: CourseStatusFilter;
+  label: string;
+  dotClassName: string;
+}[] = [
+  {
+    value: "all",
+    label: "الكل",
+    dotClassName: "bg-primary-500",
+  },
+  {
+    value: "none",
+    label: "بدون حالة",
+    dotClassName: "bg-surface-400 dark:bg-surface-500",
+  },
+  {
+    value: "in_progress",
+    label: "قيد الدراسة",
+    dotClassName: "bg-amber-500",
+  },
+  {
+    value: "completed",
+    label: "مكتمل",
+    dotClassName: "bg-emerald-500",
+  },
+];
+
+function parseCourseStatusFilter(raw: string | null): CourseStatusFilter | null {
+  if (
+    raw === "all" ||
+    raw === "none" ||
+    raw === "in_progress" ||
+    raw === "completed"
+  ) {
+    return raw;
+  }
+
+  return null;
+}
+
+function loadCourseStatusFilter(): CourseStatusFilter | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return parseCourseStatusFilter(
+      window.localStorage.getItem(STATUS_FILTER_STORAGE_KEY),
+    );
+  } catch {
+    return null;
+  }
+}
+
+function persistCourseStatusFilter(filter: CourseStatusFilter) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    if (filter === "all") {
+      window.localStorage.removeItem(STATUS_FILTER_STORAGE_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(STATUS_FILTER_STORAGE_KEY, filter);
+  } catch {
+    // Local storage may be blocked by the browser.
+  }
+}
+
+function getFilterButtonClassName(isActive: boolean) {
+  if (isActive) {
+    return "inline-flex items-center gap-1.5 rounded-full border border-primary-300 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 transition-colors dark:border-primary-600 dark:bg-primary-900/40 dark:text-primary-300";
+  }
+
+  return "inline-flex items-center gap-1.5 rounded-full border border-surface-200 bg-white px-3 py-1.5 text-xs text-surface-500 transition-colors hover:border-primary-200 hover:text-primary-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-400 dark:hover:border-primary-700 dark:hover:text-primary-300";
+}
 
 function groupCoursesBySemester(courses: CourseListItem[]) {
   const grouped = new Map<number | null, CourseListItem[]>();
@@ -145,26 +225,51 @@ export function CoursesSearchSection({
   universitySlug,
   majorSlug,
   courses,
+  initialStatusFilter,
 }: {
   majorId: Id<"majors">;
   universitySlug: string;
   majorSlug: string;
   courses: CourseListItem[];
+  initialStatusFilter?: CourseStatusFilter;
 }) {
   const search = useDebouncedPublicSearch();
   const [courseStatuses, setCourseStatuses] = useState<
     Record<string, CourseProgressStatus>
   >({});
+  const [statusFilter, setStatusFilter] = useState<CourseStatusFilter>(
+    initialStatusFilter ?? "all",
+  );
+  const [isStatusFilterReady, setIsStatusFilterReady] = useState(false);
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
       setCourseStatuses(loadCourseStatuses());
+
+      if (initialStatusFilter === undefined) {
+        const storedFilter = loadCourseStatusFilter();
+        if (storedFilter) {
+          setStatusFilter(storedFilter);
+        }
+      } else {
+        setStatusFilter(initialStatusFilter);
+      }
+
+      setIsStatusFilterReady(true);
     });
 
     return () => {
       window.cancelAnimationFrame(frameId);
     };
-  }, []);
+  }, [initialStatusFilter]);
+
+  useEffect(() => {
+    if (!isStatusFilterReady) {
+      return;
+    }
+
+    persistCourseStatusFilter(statusFilter);
+  }, [isStatusFilterReady, statusFilter]);
 
   const searchedCourses = useQuery(
     api.courses.searchByMajor,
@@ -175,17 +280,43 @@ export function CoursesSearchSection({
     () => courses.toSorted((a, b) => a.order - b.order),
     [courses],
   );
-  const groupedDefaultCourses = useMemo(
-    () => groupCoursesBySemester(defaultCourses),
-    [defaultCourses],
+  const filteredDefaultCourses = useMemo(
+    () =>
+      defaultCourses.filter(
+        (course) =>
+          statusFilter === "all" ||
+          (courseStatuses[course._id] ?? "none") === statusFilter,
+      ),
+    [courseStatuses, defaultCourses, statusFilter],
   );
-  const activeSearchedCourses = searchedCourses ?? [];
+  const groupedDefaultCourses = useMemo(
+    () => groupCoursesBySemester(filteredDefaultCourses),
+    [filteredDefaultCourses],
+  );
+  const activeSearchedCourses = useMemo(
+    () => searchedCourses ?? [],
+    [searchedCourses],
+  );
+  const filteredSearchedCourses = useMemo(
+    () =>
+      activeSearchedCourses.filter(
+        (course: CourseListItem) =>
+          statusFilter === "all" ||
+          (courseStatuses[course._id] ?? "none") === statusFilter,
+      ),
+    [activeSearchedCourses, courseStatuses, statusFilter],
+  );
 
   const isLoading =
     !search.isEmpty && (search.isDebouncing || searchedCourses === undefined);
   const isNoResults =
-    !search.isEmpty && !isLoading && activeSearchedCourses.length === 0;
+    !search.isEmpty && !isLoading && filteredSearchedCourses.length === 0;
   const isEmptyList = search.isEmpty && defaultCourses.length === 0;
+  const isNoFilterResults =
+    search.isEmpty &&
+    statusFilter !== "all" &&
+    defaultCourses.length > 0 &&
+    filteredDefaultCourses.length === 0;
 
   const getStatus = (courseId: Id<"courses">) => {
     return courseStatuses[courseId] ?? "none";
@@ -205,13 +336,45 @@ export function CoursesSearchSection({
           الخطة الدراسية
         </h2>
 
-        <div className="max-w-2xl">
+        <div className="max-w-2xl space-y-3">
           <PublicSearchInput
             label="ابحث داخل مواد التخصص"
             placeholder="مثال: برمجة كائنية"
             value={search.input}
             onChange={search.setInput}
           />
+
+          <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 dark:border-surface-700 dark:bg-surface-900">
+            <p className="mb-2 text-xs font-medium text-surface-600 dark:text-surface-300">
+              فلترة حسب حالة الدراسة
+            </p>
+            <div
+              role="radiogroup"
+              aria-label="فلترة المواد حسب حالة الدراسة"
+              className="flex flex-wrap items-center gap-2"
+            >
+              {statusFilterOptions.map((option) => {
+                const isActive = statusFilter === option.value;
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={isActive}
+                    onClick={() => setStatusFilter(option.value)}
+                    className={getFilterButtonClassName(isActive)}
+                  >
+                    <span
+                      className={`h-2 w-2 rounded-full ${option.dotClassName}`}
+                      aria-hidden="true"
+                    />
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -237,6 +400,15 @@ export function CoursesSearchSection({
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-surface-500 dark:text-surface-400">
             لم تُضاف مواد بعد. ترقبوا التحديثات!
+          </p>
+        </div>
+      ) : isNoFilterResults ? (
+        <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+          <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
+            لا توجد مواد بهذه الحالة حالياً
+          </p>
+          <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
+            غيّر فلتر الحالة لعرض مواد إضافية.
           </p>
         </div>
       ) : search.isEmpty ? (
@@ -268,10 +440,10 @@ export function CoursesSearchSection({
       ) : (
         <div>
           <p className="mb-4 text-sm text-surface-500 dark:text-surface-400">
-            {activeSearchedCourses.length} نتيجة بحث
+            {filteredSearchedCourses.length} نتيجة بحث
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {activeSearchedCourses.map((course: CourseListItem) => (
+            {filteredSearchedCourses.map((course: CourseListItem) => (
               <CourseCard
                 key={course._id}
                 course={course}

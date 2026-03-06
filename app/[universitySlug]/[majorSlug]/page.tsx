@@ -8,6 +8,30 @@ import * as motion from "motion/react-client";
 import { MajorLastVisitTracker } from "@/components/major-last-visit-tracker";
 
 type Params = { universitySlug: string; majorSlug: string };
+type SearchParams = {
+  status?: string | string[];
+};
+type CourseStatusFilter = "all" | "completed" | "in_progress" | "none";
+
+function normalizeStatusFilter(
+  value: string | string[] | undefined,
+): CourseStatusFilter | undefined {
+  const singleValue = Array.isArray(value) ? value[0] : value;
+  if (!singleValue) {
+    return undefined;
+  }
+
+  if (
+    singleValue === "all" ||
+    singleValue === "completed" ||
+    singleValue === "in_progress" ||
+    singleValue === "none"
+  ) {
+    return singleValue;
+  }
+
+  return undefined;
+}
 
 export async function generateMetadata({
   params,
@@ -40,10 +64,16 @@ export async function generateMetadata({
 
 export default async function MajorPage({
   params,
+  searchParams,
 }: {
   params: Promise<Params>;
+  searchParams: Promise<SearchParams>;
 }) {
-  const { universitySlug, majorSlug } = await params;
+  const [{ universitySlug, majorSlug }, resolvedSearchParams] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const initialStatusFilter = normalizeStatusFilter(resolvedSearchParams.status);
 
   const university = await fetchQuery(api.universities.getBySlug, {
     slug: universitySlug,
@@ -103,6 +133,7 @@ export default async function MajorPage({
         universitySlug={universitySlug}
         majorSlug={majorSlug}
         courses={courses}
+        initialStatusFilter={initialStatusFilter}
       />
     </div>
   );
