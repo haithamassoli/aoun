@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import type { Metadata } from "next";
 import * as motion from "motion/react-client";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
+import { CourseStatusControl } from "@/components/course-status-control";
 
 type Params = {
   universitySlug: string;
@@ -149,6 +150,7 @@ export default async function CoursePage({
               {major.name} · {university.name}
             </span>
           </motion.div>
+          <CourseStatusControl courseId={course._id} courseName={course.name} />
         </div>
       </section>
 

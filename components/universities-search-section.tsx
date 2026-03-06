@@ -7,7 +7,6 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { PublicSearchInput } from "@/components/public-search-input";
 import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
-import { PUBLIC_SEARCH_CONTRACT } from "@/lib/public-search";
 
 type UniversityListItem = {
   _id: Id<"universities">;

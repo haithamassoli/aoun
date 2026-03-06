@@ -3,6 +3,7 @@ import { api } from "@/convex/_generated/api";
 import type { Metadata } from "next";
 import * as motion from "motion/react-client";
 import { UniversitiesSearchSection } from "@/components/universities-search-section";
+import { HomeLastMajorRedirect } from "@/components/home-last-major-redirect";
 
 export const metadata: Metadata = {
   title: "عون — مصادر أكاديمية للجامعات الأردنية",
@@ -30,6 +31,8 @@ export default async function Home() {
 
   return (
     <div>
+      <HomeLastMajorRedirect />
+
       {/* Hero */}
       <section className="bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">

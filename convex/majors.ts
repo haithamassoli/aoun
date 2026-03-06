@@ -14,6 +14,11 @@ const majorDoc = v.object({
   searchToken: v.optional(v.string()),
 });
 
+const redirectTarget = v.object({
+  universitySlug: v.string(),
+  majorSlug: v.string(),
+});
+
 export const listByUniversity = query({
   args: { universityId: v.id("universities") },
   returns: v.array(majorDoc),
@@ -81,6 +86,40 @@ export const getByUniversityAndSlug = query({
       .collect();
     const major = results.find(isNotDeleted);
     return major ?? null;
+  },
+});
+
+export const validateLastVisitedMajor = query({
+  args: {
+    universitySlug: v.string(),
+    majorSlug: v.string(),
+  },
+  returns: v.union(v.null(), redirectTarget),
+  handler: async (ctx, args) => {
+    const universities = await ctx.db
+      .query("universities")
+      .withIndex("by_slug", (q) => q.eq("slug", args.universitySlug))
+      .collect();
+    const university = universities.find(isNotDeleted);
+    if (!university) {
+      return null;
+    }
+
+    const majors = await ctx.db
+      .query("majors")
+      .withIndex("by_universityId_slug", (q) =>
+        q.eq("universityId", university._id).eq("slug", args.majorSlug)
+      )
+      .collect();
+    const major = majors.find(isNotDeleted);
+    if (!major) {
+      return null;
+    }
+
+    return {
+      universitySlug: university.slug,
+      majorSlug: major.slug,
+    };
   },
 });
 

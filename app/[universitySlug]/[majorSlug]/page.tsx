@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { CoursesSearchSection } from "@/components/courses-search-section";
 import type { Metadata } from "next";
 import * as motion from "motion/react-client";
+import { MajorLastVisitTracker } from "@/components/major-last-visit-tracker";
 
 type Params = { universitySlug: string; majorSlug: string };
 
@@ -60,6 +61,11 @@ export default async function MajorPage({
 
   return (
     <div>
+      <MajorLastVisitTracker
+        universitySlug={universitySlug}
+        majorSlug={majorSlug}
+      />
+
       {/* Major Header */}
       <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-16 lg:px-8">
         <div className="mx-auto max-w-7xl">
