@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
-import { buildUniversitySearchToken } from "./searchUtils";
+import { buildUniversitySearchToken, normalize } from "./searchUtils";
 
 const universityDoc = v.object({
   _id: v.id("universities"),
@@ -11,6 +11,7 @@ const universityDoc = v.object({
   logoUrl: v.optional(v.string()),
   order: v.number(),
   alias: v.optional(v.string()),
+  searchToken: v.optional(v.string()),
 });
 
 export const list = query({
@@ -19,6 +20,26 @@ export const list = query({
   handler: async (ctx) => {
     const all = await ctx.db.query("universities").withIndex("by_order").collect();
     return all.filter(isNotDeleted);
+  },
+});
+
+export const searchPublic = query({
+  args: { query: v.string() },
+  returns: v.array(universityDoc),
+  handler: async (ctx, args) => {
+    const queryText = normalize(args.query);
+    if (!queryText) {
+      return [];
+    }
+
+    const matches = await ctx.db
+      .query("universities")
+      .withSearchIndex("search_token", (q) =>
+        q.search("searchToken", queryText)
+      )
+      .collect();
+
+    return matches.filter(isNotDeleted);
   },
 });
 

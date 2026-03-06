@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { assertCanEditCourse, assertCanEditMajor, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
-import { buildCourseSearchToken } from "./searchUtils";
+import { buildCourseSearchToken, normalize } from "./searchUtils";
 
 const courseDoc = v.object({
   _id: v.id("courses"),
@@ -13,6 +13,7 @@ const courseDoc = v.object({
   semester: v.optional(v.number()),
   order: v.number(),
   alias: v.optional(v.string()),
+  searchToken: v.optional(v.string()),
 });
 
 export const listByMajor = query({
@@ -24,6 +25,31 @@ export const listByMajor = query({
       .withIndex("by_majorId_order", (q) => q.eq("majorId", args.majorId))
       .collect();
     return all.filter(isNotDeleted);
+  },
+});
+
+export const searchByMajor = query({
+  args: {
+    majorId: v.id("majors"),
+    query: v.string(),
+  },
+  returns: v.array(courseDoc),
+  handler: async (ctx, args) => {
+    const queryText = normalize(args.query);
+    if (!queryText) {
+      return [];
+    }
+
+    const matches = await ctx.db
+      .query("courses")
+      .withSearchIndex("search_token", (q) =>
+        q
+          .search("searchToken", queryText)
+          .eq("majorId", args.majorId)
+      )
+      .collect();
+
+    return matches.filter(isNotDeleted);
   },
 });
 

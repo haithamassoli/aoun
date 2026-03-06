@@ -2,9 +2,9 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { MajorsSearchSection } from "@/components/majors-search-section";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import * as motion from "motion/react-client";
 
 type Params = { universitySlug: string };
@@ -98,63 +98,11 @@ export default async function UniversityPage({
         </div>
       </section>
 
-      {/* Majors Grid */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <h2 className="mb-8 text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
-          التخصصات
-        </h2>
-
-        {majors.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {sortedMajors.map(
-              (
-                major: { _id: string; name: string; slug: string },
-                index: number
-              ) => (
-                <motion.div
-                  key={major._id}
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
-                >
-                  <Link
-                    href={`/${universitySlug}/${major.slug}`}
-                    className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
-                  >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-lg font-bold text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
-                    {major.name.charAt(0)}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="truncate text-base font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">
-                      {major.name}
-                    </h3>
-                  </div>
-                  <svg
-                    className="ms-auto h-5 w-5 shrink-0 rotate-180 text-surface-400 transition-colors group-hover:text-primary-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                  </Link>
-                </motion.div>
-              )
-            )}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
-            <p className="text-surface-500 dark:text-surface-400">
-              لم تُضاف تخصصات بعد. ترقبوا التحديثات!
-            </p>
-          </div>
-        )}
-      </section>
+      <MajorsSearchSection
+        universityId={university._id}
+        universitySlug={universitySlug}
+        majors={sortedMajors}
+      />
     </div>
   );
 }
