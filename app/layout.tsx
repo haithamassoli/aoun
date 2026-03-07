@@ -96,7 +96,7 @@ export default async function RootLayout({
                   >
                     <Link
                       href="/gpa-calculator"
-                      className="hidden rounded-lg px-3 py-1.5 transition-colors hover:bg-surface-100 hover:text-primary-600 dark:hover:bg-surface-800 dark:hover:text-primary-400 sm:block"
+                      className=" rounded-lg px-3 py-1.5 transition-colors hover:bg-surface-100 hover:text-primary-600 dark:hover:bg-surface-800 dark:hover:text-primary-400 sm:block"
                     >
                       حاسبة المعدل
                     </Link>
