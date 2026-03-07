@@ -10,6 +10,7 @@ import { useForm } from "@tanstack/react-form";
 import { Toast, useToast } from "@/components/toast";
 import { FormInput } from "@/components/form-field";
 import { universitySchema } from "@/lib/schemas";
+import { motion } from "motion/react";
 
 const generateSlug = (name: string) =>
   name.trim().replace(/\s+/g, "-").toLowerCase();
@@ -264,7 +265,12 @@ export default function AdminUniversitiesPage() {
         </span>
       </nav>
 
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div>
           <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
             إدارة الجامعات
@@ -295,7 +301,7 @@ export default function AdminUniversitiesPage() {
           </svg>
           إضافة جامعة
         </button>
-      </div>
+      </motion.div>
 
       {showForm && (
         <form
@@ -573,9 +579,12 @@ export default function AdminUniversitiesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {universities.map((uni) => (
-            <div
+          {universities.map((uni, index) => (
+            <motion.div
               key={uni._id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.2) }}
               className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
             >
               <div className="min-w-0 flex-1">
@@ -644,7 +653,7 @@ export default function AdminUniversitiesPage() {
                   </svg>
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

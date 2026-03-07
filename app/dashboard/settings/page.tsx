@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { motion } from "motion/react";
 import { changePasswordAction } from "@/app/actions/auth";
 
 function EyeIcon({ open }: { open: boolean }) {
@@ -132,7 +133,12 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mx-auto max-w-lg"
+    >
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
@@ -319,6 +325,6 @@ export default function SettingsPage() {
           </button>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Fira_Code } from "next/font/google";
 import Link from "next/link";
+import { motion } from "motion/react";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -99,16 +100,26 @@ export default function DashboardPage() {
 
     return (
       <div>
-        <div className="mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-6"
+        >
           <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
             لوحة التحكم
           </h1>
           <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
             مرحبا، {user.name}. لديك صلاحيات كاملة.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="relative mb-6 overflow-hidden rounded-2xl border border-primary-200/70 bg-gradient-to-l from-white via-primary-50/60 to-primary-100/70 p-5 dark:border-primary-900/50 dark:from-surface-900 dark:via-primary-950/20 dark:to-surface-900 sm:p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.08 }}
+          className="relative mb-6 overflow-hidden rounded-2xl border border-primary-200/70 bg-gradient-to-l from-white via-primary-50/60 to-primary-100/70 p-5 dark:border-primary-900/50 dark:from-surface-900 dark:via-primary-950/20 dark:to-surface-900 sm:p-6"
+        >
           <div className="absolute -top-14 left-0 h-44 w-44 rounded-full bg-amber-300/20 blur-3xl dark:bg-amber-700/10" />
           <div className="relative">
             <h2 className="text-xl font-bold text-surface-900 dark:text-surface-50 sm:text-2xl">
@@ -118,7 +129,7 @@ export default function DashboardPage() {
               أرقام حية لإجمالي الجامعات والتخصصات والمواد غير المحذوفة.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {totals === undefined ? (
           <div className="space-y-6">
@@ -135,9 +146,12 @@ export default function DashboardPage() {
         ) : (
           <>
             <div className="mb-6 grid gap-4 md:grid-cols-3">
-              {chartBars.map((metric) => (
-                <article
+              {chartBars.map((metric, index) => (
+                <motion.article
                   key={metric.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: 0.15 + index * 0.08 }}
                   className="group relative overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 motion-reduce:transform-none"
                 >
                   <div
@@ -176,11 +190,16 @@ export default function DashboardPage() {
                       {metric.hint}
                     </p>
                   </div>
-                </article>
+                </motion.article>
               ))}
             </div>
 
-            <section className="rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900 sm:p-6">
+            <motion.section
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.35 }}
+              className="rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900 sm:p-6"
+            >
               <div className="mb-2 flex items-center justify-between gap-3">
                 <h2 className="text-base font-semibold text-surface-900 dark:text-surface-50 sm:text-lg">
                   مقارنة الكيانات
@@ -228,7 +247,7 @@ export default function DashboardPage() {
                   ))}
                 </div>
               </div>
-            </section>
+            </motion.section>
           </>
         )}
       </div>
@@ -238,12 +257,17 @@ export default function DashboardPage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6"
+      >
         <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">لوحة التحكم</h1>
         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
           مرحبا، {user.name}. {user.role === "admin" ? "لديك صلاحيات كاملة." : "اختر تخصصا لإدارة محتواه."}
         </p>
-      </div>
+      </motion.div>
 
       {/* Majors grid */}
       {majors === undefined ? (
@@ -264,11 +288,16 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {majors.map((major: { _id: string; name: string; universityName: string }) => (
-            <Link
+          {majors.map((major: { _id: string; name: string; universityName: string }, index: number) => (
+            <motion.div
               key={major._id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.1 + index * 0.07 }}
+            >
+            <Link
               href={`/dashboard/major/${major._id}`}
-              className="group rounded-2xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-200 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-700"
+              className="group rounded-2xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-200 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-700 block"
             >
               <div className="mb-3 flex items-start justify-between">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
@@ -283,6 +312,7 @@ export default function DashboardPage() {
               <h3 className="text-base font-semibold text-surface-900 dark:text-surface-50">{major.name}</h3>
               <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">{major.universityName}</p>
             </Link>
+            </motion.div>
           ))}
         </div>
       )}

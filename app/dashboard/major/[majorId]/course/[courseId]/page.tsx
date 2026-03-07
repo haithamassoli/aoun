@@ -14,6 +14,7 @@ import { FormInput, FormSelect } from "@/components/form-field";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { contributorResourceSchema } from "@/lib/schemas";
+import { motion } from "motion/react";
 
 const CATEGORIES = [
   { value: "notes", label: "ملاحظات" },
@@ -245,7 +246,12 @@ export default function CourseResourcesPage() {
       </nav>
 
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div>
           <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
             {course.name}
@@ -281,7 +287,7 @@ export default function CourseResourcesPage() {
           </svg>
           إضافة مصدر
         </button>
-      </div>
+      </motion.div>
 
       {/* Resource editor form */}
       {showForm && (
@@ -514,9 +520,12 @@ export default function CourseResourcesPage() {
               url?: string;
               content?: string;
               order: number;
-            }) => (
-              <div
+            }, index: number) => (
+              <motion.div
                 key={resource._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.2) }}
                 className="group rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -603,7 +612,7 @@ export default function CourseResourcesPage() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ),
           )}
         </div>

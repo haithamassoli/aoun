@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { loginAction } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
 import { loginSchema } from "@/lib/schemas";
+import { motion } from "motion/react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,7 +32,12 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        className="w-full max-w-md"
+      >
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600 text-2xl font-bold text-white">
@@ -189,7 +195,7 @@ export default function LoginPage() {
           </a>
           .
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }

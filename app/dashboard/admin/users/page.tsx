@@ -10,6 +10,7 @@ import { useForm } from "@tanstack/react-form";
 import { Toast, useToast } from "@/components/toast";
 import { FormInput, FormSelect } from "@/components/form-field";
 import { createUserSchema, editUserSchema } from "@/lib/schemas";
+import { motion } from "motion/react";
 
 const ROLE_OPTIONS = [
   { value: "admin", label: "مدير" },
@@ -217,14 +218,19 @@ export default function AdminUsersPage() {
       </nav>
 
       {/* Header */}
-      <div className="mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6"
+      >
         <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
           إدارة المستخدمين
         </h1>
         <p className="text-sm text-surface-500 dark:text-surface-400">
           {users ? `${users.length} مستخدم` : "جاري التحميل..."}
         </p>
-      </div>
+      </motion.div>
 
       {/* Create user form */}
       <form
@@ -440,9 +446,12 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {users.map((u) => (
-            <div
+          {users.map((u, index) => (
+            <motion.div
               key={u._id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.2) }}
               className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
             >
               <div className="min-w-0 flex-1">
@@ -543,7 +552,7 @@ export default function AdminUsersPage() {
                   </svg>
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
