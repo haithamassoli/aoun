@@ -171,6 +171,35 @@ export const createContributor = action({
   },
 });
 
+export const changePassword = action({
+  args: {
+    token: v.string(),
+    currentPassword: v.string(),
+    newPassword: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, { token, currentPassword, newPassword }) => {
+    const user = await ctx.runQuery(api.auth.getCurrentUser, { token });
+    if (!user) throw new ConvexError({ code: "UNAUTHORIZED" });
+
+    const fullUser = await ctx.runQuery(internal.auth.getUserByEmail, { email: user.email });
+    if (!fullUser) throw new ConvexError({ code: "USER_NOT_FOUND" });
+
+    const valid = await bcrypt.compare(currentPassword, fullUser.passwordHash);
+    if (!valid) throw new ConvexError({ code: "INVALID_CURRENT_PASSWORD" });
+
+    if (newPassword.length < 8) throw new ConvexError({ code: "WEAK_PASSWORD" });
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await ctx.runMutation(internal.auth.updatePasswordHash, {
+      userId: fullUser._id,
+      passwordHash,
+    });
+
+    return null;
+  },
+});
+
 export const createUser = action({
   args: {
     token: v.string(),

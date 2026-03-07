@@ -121,6 +121,15 @@ export const createUser = internalMutation({
   },
 });
 
+export const updatePasswordHash = internalMutation({
+  args: { userId: v.id("users"), passwordHash: v.string() },
+  returns: v.null(),
+  handler: async (ctx, { userId, passwordHash }) => {
+    await ctx.db.patch("users", userId, { passwordHash });
+    return null;
+  },
+});
+
 export const listUsers = query({
   args: { token: v.string() },
   returns: v.array(publicUser),

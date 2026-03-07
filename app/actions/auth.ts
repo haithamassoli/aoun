@@ -48,3 +48,18 @@ export async function getSessionToken() {
   const cookieStore = await cookies();
   return cookieStore.get(SESSION_COOKIE)?.value ?? null;
 }
+
+export async function changePasswordAction(currentPassword: string, newPassword: string) {
+  const token = await getSessionToken();
+  if (!token) return { success: false, error: "غير مصرح لك" };
+
+  try {
+    await fetchAction(api.authActions.changePassword, { token, currentPassword, newPassword });
+    return { success: true };
+  } catch (e) {
+    const code = (e as { data?: { code?: string } })?.data?.code;
+    if (code === "INVALID_CURRENT_PASSWORD") return { success: false, error: "كلمة المرور الحالية غير صحيحة" };
+    if (code === "WEAK_PASSWORD") return { success: false, error: "كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل" };
+    return { success: false, error: "حدث خطأ غير متوقع" };
+  }
+}
