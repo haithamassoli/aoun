@@ -94,6 +94,12 @@ export default async function RootLayout({
                     aria-label="التنقل الرئيسي"
                     className="flex items-center gap-4 text-sm font-medium text-surface-600 dark:text-surface-300"
                   >
+                    <Link
+                      href="/gpa-calculator"
+                      className="hidden rounded-lg px-3 py-1.5 transition-colors hover:bg-surface-100 hover:text-primary-600 dark:hover:bg-surface-800 dark:hover:text-primary-400 sm:block"
+                    >
+                      حاسبة المعدل
+                    </Link>
                     <HeaderAuth />
                     <ThemeToggle />
                   </nav>
