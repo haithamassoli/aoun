@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DEFAULT_GRADE_SCALE, GRADE_SCALES } from "@/lib/gpa-utils";
 import { SemesterGpaForm } from "./semester-gpa-form";
 import { CumulativeGpaForm } from "./cumulative-gpa-form";
 import { GpaPlannerForm } from "./gpa-planner-form";
@@ -12,6 +13,21 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "cumulative", label: "المعدل التراكمي", icon: "📊" },
   { id: "planner", label: "مخطط المعدل", icon: "🎯" },
 ];
+const DEFAULT_SCALE = GRADE_SCALES[DEFAULT_GRADE_SCALE];
+
+function formatPercentRange(
+  grades: (typeof DEFAULT_SCALE)["grades"],
+  index: number,
+) {
+  const current = grades[index];
+  const upperBound = index === 0 ? 100 : grades[index - 1].minPercent - 1;
+
+  if (current.minPercent === 0) {
+    return `<${grades[index - 1].minPercent}`;
+  }
+
+  return `${current.minPercent}–${upperBound}`;
+}
 
 export function GpaCalculatorTabs() {
   const [activeTab, setActiveTab] = useState<Tab>("semester");
@@ -31,14 +47,12 @@ export function GpaCalculatorTabs() {
       {/* Grade Scale Info */}
       <div className="mb-6 rounded-xl border border-surface-200 bg-surface-50 p-4 text-xs text-surface-500 dark:border-surface-700 dark:bg-surface-800/50 dark:text-surface-400">
         <p className="font-medium text-surface-600 dark:text-surface-300">
-          الجامعات الأردنية المدعومة
+          آلية الحساب
         </p>
         <p className="mt-1">
-          <span className="font-medium text-surface-700 dark:text-surface-200">المعيارية:</span>{" "}
-          الأردنية، اليرموك، الهاشمية، البلقاء، مؤتة وغيرها
-          &nbsp;|&nbsp;
-          <span className="font-medium text-surface-700 dark:text-surface-200">المتقدمة:</span>{" "}
-          جامعة العلوم والتكنولوجيا (JUST) وبعض الجامعات الخاصة
+          الحاسبة تعتمد سلّم 4.2 ثابتاً مع دعم A+ افتراضياً، ويمكنك اختيار
+          طريقة إدخال الدرجة بالحرف أو بالنسبة المئوية أو بالنقاط قبل إدخال
+          المواد.
         </p>
       </div>
 
@@ -72,77 +86,38 @@ export function GpaCalculatorTabs() {
         <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200">
           جدول تحويل الدرجات
         </summary>
-        <div className="grid grid-cols-2 gap-4 px-4 pb-4 pt-2 sm:grid-cols-2">
-          {/* Jordan Standard */}
-          <div>
-            <p className="mb-2 text-xs font-semibold text-surface-600 dark:text-surface-300">
-              المعيارية (A, B+, B, ...)
-            </p>
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-surface-500 dark:text-surface-400">
-                  <th className="pb-1 text-right font-medium">الحرف</th>
-                  <th className="pb-1 text-center font-medium">%</th>
-                  <th className="pb-1 text-left font-medium">نقطة</th>
+        <div className="px-4 pb-4 pt-2">
+          <p className="mb-1 text-xs font-semibold text-surface-600 dark:text-surface-300">
+            {DEFAULT_SCALE.label}
+          </p>
+          <p className="mb-2 text-[11px] leading-5 text-surface-500 dark:text-surface-400">
+            {DEFAULT_SCALE.description}
+          </p>
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-surface-500 dark:text-surface-400">
+                <th className="pb-1 text-right font-medium">الحرف</th>
+                <th className="pb-1 text-center font-medium">%</th>
+                <th className="pb-1 text-left font-medium">نقطة</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-100 dark:divide-surface-700">
+              {DEFAULT_SCALE.grades.map((grade, index) => (
+                <tr key={grade.letter} className="text-surface-700 dark:text-surface-300">
+                  <td className="py-1 font-medium">{grade.letter}</td>
+                  <td className="py-1 text-center text-surface-500 dark:text-surface-400">
+                    {formatPercentRange(DEFAULT_SCALE.grades, index)}
+                  </td>
+                  <td className="py-1 text-left">{grade.points.toFixed(2)}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-surface-100 dark:divide-surface-700">
-                {[
-                  ["A", "90–100", "4.0"],
-                  ["B+", "85–89", "3.5"],
-                  ["B", "80–84", "3.0"],
-                  ["C+", "75–79", "2.5"],
-                  ["C", "70–74", "2.0"],
-                  ["D+", "65–69", "1.5"],
-                  ["D", "60–64", "1.0"],
-                  ["F", "<60", "0.0"],
-                ].map(([letter, pct, pts]) => (
-                  <tr key={letter} className="text-surface-700 dark:text-surface-300">
-                    <td className="py-1 font-medium">{letter}</td>
-                    <td className="py-1 text-center text-surface-500 dark:text-surface-400">{pct}</td>
-                    <td className="py-1 text-left">{pts}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Jordan Plus/Minus */}
-          <div>
-            <p className="mb-2 text-xs font-semibold text-surface-600 dark:text-surface-300">
-              المتقدمة (A, A-, B+, ...)
-            </p>
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-surface-500 dark:text-surface-400">
-                  <th className="pb-1 text-right font-medium">الحرف</th>
-                  <th className="pb-1 text-center font-medium">%</th>
-                  <th className="pb-1 text-left font-medium">نقطة</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-surface-100 dark:divide-surface-700">
-                {[
-                  ["A", "90–100", "4.0"],
-                  ["A-", "85–89", "3.7"],
-                  ["B+", "80–84", "3.3"],
-                  ["B", "75–79", "3.0"],
-                  ["B-", "70–74", "2.7"],
-                  ["C+", "65–69", "2.3"],
-                  ["C", "60–64", "2.0"],
-                  ["D+", "55–59", "1.3"],
-                  ["D", "50–54", "1.0"],
-                  ["F", "<50", "0.0"],
-                ].map(([letter, pct, pts]) => (
-                  <tr key={letter} className="text-surface-700 dark:text-surface-300">
-                    <td className="py-1 font-medium">{letter}</td>
-                    <td className="py-1 text-center text-surface-500 dark:text-surface-400">{pct}</td>
-                    <td className="py-1 text-left">{pts}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
+        <p className="px-4 pb-4 text-[11px] leading-5 text-surface-500 dark:text-surface-400">
+          تحويل النسبة المئوية هنا تقريبي للاستخدام العام. إذا كنت تعتمد حدوداً
+          مختلفة في جامعتك، فاستخدم الإدخال بالحروف أو بالنقاط لأنه أدق.
+        </p>
       </details>
     </div>
   );

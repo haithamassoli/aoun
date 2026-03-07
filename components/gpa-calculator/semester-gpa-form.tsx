@@ -2,35 +2,45 @@
 
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { GRADE_SCALES, calculateSemesterGpa, type GradeScale } from "@/lib/gpa-utils";
+import {
+  DEFAULT_GRADE_SCALE,
+  GRADE_TYPE_LABELS,
+  calculateSemesterGpa,
+  type GradeType,
+} from "@/lib/gpa-utils";
 import { type CourseRowValues } from "@/lib/gpa-schemas";
 import { GpaResultCard } from "./gpa-result-card";
 import { CourseRow } from "./course-row";
 import type { GpaResult } from "@/lib/gpa-utils";
 
-const newCourse = (): CourseRowValues => ({
+const newCourse = (gradeType: GradeType): CourseRowValues => ({
   name: "",
   creditHours: 3,
-  gradeType: "letter",
+  gradeType,
   grade: "",
 });
 
 const inputCls =
   "w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100";
 
+type GradeTypeField = {
+  state: { value: GradeType };
+  handleChange: (value: GradeType) => void;
+};
+
 export function SemesterGpaForm() {
-  const [courses, setCourses] = useState<CourseRowValues[]>([newCourse()]);
+  const [gradeType, setGradeType] = useState<GradeType>("letter");
+  const [courses, setCourses] = useState<CourseRowValues[]>([newCourse("letter")]);
   const [result, setResult] = useState<GpaResult | null>(null);
   const [courseErrors, setCourseErrors] = useState<Record<number, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
-      gradeScale: "jordan_standard" as GradeScale,
-      courses: [newCourse()],
+      gradeType: "letter" as GradeType,
+      courses: [newCourse("letter")],
     },
-    onSubmit: ({ value }) => {
-      const gradeScale = value.gradeScale as GradeScale;
+    onSubmit: () => {
       const errors: Record<number, string> = {};
       let valid = true;
 
@@ -49,7 +59,7 @@ export function SemesterGpaForm() {
 
       setCourseErrors({});
       setGlobalError(null);
-      const computed = calculateSemesterGpa(courses, gradeScale);
+      const computed = calculateSemesterGpa(courses, DEFAULT_GRADE_SCALE);
       setResult(computed);
     },
   });
@@ -60,7 +70,7 @@ export function SemesterGpaForm() {
     setResult(null);
   };
 
-  const addCourse = () => syncCourses([...courses, newCourse()]);
+  const addCourse = () => syncCourses([...courses, newCourse(gradeType)]);
 
   const removeCourse = (i: number) =>
     syncCourses(courses.filter((_, idx) => idx !== i));
@@ -75,6 +85,19 @@ export function SemesterGpaForm() {
     }
   };
 
+  const handleGradeTypeChange = (nextGradeType: GradeType) => {
+    setGradeType(nextGradeType);
+    form.setFieldValue("gradeType", nextGradeType);
+    setGlobalError(null);
+    syncCourses(
+      courses.map((course) => ({
+        ...course,
+        gradeType: nextGradeType,
+        grade: "",
+      })),
+    );
+  };
+
   return (
     <div className="space-y-6">
       <form
@@ -84,28 +107,32 @@ export function SemesterGpaForm() {
         }}
         className="space-y-5"
       >
-        {/* Grade Scale */}
+        {/* Grade Type */}
         <div>
-          <form.Field name="gradeScale">
-            {(field: any) => (
+          <form.Field name="gradeType">
+            {(field: GradeTypeField) => (
               <div>
                 <label className="mb-1 block text-sm font-medium text-surface-700 dark:text-surface-200">
-                  سلّم الدرجات
+                  نوع الدرجة
                 </label>
                 <select
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value as GradeScale);
-                    syncCourses(courses.map((c) => ({ ...c, grade: c.gradeType === "letter" ? "" : c.grade })));
+                    const nextGradeType = e.target.value as GradeType;
+                    field.handleChange(nextGradeType);
+                    handleGradeTypeChange(nextGradeType);
                   }}
                   className={inputCls}
                 >
-                  {Object.entries(GRADE_SCALES).map(([key, scale]) => (
-                    <option key={key} value={key}>
-                      {scale.label}
+                  {Object.entries(GRADE_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
                     </option>
                   ))}
                 </select>
+                <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                  النوع المختار سيُطبّق على جميع المواد في هذا النموذج.
+                </p>
               </div>
             )}
           </form.Field>
@@ -122,24 +149,21 @@ export function SemesterGpaForm() {
             </span>
           </div>
 
-          <form.Field name="gradeScale">
-            {(scaleField: any) => (
-              <div className="space-y-2">
-                {courses.map((course, i) => (
-                  <CourseRow
-                    key={i}
-                    course={course}
-                    index={i}
-                    gradeScale={scaleField.state.value as GradeScale}
-                    error={courseErrors[i]}
-                    onChange={(updated) => updateCourse(i, updated)}
-                    onRemove={() => removeCourse(i)}
-                    canRemove={courses.length > 1}
-                  />
-                ))}
-              </div>
-            )}
-          </form.Field>
+          <div className="space-y-2">
+            {courses.map((course, i) => (
+              <CourseRow
+                key={i}
+                course={course}
+                index={i}
+                gradeScale={DEFAULT_GRADE_SCALE}
+                error={courseErrors[i]}
+                onChange={(updated) => updateCourse(i, updated)}
+                onRemove={() => removeCourse(i)}
+                canRemove={courses.length > 1}
+                allowGradeTypeChange={false}
+              />
+            ))}
+          </div>
 
           <button
             type="button"
@@ -167,7 +191,13 @@ export function SemesterGpaForm() {
         </button>
       </form>
 
-      {result && <GpaResultCard result={result} title="معدل الفصل الدراسي" />}
+      {result && (
+        <GpaResultCard
+          result={result}
+          scale={DEFAULT_GRADE_SCALE}
+          title="معدل الفصل الدراسي"
+        />
+      )}
     </div>
   );
 }

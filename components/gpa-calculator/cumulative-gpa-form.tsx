@@ -2,37 +2,61 @@
 
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { GRADE_SCALES, calculateCumulativeGpa, type GradeScale } from "@/lib/gpa-utils";
+import {
+  DEFAULT_GRADE_SCALE,
+  GRADE_TYPE_LABELS,
+  calculateCumulativeGpa,
+  getScaleMaxGpa,
+  type GradeType,
+} from "@/lib/gpa-utils";
 import { type CourseRowValues } from "@/lib/gpa-schemas";
 import { GpaResultCard } from "./gpa-result-card";
 import { CourseRow } from "./course-row";
 import type { GpaResult } from "@/lib/gpa-utils";
 
-const newCourse = (): CourseRowValues => ({
+const newCourse = (gradeType: GradeType): CourseRowValues => ({
   name: "",
   creditHours: 3,
-  gradeType: "letter",
+  gradeType,
   grade: "",
 });
 
 const inputCls =
   "w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100";
 
+type GradeTypeField = {
+  state: { value: GradeType };
+  handleChange: (value: GradeType) => void;
+};
+
+type NumericField = {
+  state: { value: string | number };
+  handleChange: (value: string) => void;
+  handleBlur: () => void;
+};
+
 export function CumulativeGpaForm() {
-  const [courses, setCourses] = useState<CourseRowValues[]>([newCourse()]);
+  const [gradeType, setGradeType] = useState<GradeType>("letter");
+  const [courses, setCourses] = useState<CourseRowValues[]>([newCourse("letter")]);
   const [result, setResult] = useState<GpaResult | null>(null);
   const [courseErrors, setCourseErrors] = useState<Record<number, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<"previousGpa" | "previousCreditHours", string>>
+  >({});
+  const maxGpa = getScaleMaxGpa(DEFAULT_GRADE_SCALE);
 
   const form = useForm({
     defaultValues: {
-      gradeScale: "jordan_standard" as GradeScale,
+      gradeType: "letter" as GradeType,
       previousGpa: "" as string | number,
       previousCreditHours: "" as string | number,
-      courses: [newCourse()],
+      courses: [newCourse("letter")],
     },
     onSubmit: ({ value }) => {
-      const gradeScale = value.gradeScale as GradeScale;
       const errors: Record<number, string> = {};
+      const nextFieldErrors: Partial<
+        Record<"previousGpa" | "previousCreditHours", string>
+      > = {};
       let valid = true;
 
       courses.forEach((course, i) => {
@@ -42,16 +66,57 @@ export function CumulativeGpaForm() {
         }
       });
 
+      const rawPreviousGpa =
+        value.previousGpa === "" ? undefined : Number(value.previousGpa);
+      const rawPreviousCredits =
+        value.previousCreditHours === ""
+          ? undefined
+          : Number(value.previousCreditHours);
+
+      if ((rawPreviousGpa === undefined) !== (rawPreviousCredits === undefined)) {
+        nextFieldErrors.previousGpa = "أدخل المعدل والساعات السابقة معاً";
+        nextFieldErrors.previousCreditHours = "أدخل المعدل والساعات السابقة معاً";
+        valid = false;
+      }
+
+      if (
+        rawPreviousGpa !== undefined &&
+        (Number.isNaN(rawPreviousGpa) ||
+          rawPreviousGpa < 0 ||
+          rawPreviousGpa > maxGpa)
+      ) {
+        nextFieldErrors.previousGpa =
+          `المعدل السابق يجب أن يكون بين 0.00 و ${maxGpa.toFixed(2)}`;
+        valid = false;
+      }
+
+      if (
+        rawPreviousCredits !== undefined &&
+        (Number.isNaN(rawPreviousCredits) || rawPreviousCredits < 0)
+      ) {
+        nextFieldErrors.previousCreditHours =
+          "الساعات السابقة يجب أن تكون 0 أو أكثر";
+        valid = false;
+      }
+
       if (!valid) {
         setCourseErrors(errors);
+        setFieldErrors(nextFieldErrors);
+        setResult(null);
         return;
       }
 
       setCourseErrors({});
-      const prevGpa = value.previousGpa !== "" ? Number(value.previousGpa) : undefined;
-      const prevCredits = value.previousCreditHours !== "" ? Number(value.previousCreditHours) : undefined;
+      setFieldErrors({});
+      const prevGpa = rawPreviousGpa;
+      const prevCredits = rawPreviousCredits;
 
-      const computed = calculateCumulativeGpa(courses, gradeScale, prevGpa, prevCredits);
+      const computed = calculateCumulativeGpa(
+        courses,
+        DEFAULT_GRADE_SCALE,
+        prevGpa,
+        prevCredits,
+      );
       setResult(computed);
     },
   });
@@ -62,7 +127,7 @@ export function CumulativeGpaForm() {
     setResult(null);
   };
 
-  const addCourse = () => syncCourses([...courses, newCourse()]);
+  const addCourse = () => syncCourses([...courses, newCourse(gradeType)]);
 
   const removeCourse = (i: number) =>
     syncCourses(courses.filter((_, idx) => idx !== i));
@@ -77,6 +142,19 @@ export function CumulativeGpaForm() {
     }
   };
 
+  const handleGradeTypeChange = (nextGradeType: GradeType) => {
+    setGradeType(nextGradeType);
+    form.setFieldValue("gradeType", nextGradeType);
+    setFieldErrors({});
+    syncCourses(
+      courses.map((course) => ({
+        ...course,
+        gradeType: nextGradeType,
+        grade: "",
+      })),
+    );
+  };
+
   return (
     <div className="space-y-6">
       <form
@@ -86,28 +164,32 @@ export function CumulativeGpaForm() {
         }}
         className="space-y-5"
       >
-        {/* Grade Scale */}
+        {/* Grade Type */}
         <div>
-          <form.Field name="gradeScale">
-            {(field: any) => (
+          <form.Field name="gradeType">
+            {(field: GradeTypeField) => (
               <div>
                 <label className="mb-1 block text-sm font-medium text-surface-700 dark:text-surface-200">
-                  سلّم الدرجات
+                  نوع الدرجة
                 </label>
                 <select
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value as GradeScale);
-                    syncCourses(courses.map((c) => ({ ...c, grade: c.gradeType === "letter" ? "" : c.grade })));
+                    const nextGradeType = e.target.value as GradeType;
+                    field.handleChange(nextGradeType);
+                    handleGradeTypeChange(nextGradeType);
                   }}
                   className={inputCls}
                 >
-                  {Object.entries(GRADE_SCALES).map(([key, scale]) => (
-                    <option key={key} value={key}>
-                      {scale.label}
+                  {Object.entries(GRADE_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
                     </option>
                   ))}
                 </select>
+                <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                  النوع المختار سيُطبّق على جميع المواد في هذا النموذج.
+                </p>
               </div>
             )}
           </form.Field>
@@ -118,10 +200,13 @@ export function CumulativeGpaForm() {
           <h3 className="mb-3 text-sm font-semibold text-surface-700 dark:text-surface-200">
             المعدل السابق (اختياري)
           </h3>
+          <p className="mb-3 text-xs text-surface-500 dark:text-surface-400">
+            عند إدخال المعدل السابق يجب إدخال الساعات السابقة معه.
+          </p>
           <div className="grid grid-cols-2 gap-3">
             <form.Field name="previousGpa">
-              {(field: any) => {
-                const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+              {(field: NumericField) => {
+                const error = fieldErrors.previousGpa;
                 return (
                   <div>
                     <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
@@ -130,22 +215,22 @@ export function CumulativeGpaForm() {
                     <input
                       type="number"
                       value={field.state.value}
-                      onChange={(e) => { field.handleChange(e.target.value); setResult(null); }}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        setResult(null);
+                        if (fieldErrors.previousGpa) {
+                          setFieldErrors((prev) => ({ ...prev, previousGpa: undefined }));
+                        }
+                      }}
                       onBlur={field.handleBlur}
                       placeholder="0.00"
                       min={0}
-                      max={4}
+                      max={maxGpa}
                       step={0.01}
-                      className={`${inputCls}${hasError ? " border-red-400 dark:border-red-600" : ""}`}
+                      className={`${inputCls}${error ? " border-red-400 dark:border-red-600" : ""}`}
                     />
-                    {hasError && (
-                      <p className="mt-1 text-xs text-red-500 dark:text-red-400">
-                        {field.state.meta.errors
-                          .map((e: unknown) =>
-                            typeof e === "string" ? e : (e as { message?: string })?.message ?? String(e),
-                          )
-                          .join(", ")}
-                      </p>
+                    {error && (
+                      <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
                     )}
                   </div>
                 );
@@ -153,8 +238,8 @@ export function CumulativeGpaForm() {
             </form.Field>
 
             <form.Field name="previousCreditHours">
-              {(field: any) => {
-                const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+              {(field: NumericField) => {
+                const error = fieldErrors.previousCreditHours;
                 return (
                   <div>
                     <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
@@ -163,20 +248,23 @@ export function CumulativeGpaForm() {
                     <input
                       type="number"
                       value={field.state.value}
-                      onChange={(e) => { field.handleChange(e.target.value); setResult(null); }}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        setResult(null);
+                        if (fieldErrors.previousCreditHours) {
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            previousCreditHours: undefined,
+                          }));
+                        }
+                      }}
                       onBlur={field.handleBlur}
                       placeholder="0"
                       min={0}
-                      className={`${inputCls}${hasError ? " border-red-400 dark:border-red-600" : ""}`}
+                      className={`${inputCls}${error ? " border-red-400 dark:border-red-600" : ""}`}
                     />
-                    {hasError && (
-                      <p className="mt-1 text-xs text-red-500 dark:text-red-400">
-                        {field.state.meta.errors
-                          .map((e: unknown) =>
-                            typeof e === "string" ? e : (e as { message?: string })?.message ?? String(e),
-                          )
-                          .join(", ")}
-                      </p>
+                    {error && (
+                      <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>
                     )}
                   </div>
                 );
@@ -196,24 +284,21 @@ export function CumulativeGpaForm() {
             </span>
           </div>
 
-          <form.Field name="gradeScale">
-            {(scaleField: any) => (
-              <div className="space-y-2">
-                {courses.map((course, i) => (
-                  <CourseRow
-                    key={i}
-                    course={course}
-                    index={i}
-                    gradeScale={scaleField.state.value as GradeScale}
-                    error={courseErrors[i]}
-                    onChange={(updated) => updateCourse(i, updated)}
-                    onRemove={() => removeCourse(i)}
-                    canRemove={courses.length > 1}
-                  />
-                ))}
-              </div>
-            )}
-          </form.Field>
+          <div className="space-y-2">
+            {courses.map((course, i) => (
+              <CourseRow
+                key={i}
+                course={course}
+                index={i}
+                gradeScale={DEFAULT_GRADE_SCALE}
+                error={courseErrors[i]}
+                onChange={(updated) => updateCourse(i, updated)}
+                onRemove={() => removeCourse(i)}
+                canRemove={courses.length > 1}
+                allowGradeTypeChange={false}
+              />
+            ))}
+          </div>
 
           <button
             type="button"
@@ -235,7 +320,13 @@ export function CumulativeGpaForm() {
         </button>
       </form>
 
-      {result && <GpaResultCard result={result} title="المعدل التراكمي" />}
+      {result && (
+        <GpaResultCard
+          result={result}
+          scale={DEFAULT_GRADE_SCALE}
+          title="المعدل التراكمي"
+        />
+      )}
     </div>
   );
 }

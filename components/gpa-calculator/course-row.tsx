@@ -1,16 +1,15 @@
 "use client";
 
-import { getLetterGrades, type GradeScale, type GradeType } from "@/lib/gpa-utils";
+import {
+  GRADE_TYPE_LABELS,
+  getLetterGrades,
+  getScaleMaxGpa,
+  type GradeScale,
+} from "@/lib/gpa-utils";
 import type { CourseRowValues } from "@/lib/gpa-schemas";
 
 const inputCls =
   "w-full rounded-lg border border-surface-300 bg-white px-2 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100";
-
-const GRADE_TYPE_LABELS: Record<GradeType, string> = {
-  letter: "حرف",
-  percentage: "%",
-  points: "نقطة",
-};
 
 interface CourseRowProps {
   course: CourseRowValues;
@@ -20,6 +19,7 @@ interface CourseRowProps {
   onChange: (updated: CourseRowValues) => void;
   onRemove: () => void;
   canRemove: boolean;
+  allowGradeTypeChange?: boolean;
 }
 
 export function CourseRow({
@@ -30,9 +30,10 @@ export function CourseRow({
   onChange,
   onRemove,
   canRemove,
+  allowGradeTypeChange = true,
 }: CourseRowProps) {
   const letterGrades = getLetterGrades(gradeScale);
-  const gradeTypes: GradeType[] = ["letter", "percentage", "points"];
+  const maxGpa = getScaleMaxGpa(gradeScale);
 
   const handleField = <K extends keyof CourseRowValues>(
     key: K,
@@ -53,7 +54,11 @@ export function CourseRow({
         </span>
 
         <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div
+            className={`grid grid-cols-2 gap-2 ${
+              allowGradeTypeChange ? "sm:grid-cols-4" : "sm:grid-cols-3"
+            }`}
+          >
             {/* Course Name */}
             <div className="col-span-2 sm:col-span-1">
               <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
@@ -89,27 +94,33 @@ export function CourseRow({
             </div>
 
             {/* Grade Type */}
-            <div>
-              <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
-                نوع الدرجة
-              </label>
-              <div className="flex rounded-lg border border-surface-300 dark:border-surface-600 overflow-hidden">
-                {gradeTypes.map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => handleField("gradeType", type)}
-                    className={`flex-1 py-2 text-xs font-medium transition-colors ${
-                      course.gradeType === type
-                        ? "bg-primary-600 text-white"
-                        : "bg-white text-surface-600 hover:bg-surface-100 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
-                    }`}
-                  >
-                    {GRADE_TYPE_LABELS[type]}
-                  </button>
-                ))}
+            {allowGradeTypeChange && (
+              <div>
+                <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
+                  نوع الدرجة
+                </label>
+                <div className="overflow-hidden rounded-lg border border-surface-300 dark:border-surface-600">
+                  <div className="flex">
+                    {Object.entries(GRADE_TYPE_LABELS).map(([type, label]) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() =>
+                          handleField("gradeType", type as CourseRowValues["gradeType"])
+                        }
+                        className={`flex-1 py-2 text-xs font-medium transition-colors ${
+                          course.gradeType === type
+                            ? "bg-primary-600 text-white"
+                            : "bg-white text-surface-600 hover:bg-surface-100 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Grade Input */}
             <div>
@@ -134,10 +145,14 @@ export function CourseRow({
                   type="number"
                   value={course.grade}
                   onChange={(e) => handleField("grade", e.target.value)}
-                  placeholder={course.gradeType === "percentage" ? "0–100" : "0–4"}
+                  placeholder={
+                    course.gradeType === "percentage"
+                      ? "0–100"
+                      : `0–${maxGpa.toFixed(2)}`
+                  }
                   min={0}
-                  max={course.gradeType === "percentage" ? 100 : 4}
-                  step={course.gradeType === "percentage" ? 1 : 0.1}
+                  max={course.gradeType === "percentage" ? 100 : maxGpa}
+                  step={course.gradeType === "percentage" ? 1 : 0.01}
                   className={`${inputCls}${!course.grade ? " border-red-300 dark:border-red-700" : ""}`}
                 />
               )}

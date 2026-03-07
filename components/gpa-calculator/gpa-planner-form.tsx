@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { calculateRequiredGpa, getGpaColors } from "@/lib/gpa-utils";
-import { gpaPlannerSchema } from "@/lib/gpa-schemas";
+import {
+  DEFAULT_GRADE_SCALE,
+  calculateRequiredGpa,
+  getGpaColors,
+  getScaleMaxGpa,
+} from "@/lib/gpa-utils";
+import { createGpaPlannerSchema } from "@/lib/gpa-schemas";
 
 const inputCls =
   "w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100";
@@ -24,6 +29,7 @@ type FieldErrors = Partial<
 export function GpaPlannerForm() {
   const [result, setResult] = useState<PlannerResult | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const maxGpa = getScaleMaxGpa(DEFAULT_GRADE_SCALE);
 
   const form = useForm({
     defaultValues: {
@@ -33,7 +39,7 @@ export function GpaPlannerForm() {
       plannedCreditHours: "",
     },
     onSubmit: ({ value }) => {
-      const parsed = gpaPlannerSchema.safeParse(value);
+      const parsed = createGpaPlannerSchema(maxGpa).safeParse(value);
       if (!parsed.success) {
         const errors: FieldErrors = {};
         for (const issue of parsed.error.issues) {
@@ -55,11 +61,11 @@ export function GpaPlannerForm() {
         plannedCreditHours,
       );
 
-      const isAchievable = required <= 4.0 && required >= 0;
+      const isAchievable = required <= maxGpa && required >= 0;
 
       let message: string;
-      if (required > 4.0) {
-        message = `تحتاج معدل ${required.toFixed(2)} في الفصل القادم لتحقيق هدفك — وهذا أعلى من الحد الأقصى (4.0). قد تحتاج لتعديل هدفك أو زيادة الساعات المخططة.`;
+      if (required > maxGpa) {
+        message = `تحتاج معدل ${required.toFixed(2)} في الفصل القادم لتحقيق هدفك، وهذا أعلى من الحد الأقصى (${maxGpa.toFixed(2)}). قد تحتاج لتعديل هدفك أو زيادة الساعات المخططة.`;
       } else if (required < 0) {
         message =
           "معدلك الحالي يتجاوز هدفك بالفعل! يمكنك تخفيف الحمل الدراسي.";
@@ -141,12 +147,16 @@ export function GpaPlannerForm() {
         }}
         className="space-y-4"
       >
+        <div className="rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-xs text-surface-500 dark:border-surface-700 dark:bg-surface-800/50 dark:text-surface-400">
+          المخطط يعتمد سلّم 4.20 كحد أعلى للمعدل مع دعم A+ افتراضياً.
+        </div>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {renderField(
             "currentGpa",
             "المعدل التراكمي الحالي",
             "مثال: 2.80",
-            4,
+            maxGpa,
             0.01,
           )}
           {renderField(
@@ -160,7 +170,7 @@ export function GpaPlannerForm() {
             "targetGpa",
             "المعدل المستهدف",
             "مثال: 3.20",
-            4,
+            maxGpa,
             0.01,
           )}
           {renderField(
@@ -200,12 +210,12 @@ export function GpaPlannerForm() {
                   {result.requiredGpa.toFixed(2)}
                 </span>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  من أصل 4.00
+                  من أصل {maxGpa.toFixed(2)}
                 </p>
               </>
             ) : (
               <span className="text-5xl font-bold text-red-600 dark:text-red-400">
-                {result.requiredGpa > 4
+                {result.requiredGpa > maxGpa
                   ? `>${result.requiredGpa.toFixed(2)}`
                   : result.requiredGpa.toFixed(2)}
               </span>

@@ -1,15 +1,27 @@
 "use client";
 
-import { getGpaColors, getGpaLabel, type GpaResult } from "@/lib/gpa-utils";
+import {
+  getGpaColors,
+  getGpaLabel,
+  getScaleMaxGpa,
+  type GpaResult,
+  type GradeScale,
+} from "@/lib/gpa-utils";
 
 interface GpaResultCardProps {
   result: GpaResult;
+  scale: GradeScale;
   title?: string;
 }
 
-export function GpaResultCard({ result, title = "نتيجة الحساب" }: GpaResultCardProps) {
+export function GpaResultCard({
+  result,
+  scale,
+  title = "نتيجة الحساب",
+}: GpaResultCardProps) {
   const colors = getGpaColors(result.gpa);
   const label = getGpaLabel(result.gpa);
+  const maxGpa = getScaleMaxGpa(scale);
 
   return (
     <div
@@ -27,6 +39,9 @@ export function GpaResultCard({ result, title = "نتيجة الحساب" }: Gpa
         >
           {label}
         </span>
+        <p className="text-xs text-surface-500 dark:text-surface-400">
+          من أصل {maxGpa.toFixed(2)}
+        </p>
       </div>
       <div className="mt-4 flex justify-center gap-6 border-t border-current/10 pt-4 text-sm text-surface-500 dark:text-surface-400">
         <div className="text-center">

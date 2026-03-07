@@ -31,7 +31,7 @@ export function UniversityQuickLinks({ links }: UniversityQuickLinksProps) {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex min-h-11 items-center gap-2 rounded-full border border-surface-200 bg-white/90 px-4 py-2 text-sm font-medium text-surface-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:border-surface-700 dark:bg-surface-900/80 dark:text-surface-200 dark:hover:border-primary-700 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950"
+                className="group inline-flex min-h-11 items-center gap-2 rounded-full border border-surface-200 bg-white/90 px-4 py-2 text-sm font-medium text-surface-700 shadow-sm transition duration-200 hover:border-primary-300 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:border-surface-700 dark:bg-surface-900/80 dark:text-surface-200 dark:hover:border-primary-700 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950"
               >
                 <span className="truncate">{link.title}</span>
                 <svg
