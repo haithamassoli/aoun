@@ -230,7 +230,7 @@ export default function MajorCoursesPage() {
             <FormInput
               form={form}
               name="semester"
-              label="الفصل الدراسي"
+              label="المستوى الدراسي"
               type="number"
               min="1"
             />
@@ -330,7 +330,7 @@ export default function MajorCoursesPage() {
                       </h3>
                       <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
                         {course.semester && (
-                          <span>الفصل {course.semester}</span>
+                          <span>المستوى {course.semester}</span>
                         )}
                         <span>{course.resourceCount} مصدر</span>
                       </div>

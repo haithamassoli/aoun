@@ -252,7 +252,7 @@ export default function AdminCoursesPage() {
             <FormInput
               form={form}
               name="semester"
-              label="الفصل الدراسي"
+              label="المستوى الدراسي"
               type="number"
               min="1"
             />
@@ -329,7 +329,9 @@ export default function AdminCoursesPage() {
                     <div className="flex flex-wrap items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
                       <span>{course.majorName}</span>
                       <span>{course.universityName}</span>
-                      {course.semester && <span>الفصل {course.semester}</span>}
+                      {course.semester && (
+                        <span>المستوى {course.semester}</span>
+                      )}
                       {course.alias && (
                         <span className="rounded bg-surface-100 px-1.5 py-0.5 dark:bg-surface-800">
                           {course.alias}

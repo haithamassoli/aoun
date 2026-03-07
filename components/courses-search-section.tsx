@@ -25,16 +25,16 @@ type CourseListItem = {
 type CourseStatusFilter = "all" | CourseProgressStatus;
 
 const semesterLabels: Record<number, string> = {
-  1: "الفصل الأول",
-  2: "الفصل الثاني",
-  3: "الفصل الثالث",
-  4: "الفصل الرابع",
-  5: "الفصل الخامس",
-  6: "الفصل السادس",
-  7: "الفصل السابع",
-  8: "الفصل الثامن",
-  9: "الفصل التاسع",
-  10: "الفصل العاشر",
+  1: "المستوى الأول",
+  2: "المستوى الثاني",
+  3: "المستوى الثالث",
+  4: "المستوى الرابع",
+  5: "المستوى الخامس",
+  6: "المستوى السادس",
+  7: "المستوى السابع",
+  8: "المستوى الثامن",
+  9: "المستوى التاسع",
+  10: "المستوى العاشر",
 };
 const STATUS_FILTER_STORAGE_KEY = "aoun:student:course-filter:v1";
 const statusFilterOptions: {
@@ -64,7 +64,9 @@ const statusFilterOptions: {
   },
 ];
 
-function parseCourseStatusFilter(raw: string | null): CourseStatusFilter | null {
+function parseCourseStatusFilter(
+  raw: string | null,
+): CourseStatusFilter | null {
   if (
     raw === "all" ||
     raw === "none" ||
@@ -140,7 +142,7 @@ function groupCoursesBySemester(courses: CourseListItem[]) {
 
     const label =
       semesterKey !== null
-        ? semesterLabels[semesterKey] || `الفصل ${semesterKey}`
+        ? semesterLabels[semesterKey] || `المستوى ${semesterKey}`
         : "مواد أخرى";
 
     return {
@@ -450,11 +452,14 @@ export function CoursesSearchSection({
                 href={`/${universitySlug}/${majorSlug}/${course.slug}`}
                 badge={
                   course.semester
-                    ? semesterLabels[course.semester] || `فصل ${course.semester}`
+                    ? semesterLabels[course.semester] ||
+                      `فصل ${course.semester}`
                     : "مادة عامة"
                 }
                 status={getStatus(course._id)}
-                onStatusChange={(status) => handleStatusChange(course._id, status)}
+                onStatusChange={(status) =>
+                  handleStatusChange(course._id, status)
+                }
               />
             ))}
           </div>
