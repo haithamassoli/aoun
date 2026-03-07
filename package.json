@@ -11,6 +11,7 @@
   "dependencies": {
     "@tanstack/react-form": "^1.28.4",
     "@tanstack/react-form-nextjs": "^1.28.4",
+    "@tanstack/react-store": "^0.9.1",
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/extension-link": "^3.20.0",
     "@tiptap/react": "^3.20.0",

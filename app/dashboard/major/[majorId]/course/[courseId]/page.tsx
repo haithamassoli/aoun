@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
+import { useStore } from "@tanstack/react-store";
 import { Toast, useToast } from "@/components/toast";
 import { FormInput, FormSelect } from "@/components/form-field";
 import { TiptapEditor } from "@/components/tiptap-editor";
@@ -95,7 +96,7 @@ export default function CourseResourcesPage() {
             token: sessionToken,
             resourceId: editingId as Id<"resources">,
             title: value.title.trim(),
-            category: value.category,
+            category: value.category as CategoryValue,
             type: value.type,
             url: value.type === "link" ? value.url.trim() : undefined,
             content: sanitizedContent,
@@ -107,7 +108,7 @@ export default function CourseResourcesPage() {
             token: sessionToken,
             courseId: courseId as Id<"courses">,
             title: value.title.trim(),
-            category: value.category,
+            category: value.category as CategoryValue,
             type: value.type,
             url: value.type === "link" ? value.url.trim() : undefined,
             content: sanitizedContent,
@@ -124,7 +125,7 @@ export default function CourseResourcesPage() {
     },
   });
 
-  const resourceType = form.useStore((s) => s.values.type);
+  const resourceType = useStore(form.store, (s) => s.values.type);
 
   const resetForm = () => {
     form.reset();

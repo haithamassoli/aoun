@@ -7,6 +7,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
+import { useStore } from "@tanstack/react-store";
 import { Toast, useToast } from "@/components/toast";
 import { FormInput, FormSelect } from "@/components/form-field";
 import { TiptapEditor } from "@/components/tiptap-editor";
@@ -84,7 +85,7 @@ export default function AdminResourcesPage() {
             token: sessionToken,
             resourceId: editingId as Id<"resources">,
             title: value.title.trim(),
-            category: value.category,
+            category: value.category as CategoryValue,
             type: value.type,
             url: value.type === "link" ? value.url.trim() : undefined,
             content: sanitizedContent,
@@ -96,7 +97,7 @@ export default function AdminResourcesPage() {
             token: sessionToken,
             courseId: value.courseId as Id<"courses">,
             title: value.title.trim(),
-            category: value.category,
+            category: value.category as CategoryValue,
             type: value.type,
             url: value.type === "link" ? value.url.trim() : undefined,
             content: sanitizedContent,
@@ -113,7 +114,7 @@ export default function AdminResourcesPage() {
     },
   });
 
-  const resourceType = form.useStore((s) => s.values.type);
+  const resourceType = useStore(form.store, (s) => s.values.type);
 
   if (!user || user.role !== "admin") return null;
 
