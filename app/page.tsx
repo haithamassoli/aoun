@@ -19,14 +19,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  let universities: Awaited<ReturnType<typeof fetchQuery<typeof api.universities.list>>> = [];
+  let universities: Awaited<
+    ReturnType<typeof fetchQuery<typeof api.universities.list>>
+  > = [];
   try {
     universities = await fetchQuery(api.universities.list);
   } catch {
     // Convex may not have data yet
   }
   const sortedUniversities = universities.toSorted(
-    (a: { order: number }, b: { order: number }) => a.order - b.order
+    (a: { order: number }, b: { order: number }) => a.order - b.order,
   );
 
   return (
@@ -42,7 +44,7 @@ export default async function Home() {
             transition={{ duration: 0.5 }}
             className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
           >
-            عون
+            عـــون
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

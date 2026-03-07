@@ -40,8 +40,8 @@ export default function LoginPage() {
       >
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600 text-2xl font-bold text-white">
-            عـ
+          <div className="mx-auto mb-4 flex h-14 w-16 items-center justify-center rounded-2xl bg-primary-600 text-2xl font-bold text-white">
+            عـون
           </div>
           <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
             تسجيل الدخول
@@ -95,8 +95,8 @@ export default function LoginPage() {
                           .map((e) =>
                             typeof e === "string"
                               ? e
-                              : (e as { message?: string })?.message ??
-                                String(e),
+                              : ((e as { message?: string })?.message ??
+                                String(e)),
                           )
                           .join(", ")}
                       </p>
@@ -132,8 +132,8 @@ export default function LoginPage() {
                           .map((e) =>
                             typeof e === "string"
                               ? e
-                              : (e as { message?: string })?.message ??
-                                String(e),
+                              : ((e as { message?: string })?.message ??
+                                String(e)),
                           )
                           .join(", ")}
                       </p>

@@ -129,12 +129,12 @@ export function PWAInstallBanner() {
       <section className="pointer-events-auto mx-auto w-full max-w-xl rounded-2xl border border-primary-200 bg-white/95 p-4 shadow-xl shadow-primary-900/10 backdrop-blur-md dark:border-primary-800 dark:bg-surface-900/95">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300">
-            <span className="text-lg font-bold">عون</span>
+            <span className="text-lg font-bold">عـون</span>
           </div>
 
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-surface-900 dark:text-surface-100">
-              ثبت تطبيق عون على جهازك
+              ثبت تطبيق عـون على جهازك
             </p>
             <p className="mt-1 text-xs leading-5 text-surface-600 dark:text-surface-300">
               افتحه بسرعة من الشاشة الرئيسية واحصل على تجربة كاملة بدون تبويب
