@@ -3,6 +3,7 @@ import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { CoursesSearchSection } from "@/components/courses-search-section";
+import { UniversityQuickLinks } from "@/components/university-quick-links";
 import type { Metadata } from "next";
 import * as motion from "motion/react-client";
 import { MajorLastVisitTracker } from "@/components/major-last-visit-tracker";
@@ -125,6 +126,7 @@ export default async function MajorPage({
               ? `${courses.length} مادة`
               : "لا توجد مواد حالياً"}
           </motion.p>
+          <UniversityQuickLinks links={university.quickLinks} />
         </div>
       </section>
 

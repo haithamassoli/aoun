@@ -30,6 +30,14 @@ export default defineSchema({
     logoUrl: v.optional(v.string()),
     order: v.number(),
     alias: v.optional(v.string()),
+    quickLinks: v.optional(
+      v.array(
+        v.object({
+          title: v.string(),
+          url: v.string(),
+        })
+      )
+    ),
     searchToken: v.optional(v.string()),
     ...softDeleteFields,
   })

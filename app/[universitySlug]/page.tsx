@@ -3,6 +3,7 @@ import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { MajorsSearchSection } from "@/components/majors-search-section";
+import { UniversityQuickLinks } from "@/components/university-quick-links";
 import type { Metadata } from "next";
 import Image from "next/image";
 import * as motion from "motion/react-client";
@@ -95,6 +96,7 @@ export default async function UniversityPage({
               </p>
             </div>
           </motion.div>
+          <UniversityQuickLinks links={university.quickLinks} />
         </div>
       </section>
 

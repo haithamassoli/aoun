@@ -1,5 +1,44 @@
 import { z } from "zod";
 
+const quickLinkSchema = z
+  .object({
+    title: z.string(),
+    url: z.string(),
+  })
+  .superRefine((value, ctx) => {
+    const title = value.title.trim();
+    const url = value.url.trim();
+
+    if (!title && !url) {
+      return;
+    }
+
+    if (!title) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["title"],
+        message: "عنوان الرابط مطلوب",
+      });
+    }
+
+    if (!url) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["url"],
+        message: "الرابط مطلوب",
+      });
+      return;
+    }
+
+    if (!z.string().url().safeParse(url).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["url"],
+        message: "رابط غير صالح",
+      });
+    }
+  });
+
 export const loginSchema = z.object({
   email: z.string().email("البريد الإلكتروني غير صالح"),
   password: z.string().min(1, "كلمة المرور مطلوبة"),
@@ -11,6 +50,7 @@ export const universitySchema = z.object({
   logoUrl: z.union([z.literal(""), z.string().url("رابط الشعار غير صالح")]),
   order: z.string(),
   alias: z.string(),
+  quickLinks: z.array(quickLinkSchema),
 });
 
 export const majorSchema = z.object({

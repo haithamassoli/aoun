@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import * as motion from "motion/react-client";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { CourseStatusControl } from "@/components/course-status-control";
+import { UniversityQuickLinks } from "@/components/university-quick-links";
 
 type Params = {
   universitySlug: string;
@@ -162,6 +163,7 @@ export default async function CoursePage({
               {major.name} · {university.name}
             </span>
           </motion.div>
+          <UniversityQuickLinks links={university.quickLinks} />
           <CourseStatusControl courseId={course._id} courseName={course.name} />
         </div>
       </section>

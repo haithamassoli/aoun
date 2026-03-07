@@ -1,9 +1,15 @@
 import { ConvexError, v } from "convex/values";
+import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildUniversitySearchToken, normalize } from "./searchUtils";
 
-const universityDoc = v.object({
+const quickLinkValidator = v.object({
+  title: v.string(),
+  url: v.string(),
+});
+
+const universitySearchDoc = v.object({
   _id: v.id("universities"),
   _creationTime: v.number(),
   name: v.string(),
@@ -14,18 +20,101 @@ const universityDoc = v.object({
   searchToken: v.optional(v.string()),
 });
 
+const universityDoc = v.object({
+  _id: v.id("universities"),
+  _creationTime: v.number(),
+  name: v.string(),
+  slug: v.string(),
+  logoUrl: v.optional(v.string()),
+  order: v.number(),
+  alias: v.optional(v.string()),
+  quickLinks: v.array(quickLinkValidator),
+  searchToken: v.optional(v.string()),
+});
+
+function normalizeQuickLinks(
+  quickLinks:
+    | Array<{
+        title: string;
+        url: string;
+      }>
+    | undefined,
+) {
+  return quickLinks ?? [];
+}
+
+function normalizeUniversityDoc(doc: Doc<"universities">) {
+  return {
+    ...doc,
+    quickLinks: normalizeQuickLinks(doc.quickLinks),
+  };
+}
+
+function sanitizeQuickLinks(
+  quickLinks:
+    | Array<{
+        title: string;
+        url: string;
+      }>
+    | undefined,
+) {
+  if (!quickLinks) {
+    return undefined;
+  }
+
+  const sanitized = quickLinks.flatMap((link) => {
+    const title = link.title.trim();
+    const url = link.url.trim();
+
+    if (!title && !url) {
+      return [];
+    }
+
+    if (!title || !url) {
+      throw new ConvexError({
+        code: "UNIVERSITY_QUICK_LINK_INVALID",
+        message: "Each quick link must include both a title and a URL.",
+      });
+    }
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      throw new ConvexError({
+        code: "UNIVERSITY_QUICK_LINK_INVALID",
+        message: "Quick link URLs must be valid absolute URLs.",
+      });
+    }
+
+    if (
+      parsedUrl.protocol !== "http:" &&
+      parsedUrl.protocol !== "https:"
+    ) {
+      throw new ConvexError({
+        code: "UNIVERSITY_QUICK_LINK_INVALID",
+        message: "Quick link URLs must use http or https.",
+      });
+    }
+
+    return [{ title, url }];
+  });
+
+  return sanitized.length > 0 ? sanitized : undefined;
+}
+
 export const list = query({
   args: {},
   returns: v.array(universityDoc),
   handler: async (ctx) => {
     const all = await ctx.db.query("universities").withIndex("by_order").collect();
-    return all.filter(isNotDeleted);
+    return all.filter(isNotDeleted).map(normalizeUniversityDoc);
   },
 });
 
 export const searchPublic = query({
   args: { query: v.string() },
-  returns: v.array(universityDoc),
+  returns: v.array(universitySearchDoc),
   handler: async (ctx, args) => {
     const queryText = normalize(args.query);
     if (!queryText) {
@@ -52,7 +141,7 @@ export const getBySlug = query({
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
     if (!university || university.deletedAt !== undefined) return null;
-    return university;
+    return normalizeUniversityDoc(university);
   },
 });
 
@@ -64,6 +153,7 @@ export const add = mutation({
     logoUrl: v.optional(v.string()),
     order: v.number(),
     alias: v.optional(v.string()),
+    quickLinks: v.optional(v.array(quickLinkValidator)),
   },
   returns: v.id("universities"),
   handler: async (ctx, args) => {
@@ -84,6 +174,7 @@ export const add = mutation({
       slug: args.slug,
       alias: args.alias,
     });
+    const quickLinks = sanitizeQuickLinks(args.quickLinks);
 
     return await ctx.db.insert("universities", {
       name: args.name,
@@ -91,6 +182,7 @@ export const add = mutation({
       logoUrl: args.logoUrl,
       order: args.order,
       alias: args.alias,
+      quickLinks,
       searchToken,
     });
   },
@@ -105,6 +197,7 @@ export const update = mutation({
     logoUrl: v.optional(v.string()),
     order: v.optional(v.number()),
     alias: v.optional(v.string()),
+    quickLinks: v.optional(v.array(quickLinkValidator)),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -139,14 +232,20 @@ export const update = mutation({
       slug: newSlug,
       alias: newAlias,
     });
+    const quickLinks = sanitizeQuickLinks(
+      args.quickLinks !== undefined ? args.quickLinks : current.quickLinks,
+    );
 
-    const { universityId, token: _token, ...rawUpdates } = args;
+    const { universityId, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
-      Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
+      Object.entries(rawUpdates).filter(
+        ([key, value]) => key !== "token" && value !== undefined,
+      )
     );
 
     await ctx.db.patch("universities", universityId, {
       ...filtered,
+      quickLinks,
       searchToken,
     });
 
