@@ -8,11 +8,12 @@ import {
   calculateCumulativeGpa,
   getScaleMaxGpa,
   type GradeType,
+  type GpaResult,
+  type GradeScale,
 } from "@/lib/gpa-utils";
 import { type CourseRowValues } from "@/lib/gpa-schemas";
 import { GpaResultCard } from "./gpa-result-card";
 import { CourseRow } from "./course-row";
-import type { GpaResult } from "@/lib/gpa-utils";
 
 const newCourse = (gradeType: GradeType): CourseRowValues => ({
   name: "",
@@ -35,7 +36,15 @@ type NumericField = {
   handleBlur: () => void;
 };
 
-export function CumulativeGpaForm() {
+interface CumulativeGpaFormProps {
+  onCalculated?: (result: GpaResult) => void;
+  scale?: GradeScale;
+}
+
+export function CumulativeGpaForm({
+  onCalculated,
+  scale = DEFAULT_GRADE_SCALE,
+}: CumulativeGpaFormProps) {
   const [gradeType, setGradeType] = useState<GradeType>("letter");
   const [courses, setCourses] = useState<CourseRowValues[]>([newCourse("letter")]);
   const [result, setResult] = useState<GpaResult | null>(null);
@@ -43,7 +52,7 @@ export function CumulativeGpaForm() {
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<"previousGpa" | "previousCreditHours", string>>
   >({});
-  const maxGpa = getScaleMaxGpa(DEFAULT_GRADE_SCALE);
+  const maxGpa = getScaleMaxGpa(scale);
 
   const form = useForm({
     defaultValues: {
@@ -113,11 +122,12 @@ export function CumulativeGpaForm() {
 
       const computed = calculateCumulativeGpa(
         courses,
-        DEFAULT_GRADE_SCALE,
+        scale,
         prevGpa,
         prevCredits,
       );
       setResult(computed);
+      onCalculated?.(computed);
     },
   });
 
@@ -290,7 +300,7 @@ export function CumulativeGpaForm() {
                 key={i}
                 course={course}
                 index={i}
-                gradeScale={DEFAULT_GRADE_SCALE}
+                gradeScale={scale}
                 error={courseErrors[i]}
                 onChange={(updated) => updateCourse(i, updated)}
                 onRemove={() => removeCourse(i)}
@@ -323,7 +333,7 @@ export function CumulativeGpaForm() {
       {result && (
         <GpaResultCard
           result={result}
-          scale={DEFAULT_GRADE_SCALE}
+          scale={scale}
           title="المعدل التراكمي"
         />
       )}

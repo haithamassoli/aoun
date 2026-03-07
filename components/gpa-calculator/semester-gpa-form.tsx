@@ -7,11 +7,12 @@ import {
   GRADE_TYPE_LABELS,
   calculateSemesterGpa,
   type GradeType,
+  type GpaResult,
+  type GradeScale,
 } from "@/lib/gpa-utils";
 import { type CourseRowValues } from "@/lib/gpa-schemas";
 import { GpaResultCard } from "./gpa-result-card";
 import { CourseRow } from "./course-row";
-import type { GpaResult } from "@/lib/gpa-utils";
 
 const newCourse = (gradeType: GradeType): CourseRowValues => ({
   name: "",
@@ -28,7 +29,15 @@ type GradeTypeField = {
   handleChange: (value: GradeType) => void;
 };
 
-export function SemesterGpaForm() {
+interface SemesterGpaFormProps {
+  onCalculated?: (result: GpaResult) => void;
+  scale?: GradeScale;
+}
+
+export function SemesterGpaForm({
+  onCalculated,
+  scale = DEFAULT_GRADE_SCALE,
+}: SemesterGpaFormProps) {
   const [gradeType, setGradeType] = useState<GradeType>("letter");
   const [courses, setCourses] = useState<CourseRowValues[]>([newCourse("letter")]);
   const [result, setResult] = useState<GpaResult | null>(null);
@@ -59,8 +68,9 @@ export function SemesterGpaForm() {
 
       setCourseErrors({});
       setGlobalError(null);
-      const computed = calculateSemesterGpa(courses, DEFAULT_GRADE_SCALE);
+      const computed = calculateSemesterGpa(courses, scale);
       setResult(computed);
+      onCalculated?.(computed);
     },
   });
 
@@ -155,7 +165,7 @@ export function SemesterGpaForm() {
                 key={i}
                 course={course}
                 index={i}
-                gradeScale={DEFAULT_GRADE_SCALE}
+                gradeScale={scale}
                 error={courseErrors[i]}
                 onChange={(updated) => updateCourse(i, updated)}
                 onRemove={() => removeCourse(i)}
@@ -194,7 +204,7 @@ export function SemesterGpaForm() {
       {result && (
         <GpaResultCard
           result={result}
-          scale={DEFAULT_GRADE_SCALE}
+          scale={scale}
           title="معدل الفصل الدراسي"
         />
       )}

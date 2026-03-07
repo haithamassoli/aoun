@@ -26,7 +26,13 @@ type FieldErrors = Partial<
   >
 >;
 
-export function GpaPlannerForm() {
+interface GpaPlannerFormProps {
+  onCalculated?: (result: PlannerResult) => void;
+}
+
+export type { PlannerResult };
+
+export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
   const [result, setResult] = useState<PlannerResult | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const maxGpa = getScaleMaxGpa(DEFAULT_GRADE_SCALE);
@@ -77,7 +83,9 @@ export function GpaPlannerForm() {
         message = `تحتاج معدل ${required.toFixed(2)} في الفصل القادم — هدف طموح يحتاج جهداً إضافياً.`;
       }
 
-      setResult({ requiredGpa: required, isAchievable, message });
+      const nextResult = { requiredGpa: required, isAchievable, message };
+      setResult(nextResult);
+      onCalculated?.(nextResult);
     },
   });
 

@@ -22,6 +22,7 @@ export function GpaResultCard({
   const colors = getGpaColors(result.gpa);
   const label = getGpaLabel(result.gpa);
   const maxGpa = getScaleMaxGpa(scale);
+  const percentage = maxGpa > 0 ? (result.gpa / maxGpa) * 100 : 0;
 
   return (
     <div
@@ -30,17 +31,22 @@ export function GpaResultCard({
       <p className="mb-3 text-center text-sm font-medium text-surface-500 dark:text-surface-400">
         {title}
       </p>
-      <div className="flex flex-col items-center gap-2">
-        <span className={`text-6xl font-bold tabular-nums ${colors.text}`}>
-          {result.gpa.toFixed(2)}
-        </span>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <div className="flex flex-col items-center gap-1 sm:flex-row sm:items-end sm:gap-3">
+          <span className={`text-5xl font-bold tabular-nums sm:text-6xl ${colors.text}`}>
+            {percentage.toFixed(1)}%
+          </span>
+          <span className="text-lg font-semibold tabular-nums text-surface-700 dark:text-surface-200">
+            {result.gpa.toFixed(2)} / {maxGpa.toFixed(2)}
+          </span>
+        </div>
         <span
           className={`rounded-full px-3 py-1 text-sm font-semibold ${colors.bg} ${colors.text} border ${colors.border}`}
         >
           {label}
         </span>
         <p className="text-xs text-surface-500 dark:text-surface-400">
-          من أصل {maxGpa.toFixed(2)}
+          النسبة المكافئة والمعدل بالنقاط معاً
         </p>
       </div>
       <div className="mt-4 flex justify-center gap-6 border-t border-current/10 pt-4 text-sm text-surface-500 dark:text-surface-400">
