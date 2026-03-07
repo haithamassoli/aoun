@@ -17,7 +17,8 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   display: "swap",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aoun.jo";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://aoun-jo.netlify.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
