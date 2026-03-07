@@ -10,6 +10,10 @@ import {
   type GpaResult,
   type GradeScale,
 } from "@/lib/gpa-utils";
+import {
+  saveGradeTypePreference,
+  useGradeTypePreference,
+} from "@/lib/gpa-preferences";
 import { type CourseRowValues } from "@/lib/gpa-schemas";
 import { GpaResultCard } from "./gpa-result-card";
 import { CourseRow } from "./course-row";
@@ -34,20 +38,27 @@ interface SemesterGpaFormProps {
   scale?: GradeScale;
 }
 
-export function SemesterGpaForm({
+interface SemesterGpaFormContentProps extends SemesterGpaFormProps {
+  initialGradeType: GradeType;
+}
+
+function SemesterGpaFormContent({
   onCalculated,
   scale = DEFAULT_GRADE_SCALE,
-}: SemesterGpaFormProps) {
-  const [gradeType, setGradeType] = useState<GradeType>("letter");
-  const [courses, setCourses] = useState<CourseRowValues[]>([newCourse("letter")]);
+  initialGradeType,
+}: SemesterGpaFormContentProps) {
+  const [gradeType, setGradeType] = useState<GradeType>(initialGradeType);
+  const [courses, setCourses] = useState<CourseRowValues[]>([
+    newCourse(initialGradeType),
+  ]);
   const [result, setResult] = useState<GpaResult | null>(null);
   const [courseErrors, setCourseErrors] = useState<Record<number, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
-      gradeType: "letter" as GradeType,
-      courses: [newCourse("letter")],
+      gradeType: initialGradeType,
+      courses: [newCourse(initialGradeType)],
     },
     onSubmit: () => {
       const errors: Record<number, string> = {};
@@ -99,6 +110,7 @@ export function SemesterGpaForm({
     setGradeType(nextGradeType);
     form.setFieldValue("gradeType", nextGradeType);
     setGlobalError(null);
+    saveGradeTypePreference(nextGradeType);
     syncCourses(
       courses.map((course) => ({
         ...course,
@@ -209,5 +221,17 @@ export function SemesterGpaForm({
         />
       )}
     </div>
+  );
+}
+
+export function SemesterGpaForm(props: SemesterGpaFormProps) {
+  const initialGradeType = useGradeTypePreference();
+
+  return (
+    <SemesterGpaFormContent
+      key={initialGradeType}
+      initialGradeType={initialGradeType}
+      {...props}
+    />
   );
 }

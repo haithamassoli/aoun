@@ -11,6 +11,10 @@ import {
   type GpaResult,
   type GradeScale,
 } from "@/lib/gpa-utils";
+import {
+  saveGradeTypePreference,
+  useGradeTypePreference,
+} from "@/lib/gpa-preferences";
 import { type CourseRowValues } from "@/lib/gpa-schemas";
 import { GpaResultCard } from "./gpa-result-card";
 import { CourseRow } from "./course-row";
@@ -41,12 +45,19 @@ interface CumulativeGpaFormProps {
   scale?: GradeScale;
 }
 
-export function CumulativeGpaForm({
+interface CumulativeGpaFormContentProps extends CumulativeGpaFormProps {
+  initialGradeType: GradeType;
+}
+
+function CumulativeGpaFormContent({
   onCalculated,
   scale = DEFAULT_GRADE_SCALE,
-}: CumulativeGpaFormProps) {
-  const [gradeType, setGradeType] = useState<GradeType>("letter");
-  const [courses, setCourses] = useState<CourseRowValues[]>([newCourse("letter")]);
+  initialGradeType,
+}: CumulativeGpaFormContentProps) {
+  const [gradeType, setGradeType] = useState<GradeType>(initialGradeType);
+  const [courses, setCourses] = useState<CourseRowValues[]>([
+    newCourse(initialGradeType),
+  ]);
   const [result, setResult] = useState<GpaResult | null>(null);
   const [courseErrors, setCourseErrors] = useState<Record<number, string>>({});
   const [fieldErrors, setFieldErrors] = useState<
@@ -56,10 +67,10 @@ export function CumulativeGpaForm({
 
   const form = useForm({
     defaultValues: {
-      gradeType: "letter" as GradeType,
+      gradeType: initialGradeType,
       previousGpa: "" as string | number,
       previousCreditHours: "" as string | number,
-      courses: [newCourse("letter")],
+      courses: [newCourse(initialGradeType)],
     },
     onSubmit: ({ value }) => {
       const errors: Record<number, string> = {};
@@ -156,6 +167,7 @@ export function CumulativeGpaForm({
     setGradeType(nextGradeType);
     form.setFieldValue("gradeType", nextGradeType);
     setFieldErrors({});
+    saveGradeTypePreference(nextGradeType);
     syncCourses(
       courses.map((course) => ({
         ...course,
@@ -338,5 +350,17 @@ export function CumulativeGpaForm({
         />
       )}
     </div>
+  );
+}
+
+export function CumulativeGpaForm(props: CumulativeGpaFormProps) {
+  const initialGradeType = useGradeTypePreference();
+
+  return (
+    <CumulativeGpaFormContent
+      key={initialGradeType}
+      initialGradeType={initialGradeType}
+      {...props}
+    />
   );
 }

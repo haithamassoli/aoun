@@ -8,6 +8,10 @@ import {
   type GradeScale,
   type GpaResult,
 } from "@/lib/gpa-utils";
+import {
+  loadSupports42ScalePreference,
+  saveSupports42ScalePreference,
+} from "@/lib/gpa-preferences";
 import { SemesterGpaForm } from "./semester-gpa-form";
 import { CumulativeGpaForm } from "./cumulative-gpa-form";
 import { GpaPlannerForm, type PlannerResult } from "./gpa-planner-form";
@@ -96,11 +100,17 @@ export function GpaCalculatorTabs() {
   const [activeTab, setActiveTab] = useState<Tab>("semester");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
+  const [hasLoadedScalePreference, setHasLoadedScalePreference] = useState(false);
   const [supports42Scale, setSupports42Scale] = useState(
     DEFAULT_GRADE_SCALE === "just",
   );
   const activeScale: GradeScale = supports42Scale ? "just" : "jordan_plus_minus";
   const activeScaleInfo = GRADE_SCALES[activeScale];
+
+  useEffect(() => {
+    setSupports42Scale(loadSupports42ScalePreference());
+    setHasLoadedScalePreference(true);
+  }, []);
 
   useEffect(() => {
     try {
@@ -122,6 +132,14 @@ export function GpaCalculatorTabs() {
       setHasLoadedHistory(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (!hasLoadedScalePreference) {
+      return;
+    }
+
+    saveSupports42ScalePreference(supports42Scale);
+  }, [hasLoadedScalePreference, supports42Scale]);
 
   useEffect(() => {
     if (!hasLoadedHistory) {

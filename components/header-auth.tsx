@@ -6,7 +6,10 @@ import { useAuth } from "./auth-provider";
 export function HeaderAuth() {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) return null;
+  if (isLoading)
+    return (
+      <div className="h-7 w-20 animate-pulse rounded-lg bg-surface-200 dark:bg-surface-700" />
+    );
 
   if (user) {
     return (

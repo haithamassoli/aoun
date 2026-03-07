@@ -4,8 +4,10 @@ import {
   GRADE_TYPE_LABELS,
   getLetterGrades,
   getScaleMaxGpa,
+  type GradeType,
   type GradeScale,
 } from "@/lib/gpa-utils";
+import { saveGradeTypePreference } from "@/lib/gpa-preferences";
 import type { CourseRowValues } from "@/lib/gpa-schemas";
 
 const inputCls =
@@ -42,6 +44,7 @@ export function CourseRow({
     const updated = { ...course, [key]: value };
     if (key === "gradeType") {
       updated.grade = "";
+      saveGradeTypePreference(value as GradeType);
     }
     onChange(updated);
   };
