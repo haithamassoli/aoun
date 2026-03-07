@@ -6,6 +6,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { CourseStatusSelector } from "@/components/course-status-selector";
+import { motion } from "@/components/motion";
 import { PublicSearchInput } from "@/components/public-search-input";
 import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
 import {
@@ -222,6 +223,132 @@ function CourseCard({
   );
 }
 
+function CourseProgressStats({
+  total,
+  courseStatuses,
+  courses,
+}: {
+  total: number;
+  courseStatuses: Record<string, CourseProgressStatus>;
+  courses: CourseListItem[];
+}) {
+  const completed = courses.filter(
+    (course) => courseStatuses[course._id] === "completed",
+  ).length;
+  const inProgress = courses.filter(
+    (course) => courseStatuses[course._id] === "in_progress",
+  ).length;
+  const none = total - completed - inProgress;
+  const completedPct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const inProgressPct =
+    total > 0 ? Math.round((inProgress / total) * 100) : 0;
+  const nonePct = 100 - completedPct - inProgressPct;
+
+  const stats = [
+    {
+      key: "completed",
+      label: "مكتمل",
+      count: completed,
+      percentage: completedPct,
+      dotClassName: "bg-emerald-500",
+      textClassName: "text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      key: "in_progress",
+      label: "قيد الدراسة",
+      count: inProgress,
+      percentage: inProgressPct,
+      dotClassName: "bg-amber-500",
+      textClassName: "text-amber-600 dark:text-amber-400",
+    },
+    {
+      key: "none",
+      label: "لم يُبدأ",
+      count: none,
+      percentage: nonePct,
+      dotClassName: "bg-surface-300 dark:bg-surface-600",
+      textClassName: "text-surface-600 dark:text-surface-300",
+    },
+  ] as const;
+
+  return (
+    <div className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-surface-800 dark:text-surface-100">
+            تقدم الدراسة
+          </p>
+          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+            توزيع حالة {total} مادة ضمن الخطة.
+          </p>
+        </div>
+
+        <div className="sm:text-left">
+          <p className="text-xs font-medium text-surface-500 dark:text-surface-400">
+            مكتمل
+          </p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+              {completedPct}%
+            </span>
+            <span className="text-sm text-surface-500 dark:text-surface-400">
+              {completed} / {total}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800"
+        aria-label="مخطط تقدم الدراسة"
+        role="img"
+      >
+        <motion.div
+          className="h-full bg-emerald-500"
+          initial={{ width: 0 }}
+          animate={{ width: `${completedPct}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        />
+        <motion.div
+          className="h-full bg-amber-500"
+          initial={{ width: 0 }}
+          animate={{ width: `${inProgressPct}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        />
+        <motion.div
+          className="h-full bg-surface-200 dark:bg-surface-700"
+          initial={{ width: 0 }}
+          animate={{ width: `${nonePct}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        />
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {stats.map((stat) => (
+          <div
+            key={stat.key}
+            className="inline-flex items-center gap-2 rounded-full border border-surface-200 px-3 py-1.5 text-sm dark:border-surface-700"
+          >
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${stat.dotClassName}`}
+              aria-hidden="true"
+            />
+            <span className="text-surface-700 dark:text-surface-200">
+              {stat.label}
+            </span>
+            <span className={`font-semibold ${stat.textClassName}`}>
+              {stat.count}
+            </span>
+            <span className="text-surface-500 dark:text-surface-400">
+              ({stat.percentage}%)
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function CoursesSearchSection({
   majorId,
   universitySlug,
@@ -337,6 +464,14 @@ export function CoursesSearchSection({
         <h2 className="text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
           الخطة الدراسية
         </h2>
+
+        {isStatusFilterReady && courses.length > 0 ? (
+          <CourseProgressStats
+            total={courses.length}
+            courseStatuses={courseStatuses}
+            courses={courses}
+          />
+        ) : null}
 
         <div className="max-w-2xl space-y-3">
           <PublicSearchInput
