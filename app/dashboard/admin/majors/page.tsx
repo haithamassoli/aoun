@@ -6,23 +6,13 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
 import { Toast, useToast } from "@/components/toast";
+import { FormInput, FormSelect } from "@/components/form-field";
+import { majorSchema } from "@/lib/schemas";
 
-type FormData = {
-  universityId: string;
-  name: string;
-  slug: string;
-  order: string;
-  alias: string;
-};
-
-const EMPTY_FORM: FormData = {
-  universityId: "",
-  name: "",
-  slug: "",
-  order: "0",
-  alias: "",
-};
+const generateSlug = (name: string) =>
+  name.trim().replace(/\s+/g, "-").toLowerCase();
 
 export default function AdminMajorsPage() {
   const { user, sessionToken } = useAuth();
@@ -40,20 +30,61 @@ export default function AdminMajorsPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  const form = useForm({
+    defaultValues: {
+      universityId: "",
+      name: "",
+      slug: "",
+      order: "0",
+      alias: "",
+    },
+    validators: { onChange: majorSchema },
+    onSubmit: async ({ value, formApi }) => {
+      if (!sessionToken) return;
+      try {
+        if (editingId) {
+          await updateMajor({
+            token: sessionToken,
+            majorId: editingId as Id<"majors">,
+            name: value.name.trim(),
+            slug: value.slug.trim(),
+            order: Number(value.order) || 0,
+            alias: value.alias.trim() || undefined,
+          });
+          toast.show("تم تحديث التخصص بنجاح", "success");
+        } else {
+          await addMajor({
+            token: sessionToken,
+            universityId: value.universityId as Id<"universities">,
+            name: value.name.trim(),
+            slug: value.slug.trim(),
+            order: Number(value.order) || 0,
+            alias: value.alias.trim() || undefined,
+          });
+          toast.show("تم إضافة التخصص بنجاح", "success");
+        }
+        formApi.reset();
+        setEditingId(null);
+        setShowForm(false);
+      } catch (error) {
+        const msg =
+          error instanceof Error && error.message.includes("MAJOR_SLUG_EXISTS")
+            ? "الرابط (slug) مستخدم بالفعل في هذه الجامعة"
+            : "حدث خطأ أثناء الحفظ";
+        toast.show(msg, "error");
+      }
+    },
+  });
 
   if (!user || user.role !== "admin") return null;
 
   const resetForm = () => {
-    setFormData(EMPTY_FORM);
+    form.reset();
     setEditingId(null);
     setShowForm(false);
   };
-
-  const generateSlug = (name: string) =>
-    name.trim().replace(/\s+/g, "-").toLowerCase();
 
   const handleEdit = (major: {
     _id: string;
@@ -63,7 +94,7 @@ export default function AdminMajorsPage() {
     order: number;
     alias?: string;
   }) => {
-    setFormData({
+    form.reset({
       universityId: major.universityId,
       name: major.name,
       slug: major.slug,
@@ -87,50 +118,8 @@ export default function AdminMajorsPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      !sessionToken ||
-      !formData.name.trim() ||
-      !formData.slug.trim() ||
-      !formData.universityId
-    )
-      return;
-    setSaving(true);
-
-    try {
-      if (editingId) {
-        await updateMajor({
-          token: sessionToken,
-          majorId: editingId as Id<"majors">,
-          name: formData.name.trim(),
-          slug: formData.slug.trim(),
-          order: Number(formData.order) || 0,
-          alias: formData.alias.trim() || undefined,
-        });
-        toast.show("تم تحديث التخصص بنجاح", "success");
-      } else {
-        await addMajor({
-          token: sessionToken,
-          universityId: formData.universityId as Id<"universities">,
-          name: formData.name.trim(),
-          slug: formData.slug.trim(),
-          order: Number(formData.order) || 0,
-          alias: formData.alias.trim() || undefined,
-        });
-        toast.show("تم إضافة التخصص بنجاح", "success");
-      }
-      resetForm();
-    } catch (error) {
-      const msg =
-        error instanceof Error && error.message.includes("MAJOR_SLUG_EXISTS")
-          ? "الرابط (slug) مستخدم بالفعل في هذه الجامعة"
-          : "حدث خطأ أثناء الحفظ";
-      toast.show(msg, "error");
-    } finally {
-      setSaving(false);
-    }
-  };
+  const universityOptions =
+    universities?.map((u) => ({ value: u._id, label: u.name })) ?? [];
 
   return (
     <div>
@@ -195,106 +184,69 @@ export default function AdminMajorsPage() {
       {/* Form */}
       {showForm && (
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
           className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
           <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
             {editingId ? "تعديل التخصص" : "إضافة تخصص جديد"}
           </h3>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                الجامعة *
-              </label>
-              <select
-                value={formData.universityId}
-                onChange={(e) =>
-                  setFormData({ ...formData, universityId: e.target.value })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-                required
-                disabled={!!editingId}
-              >
-                <option value="">اختر الجامعة</option>
-                {universities?.map((uni) => (
-                  <option key={uni._id} value={uni._id}>
-                    {uni.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                اسم التخصص *
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    name: e.target.value,
-                    slug: editingId
-                      ? formData.slug
-                      : generateSlug(e.target.value),
-                  })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                الرابط (slug) *
-              </label>
-              <input
-                type="text"
-                dir="ltr"
-                value={formData.slug}
-                onChange={(e) =>
-                  setFormData({ ...formData, slug: e.target.value })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                الاسم البديل (alias)
-              </label>
-              <input
-                type="text"
-                value={formData.alias}
-                onChange={(e) =>
-                  setFormData({ ...formData, alias: e.target.value })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-                placeholder="اسم بديل للبحث"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                الترتيب
-              </label>
-              <input
-                type="number"
-                value={formData.order}
-                onChange={(e) =>
-                  setFormData({ ...formData, order: e.target.value })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-                min="0"
-              />
-            </div>
+            <FormSelect
+              form={form}
+              name="universityId"
+              label="الجامعة *"
+              options={universityOptions}
+              placeholder="اختر الجامعة"
+              disabled={!!editingId}
+            />
+            <FormInput
+              form={form}
+              name="name"
+              label="اسم التخصص *"
+              onChangeCallback={(val) => {
+                if (!editingId) form.setFieldValue("slug", generateSlug(val));
+              }}
+            />
+            <FormInput
+              form={form}
+              name="slug"
+              label="الرابط (slug) *"
+              dir="ltr"
+            />
+            <FormInput
+              form={form}
+              name="alias"
+              label="الاسم البديل (alias)"
+              placeholder="اسم بديل للبحث"
+            />
+            <FormInput
+              form={form}
+              name="order"
+              label="الترتيب"
+              type="number"
+              min="0"
+            />
           </div>
           <div className="mt-4 flex items-center gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
-            >
-              {saving ? "جاري الحفظ..." : editingId ? "تحديث" : "إضافة"}
-            </button>
+            <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
+                <button
+                  type="submit"
+                  disabled={!canSubmit || isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
+                >
+                  {isSubmitting
+                    ? "جاري الحفظ..."
+                    : editingId
+                      ? "تحديث"
+                      : "إضافة"}
+                </button>
+              )}
+            </form.Subscribe>
             <button
               type="button"
               onClick={resetForm}

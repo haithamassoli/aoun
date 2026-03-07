@@ -6,30 +6,15 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
 import { Toast, useToast } from "@/components/toast";
+import { FormInput, FormSelect } from "@/components/form-field";
+import { createUserSchema, editUserSchema } from "@/lib/schemas";
 
-type EditUserFormData = {
-  name: string;
-  email: string;
-  role: "admin" | "contributor";
-};
-
-type CreateUserFormData = EditUserFormData & {
-  password: string;
-};
-
-const EMPTY_EDIT_FORM: EditUserFormData = {
-  name: "",
-  email: "",
-  role: "contributor",
-};
-
-const EMPTY_CREATE_FORM: CreateUserFormData = {
-  name: "",
-  email: "",
-  password: "",
-  role: "contributor",
-};
+const ROLE_OPTIONS = [
+  { value: "admin", label: "مدير" },
+  { value: "contributor", label: "مساهم" },
+];
 
 export default function AdminUsersPage() {
   const { user, sessionToken } = useAuth();
@@ -51,10 +36,6 @@ export default function AdminUsersPage() {
   const createUser = useAction(api.authActions.createUser);
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editFormData, setEditFormData] = useState<EditUserFormData>(EMPTY_EDIT_FORM);
-  const [createFormData, setCreateFormData] = useState<CreateUserFormData>(EMPTY_CREATE_FORM);
-  const [saving, setSaving] = useState(false);
-  const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   // Permission management
@@ -68,10 +49,72 @@ export default function AdminUsersPage() {
       : "skip",
   );
 
+  const createForm = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "contributor" as "admin" | "contributor",
+    },
+    validators: { onChange: createUserSchema },
+    onSubmit: async ({ value, formApi }) => {
+      if (!sessionToken) return;
+      try {
+        await createUser({
+          token: sessionToken,
+          name: value.name.trim(),
+          email: value.email.trim(),
+          password: value.password,
+          role: value.role,
+        });
+        formApi.reset();
+        toast.show("تم إنشاء المستخدم بنجاح", "success");
+      } catch (error) {
+        const msg =
+          error instanceof Error && error.message.includes("EMAIL_ALREADY_EXISTS")
+            ? "البريد الإلكتروني مستخدم بالفعل"
+            : error instanceof Error && error.message.includes("WEAK_PASSWORD")
+              ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل"
+              : "حدث خطأ أثناء إنشاء المستخدم";
+        toast.show(msg, "error");
+      }
+    },
+  });
+
+  const editForm = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      role: "contributor" as "admin" | "contributor",
+    },
+    validators: { onChange: editUserSchema },
+    onSubmit: async ({ value, formApi }) => {
+      if (!sessionToken || !editingId) return;
+      try {
+        await updateUser({
+          token: sessionToken,
+          userId: editingId as Id<"users">,
+          name: value.name.trim(),
+          email: value.email.trim(),
+          role: value.role,
+        });
+        toast.show("تم تحديث المستخدم بنجاح", "success");
+        formApi.reset();
+        setEditingId(null);
+      } catch (error) {
+        const msg =
+          error instanceof Error && error.message.includes("EMAIL_ALREADY_EXISTS")
+            ? "البريد الإلكتروني مستخدم بالفعل"
+            : "حدث خطأ أثناء الحفظ";
+        toast.show(msg, "error");
+      }
+    },
+  });
+
   if (!user || user.role !== "admin") return null;
 
   const resetEditForm = () => {
-    setEditFormData(EMPTY_EDIT_FORM);
+    editForm.reset();
     setEditingId(null);
   };
 
@@ -81,37 +124,9 @@ export default function AdminUsersPage() {
     email: string;
     role: "admin" | "contributor";
   }) => {
-    setEditFormData({ name: u.name, email: u.email, role: u.role });
+    editForm.reset({ name: u.name, email: u.email, role: u.role });
     setEditingId(u._id);
     setManagingPermsFor(null);
-  };
-
-  const handleCreateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sessionToken) return;
-    setCreating(true);
-
-    try {
-      await createUser({
-        token: sessionToken,
-        name: createFormData.name.trim(),
-        email: createFormData.email.trim(),
-        password: createFormData.password,
-        role: createFormData.role,
-      });
-      setCreateFormData(EMPTY_CREATE_FORM);
-      toast.show("تم إنشاء المستخدم بنجاح", "success");
-    } catch (error) {
-      const msg =
-        error instanceof Error && error.message.includes("EMAIL_ALREADY_EXISTS")
-          ? "البريد الإلكتروني مستخدم بالفعل"
-          : error instanceof Error && error.message.includes("WEAK_PASSWORD")
-            ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل"
-            : "حدث خطأ أثناء إنشاء المستخدم";
-      toast.show(msg, "error");
-    } finally {
-      setCreating(false);
-    }
   };
 
   const handleDelete = async (userId: string) => {
@@ -128,32 +143,6 @@ export default function AdminUsersPage() {
       toast.show(msg, "error");
     } finally {
       setDeleting(null);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sessionToken || !editingId) return;
-    setSaving(true);
-
-    try {
-      await updateUser({
-        token: sessionToken,
-        userId: editingId as Id<"users">,
-        name: editFormData.name.trim(),
-        email: editFormData.email.trim(),
-        role: editFormData.role,
-      });
-      toast.show("تم تحديث المستخدم بنجاح", "success");
-      resetEditForm();
-    } catch (error) {
-      const msg =
-        error instanceof Error && error.message.includes("EMAIL_ALREADY_EXISTS")
-          ? "البريد الإلكتروني مستخدم بالفعل"
-          : "حدث خطأ أثناء الحفظ";
-      toast.show(msg, "error");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -195,7 +184,6 @@ export default function AdminUsersPage() {
     return major ? `${major.name} — ${major.universityName}` : majorId;
   };
 
-  // Filter out already-assigned majors from the picker
   const assignedMajorIds = new Set(
     userPermissions?.map((p) => p.majorId) ?? [],
   );
@@ -238,86 +226,53 @@ export default function AdminUsersPage() {
         </p>
       </div>
 
+      {/* Create user form */}
       <form
-        onSubmit={handleCreateSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          createForm.handleSubmit();
+        }}
         className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/30 p-5 dark:border-emerald-800 dark:bg-emerald-950/30"
       >
         <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
           إضافة مستخدم جديد
         </h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-              الاسم *
-            </label>
-            <input
-              type="text"
-              value={createFormData.name}
-              onChange={(e) =>
-                setCreateFormData({ ...createFormData, name: e.target.value })
-              }
-              className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-              required
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-              البريد الإلكتروني *
-            </label>
-            <input
-              type="email"
-              dir="ltr"
-              value={createFormData.email}
-              onChange={(e) =>
-                setCreateFormData({ ...createFormData, email: e.target.value })
-              }
-              className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-              required
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-              كلمة المرور *
-            </label>
-            <input
-              type="password"
-              dir="ltr"
-              minLength={8}
-              value={createFormData.password}
-              onChange={(e) =>
-                setCreateFormData({ ...createFormData, password: e.target.value })
-              }
-              className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-              required
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-              الدور *
-            </label>
-            <select
-              value={createFormData.role}
-              onChange={(e) =>
-                setCreateFormData({
-                  ...createFormData,
-                  role: e.target.value as "admin" | "contributor",
-                })
-              }
-              className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-            >
-              <option value="admin">مدير</option>
-              <option value="contributor">مساهم</option>
-            </select>
-          </div>
+          <FormInput form={createForm} name="name" label="الاسم *" />
+          <FormInput
+            form={createForm}
+            name="email"
+            label="البريد الإلكتروني *"
+            type="email"
+            dir="ltr"
+          />
+          <FormInput
+            form={createForm}
+            name="password"
+            label="كلمة المرور *"
+            type="password"
+            dir="ltr"
+          />
+          <FormSelect
+            form={createForm}
+            name="role"
+            label="الدور *"
+            options={ROLE_OPTIONS}
+          />
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={creating}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-50"
-          >
-            {creating ? "جاري الإنشاء..." : "إنشاء مستخدم"}
-          </button>
+          <createForm.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
+            {([canSubmit, isSubmitting]) => (
+              <button
+                type="submit"
+                disabled={!canSubmit || isSubmitting}
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {isSubmitting ? "جاري الإنشاء..." : "إنشاء مستخدم"}
+              </button>
+            )}
+          </createForm.Subscribe>
           <p className="text-xs text-surface-500 dark:text-surface-400">
             للمساهمين، قم بإضافة الصلاحيات بعد الإنشاء.
           </p>
@@ -327,69 +282,44 @@ export default function AdminUsersPage() {
       {/* Edit form */}
       {editingId && (
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            editForm.handleSubmit();
+          }}
           className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
           <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
             تعديل المستخدم
           </h3>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                الاسم *
-              </label>
-              <input
-                type="text"
-                value={editFormData.name}
-                onChange={(e) =>
-                  setEditFormData({ ...editFormData, name: e.target.value })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                البريد الإلكتروني *
-              </label>
-              <input
-                type="email"
-                dir="ltr"
-                value={editFormData.email}
-                onChange={(e) =>
-                  setEditFormData({ ...editFormData, email: e.target.value })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                الدور *
-              </label>
-              <select
-                value={editFormData.role}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    role: e.target.value as "admin" | "contributor",
-                  })
-                }
-                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-              >
-                <option value="admin">مدير</option>
-                <option value="contributor">مساهم</option>
-              </select>
-            </div>
+            <FormInput form={editForm} name="name" label="الاسم *" />
+            <FormInput
+              form={editForm}
+              name="email"
+              label="البريد الإلكتروني *"
+              type="email"
+              dir="ltr"
+            />
+            <FormSelect
+              form={editForm}
+              name="role"
+              label="الدور *"
+              options={ROLE_OPTIONS}
+            />
           </div>
           <div className="mt-4 flex items-center gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
-            >
-              {saving ? "جاري الحفظ..." : "تحديث"}
-            </button>
+            <editForm.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
+                <button
+                  type="submit"
+                  disabled={!canSubmit || isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? "جاري الحفظ..." : "تحديث"}
+                </button>
+              )}
+            </editForm.Subscribe>
             <button
               type="button"
               onClick={resetEditForm}
@@ -428,7 +358,6 @@ export default function AdminUsersPage() {
             </button>
           </div>
 
-          {/* Current permissions */}
           {userPermissions === undefined ? (
             <p className="text-xs text-surface-500">جاري التحميل...</p>
           ) : userPermissions.length === 0 ? (
@@ -469,7 +398,6 @@ export default function AdminUsersPage() {
             </div>
           )}
 
-          {/* Add permission */}
           <div className="flex items-center gap-2">
             <select
               value={selectedMajorId}
