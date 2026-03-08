@@ -40,6 +40,7 @@ export default function AdminMajorsPage() {
       slug: "",
       order: "0",
       alias: "",
+      treeDiagramUrl: "",
     },
     validators: { onChange: majorSchema },
     onSubmit: async ({ value, formApi }) => {
@@ -53,6 +54,7 @@ export default function AdminMajorsPage() {
             slug: value.slug.trim(),
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
+            treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
           });
           toast.show("تم تحديث التخصص بنجاح", "success");
         } else {
@@ -63,6 +65,7 @@ export default function AdminMajorsPage() {
             slug: value.slug.trim(),
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
+            treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
           });
           toast.show("تم إضافة التخصص بنجاح", "success");
         }
@@ -94,6 +97,7 @@ export default function AdminMajorsPage() {
     slug: string;
     order: number;
     alias?: string;
+    treeDiagramUrl?: string;
   }) => {
     form.reset({
       universityId: major.universityId,
@@ -101,6 +105,7 @@ export default function AdminMajorsPage() {
       slug: major.slug,
       order: major.order.toString(),
       alias: major.alias ?? "",
+      treeDiagramUrl: major.treeDiagramUrl ?? "",
     });
     setEditingId(major._id);
     setShowForm(true);
@@ -236,6 +241,13 @@ export default function AdminMajorsPage() {
               type="number"
               min="0"
             />
+            <FormInput
+              form={form}
+              name="treeDiagramUrl"
+              label="رابط شجرة المسار (اختياري)"
+              placeholder="https://drive.google.com/..."
+              dir="ltr"
+            />
           </div>
           <div className="mt-4 flex items-center gap-3">
             <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
@@ -309,6 +321,21 @@ export default function AdminMajorsPage() {
                         <span className="rounded bg-surface-100 px-1.5 py-0.5 dark:bg-surface-800">
                           {major.alias}
                         </span>
+                      )}
+                      {major.treeDiagramUrl && (
+                        <a
+                          href={major.treeDiagramUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 rounded bg-emerald-100 px-1.5 py-0.5 text-emerald-700 transition-colors hover:bg-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60"
+                          title="شجرة المسار"
+                        >
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2h2a2 2 0 012 2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v2m0 0a2 2 0 002 2h2a2 2 0 002-2V9a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                          </svg>
+                          شجرة المسار
+                        </a>
                       )}
                     </div>
                   </div>

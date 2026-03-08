@@ -59,6 +59,7 @@ export const majorSchema = z.object({
   slug: z.string().min(1, "الرابط مطلوب"),
   order: z.string(),
   alias: z.string(),
+  treeDiagramUrl: z.union([z.literal(""), z.string().url("رابط غير صالح")]),
 });
 
 export const courseSchema = z.object({

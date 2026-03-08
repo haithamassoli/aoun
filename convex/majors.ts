@@ -11,6 +11,7 @@ const majorDoc = v.object({
   slug: v.string(),
   order: v.number(),
   alias: v.optional(v.string()),
+  treeDiagramUrl: v.optional(v.string()),
   searchToken: v.optional(v.string()),
 });
 
@@ -131,6 +132,7 @@ export const add = mutation({
     slug: v.string(),
     order: v.number(),
     alias: v.optional(v.string()),
+    treeDiagramUrl: v.optional(v.string()),
   },
   returns: v.id("majors"),
   handler: async (ctx, args) => {
@@ -160,6 +162,7 @@ export const add = mutation({
       slug: args.slug,
       order: args.order,
       alias: args.alias,
+      treeDiagramUrl: args.treeDiagramUrl,
       searchToken,
     });
   },
@@ -173,6 +176,7 @@ export const update = mutation({
     slug: v.optional(v.string()),
     order: v.optional(v.number()),
     alias: v.optional(v.string()),
+    treeDiagramUrl: v.optional(v.string()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {

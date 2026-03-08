@@ -212,6 +212,7 @@ export const adminListMajors = query({
       slug: v.string(),
       order: v.number(),
       alias: v.optional(v.string()),
+      treeDiagramUrl: v.optional(v.string()),
       universityName: v.string(),
     })
   ),
@@ -231,6 +232,7 @@ export const adminListMajors = query({
           slug: major.slug,
           order: major.order,
           alias: major.alias,
+          treeDiagramUrl: major.treeDiagramUrl,
           universityName: university?.name ?? "",
         };
       })

@@ -54,6 +54,7 @@ export default defineSchema({
     slug: v.string(),
     order: v.number(),
     alias: v.optional(v.string()),
+    treeDiagramUrl: v.optional(v.string()),
     searchToken: v.optional(v.string()),
     ...softDeleteFields,
   })
