@@ -27,6 +27,12 @@ type CourseListItem = {
   order: number;
 };
 type CourseStatusFilter = "all" | CourseProgressStatus;
+type StatusFilterOption = {
+  value: CourseStatusFilter;
+  label: string;
+  dotClassName: string;
+};
+type CourseStatusCounts = Record<CourseStatusFilter, number>;
 
 const semesterLabels: Record<number, string> = {
   1: "المستوى الأول",
@@ -41,11 +47,7 @@ const semesterLabels: Record<number, string> = {
   10: "المستوى العاشر",
 };
 const STATUS_FILTER_STORAGE_KEY = "aoun:student:course-filter:v1";
-const statusFilterOptions: {
-  value: CourseStatusFilter;
-  label: string;
-  dotClassName: string;
-}[] = [
+const baseStatusFilterOptions: StatusFilterOption[] = [
   {
     value: "all",
     label: "الكل",
@@ -159,6 +161,24 @@ function groupCoursesBySemester(courses: CourseListItem[]) {
 
 function getSemesterGroupKey(semesterKey: number | null) {
   return semesterKey === null ? "other" : `semester-${semesterKey}`;
+}
+
+function getCourseStatusCounts(
+  courses: CourseListItem[],
+  courseStatuses: Record<string, CourseProgressStatus>,
+): CourseStatusCounts {
+  const counts: CourseStatusCounts = {
+    all: courses.length,
+    none: 0,
+    in_progress: 0,
+    completed: 0,
+  };
+
+  for (const course of courses) {
+    counts[courseStatuses[course._id] ?? "none"] += 1;
+  }
+
+  return counts;
 }
 
 function CourseCard({
@@ -477,6 +497,22 @@ export function CoursesSearchSection({
     () => searchedCourses ?? [],
     [searchedCourses],
   );
+  const coursesForStatusCounts =
+    search.isEmpty || searchedCourses === undefined
+      ? defaultCourses
+      : activeSearchedCourses;
+  const statusFilterCounts = useMemo(
+    () => getCourseStatusCounts(coursesForStatusCounts, courseStatuses),
+    [courseStatuses, coursesForStatusCounts],
+  );
+  const statusFilterOptions = useMemo(
+    () =>
+      baseStatusFilterOptions.map((option) => ({
+        ...option,
+        count: statusFilterCounts[option.value],
+      })),
+    [statusFilterCounts],
+  );
   const filteredSearchedCourses = useMemo(
     () =>
       activeSearchedCourses.filter(
@@ -564,7 +600,12 @@ export function CoursesSearchSection({
                       className={`h-2 w-2 rounded-full ${option.dotClassName}`}
                       aria-hidden="true"
                     />
-                    {option.label}
+                    <span>{option.label}</span>
+                    {isStatusFilterReady ? (
+                      <span className="text-[11px] tabular-nums">
+                        ({option.count})
+                      </span>
+                    ) : null}
                   </button>
                 );
               })}
