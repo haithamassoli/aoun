@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import {
   assertAdmin,
   assertCanEditCourse,
@@ -66,6 +66,94 @@ const analyticsTotals = v.object({
   majorsTotal: v.number(),
   coursesTotal: v.number(),
 });
+
+const visitorSeriesEntry = v.object({
+  dateKey: v.string(),
+  label: v.string(),
+  uniqueVisitors: v.number(),
+});
+
+const adminDashboardAnalytics = v.object({
+  universitiesTotal: v.number(),
+  majorsTotal: v.number(),
+  coursesTotal: v.number(),
+  visitorsTotal: v.number(),
+  visitorSeries: v.array(visitorSeriesEntry),
+});
+
+const AMMAN_TIME_ZONE = "Asia/Amman";
+const PUBLIC_VISITOR_STATIC_PATHS = new Set(["/", "/gpa-calculator"]);
+const ammanDateKeyFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: AMMAN_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+const ammanLabelFormatter = new Intl.DateTimeFormat("ar-JO", {
+  timeZone: AMMAN_TIME_ZONE,
+  month: "short",
+  day: "numeric",
+});
+
+function getDatePart(
+  parts: Intl.DateTimeFormatPart[],
+  type: "year" | "month" | "day"
+) {
+  const value = parts.find((part) => part.type === type)?.value;
+  if (!value) {
+    throw new Error(`Missing ${type} in visitor analytics date formatter`);
+  }
+  return value;
+}
+
+function formatDateKey(timestamp: number) {
+  const parts = ammanDateKeyFormatter.formatToParts(new Date(timestamp));
+  const year = getDatePart(parts, "year");
+  const month = getDatePart(parts, "month");
+  const day = getDatePart(parts, "day");
+  return `${year}-${month}-${day}`;
+}
+
+function formatVisitorLabel(dateKey: string) {
+  return ammanLabelFormatter.format(new Date(`${dateKey}T12:00:00.000Z`));
+}
+
+function buildRecentDateKeys(days: number) {
+  const anchor = new Date();
+  anchor.setUTCHours(12, 0, 0, 0);
+
+  return Array.from({ length: days }, (_, index) => {
+    const current = new Date(anchor);
+    current.setUTCDate(anchor.getUTCDate() - (days - index - 1));
+    return formatDateKey(current.getTime());
+  });
+}
+
+function shouldTrackVisitorPath(pathname: string) {
+  if (PUBLIC_VISITOR_STATIC_PATHS.has(pathname)) {
+    return true;
+  }
+
+  if (!pathname || pathname.includes(".")) {
+    return false;
+  }
+
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length < 1 || segments.length > 3) {
+    return false;
+  }
+
+  const [firstSegment] = segments;
+  if (
+    firstSegment === "dashboard" ||
+    firstSegment === "login" ||
+    firstSegment === "offline"
+  ) {
+    return false;
+  }
+
+  return true;
+}
 
 export const getMyMajors = query({
   args: { token: v.string() },
@@ -197,6 +285,121 @@ export const getAdminAnalyticsTotals = query({
       universitiesTotal: universities.filter(isNotDeleted).length,
       majorsTotal: majors.filter(isNotDeleted).length,
       coursesTotal: courses.filter(isNotDeleted).length,
+    };
+  },
+});
+
+export const trackVisitorVisit = mutation({
+  args: {
+    visitorKey: v.string(),
+    pathname: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, { visitorKey, pathname }) => {
+    const normalizedPathname = pathname.trim();
+    if (!visitorKey || !normalizedPathname) {
+      return null;
+    }
+
+    if (!shouldTrackVisitorPath(normalizedPathname)) {
+      return null;
+    }
+
+    const now = Date.now();
+    const dateKey = formatDateKey(now);
+    const visitor = await ctx.db
+      .query("visitors")
+      .withIndex("by_visitorKey", (q) => q.eq("visitorKey", visitorKey))
+      .first();
+
+    if (visitor) {
+      await ctx.db.patch(visitor._id, {
+        lastSeenAt: now,
+        lastPath: normalizedPathname,
+      });
+    } else {
+      await ctx.db.insert("visitors", {
+        visitorKey,
+        firstSeenAt: now,
+        lastSeenAt: now,
+        lastPath: normalizedPathname,
+      });
+    }
+
+    const existingDailyVisit = await ctx.db
+      .query("visitorDailyVisits")
+      .withIndex("by_visitorKey_dateKey", (q) =>
+        q.eq("visitorKey", visitorKey).eq("dateKey", dateKey)
+      )
+      .first();
+
+    if (existingDailyVisit) {
+      return null;
+    }
+
+    await ctx.db.insert("visitorDailyVisits", {
+      visitorKey,
+      dateKey,
+      pathname: normalizedPathname,
+      trackedAt: now,
+    });
+
+    const dailyStats = await ctx.db
+      .query("visitorDailyStats")
+      .withIndex("by_dateKey", (q) => q.eq("dateKey", dateKey))
+      .first();
+
+    if (dailyStats) {
+      await ctx.db.patch(dailyStats._id, {
+        uniqueVisitors: dailyStats.uniqueVisitors + 1,
+        updatedAt: now,
+      });
+      return null;
+    }
+
+    await ctx.db.insert("visitorDailyStats", {
+      dateKey,
+      uniqueVisitors: 1,
+      updatedAt: now,
+    });
+    return null;
+  },
+});
+
+export const getAdminDashboardAnalytics = query({
+  args: {
+    token: v.string(),
+    days: v.optional(v.number()),
+  },
+  returns: adminDashboardAnalytics,
+  handler: async (ctx, { token, days }) => {
+    const user = await authenticateUser(ctx, token);
+    await assertAdmin(ctx, user._id);
+
+    const resolvedDays = Math.max(7, Math.min(days ?? 30, 90));
+    const [universities, majors, courses, visitors, visitorDailyStats] =
+      await Promise.all([
+        ctx.db.query("universities").collect(),
+        ctx.db.query("majors").collect(),
+        ctx.db.query("courses").collect(),
+        ctx.db.query("visitors").collect(),
+        ctx.db.query("visitorDailyStats").collect(),
+      ]);
+
+    const visitorDailyStatsByDate = new Map(
+      visitorDailyStats.map((entry) => [entry.dateKey, entry.uniqueVisitors])
+    );
+
+    return {
+      universitiesTotal: universities.filter(isNotDeleted).length,
+      majorsTotal: majors.filter(isNotDeleted).length,
+      coursesTotal: courses.filter(isNotDeleted).length,
+      visitorsTotal: visitors.length,
+      visitorSeries: buildRecentDateKeys(resolvedDays).map((dateKey) => ({
+        dateKey,
+        label: formatVisitorLabel(dateKey),
+        uniqueVisitors: visitorDailyStatsByDate.get(dateKey) ?? 0,
+      })),
     };
   },
 });

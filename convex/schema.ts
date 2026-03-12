@@ -126,4 +126,26 @@ export default defineSchema({
   })
     .index("by_token", ["token"])
     .index("by_userId", ["userId"]),
+
+  visitors: defineTable({
+    visitorKey: v.string(),
+    firstSeenAt: v.number(),
+    lastSeenAt: v.number(),
+    lastPath: v.string(),
+  }).index("by_visitorKey", ["visitorKey"]),
+
+  visitorDailyVisits: defineTable({
+    visitorKey: v.string(),
+    dateKey: v.string(),
+    pathname: v.string(),
+    trackedAt: v.number(),
+  })
+    .index("by_visitorKey_dateKey", ["visitorKey", "dateKey"])
+    .index("by_dateKey", ["dateKey"]),
+
+  visitorDailyStats: defineTable({
+    dateKey: v.string(),
+    uniqueVisitors: v.number(),
+    updatedAt: v.number(),
+  }).index("by_dateKey", ["dateKey"]),
 });

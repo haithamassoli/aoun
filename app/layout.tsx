@@ -8,6 +8,7 @@ import { HeaderAuth } from "@/components/header-auth";
 import { getSessionToken } from "@/app/actions/auth";
 import { PWARegister } from "@/components/pwa-register";
 import { PWAInstallBanner } from "@/components/pwa-install-banner";
+import { VisitorTracker } from "@/components/visitor-tracker";
 import "./globals.css";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -82,6 +83,7 @@ export default async function RootLayout({
         <PWAInstallBanner />
         <ThemeProvider>
           <ConvexClientProvider sessionToken={sessionToken}>
+            <VisitorTracker />
             <div className="flex min-h-screen flex-col">
               <header className="sticky top-0 z-50 border-b border-surface-200 bg-white/80 backdrop-blur-md dark:border-surface-700 dark:bg-surface-950/80">
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
