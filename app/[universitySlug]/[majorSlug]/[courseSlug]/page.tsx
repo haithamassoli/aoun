@@ -209,7 +209,7 @@ export default async function CoursePage({
                               href={resource.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="group flex items-center gap-3 p-4 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
+                              className="group flex items-start gap-3 overflow-hidden p-4 text-primary-600 transition-colors hover:bg-surface-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-surface-800 dark:hover:text-primary-300 sm:items-center"
                             >
                               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
                                 <svg
@@ -226,11 +226,11 @@ export default async function CoursePage({
                                   />
                                 </svg>
                               </div>
-                              <span className="min-w-0 flex-1 truncate font-medium text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">
+                              <span className="min-w-0 flex-1 break-words text-sm font-medium leading-6 text-inherit [overflow-wrap:anywhere] sm:text-base">
                                 {resource.title}
                               </span>
                               <svg
-                                className="h-4 w-4 shrink-0 text-surface-400"
+                                className="mt-1 h-4 w-4 shrink-0 text-surface-400 sm:mt-0"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -250,7 +250,7 @@ export default async function CoursePage({
                               </h3>
                               {resource.content && (
                                 <div
-                                  className="prose prose-sm max-w-none text-surface-700 dark:text-surface-300"
+                                  className="prose prose-sm max-w-none break-words text-surface-700 [overflow-wrap:anywhere] [&_a]:break-all [&_a]:text-primary-600 [&_a]:[overflow-wrap:anywhere] dark:text-surface-300 dark:[&_a]:text-primary-400"
                                   style={{ direction: "rtl" }}
                                   dangerouslySetInnerHTML={{
                                     __html: sanitizeRichText(resource.content),
