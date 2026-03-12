@@ -19,6 +19,13 @@ type MetricKey =
   | "coursesTotal"
   | "visitorsTotal";
 
+type EntityMetricKey = Exclude<MetricKey, "visitorsTotal">;
+
+type EntitySeriesPoint = {
+  dateKey: string;
+  label: string;
+} & Record<EntityMetricKey, number>;
+
 type VisitorSeriesPoint = {
   dateKey: string;
   label: string;
@@ -26,6 +33,7 @@ type VisitorSeriesPoint = {
 };
 
 type DashboardAnalytics = Record<MetricKey, number> & {
+  entitySeries: EntitySeriesPoint[];
   visitorSeries: VisitorSeriesPoint[];
 };
 
@@ -34,6 +42,7 @@ const DEFAULT_ANALYTICS: DashboardAnalytics = {
   majorsTotal: 0,
   coursesTotal: 0,
   visitorsTotal: 0,
+  entitySeries: [],
   visitorSeries: [],
 };
 
@@ -92,9 +101,136 @@ const KPI_METRICS: Array<{
   },
 ];
 
-const ENTITY_CHART_METRICS = KPI_METRICS.filter(
-  (metric) => metric.key !== "visitorsTotal",
-);
+const ENTITY_CHART_METRICS: Array<{
+  key: EntityMetricKey;
+  label: string;
+  shortLabel: string;
+  stroke: string;
+  fill: string;
+  badgeClass: string;
+  panelClass: string;
+}> = [
+  {
+    key: "universitiesTotal",
+    label: "إجمالي الجامعات",
+    shortLabel: "الجامعات",
+    stroke: "#2563eb",
+    fill: "rgba(37, 99, 235, 0.16)",
+    badgeClass:
+      "border-sky-200/80 bg-sky-500/10 text-sky-700 dark:border-sky-400/20 dark:bg-sky-400/10 dark:text-sky-100",
+    panelClass:
+      "from-sky-500/15 via-sky-500/5 to-transparent dark:from-sky-400/18 dark:via-sky-400/8 dark:to-transparent",
+  },
+  {
+    key: "majorsTotal",
+    label: "إجمالي التخصصات",
+    shortLabel: "التخصصات",
+    stroke: "#7c3aed",
+    fill: "rgba(124, 58, 237, 0.14)",
+    badgeClass:
+      "border-violet-200/80 bg-violet-500/10 text-violet-700 dark:border-violet-400/20 dark:bg-violet-400/10 dark:text-violet-100",
+    panelClass:
+      "from-violet-500/15 via-violet-500/5 to-transparent dark:from-violet-400/18 dark:via-violet-400/8 dark:to-transparent",
+  },
+  {
+    key: "coursesTotal",
+    label: "إجمالي المواد",
+    shortLabel: "المواد",
+    stroke: "#f59e0b",
+    fill: "rgba(245, 158, 11, 0.14)",
+    badgeClass:
+      "border-amber-200/80 bg-amber-500/10 text-amber-700 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100",
+    panelClass:
+      "from-amber-500/15 via-amber-500/5 to-transparent dark:from-amber-400/18 dark:via-amber-400/8 dark:to-transparent",
+  },
+];
+
+const ENTITY_CHART_WIDTH = 960;
+const ENTITY_CHART_HEIGHT = 280;
+const ENTITY_CHART_PADDING_X = 28;
+const ENTITY_CHART_PADDING_TOP = 16;
+const ENTITY_CHART_PADDING_BOTTOM = 36;
+
+type ChartCoordinate = {
+  x: number;
+  y: number;
+};
+
+function buildChartX(index: number, total: number) {
+  const drawableWidth = ENTITY_CHART_WIDTH - ENTITY_CHART_PADDING_X * 2;
+  if (total <= 1) {
+    return ENTITY_CHART_WIDTH / 2;
+  }
+
+  return ENTITY_CHART_PADDING_X + (index / (total - 1)) * drawableWidth;
+}
+
+function buildChartY(value: number, maxValue: number) {
+  const safeMaxValue = Math.max(maxValue, 1);
+  const drawableHeight =
+    ENTITY_CHART_HEIGHT - ENTITY_CHART_PADDING_TOP - ENTITY_CHART_PADDING_BOTTOM;
+  return (
+    ENTITY_CHART_HEIGHT -
+    ENTITY_CHART_PADDING_BOTTOM -
+    (value / safeMaxValue) * drawableHeight
+  );
+}
+
+function buildSmoothPath(points: ChartCoordinate[]) {
+  if (points.length === 0) {
+    return "";
+  }
+
+  if (points.length === 1) {
+    return `M ${points[0].x} ${points[0].y}`;
+  }
+
+  let path = `M ${points[0].x} ${points[0].y}`;
+
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const currentPoint = points[index];
+    const nextPoint = points[index + 1];
+    const midpointX = (currentPoint.x + nextPoint.x) / 2;
+
+    path += ` C ${midpointX} ${currentPoint.y}, ${midpointX} ${nextPoint.y}, ${nextPoint.x} ${nextPoint.y}`;
+  }
+
+  return path;
+}
+
+function buildAreaPath(points: ChartCoordinate[]) {
+  if (points.length === 0) {
+    return "";
+  }
+
+  const baselineY = ENTITY_CHART_HEIGHT - ENTITY_CHART_PADDING_BOTTOM;
+  return `${buildSmoothPath(points)} L ${points[points.length - 1].x} ${baselineY} L ${points[0].x} ${baselineY} Z`;
+}
+
+function buildChartTicks(maxValue: number) {
+  if (maxValue <= 3) {
+    return [maxValue, Math.max(maxValue - 1, 0), Math.max(maxValue - 2, 0), 0];
+  }
+
+  return [
+    maxValue,
+    Math.round(maxValue * 0.66),
+    Math.round(maxValue * 0.33),
+    0,
+  ];
+}
+
+function formatSignedDelta(value: number) {
+  if (value > 0) {
+    return `+${value}`;
+  }
+
+  if (value < 0) {
+    return `${value}`;
+  }
+
+  return "0";
+}
 
 export default function DashboardPage() {
   const { user, sessionToken } = useAuth();
@@ -113,26 +249,55 @@ export default function DashboardPage() {
 
   if (isAdmin) {
     const resolvedAnalytics = analytics ?? DEFAULT_ANALYTICS;
-    const highestEntityValue = Math.max(
-      1,
-      ...ENTITY_CHART_METRICS.map((metric) => resolvedAnalytics[metric.key])
-    );
     const metricCards = KPI_METRICS.map((metric) => ({
       ...metric,
       value: resolvedAnalytics[metric.key],
     }));
-    const entityChartBars = ENTITY_CHART_METRICS.map((metric) => {
-      const value = resolvedAnalytics[metric.key];
-      const heightPercent =
-        value === 0
-          ? 8
-          : Math.max(14, Math.round((value / highestEntityValue) * 100));
+    const firstEntityPoint = resolvedAnalytics.entitySeries[0];
+    const latestEntityPoint =
+      resolvedAnalytics.entitySeries[resolvedAnalytics.entitySeries.length - 1];
+    const highestEntityGrowthValue = Math.max(
+      1,
+      ...resolvedAnalytics.entitySeries.flatMap((point) =>
+        ENTITY_CHART_METRICS.map((metric) =>
+          Math.max(point[metric.key] - (firstEntityPoint?.[metric.key] ?? 0), 0)
+        )
+      )
+    );
+    const entityChartTicks = buildChartTicks(highestEntityGrowthValue);
+    const entityMidpointIndex = Math.floor(
+      Math.max(resolvedAnalytics.entitySeries.length - 1, 0) / 2
+    );
+    const entityChartSeries = ENTITY_CHART_METRICS.map((metric) => {
+      const startingValue = firstEntityPoint?.[metric.key] ?? 0;
+      const coordinates = resolvedAnalytics.entitySeries.map((point, index) => ({
+        x: buildChartX(index, resolvedAnalytics.entitySeries.length),
+        y: buildChartY(
+          Math.max(point[metric.key] - startingValue, 0),
+          highestEntityGrowthValue
+        ),
+      }));
+      const currentValue = latestEntityPoint?.[metric.key] ?? 0;
+
       return {
         ...metric,
-        value,
-        heightPercent,
+        currentValue,
+        delta: currentValue - startingValue,
+        linePath: buildSmoothPath(coordinates),
+        areaPath: buildAreaPath(coordinates),
+        lastCoordinate: coordinates[coordinates.length - 1],
       };
     });
+    const entityLatestX =
+      resolvedAnalytics.entitySeries.length > 0
+        ? buildChartX(
+            resolvedAnalytics.entitySeries.length - 1,
+            resolvedAnalytics.entitySeries.length
+          )
+        : ENTITY_CHART_WIDTH - ENTITY_CHART_PADDING_X;
+    const hasEntityGrowthData = entityChartSeries.some(
+      (series) => series.delta > 0
+    );
     const highestVisitorCount = Math.max(
       1,
       ...resolvedAnalytics.visitorSeries.map((point) => point.uniqueVisitors)
@@ -361,53 +526,264 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.38 }}
-              className="rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900 sm:p-6"
+              className="relative overflow-hidden rounded-[28px] border border-sky-200/80 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(245,158,11,0.16),_transparent_34%),linear-gradient(135deg,_rgba(255,255,255,1),_rgba(248,250,252,0.98)_44%,_rgba(239,246,255,0.96))] p-5 text-slate-900 shadow-[0_24px_60px_-32px_rgba(15,23,42,0.18)] dark:border-slate-700 dark:bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.2),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(245,158,11,0.16),_transparent_34%),linear-gradient(135deg,_rgba(2,6,23,1),_rgba(15,23,42,0.96)_50%,_rgba(30,41,59,0.95))] dark:text-white dark:shadow-[0_24px_60px_-32px_rgba(3,7,18,0.7)] sm:p-6"
             >
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <h2 className="text-base font-semibold text-surface-900 dark:text-surface-50 sm:text-lg">
-                  مقارنة الكيانات
-                </h2>
-                <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 dark:bg-primary-950/70 dark:text-primary-300">
-                  تحديث مباشر
-                </span>
-              </div>
-              <p className="text-sm text-surface-500 dark:text-surface-400">
-                مخطط أعمدة واحد يعرض نفس بيانات بطاقات المؤشرات.
-              </p>
-
-              <div className="relative mt-6">
-                <div className="pointer-events-none absolute inset-0 grid grid-rows-4">
-                  {[0, 1, 2, 3].map((line) => (
-                    <div
-                      key={line}
-                      className="border-t border-dashed border-surface-200 dark:border-surface-700"
-                    />
-                  ))}
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(circle_at_center,_rgba(37,99,235,0.14),_transparent_68%)] dark:bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.16),_transparent_68%)]" />
+              <div className="pointer-events-none absolute -bottom-14 left-0 h-52 w-52 rounded-full bg-amber-300/20 blur-3xl dark:bg-amber-400/12" />
+              <div className="relative">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.32em] text-sky-700/80 dark:text-sky-200/80">
+                      Entity tempo
+                    </p>
+                    <h2 className="mt-2 text-xl font-bold sm:text-2xl">
+                      نمو الكيانات خلال آخر 30 يوما
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+                      كل خط يبدأ من نقطة بداية الفترة نفسها، لذلك يظهر صافي
+                      النمو اليومي للجامعات والتخصصات والمواد بدل تكرار الأرقام
+                      الإجمالية في مخطط ثابت.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 text-sm shadow-[0_18px_30px_-24px_rgba(15,23,42,0.35)] backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none">
+                    <p className="text-xs text-slate-500 dark:text-slate-300">
+                      النافذة الزمنية
+                    </p>
+                    <p className="mt-1 font-semibold">
+                      آخر 30 يوما حتى{" "}
+                      {latestEntityPoint?.label ??
+                        resolvedAnalytics.entitySeries[
+                          resolvedAnalytics.entitySeries.length - 1
+                        ]?.label ??
+                        "اليوم"}
+                    </p>
+                  </div>
                 </div>
 
-                <div
-                  className="relative grid grid-cols-3 gap-3 sm:gap-6"
-                  role="img"
-                  aria-label="مخطط أعمدة لإجمالي الجامعات والتخصصات والمواد"
-                >
-                  {entityChartBars.map((bar) => (
-                    <div key={bar.key} className="flex flex-col items-center">
-                      <div className="relative flex h-56 w-full max-w-28 items-end rounded-xl border border-surface-200/80 bg-gradient-to-b from-surface-50 to-white p-2 dark:border-surface-700 dark:from-surface-800 dark:to-surface-900">
+                <div className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
+                  <div className="rounded-[24px] border border-white/80 bg-white/78 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_22px_34px_-30px_rgba(15,23,42,0.32)] backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:shadow-inner dark:shadow-black/10 sm:p-5">
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
+                      {entityChartSeries.map((series) => (
                         <div
-                          className={`w-full rounded-lg bg-gradient-to-b ${bar.barClass} shadow-[0_10px_24px_-12px_rgba(0,0,0,0.55)] transition-all duration-500 motion-reduce:duration-0`}
-                          style={{ height: `${bar.heightPercent}%` }}
-                        />
-                        <span
-                          className={`${firaCode.className} absolute bottom-3 right-0 left-0 text-center text-xs font-semibold text-surface-800 dark:text-surface-100`}
+                          key={series.key}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
                         >
-                          {bar.value}
-                        </span>
-                      </div>
-                      <p className="mt-3 text-xs font-medium text-surface-700 dark:text-surface-200 sm:text-sm">
-                        {bar.shortLabel}
-                      </p>
+                          <span
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: series.stroke }}
+                          />
+                          <span>{series.shortLabel}</span>
+                          <span
+                            className={`${firaCode.className} text-[11px] font-semibold`}
+                          >
+                            {series.currentValue}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+
+                    {hasEntityGrowthData ? (
+                      <>
+                        <div className="grid gap-3 sm:grid-cols-[44px_minmax(0,1fr)]">
+                          <div className="flex h-[280px] flex-col justify-between pb-9 text-[11px] text-slate-500 dark:text-slate-300">
+                            {entityChartTicks.map((tick, index) => (
+                              <span
+                                key={`${tick}-${index}`}
+                                className={index === entityChartTicks.length - 1 ? "translate-y-1" : ""}
+                              >
+                                {tick}
+                              </span>
+                            ))}
+                          </div>
+
+                          <div
+                            className="relative"
+                            role="img"
+                            aria-label="مخطط زمني لصافي نمو الجامعات والتخصصات والمواد خلال آخر 30 يوما"
+                          >
+                            <div
+                              className="pointer-events-none absolute inset-y-0 w-px bg-slate-900/10 dark:bg-white/10"
+                              style={{
+                                left: `${(entityLatestX / ENTITY_CHART_WIDTH) * 100}%`,
+                              }}
+                            />
+                            <svg
+                              viewBox={`0 0 ${ENTITY_CHART_WIDTH} ${ENTITY_CHART_HEIGHT}`}
+                              className="h-[280px] w-full overflow-visible"
+                              preserveAspectRatio="none"
+                            >
+                              <defs>
+                                {entityChartSeries.map((series) => (
+                                  <linearGradient
+                                    key={series.key}
+                                    id={`entity-series-${series.key}`}
+                                    x1="0"
+                                    x2="0"
+                                    y1="0"
+                                    y2="1"
+                                  >
+                                    <stop
+                                      offset="0%"
+                                      stopColor={series.stroke}
+                                      stopOpacity="0.38"
+                                    />
+                                    <stop
+                                      offset="100%"
+                                      stopColor={series.stroke}
+                                      stopOpacity="0"
+                                    />
+                                  </linearGradient>
+                                ))}
+                              </defs>
+
+                              {entityChartTicks.map((_, index) => {
+                                const progress =
+                                  index / (entityChartTicks.length - 1);
+                                const y =
+                                  ENTITY_CHART_PADDING_TOP +
+                                  progress *
+                                    (ENTITY_CHART_HEIGHT -
+                                      ENTITY_CHART_PADDING_TOP -
+                                      ENTITY_CHART_PADDING_BOTTOM);
+
+                                return (
+                                  <line
+                                    key={index}
+                                    x1={ENTITY_CHART_PADDING_X}
+                                    x2={ENTITY_CHART_WIDTH - ENTITY_CHART_PADDING_X}
+                                    y1={y}
+                                    y2={y}
+                                    stroke="currentColor"
+                                    strokeDasharray="6 10"
+                                    strokeOpacity="0.12"
+                                  />
+                                );
+                              })}
+
+                              {entityChartSeries.map((series) => (
+                                <path
+                                  key={`${series.key}-area`}
+                                  d={series.areaPath}
+                                  fill={`url(#entity-series-${series.key})`}
+                                />
+                              ))}
+
+                              {entityChartSeries.map((series) => (
+                                <path
+                                  key={`${series.key}-line`}
+                                  d={series.linePath}
+                                  fill="none"
+                                  stroke={series.stroke}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="4"
+                                />
+                              ))}
+
+                              {entityChartSeries.map(
+                                (series) =>
+                                  series.lastCoordinate && (
+                                    <g key={`${series.key}-dot`}>
+                                      <circle
+                                        cx={series.lastCoordinate.x}
+                                        cy={series.lastCoordinate.y}
+                                        fill={series.stroke}
+                                        opacity="0.24"
+                                        r="11"
+                                      />
+                                      <circle
+                                        cx={series.lastCoordinate.x}
+                                        cy={series.lastCoordinate.y}
+                                        fill={series.stroke}
+                                        r="5.5"
+                                        stroke="white"
+                                        strokeWidth="3"
+                                      />
+                                    </g>
+                                  )
+                              )}
+                            </svg>
+                          </div>
+                        </div>
+
+                        <div
+                          dir="ltr"
+                          className="mt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300"
+                        >
+                          <span>{resolvedAnalytics.entitySeries[0]?.label}</span>
+                          <span>
+                            {
+                              resolvedAnalytics.entitySeries[entityMidpointIndex]
+                                ?.label
+                            }
+                          </span>
+                          <span>
+                            {
+                              resolvedAnalytics.entitySeries[
+                                resolvedAnalytics.entitySeries.length - 1
+                              ]?.label
+                            }
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex h-[280px] items-center justify-center rounded-[20px] border border-dashed border-sky-200 bg-sky-50/70 px-6 text-center text-sm text-slate-600 dark:border-white/12 dark:bg-black/10 dark:text-slate-300">
+                        لا توجد إضافات جديدة خلال هذه النافذة الزمنية. ما زالت
+                        البطاقات على اليمين تعرض الإجمالي الحالي ونقطة بداية
+                        الفترة لكل نوع.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid gap-3">
+                    {entityChartSeries.map((series) => (
+                      <div
+                        key={series.key}
+                        className={`overflow-hidden rounded-[22px] border border-white/75 bg-gradient-to-br ${series.panelClass} p-4 shadow-[0_18px_30px_-24px_rgba(15,23,42,0.35)] backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                              {series.label}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-300">
+                              التغير خلال الفترة الحالية
+                            </p>
+                          </div>
+                          <span
+                            className={`rounded-full border px-3 py-1 text-[11px] font-medium ${series.badgeClass}`}
+                          >
+                            {series.shortLabel}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 flex items-end justify-between gap-4">
+                          <div>
+                            <p
+                              className={`${firaCode.className} text-3xl font-bold text-slate-900 dark:text-white`}
+                            >
+                              {series.currentValue}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-300">
+                              {series.delta === 0
+                                ? "بدون زيادة خلال النافذة الحالية"
+                                : `صافي ${formatSignedDelta(series.delta)} خلال آخر 30 يوما`}
+                            </p>
+                          </div>
+                          <div className="rounded-2xl border border-white/70 bg-white/80 px-3 py-2 text-right shadow-sm dark:border-white/10 dark:bg-black/10">
+                            <p className="text-[11px] text-slate-500 dark:text-slate-300">
+                              بداية الفترة
+                            </p>
+                            <p
+                              className={`${firaCode.className} mt-1 text-sm font-semibold text-slate-900 dark:text-white`}
+                            >
+                              {firstEntityPoint?.[series.key] ?? 0}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </motion.section>

@@ -73,11 +73,20 @@ const visitorSeriesEntry = v.object({
   uniqueVisitors: v.number(),
 });
 
+const entitySeriesEntry = v.object({
+  dateKey: v.string(),
+  label: v.string(),
+  universitiesTotal: v.number(),
+  majorsTotal: v.number(),
+  coursesTotal: v.number(),
+});
+
 const adminDashboardAnalytics = v.object({
   universitiesTotal: v.number(),
   majorsTotal: v.number(),
   coursesTotal: v.number(),
   visitorsTotal: v.number(),
+  entitySeries: v.array(entitySeriesEntry),
   visitorSeries: v.array(visitorSeriesEntry),
 });
 
@@ -101,7 +110,7 @@ function getDatePart(
 ) {
   const value = parts.find((part) => part.type === type)?.value;
   if (!value) {
-    throw new Error(`Missing ${type} in visitor analytics date formatter`);
+    throw new Error(`Missing ${type} in dashboard analytics date formatter`);
   }
   return value;
 }
@@ -114,7 +123,7 @@ function formatDateKey(timestamp: number) {
   return `${year}-${month}-${day}`;
 }
 
-function formatVisitorLabel(dateKey: string) {
+function formatSeriesLabel(dateKey: string) {
   return ammanLabelFormatter.format(new Date(`${dateKey}T12:00:00.000Z`));
 }
 
@@ -126,6 +135,32 @@ function buildRecentDateKeys(days: number) {
     const current = new Date(anchor);
     current.setUTCDate(anchor.getUTCDate() - (days - index - 1));
     return formatDateKey(current.getTime());
+  });
+}
+
+function buildCumulativeTotals(
+  docs: Array<{ _creationTime: number }>,
+  dateKeys: string[]
+) {
+  const firstDateKey = dateKeys[0];
+  const countsByDate = new Map<string, number>();
+  let runningTotalBeforeRange = 0;
+
+  for (const doc of docs) {
+    const dateKey = formatDateKey(doc._creationTime);
+
+    if (firstDateKey && dateKey < firstDateKey) {
+      runningTotalBeforeRange += 1;
+      continue;
+    }
+
+    countsByDate.set(dateKey, (countsByDate.get(dateKey) ?? 0) + 1);
+  }
+
+  let runningTotal = runningTotalBeforeRange;
+  return dateKeys.map((dateKey) => {
+    runningTotal += countsByDate.get(dateKey) ?? 0;
+    return runningTotal;
   });
 }
 
@@ -377,6 +412,7 @@ export const getAdminDashboardAnalytics = query({
     await assertAdmin(ctx, user._id);
 
     const resolvedDays = Math.max(7, Math.min(days ?? 30, 90));
+    const dateKeys = buildRecentDateKeys(resolvedDays);
     const [universities, majors, courses, visitors, visitorDailyStats] =
       await Promise.all([
         ctx.db.query("universities").collect(),
@@ -389,15 +425,31 @@ export const getAdminDashboardAnalytics = query({
     const visitorDailyStatsByDate = new Map(
       visitorDailyStats.map((entry) => [entry.dateKey, entry.uniqueVisitors])
     );
+    const activeUniversities = universities.filter(isNotDeleted);
+    const activeMajors = majors.filter(isNotDeleted);
+    const activeCourses = courses.filter(isNotDeleted);
+    const universityTotalsByDay = buildCumulativeTotals(
+      activeUniversities,
+      dateKeys
+    );
+    const majorTotalsByDay = buildCumulativeTotals(activeMajors, dateKeys);
+    const courseTotalsByDay = buildCumulativeTotals(activeCourses, dateKeys);
 
     return {
-      universitiesTotal: universities.filter(isNotDeleted).length,
-      majorsTotal: majors.filter(isNotDeleted).length,
-      coursesTotal: courses.filter(isNotDeleted).length,
+      universitiesTotal: activeUniversities.length,
+      majorsTotal: activeMajors.length,
+      coursesTotal: activeCourses.length,
       visitorsTotal: visitors.length,
-      visitorSeries: buildRecentDateKeys(resolvedDays).map((dateKey) => ({
+      entitySeries: dateKeys.map((dateKey, index) => ({
         dateKey,
-        label: formatVisitorLabel(dateKey),
+        label: formatSeriesLabel(dateKey),
+        universitiesTotal: universityTotalsByDay[index] ?? 0,
+        majorsTotal: majorTotalsByDay[index] ?? 0,
+        coursesTotal: courseTotalsByDay[index] ?? 0,
+      })),
+      visitorSeries: dateKeys.map((dateKey) => ({
+        dateKey,
+        label: formatSeriesLabel(dateKey),
         uniqueVisitors: visitorDailyStatsByDate.get(dateKey) ?? 0,
       })),
     };
