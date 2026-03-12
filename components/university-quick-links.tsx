@@ -23,7 +23,9 @@ export function UniversityQuickLinks({ links }: UniversityQuickLinksProps) {
             روابط مهمة مرتبطة بهذه الجامعة.
           </p>
         </div>
-        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <div
+          className="-mx-4 overflow-x-auto px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0"
+        >
           <div className="flex min-w-max items-center gap-2 pb-1">
             {items.map((link) => (
               <a
