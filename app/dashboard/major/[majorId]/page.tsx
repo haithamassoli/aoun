@@ -10,28 +10,47 @@ import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Toast, useToast } from "@/components/toast";
 import { FormInput } from "@/components/form-field";
+import { PublicSearchInput } from "@/components/public-search-input";
+import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
 import { contributorCourseSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 
 const generateSlug = (name: string) =>
   name.trim().replace(/\s+/g, "-").toLowerCase();
 
+type CourseListItem = {
+  _id: Id<"courses">;
+  name: string;
+  slug: string;
+  courseCode?: string;
+  semester?: number;
+  order: number;
+  resourceCount: number;
+  alias?: string;
+};
+
 export default function MajorCoursesPage() {
   const { user, sessionToken } = useAuth();
   const { majorId } = useParams<{ majorId: string }>();
   const toast = useToast();
+  const search = useDebouncedPublicSearch();
+  const majorIdValue = majorId as Id<"majors">;
 
   const major = useQuery(
     api.dashboard.getMajorWithUniversity,
     user && sessionToken
-      ? { token: sessionToken, majorId: majorId as Id<"majors"> }
+      ? { token: sessionToken, majorId: majorIdValue }
       : "skip",
   );
   const courses = useQuery(
     api.dashboard.getCoursesForMajor,
     user && sessionToken
-      ? { token: sessionToken, majorId: majorId as Id<"majors"> }
+      ? { token: sessionToken, majorId: majorIdValue }
       : "skip",
+  );
+  const searchedCourses = useQuery(
+    api.courses.searchByMajor,
+    search.isEmpty ? "skip" : { majorId: majorIdValue, query: search.query },
   );
 
   const addCourse = useMutation(api.courses.add);
@@ -68,7 +87,7 @@ export default function MajorCoursesPage() {
         } else {
           await addCourse({
             token: sessionToken,
-            majorId: majorId as Id<"majors">,
+            majorId: majorIdValue,
             name: value.name.trim(),
             slug: value.slug.trim(),
             courseCode: value.courseCode.trim() || undefined,
@@ -93,22 +112,14 @@ export default function MajorCoursesPage() {
     setShowForm(false);
   };
 
-  const handleEdit = (course: {
-    _id: string;
-    name: string;
-    slug: string;
-    courseCode?: string;
-    semester?: number;
-    order: number;
-    alias?: string;
-  }) => {
+  const handleEdit = (course: CourseListItem) => {
     form.reset({
       name: course.name,
       slug: course.slug,
       courseCode: course.courseCode ?? "",
       semester: course.semester?.toString() ?? "",
       order: course.order.toString(),
-      alias: (course as { alias?: string }).alias ?? "",
+      alias: course.alias ?? "",
     });
     setEditingId(course._id);
     setShowForm(true);
@@ -132,6 +143,26 @@ export default function MajorCoursesPage() {
       </div>
     );
   }
+
+  const courseLookup = new Map(courses.map((course) => [course._id, course]));
+  const activeCourses: CourseListItem[] = search.isEmpty
+    ? courses
+    : (searchedCourses ?? []).map((course) => {
+        const existingCourse = courseLookup.get(course._id);
+
+        if (existingCourse) {
+          return existingCourse;
+        }
+
+        return {
+          ...course,
+          resourceCount: 0,
+        };
+      });
+  const isSearchLoading =
+    !search.isEmpty && (search.isDebouncing || searchedCourses === undefined);
+  const isNoSearchResults =
+    !search.isEmpty && !isSearchLoading && activeCourses.length === 0;
 
   return (
     <div>
@@ -281,6 +312,37 @@ export default function MajorCoursesPage() {
         </form>
       )}
 
+      {courses.length > 0 ? (
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.05 }}
+          className="mb-6 overflow-hidden rounded-2xl border border-surface-200/80 bg-gradient-to-br from-white via-white to-surface-50/80 p-4 shadow-sm dark:border-surface-700 dark:from-surface-900 dark:via-surface-900 dark:to-surface-950"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl flex-1">
+              <PublicSearchInput
+                label="ابحث داخل مواد التخصص"
+                placeholder="مثال: برمجة كائنية أو CS101"
+                value={search.input}
+                onChange={search.setInput}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 lg:max-w-xs lg:justify-end">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 dark:border-primary-800 dark:bg-primary-950/60 dark:text-primary-300">
+                <span className="h-2 w-2 rounded-full bg-primary-500" />
+                {search.isEmpty
+                  ? `${courses.length} مادة متاحة`
+                  : isSearchLoading
+                    ? "جاري البحث..."
+                    : `${activeCourses.length} نتيجة`}
+              </span>
+            </div>
+          </div>
+        </motion.section>
+      ) : null}
+
       {/* Courses list */}
       {courses.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
@@ -306,89 +368,112 @@ export default function MajorCoursesPage() {
             أضف مادة جديدة للبدء
           </p>
         </div>
+      ) : isSearchLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="h-20 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+            />
+          ))}
+        </div>
+      ) : isNoSearchResults ? (
+        <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800">
+            <svg
+              className="h-6 w-6 text-surface-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-4.35-4.35m1.1-4.65a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+              />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
+            لا توجد نتائج مطابقة
+          </p>
+          <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
+            لم نعثر على مادة تطابق «{search.query}» داخل هذا التخصص.
+          </p>
+        </div>
       ) : (
         <div className="space-y-3">
-          {courses.map(
-            (course: {
-              _id: string;
-              name: string;
-              courseCode?: string;
-              semester?: number;
-              resourceCount: number;
-              slug: string;
-              order: number;
-            }, index: number) => (
-              <motion.div
-                key={course._id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.04 }}
-                className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
+          {activeCourses.map((course, index: number) => (
+            <motion.div
+              key={course._id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.04 }}
+              className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
+            >
+              <Link
+                href={`/dashboard/major/${majorId}/course/${course._id}`}
+                className="min-w-0 flex-1"
               >
-                <Link
-                  href={`/dashboard/major/${majorId}/course/${course._id}`}
-                  className="min-w-0 flex-1"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
-                      {course.courseCode || "#"}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
-                        {course.name}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
-                        {course.semester && (
-                          <span>المستوى {course.semester}</span>
-                        )}
-                        <span>{course.resourceCount} مصدر</span>
-                      </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
+                    {course.courseCode || "#"}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
+                      {course.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+                      {course.semester && (
+                        <span>المستوى {course.semester}</span>
+                      )}
+                      <span>{course.resourceCount} مصدر</span>
                     </div>
                   </div>
-                </Link>
-                <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button
-                    onClick={() => handleEdit(course)}
-                    className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
-                    title="تعديل"
-                  >
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                  </button>
-                  <Link
-                    href={`/dashboard/major/${majorId}/course/${course._id}`}
-                    className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
-                    title="المصادر"
-                  >
-                    <svg
-                      className="h-4 w-4 rotate-180"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </Link>
                 </div>
-              </motion.div>
-            ),
-          )}
+              </Link>
+              <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                <button
+                  onClick={() => handleEdit(course)}
+                  className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
+                  title="تعديل"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </button>
+                <Link
+                  href={`/dashboard/major/${majorId}/course/${course._id}`}
+                  className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
+                  title="المصادر"
+                >
+                  <svg
+                    className="h-4 w-4 rotate-180"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </motion.div>
+          ))}
         </div>
       )}
     </div>

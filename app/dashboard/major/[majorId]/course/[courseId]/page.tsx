@@ -399,8 +399,8 @@ export default function CourseResourcesPage() {
                             .map((e) =>
                               typeof e === "string"
                                 ? e
-                                : (e as { message?: string })?.message ??
-                                  String(e),
+                                : ((e as { message?: string })?.message ??
+                                  String(e)),
                             )
                             .join(", ")}
                         </p>
@@ -512,20 +512,26 @@ export default function CourseResourcesPage() {
       ) : (
         <div className="space-y-3">
           {filteredResources.map(
-            (resource: {
-              _id: string;
-              title: string;
-              category: CategoryValue;
-              type: "link" | "richtext";
-              url?: string;
-              content?: string;
-              order: number;
-            }, index: number) => (
+            (
+              resource: {
+                _id: string;
+                title: string;
+                category: CategoryValue;
+                type: "link" | "richtext";
+                url?: string;
+                content?: string;
+                order: number;
+              },
+              index: number,
+            ) => (
               <motion.div
                 key={resource._id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.2) }}
+                transition={{
+                  duration: 0.3,
+                  delay: Math.min(index * 0.04, 0.2),
+                }}
                 className="group rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -560,7 +566,7 @@ export default function CourseResourcesPage() {
                     )}
                     {resource.type === "richtext" && resource.content && (
                       <div
-                        className="prose prose-sm mt-2 max-w-none text-surface-600 dark:text-surface-300"
+                        className="prose prose-sm max-w-none break-words text-surface-700 [overflow-wrap:anywhere] [&_a]:break-all [&_a]:text-primary-600 [&_a]:[overflow-wrap:anywhere] dark:text-surface-300 dark:[&_a]:text-primary-400"
                         dir="rtl"
                         dangerouslySetInnerHTML={{
                           __html: sanitizeRichText(resource.content),
