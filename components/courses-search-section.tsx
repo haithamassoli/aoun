@@ -5,7 +5,10 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { CourseStatusSelector } from "@/components/course-status-selector";
+import {
+  CourseStatusMenu,
+  getCourseStatusOption,
+} from "@/components/course-status-selector";
 import { motion } from "@/components/motion";
 import { PublicSearchInput } from "@/components/public-search-input";
 import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
@@ -154,6 +157,10 @@ function groupCoursesBySemester(courses: CourseListItem[]) {
   });
 }
 
+function getSemesterGroupKey(semesterKey: number | null) {
+  return semesterKey === null ? "other" : `semester-${semesterKey}`;
+}
+
 function CourseCard({
   course,
   href,
@@ -167,58 +174,100 @@ function CourseCard({
   badge?: string;
   onStatusChange: (status: CourseProgressStatus) => void;
 }) {
+  const statusOption = getCourseStatusOption(status);
+
   return (
-    <article className="rounded-xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600">
-      <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">
+    <article className="group flex h-full flex-col rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(14,165,233,0.45)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none dark:hover:border-primary-600 sm:p-4">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="min-w-0 flex-1 space-y-2">
           {badge ? (
-            <span className="inline-flex rounded-md bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-300">
+            <span className="inline-flex max-w-full truncate rounded-full border border-primary-200/70 bg-primary-50/80 px-2.5 py-1 text-[10px] font-semibold text-primary-700 dark:border-primary-900 dark:bg-primary-950/80 dark:text-primary-300">
               {badge}
             </span>
           ) : null}
-          <Link
-            href={href}
-            className="mt-2 block truncate font-semibold text-surface-800 transition-colors hover:text-primary-600 dark:text-surface-100 dark:hover:text-primary-400"
+          <div
+            className={
+              course.courseCode
+                ? "space-y-1"
+                : "flex min-h-12 items-center justify-center"
+            }
           >
-            {course.name}
-          </Link>
-          {course.courseCode ? (
-            <p className="mt-0.5 text-sm text-surface-500 dark:text-surface-400">
-              {course.courseCode}
-            </p>
-          ) : null}
+            <div
+              className={`flex gap-2 ${
+                course.courseCode
+                  ? "items-center"
+                  : "w-full items-center justify-start"
+              }`}
+            >
+              <span
+                className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusOption.dotClassName}`}
+                aria-hidden="true"
+              />
+              <div>
+                <Link
+                  href={href}
+                  className={`block min-w-0 flex-1 line-clamp-2 text-sm font-semibold leading-6 text-surface-800 transition-colors hover:text-primary-600 dark:text-surface-100 dark:hover:text-primary-400 sm:text-base`}
+                >
+                  {course.name}
+                </Link>
+                {course.courseCode ? (
+                  <p className="truncate text-[11px] font-medium tracking-[0.14em] text-surface-500 dark:text-surface-400">
+                    {course.courseCode}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+            {/* {course.courseCode ? (
+              <p className="truncate text-[11px] font-medium tracking-[0.14em] text-surface-500 dark:text-surface-400">
+                {course.courseCode}
+              </p>
+            ) : null} */}
+          </div>
         </div>
 
-        <Link
-          href={href}
-          aria-label={`اذهب إلى مادة ${course.name}`}
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-surface-200 text-surface-500 transition-colors hover:border-primary-300 hover:text-primary-600 dark:border-surface-700 dark:text-surface-400 dark:hover:border-primary-600 dark:hover:text-primary-300"
-        >
-          <svg
-            className="h-4 w-4 rotate-180"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            aria-hidden="true"
+        <div className="flex shrink-0 items-center gap-2">
+          <CourseStatusMenu
+            ariaLabel={`تغيير حالة المادة ${course.name}`}
+            value={status}
+            onChange={onStatusChange}
+          />
+          {/* <Link
+            href={href}
+            aria-label={`اذهب إلى مادة ${course.name}`}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-surface-200/80 bg-surface-50 text-surface-500 transition-all duration-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600 group-hover:-translate-x-0.5 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-400 dark:hover:border-primary-600 dark:hover:bg-primary-950/60 dark:hover:text-primary-300"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </Link>
+            <svg
+              className="h-4 w-4 rotate-180"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </Link> */}
+        </div>
       </div>
 
-      <div className="mt-3 border-t border-surface-100 pt-3 dark:border-surface-800">
-        <CourseStatusSelector
-          compact
-          ariaLabel={`حالة المادة ${course.name}`}
-          value={status}
-          onChange={onStatusChange}
-        />
-      </div>
+      {/* <div className="mt-auto pt-3">
+        <div className="rounded-xl border border-surface-100/80 bg-surface-50/80 p-2.5 dark:border-surface-800 dark:bg-surface-950/40">
+          <p className="mb-2 text-[10px] font-semibold text-surface-500 dark:text-surface-400">
+            الحالة الحالية
+          </p>
+          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-surface-200/80 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-surface-700 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-200">
+            <span
+              className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusOption.dotClassName}`}
+              aria-hidden="true"
+            />
+            <span className="truncate">{statusOption.label}</span>
+          </div>
+        </div>
+      </div> */}
     </article>
   );
 }
@@ -240,8 +289,7 @@ function CourseProgressStats({
   ).length;
   const none = total - completed - inProgress;
   const completedPct = total > 0 ? Math.round((completed / total) * 100) : 0;
-  const inProgressPct =
-    total > 0 ? Math.round((inProgress / total) * 100) : 0;
+  const inProgressPct = total > 0 ? Math.round((inProgress / total) * 100) : 0;
   const nonePct = 100 - completedPct - inProgressPct;
 
   const stats = [
@@ -370,6 +418,9 @@ export function CoursesSearchSection({
     initialStatusFilter ?? "all",
   );
   const [isStatusFilterReady, setIsStatusFilterReady] = useState(false);
+  const [collapsedSemesterGroups, setCollapsedSemesterGroups] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
@@ -458,6 +509,13 @@ export function CoursesSearchSection({
     setCourseStatuses(setCourseStatus(courseId, nextStatus));
   };
 
+  const toggleSemesterGroup = (groupKey: string) => {
+    setCollapsedSemesterGroups((current) => ({
+      ...current,
+      [groupKey]: !(current[groupKey] ?? false),
+    }));
+  };
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <div className="mb-8 space-y-4">
@@ -516,11 +574,11 @@ export function CoursesSearchSection({
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((item) => (
             <div
               key={item}
-              className="h-20 animate-pulse rounded-xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+              className="h-52 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
             />
           ))}
         </div>
@@ -550,36 +608,83 @@ export function CoursesSearchSection({
         </div>
       ) : search.isEmpty ? (
         <div className="space-y-10">
-          {groupedDefaultCourses.map((semester) => (
-            <div key={semester.key ?? "other"}>
-              <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-surface-700 dark:text-surface-200">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
-                  {semester.key ?? "—"}
-                </span>
-                {semester.label}
-              </h3>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {semester.courses.map((course) => (
-                  <CourseCard
-                    key={course._id}
-                    course={course}
-                    href={`/${universitySlug}/${majorSlug}/${course.slug}`}
-                    status={getStatus(course._id)}
-                    onStatusChange={(status) =>
-                      handleStatusChange(course._id, status)
-                    }
-                  />
-                ))}
+          {groupedDefaultCourses.map((semester) => {
+            const groupKey = getSemesterGroupKey(semester.key);
+            const panelId = `courses-semester-panel-${groupKey}`;
+            const isCollapsed = collapsedSemesterGroups[groupKey] ?? false;
+
+            return (
+              <div key={groupKey} className="space-y-4">
+                <button
+                  type="button"
+                  aria-expanded={!isCollapsed}
+                  aria-controls={panelId}
+                  onClick={() => toggleSemesterGroup(groupKey)}
+                  className="flex w-full items-center justify-between gap-3 rounded-2xl border border-surface-200/80 bg-white/90 px-4 py-3 text-right shadow-[0_12px_30px_-28px_rgba(15,23,42,0.55)] transition-all duration-200 hover:border-primary-300 hover:bg-primary-50/60 dark:border-surface-700/80 dark:bg-surface-900/90 dark:shadow-none dark:hover:border-primary-600 dark:hover:bg-surface-900"
+                >
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
+                      {semester.key ?? "—"}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-base font-semibold text-surface-800 dark:text-surface-100 sm:text-lg">
+                        {semester.label}
+                      </span>
+                      <span className="block text-xs text-surface-500 dark:text-surface-400">
+                        {semester.courses.length} مادة
+                      </span>
+                    </span>
+                  </span>
+
+                  <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-surface-200/80 bg-surface-50/80 px-2.5 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-300">
+                    <span>{isCollapsed ? "عرض المواد" : "إخفاء المواد"}</span>
+                    <svg
+                      className={`h-4 w-4 transition-transform duration-200 ${
+                        isCollapsed ? "" : "rotate-180"
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </span>
+                </button>
+
+                {!isCollapsed ? (
+                  <div
+                    id={panelId}
+                    className="grid grid-cols-2 gap-2.5 lg:grid-cols-3"
+                  >
+                    {semester.courses.map((course) => (
+                      <CourseCard
+                        key={course._id}
+                        course={course}
+                        href={`/${universitySlug}/${majorSlug}/${course.slug}`}
+                        status={getStatus(course._id)}
+                        onStatusChange={(status) =>
+                          handleStatusChange(course._id, status)
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : null}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div>
           <p className="mb-4 text-sm text-surface-500 dark:text-surface-400">
             {filteredSearchedCourses.length} نتيجة بحث
           </p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
             {filteredSearchedCourses.map((course: CourseListItem) => (
               <CourseCard
                 key={course._id}
