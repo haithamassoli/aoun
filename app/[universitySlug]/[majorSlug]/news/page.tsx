@@ -7,6 +7,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { NewsPageContent } from "@/components/news-page-content";
 import type { NewsWithAuthor } from "@/components/news-card";
 import { api } from "@/convex/_generated/api";
+import { NotificationToggle } from "@/components/notification-toggle";
 
 const INITIAL_PAGE_SIZE = 8;
 
@@ -115,14 +116,17 @@ export default async function MajorNewsPage({
 
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <motion.span
+              <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45 }}
-                className="inline-flex items-center rounded-full border border-primary-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-primary-700 shadow-sm dark:border-primary-800 dark:bg-surface-900/80 dark:text-primary-300"
+                className="flex items-center gap-3"
               >
-                نافذة الأخبار
-              </motion.span>
+                <span className="inline-flex items-center rounded-full border border-primary-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-primary-700 shadow-sm dark:border-primary-800 dark:bg-surface-900/80 dark:text-primary-300">
+                  نافذة الأخبار
+                </span>
+                <NotificationToggle majorId={major._id} />
+              </motion.div>
               <motion.h1
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -104,19 +104,19 @@ Service worker, VAPID setup, and subscription management backend. No UI toggle y
 
 ### Tasks
 
-- [ ] **M4-T1: Generate VAPID keys and configure environment**
+- [x] **M4-T1: Generate VAPID keys and configure environment**
   Generate VAPID key pair using `web-push` library. Store `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` (mailto:admin email) in Convex environment variables. Add `NEXT_PUBLIC_VAPID_PUBLIC_KEY` to Next.js env for client access.
 
-- [ ] **M4-T2: Install `web-push` dependency**
+- [x] **M4-T2: Install `web-push` dependency**
   Install `web-push` npm package (used server-side in Convex actions for sending push notifications). Add to project dependencies.
 
-- [ ] **M4-T3: Update service worker with push handlers**
+- [x] **M4-T3: Update service worker with push handlers**
   Update `/public/sw.js` to handle `push` event: parse notification payload (title, body, url), call `self.registration.showNotification()` with title, body, icon (app icon), and data (url). Handle `notificationclick` event: close notification, call `clients.openWindow(event.notification.data.url)` to deep-link.
 
-- [ ] **M4-T4: Create push subscription utility**
+- [x] **M4-T4: Create push subscription utility**
   Create `lib/push-subscription.ts` with helper functions: `subscribeToPush()` — registers service worker, calls `registration.pushManager.subscribe()` with VAPID public key (urlBase64ToUint8Array conversion), returns `PushSubscription`. `getExistingSubscription()` — gets current subscription from service worker if any. `unsubscribeFromPush()` — calls `subscription.unsubscribe()`.
 
-- [ ] **M4-T5: Create `usePushSubscription` hook**
+- [x] **M4-T5: Create `usePushSubscription` hook**
   Create `hooks/use-push-subscription.ts`. On mount, check if push is supported (`'PushManager' in window`). Get existing subscription via service worker. Expose: `isSupported`, `subscription` (current PushSubscription or null), `subscribe(majorId)`, `unsubscribe(majorId)`, `isSubscribedToMajor(majorId)` (derived from `pushSubscriptions.getByEndpoint` query).
 
 ---
@@ -129,25 +129,25 @@ Connect the push infrastructure to the UI and trigger notifications on news crea
 
 ### Tasks
 
-- [ ] **M5-T1: Create notification toggle component**
+- [x] **M5-T1: Create notification toggle component**
   Create `components/notification-toggle.tsx`. Bell icon button with on/off visual state. Props: `majorId`, `universitySlug`, `majorSlug`. Uses `usePushSubscription` hook. Shows loading spinner during subscribe/unsubscribe. If push not supported, hide the toggle. On enable: prompt browser permission, subscribe, call `pushSubscriptions.subscribe` mutation. On disable: call `pushSubscriptions.unsubscribe` mutation.
 
-- [ ] **M5-T2: Add notification toggle to major page**
+- [x] **M5-T2: Add notification toggle to major page**
   Place `<NotificationToggle>` on the major page (`app/[universitySlug]/[majorSlug]/page.tsx`) in the hero section near the news button. Pass `majorId`, `universitySlug`, `majorSlug` as props.
 
-- [ ] **M5-T3: Add notification toggle to news page**
+- [x] **M5-T3: Add notification toggle to news page**
   Place `<NotificationToggle>` on the news page header as well, so students can subscribe while browsing news.
 
-- [ ] **M5-T4: Create `notifications.send` action**
+- [x] **M5-T4: Create `notifications.send` action**
   Create `convex/notifications.ts` with a `send({ newsId })` Convex action (uses `"use node"`). Fetch news doc to get `majorId` and `title`. Fetch major doc to get slug. Fetch university doc to get slug. Query all `pushSubscriptions` where `majorIds` contains this `majorId`. For each subscription, call `webpush.sendNotification()` with payload: `{ title, body: "اضغط لعرض الأخبار", url: "/{universitySlug}/{majorSlug}/news" }`. Catch 410 Gone errors and delete expired subscription records via internal mutation.
 
-- [ ] **M5-T5: Trigger notification dispatch from `news.add`**
+- [x] **M5-T5: Trigger notification dispatch from `news.add`**
   Update `news.add` mutation to schedule `notifications.send` action after successful insert. Use `ctx.scheduler.runAfter(0, internal.notifications.send, { newsId })` so notification dispatch is async and doesn't block the mutation.
 
-- [ ] **M5-T6: Create cleanup mutation for expired subscriptions**
+- [x] **M5-T6: Create cleanup mutation for expired subscriptions**
   Create `pushSubscriptions.removeExpired({ endpoint })` internal mutation. Called by `notifications.send` action when a 410 response is received. Deletes the subscription record by endpoint.
 
-- [ ] **M5-T7: Handle browser permission denied state**
+- [x] **M5-T7: Handle browser permission denied state**
   In `NotificationToggle`, check `Notification.permission`. If "denied", show disabled toggle with tooltip explaining the user needs to enable notifications in browser settings. If "default", requesting permission is handled on toggle enable.
 
 ---

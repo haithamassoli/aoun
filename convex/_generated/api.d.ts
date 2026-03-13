@@ -16,6 +16,8 @@ import type * as helpers from "../helpers.js";
 import type * as majors from "../majors.js";
 import type * as migrations from "../migrations.js";
 import type * as news from "../news.js";
+import type * as newsInternal from "../newsInternal.js";
+import type * as notifications from "../notifications.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
 import type * as resources from "../resources.js";
 import type * as searchUtils from "../searchUtils.js";
@@ -39,6 +41,8 @@ declare const fullApi: ApiFromModules<{
   majors: typeof majors;
   migrations: typeof migrations;
   news: typeof news;
+  newsInternal: typeof newsInternal;
+  notifications: typeof notifications;
   pushSubscriptions: typeof pushSubscriptions;
   resources: typeof resources;
   searchUtils: typeof searchUtils;

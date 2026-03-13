@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import * as motion from "motion/react-client";
 import { MajorLastVisitTracker } from "@/components/major-last-visit-tracker";
+import { NotificationToggle } from "@/components/notification-toggle";
 
 type Params = { universitySlug: string; majorSlug: string };
 type SearchParams = {
@@ -181,6 +182,8 @@ export default async function MajorPage({
                 </svg>
               </span>
             </Link>
+
+            <NotificationToggle majorId={major._id} />
 
             {major.treeDiagramUrl && (
               <a

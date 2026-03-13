@@ -8,6 +8,7 @@ import {
   softDeleteFields,
 } from "./helpers";
 import { paginationOptsValidator } from "convex/server";
+import { internal } from "./_generated/api";
 
 type NewsWithAuthor = Doc<"news"> & {
   authorName: string;
@@ -52,7 +53,7 @@ export const add = mutation({
     }
 
     const now = Date.now();
-    return await ctx.db.insert("news", {
+    const newsId = await ctx.db.insert("news", {
       majorId: args.majorId,
       title: args.title.trim(),
       content: args.content,
@@ -60,6 +61,10 @@ export const add = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    await ctx.scheduler.runAfter(0, internal.notifications.send, { newsId });
+
+    return newsId;
   },
 });
 
