@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import {
   assertAdmin,
@@ -17,6 +17,7 @@ const majorWithUniversity = v.object({
   slug: v.string(),
   order: v.number(),
   alias: v.optional(v.string()),
+  treeDiagramUrl: v.optional(v.string()),
   universityName: v.string(),
 });
 
@@ -296,8 +297,33 @@ export const getMajorWithUniversity = query({
       slug: major.slug,
       order: major.order,
       alias: major.alias,
+      treeDiagramUrl: major.treeDiagramUrl,
       universityName: university?.name ?? "",
     };
+  },
+});
+
+export const updateMajorTreeDiagramUrl = mutation({
+  args: {
+    token: v.string(),
+    majorId: v.id("majors"),
+    treeDiagramUrl: v.optional(v.string()),
+  },
+  returns: v.null(),
+  handler: async (ctx, { token, majorId, treeDiagramUrl }) => {
+    const user = await authenticateUser(ctx, token);
+    await assertCanEditMajor(ctx, user._id, majorId);
+
+    const major = await ctx.db.get("majors", majorId);
+    if (!major || major.deletedAt !== undefined) {
+      throw new ConvexError({ code: "MAJOR_NOT_FOUND" });
+    }
+
+    await ctx.db.patch("majors", majorId, {
+      treeDiagramUrl,
+    });
+
+    return null;
   },
 });
 

@@ -100,6 +100,10 @@ export const contributorCourseSchema = z.object({
   alias: z.string(),
 });
 
+export const contributorMajorSchema = z.object({
+  treeDiagramUrl: z.union([z.literal(""), z.string().url("رابط غير صالح")]),
+});
+
 export const contributorResourceSchema = z
   .object({
     title: z.string().min(1, "عنوان المصدر مطلوب"),
