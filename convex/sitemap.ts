@@ -22,6 +22,7 @@ export const getAllPublicUrls = query({
       const uni = uniMap.get(major.universityId);
       if (!uni) continue;
       urls.push({ path: `/${uni.slug}/${major.slug}` });
+      urls.push({ path: `/${uni.slug}/${major.slug}/news` });
     }
 
     for (const course of courses) {

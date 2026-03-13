@@ -13,10 +13,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     urls = [{ path: "/" }];
   }
 
-  return urls.map((entry) => ({
-    url: `${BASE_URL}${entry.path}`,
-    lastModified: new Date(),
-    changeFrequency: entry.path === "/" ? "daily" : "weekly",
-    priority: entry.path === "/" ? 1 : entry.path.split("/").length <= 2 ? 0.8 : 0.6,
-  }));
+  return urls.map((entry) => {
+    const isHome = entry.path === "/";
+    const isNewsPage = entry.path.endsWith("/news");
+    const segmentCount = entry.path.split("/").filter(Boolean).length;
+
+    return {
+      url: `${BASE_URL}${entry.path}`,
+      lastModified: new Date(),
+      changeFrequency: isHome
+        ? "daily"
+        : isNewsPage
+          ? "daily"
+          : "weekly",
+      priority: isHome ? 1 : segmentCount <= 2 ? 0.8 : 0.6,
+    };
+  });
 }

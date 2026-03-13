@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { CoursesSearchSection } from "@/components/courses-search-section";
 import { UniversityQuickLinks } from "@/components/university-quick-links";
 import type { Metadata } from "next";
+import Link from "next/link";
 import * as motion from "motion/react-client";
 import { MajorLastVisitTracker } from "@/components/major-last-visit-tracker";
 
@@ -86,9 +87,19 @@ export default async function MajorPage({
   });
   if (!major || major.universityId !== university._id) notFound();
 
-  const courses = await fetchQuery(api.courses.listByMajor, {
-    majorId: major._id,
-  });
+  const [courses, latestNews] = await Promise.all([
+    fetchQuery(api.courses.listByMajor, {
+      majorId: major._id,
+    }),
+    fetchQuery(api.news.getLatestByMajor, {
+      majorId: major._id,
+    }),
+  ]);
+  const latestNewsDate = latestNews
+    ? new Intl.DateTimeFormat("ar-JO", {
+        dateStyle: "medium",
+      }).format(new Date(latestNews.createdAt))
+    : null;
 
   return (
     <div>
@@ -126,18 +137,57 @@ export default async function MajorPage({
               ? `${courses.length} مادة`
               : "لا توجد مواد حالياً"}
           </motion.p>
-          {major.treeDiagramUrl && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-4"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-5 flex flex-wrap gap-3"
+          >
+            <Link
+              href={`/${universitySlug}/${majorSlug}/news`}
+              className="group flex min-w-[280px] flex-1 items-start justify-between gap-4 rounded-[24px] border border-primary-200 bg-white/90 px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(37,99,235,0.35)] dark:border-primary-800/80 dark:bg-surface-900/80 dark:hover:border-primary-700"
             >
+              <div className="min-w-0">
+                <span className="inline-flex rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/80 dark:text-primary-300">
+                  الأخبار
+                </span>
+                <p className="mt-3 text-base font-semibold text-surface-950 dark:text-surface-50">
+                  تابع مستجدات التخصص
+                </p>
+                <p className="mt-1 line-clamp-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
+                  {latestNews
+                    ? latestNews.title
+                    : "اطلع على الإعلانات والتنبيهات والمستجدات الخاصة بالقسم في صفحة واحدة."}
+                </p>
+                {latestNewsDate && (
+                  <p className="mt-2 text-xs font-medium text-primary-700 dark:text-primary-300">
+                    آخر تحديث {latestNewsDate}
+                  </p>
+                )}
+              </div>
+              <span className="mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-700 transition-transform group-hover:-translate-x-1 dark:bg-primary-950/80 dark:text-primary-300">
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 7l5 5m0 0-5 5m5-5H6"
+                  />
+                </svg>
+              </span>
+            </Link>
+
+            {major.treeDiagramUrl && (
               <a
                 href={major.treeDiagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+                className="inline-flex items-center gap-2 rounded-[24px] border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
               >
                 <svg
                   className="h-4 w-4 shrink-0"
@@ -169,8 +219,8 @@ export default async function MajorPage({
                   />
                 </svg>
               </a>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
           <UniversityQuickLinks links={university.quickLinks} />
         </div>
       </section>

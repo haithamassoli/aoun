@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { mutation, query, type QueryCtx } from "./_generated/server";
 import {
   assertCanEditMajor,
   authenticateUser,
@@ -7,6 +8,32 @@ import {
   softDeleteFields,
 } from "./helpers";
 import { paginationOptsValidator } from "convex/server";
+
+type NewsWithAuthor = Doc<"news"> & {
+  authorName: string;
+};
+
+async function withAuthorNames(
+  ctx: QueryCtx,
+  items: Doc<"news">[],
+): Promise<NewsWithAuthor[]> {
+  const authorIds = [...new Set(items.map((item) => item.createdBy))];
+  const authors = await Promise.all(
+    authorIds.map((authorId) => ctx.db.get("users", authorId)),
+  );
+
+  const authorById = new Map(
+    authorIds.map((authorId, index) => [
+      authorId,
+      authors[index]?.name ?? "فريق عون",
+    ]),
+  );
+
+  return items.map((item) => ({
+    ...item,
+    authorName: authorById.get(item.createdBy) ?? "فريق عون",
+  }));
+}
 
 export const add = mutation({
   args: {
@@ -94,12 +121,17 @@ export const listByMajor = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const result = await ctx.db
       .query("news")
       .withIndex("by_majorId", (q) => q.eq("majorId", args.majorId))
       .order("desc")
       .filter((q) => q.eq(q.field("deletedAt"), undefined))
       .paginate(args.paginationOpts);
+
+    return {
+      ...result,
+      page: await withAuthorNames(ctx, result.page),
+    };
   },
 });
 
@@ -111,6 +143,13 @@ export const getLatestByMajor = query({
       .withIndex("by_majorId", (q) => q.eq("majorId", args.majorId))
       .order("desc")
       .collect();
-    return items.find(isNotDeleted) ?? null;
+
+    const latest = items.find(isNotDeleted);
+    if (!latest) {
+      return null;
+    }
+
+    const [hydrated] = await withAuthorNames(ctx, [latest]);
+    return hydrated;
   },
 });

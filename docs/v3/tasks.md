@@ -70,28 +70,28 @@ Student-facing news page with SSR and infinite scroll.
 
 ### Tasks
 
-- [ ] **M3-T1: Create news page route**
+- [x] **M3-T1: Create news page route**
   Create `app/[universitySlug]/[majorSlug]/news/page.tsx`. Server component using `fetchQuery` to get initial news data and major/university info. Call `notFound()` if university or major doesn't exist or is deleted. Pass initial data to client component.
 
-- [ ] **M3-T2: Implement `generateMetadata` for news page**
+- [x] **M3-T2: Implement `generateMetadata` for news page**
   Add `generateMetadata()` in the news page. Set `<title>` to `أخبار {majorName} - {universityName} | عون`. Add description, Open Graph tags (`og:title`, `og:description`, `og:url`). Follow same pattern as existing major page metadata.
 
-- [ ] **M3-T3: Create news page client component with infinite scroll**
+- [x] **M3-T3: Create news page client component with infinite scroll**
   Create `components/news-page-content.tsx` client component. Use Convex `usePaginatedQuery` for `news.listByMajor` with the majorId. Render news cards newest-first. Implement infinite scroll with intersection observer trigger at bottom. Show loading spinner during fetch. Show empty state ("لا توجد أخبار حالياً") when no news.
 
-- [ ] **M3-T4: Create news card component**
+- [x] **M3-T4: Create news card component**
   Create `components/news-card.tsx`. Display: title (h2), rendered HTML content (sanitized, `dangerouslySetInnerHTML`), formatted date (Arabic locale), author name. Use prose styling for HTML content. RTL layout. Match existing card design patterns (rounded corners, shadow, padding).
 
-- [ ] **M3-T5: Add "News" button to major page**
+- [x] **M3-T5: Add "News" button to major page**
   On the major page (`app/[universitySlug]/[majorSlug]/page.tsx`), add a button/link labeled "الأخبار" that navigates to `/{universitySlug}/{majorSlug}/news`. Place it in the hero section or alongside quick links. Use `next/link` for client-side navigation.
 
-- [ ] **M3-T6: Add breadcrumb navigation to news page**
+- [x] **M3-T6: Add breadcrumb navigation to news page**
   Add breadcrumbs: الرئيسية → {universityName} → {majorName} → الأخبار. Follow same breadcrumb component pattern used on major and course pages.
 
-- [ ] **M3-T7: Add news page to sitemap**
+- [x] **M3-T7: Add news page to sitemap**
   Update `convex/sitemap.ts` to include `/{universitySlug}/{majorSlug}/news` paths for all non-deleted majors. Update `app/sitemap.ts` to handle the new paths with appropriate `changeFrequency` ("daily") and `priority` (0.6).
 
-- [ ] **M3-T8: Create `news.getLatestByMajor` query**
+- [x] **M3-T8: Create `news.getLatestByMajor` query**
   Create a non-paginated query that returns the latest news item (or null) for a given majorId. Used by the major page to show a "new news" indicator or preview snippet next to the news button.
 
 ---
