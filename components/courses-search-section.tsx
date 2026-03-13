@@ -567,15 +567,17 @@ export function CoursesSearchSection({
           />
         ) : null}
 
-        <div className="max-w-2xl space-y-3">
-          <PublicSearchInput
-            label="ابحث داخل مواد التخصص"
-            placeholder="مثال: برمجة كائنية"
-            value={search.input}
-            onChange={search.setInput}
-          />
+        <div className="max-w-5xl space-y-3 md:flex md:items-start md:gap-3 md:space-y-0">
+          <div className="w-full md:max-w-sm lg:max-w-lg">
+            <PublicSearchInput
+              label="ابحث داخل مواد التخصص"
+              placeholder="مثال: برمجة كائنية"
+              value={search.input}
+              onChange={search.setInput}
+            />
+          </div>
 
-          <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 dark:border-surface-700 dark:bg-surface-900">
+          <div className="rounded-xl flex-1 border border-surface-200/80 bg-surface-50/80 p-3 dark:border-surface-700 dark:bg-surface-900 md:w-[320px] md:shrink-0 lg:w-[360px]">
             <p className="mb-2 text-xs font-medium text-surface-600 dark:text-surface-300">
               فلترة حسب حالة الدراسة
             </p>

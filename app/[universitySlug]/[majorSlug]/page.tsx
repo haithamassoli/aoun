@@ -96,11 +96,6 @@ export default async function MajorPage({
       majorId: major._id,
     }),
   ]);
-  const latestNewsDate = latestNews
-    ? new Intl.DateTimeFormat("ar-JO", {
-        dateStyle: "medium",
-      }).format(new Date(latestNews.createdAt))
-    : null;
 
   return (
     <div>
@@ -147,40 +142,64 @@ export default async function MajorPage({
               <NotificationToggle majorId={major._id} />
             </div>
           </div>
-
-          {/* Action cards — equal-width grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2"
-          >
-            {/* News card */}
-            <Link
-              href={`/${universitySlug}/${majorSlug}/news`}
-              className="group flex items-start justify-between gap-4 rounded-2xl border border-primary-200 bg-white/90 px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(37,99,235,0.35)] dark:border-primary-800/80 dark:bg-surface-900/80 dark:hover:border-primary-700"
+          <div className="flex flex-wrap items-center gap-2">
+            {major.treeDiagramUrl && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-4"
+              >
+                <a
+                  href={major.treeDiagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+                >
+                  <svg
+                    className="h-4 w-4 shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.75}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="16" y="16" width="6" height="6" rx="1.5" />
+                    <rect x="2" y="16" width="6" height="6" rx="1.5" />
+                    <rect x="9" y="2" width="6" height="6" rx="1.5" />
+                    <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+                    <path d="M12 12V8" />
+                  </svg>
+                  شجرة مسار التخصص
+                  <svg
+                    className="h-3.5 w-3.5 shrink-0 opacity-60"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </motion.div>
+            )}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-4"
             >
-              <div className="min-w-0">
-                <span className="inline-flex rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/80 dark:text-primary-300">
-                  الأخبار
-                </span>
-                <p className="mt-3 text-base font-semibold text-surface-950 dark:text-surface-50">
-                  تابع مستجدات التخصص
-                </p>
-                <p className="mt-1 line-clamp-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-                  {latestNews
-                    ? latestNews.title
-                    : "اطلع على الإعلانات والتنبيهات والمستجدات الخاصة بالقسم في صفحة واحدة."}
-                </p>
-                {latestNewsDate && (
-                  <p className="mt-2 text-xs font-medium text-primary-700 dark:text-primary-300">
-                    آخر تحديث {latestNewsDate}
-                  </p>
-                )}
-              </div>
-              <span className="mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-700 transition-transform group-hover:-translate-x-1 dark:bg-primary-950/80 dark:text-primary-300">
+              <Link
+                href={`/${universitySlug}/${majorSlug}/news`}
+                className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+              >
                 <svg
-                  className="h-5 w-5"
+                  className="h-4 w-4 shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -190,53 +209,38 @@ export default async function MajorPage({
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M13 7l5 5m0 0-5 5m5-5H6"
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
                   />
                 </svg>
-              </span>
-            </Link>
-
-            {/* Tree diagram card — same visual weight as news card */}
-            {major.treeDiagramUrl && (
-              <a
-                href={major.treeDiagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-start justify-between gap-4 rounded-2xl border border-surface-200 bg-white/90 px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(37,99,235,0.25)] dark:border-surface-700/80 dark:bg-surface-900/80 dark:hover:border-primary-700"
+                الأخبار والمستجدات
+              </Link>
+            </motion.div>
+            {latestNews ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-4 w-full"
               >
-                <div className="min-w-0">
-                  <span className="inline-flex rounded-full bg-surface-100 px-3 py-1 text-xs font-semibold text-surface-600 dark:bg-surface-800 dark:text-surface-300">
-                    خطة التخصص
+                <Link
+                  href={`/${universitySlug}/${majorSlug}/news`}
+                  className="group flex w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-primary-200/80 bg-white/90 px-4 py-3 text-right shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800/80 dark:bg-primary-950/50 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="inline-flex shrink-0 items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-700 dark:border-primary-700 dark:bg-primary-900/60 dark:text-primary-200">
+                      News
+                    </span>
+                    <p className="line-clamp-1 text-sm font-medium text-surface-800 transition-colors group-hover:text-primary-700 dark:text-surface-100 dark:group-hover:text-primary-200">
+                      {latestNews.title}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xs font-medium text-surface-500 transition-colors group-hover:text-primary-700 dark:text-surface-400 dark:group-hover:text-primary-300">
+                    عرض الخبر
                   </span>
-                  <p className="mt-3 text-base font-semibold text-surface-950 dark:text-surface-50">
-                    شجرة مسار التخصص
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-surface-500 dark:text-surface-400">
-                    تصفح الخريطة البيانية للمواد والمتطلبات السابقة.
-                  </p>
-                </div>
-                <span className="mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-100 text-surface-600 transition-all group-hover:bg-primary-50 group-hover:text-primary-700 dark:bg-surface-800 dark:text-surface-300 dark:group-hover:bg-primary-950/80 dark:group-hover:text-primary-300">
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.75}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <rect x="16" y="16" width="6" height="6" rx="1.5" />
-                    <rect x="2" y="16" width="6" height="6" rx="1.5" />
-                    <rect x="9" y="2" width="6" height="6" rx="1.5" />
-                    <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
-                    <path d="M12 12V8" />
-                  </svg>
-                </span>
-              </a>
-            )}
-          </motion.div>
-
+                </Link>
+              </motion.div>
+            ) : null}
+          </div>
           <UniversityQuickLinks links={university.quickLinks} />
         </div>
       </section>
