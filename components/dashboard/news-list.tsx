@@ -21,7 +21,12 @@ type NewsListProps = {
   deleting: string | null;
 };
 
-export function NewsList({ majorId, onEdit, onDelete, deleting }: NewsListProps) {
+export function NewsList({
+  majorId,
+  onEdit,
+  onDelete,
+  deleting,
+}: NewsListProps) {
   const { results, status, loadMore } = usePaginatedQuery(
     api.news.listByMajor,
     { majorId },
@@ -110,7 +115,7 @@ export function NewsList({ majorId, onEdit, onDelete, deleting }: NewsListProps)
                 />
               )}
             </div>
-            <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex shrink-0 items-center gap-1 ">
               <button
                 onClick={() => onEdit(news as NewsItem)}
                 className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"

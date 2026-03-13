@@ -11,6 +11,7 @@ import { Toast, useToast } from "@/components/toast";
 import { FormInput, FormSelect } from "@/components/form-field";
 import { createUserSchema, editUserSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
+import { FormModal } from "@/components/form-modal";
 
 const ROLE_OPTIONS = [
   { value: "admin", label: "مدير" },
@@ -36,6 +37,7 @@ export default function AdminUsersPage() {
   const removePermission = useMutation(api.auth.removePermission);
   const createUser = useAction(api.authActions.createUser);
 
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
@@ -69,10 +71,12 @@ export default function AdminUsersPage() {
           role: value.role,
         });
         formApi.reset();
+        setShowCreateForm(false);
         toast.show("تم إنشاء المستخدم بنجاح", "success");
       } catch (error) {
         const msg =
-          error instanceof Error && error.message.includes("EMAIL_ALREADY_EXISTS")
+          error instanceof Error &&
+          error.message.includes("EMAIL_ALREADY_EXISTS")
             ? "البريد الإلكتروني مستخدم بالفعل"
             : error instanceof Error && error.message.includes("WEAK_PASSWORD")
               ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل"
@@ -104,7 +108,8 @@ export default function AdminUsersPage() {
         setEditingId(null);
       } catch (error) {
         const msg =
-          error instanceof Error && error.message.includes("EMAIL_ALREADY_EXISTS")
+          error instanceof Error &&
+          error.message.includes("EMAIL_ALREADY_EXISTS")
             ? "البريد الإلكتروني مستخدم بالفعل"
             : "حدث خطأ أثناء الحفظ";
         toast.show(msg, "error");
@@ -125,7 +130,10 @@ export default function AdminUsersPage() {
     email: string;
     role: "admin" | "contributor";
   }) => {
-    editForm.reset({ name: u.name, email: u.email, role: u.role });
+    editForm.reset(
+      { name: u.name, email: u.email, role: u.role },
+      { keepDefaultValues: true },
+    );
     setEditingId(u._id);
     setManagingPermsFor(null);
   };
@@ -222,82 +230,108 @@ export default function AdminUsersPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mb-6"
+        className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-          إدارة المستخدمين
-        </h1>
-        <p className="text-sm text-surface-500 dark:text-surface-400">
-          {users ? `${users.length} مستخدم` : "جاري التحميل..."}
-        </p>
-      </motion.div>
-
-      {/* Create user form */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          createForm.handleSubmit();
-        }}
-        className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/30 p-5 dark:border-emerald-800 dark:bg-emerald-950/30"
-      >
-        <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-          إضافة مستخدم جديد
-        </h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <FormInput form={createForm} name="name" label="الاسم *" />
-          <FormInput
-            form={createForm}
-            name="email"
-            label="البريد الإلكتروني *"
-            type="email"
-            dir="ltr"
-          />
-          <FormInput
-            form={createForm}
-            name="password"
-            label="كلمة المرور *"
-            type="password"
-            dir="ltr"
-          />
-          <FormSelect
-            form={createForm}
-            name="role"
-            label="الدور *"
-            options={ROLE_OPTIONS}
-          />
-        </div>
-        <div className="mt-4 flex items-center gap-3">
-          <createForm.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <button
-                type="submit"
-                disabled={!canSubmit || isSubmitting}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-50"
-              >
-                {isSubmitting ? "جاري الإنشاء..." : "إنشاء مستخدم"}
-              </button>
-            )}
-          </createForm.Subscribe>
-          <p className="text-xs text-surface-500 dark:text-surface-400">
-            للمساهمين، قم بإضافة الصلاحيات بعد الإنشاء.
+        <div>
+          <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
+            إدارة المستخدمين
+          </h1>
+          <p className="text-sm text-surface-500 dark:text-surface-400">
+            {users ? `${users.length} مستخدم` : "جاري التحميل..."}
           </p>
         </div>
-      </form>
+        <button
+          onClick={() => setShowCreateForm(true)}
+          className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
+        >
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          إضافة مستخدم
+        </button>
+      </motion.div>
 
-      {/* Edit form */}
-      {editingId && (
+      <FormModal
+        open={showCreateForm}
+        title="إضافة مستخدم جديد"
+        onClose={() => {
+          createForm.reset();
+          setShowCreateForm(false);
+        }}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            createForm.handleSubmit();
+          }}
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormInput form={createForm} name="name" label="الاسم *" />
+            <FormInput
+              form={createForm}
+              name="email"
+              label="البريد الإلكتروني *"
+              type="email"
+              dir="ltr"
+            />
+            <FormInput
+              form={createForm}
+              name="password"
+              label="كلمة المرور *"
+              type="password"
+              dir="ltr"
+            />
+            <FormSelect
+              form={createForm}
+              name="role"
+              label="الدور *"
+              options={ROLE_OPTIONS}
+            />
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <createForm.Subscribe
+              selector={(s) => [s.canSubmit, s.isSubmitting]}
+            >
+              {([canSubmit, isSubmitting]) => (
+                <button
+                  type="submit"
+                  disabled={!canSubmit || isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? "جاري الإنشاء..." : "إنشاء مستخدم"}
+                </button>
+              )}
+            </createForm.Subscribe>
+            <p className="text-xs text-surface-500 dark:text-surface-400">
+              للمساهمين، قم بإضافة الصلاحيات بعد الإنشاء.
+            </p>
+          </div>
+        </form>
+      </FormModal>
+
+      <FormModal
+        open={editingId !== null}
+        title="تعديل المستخدم"
+        onClose={resetEditForm}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
             editForm.handleSubmit();
           }}
-          className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
-          <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-            تعديل المستخدم
-          </h3>
           <div className="grid gap-4 sm:grid-cols-3">
             <FormInput form={editForm} name="name" label="الاسم *" />
             <FormInput
@@ -335,98 +369,75 @@ export default function AdminUsersPage() {
             </button>
           </div>
         </form>
-      )}
+      </FormModal>
 
-      {/* Permission management panel */}
-      {managingPermsFor && (
-        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50/30 p-5 dark:border-amber-800 dark:bg-amber-950/30">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-surface-800 dark:text-surface-100">
-              صلاحيات: {users?.find((u) => u._id === managingPermsFor)?.name}
-            </h3>
-            <button
-              onClick={() => setManagingPermsFor(null)}
-              className="rounded-lg p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
+      <FormModal
+        open={managingPermsFor !== null}
+        title={`صلاحيات: ${users?.find((u) => u._id === managingPermsFor)?.name ?? ""}`}
+        onClose={() => setManagingPermsFor(null)}
+      >
+        {userPermissions === undefined ? (
+          <p className="text-xs text-surface-500">جاري التحميل...</p>
+        ) : userPermissions.length === 0 ? (
+          <p className="mb-3 text-xs text-surface-500 dark:text-surface-400">
+            لا توجد صلاحيات
+          </p>
+        ) : (
+          <div className="mb-3 space-y-2">
+            {userPermissions.map((perm) => (
+              <div
+                key={perm._id}
+                className="flex items-center justify-between rounded-xl border border-surface-100 bg-surface-50 px-3 py-2 text-sm dark:border-surface-700 dark:bg-surface-800"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {userPermissions === undefined ? (
-            <p className="text-xs text-surface-500">جاري التحميل...</p>
-          ) : userPermissions.length === 0 ? (
-            <p className="mb-3 text-xs text-surface-500 dark:text-surface-400">
-              لا توجد صلاحيات
-            </p>
-          ) : (
-            <div className="mb-3 space-y-2">
-              {userPermissions.map((perm) => (
-                <div
-                  key={perm._id}
-                  className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm dark:bg-surface-800"
+                <span className="text-surface-700 dark:text-surface-200">
+                  {getMajorName(perm.majorId)}
+                </span>
+                <button
+                  onClick={() => handleRemovePermission(perm._id)}
+                  className="rounded p-1 text-red-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                  title="إزالة"
                 >
-                  <span className="text-surface-700 dark:text-surface-200">
-                    {getMajorName(perm.majorId)}
-                  </span>
-                  <button
-                    onClick={() => handleRemovePermission(perm._id)}
-                    className="rounded p-1 text-red-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
-                    title="إزالة"
+                  <svg
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
                   >
-                    <svg
-                      className="h-3.5 w-3.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center gap-2">
-            <select
-              value={selectedMajorId}
-              onChange={(e) => setSelectedMajorId(e.target.value)}
-              className="flex-1 rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
-            >
-              <option value="">اختر تخصص</option>
-              {availableMajors.map((m) => (
-                <option key={m._id} value={m._id}>
-                  {m.name} — {m.universityName}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleAddPermission}
-              disabled={!selectedMajorId}
-              className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50"
-            >
-              إضافة
-            </button>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
           </div>
+        )}
+
+        <div className="mt-4 flex items-center gap-2">
+          <select
+            value={selectedMajorId}
+            onChange={(e) => setSelectedMajorId(e.target.value)}
+            className="flex-1 rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
+          >
+            <option value="">اختر تخصص</option>
+            {availableMajors.map((m) => (
+              <option key={m._id} value={m._id}>
+                {m.name} — {m.universityName}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleAddPermission}
+            disabled={!selectedMajorId}
+            className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50"
+          >
+            إضافة
+          </button>
         </div>
-      )}
+      </FormModal>
 
       {/* List */}
       {users === undefined ? (
@@ -483,7 +494,7 @@ export default function AdminUsersPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="flex items-center gap-1 ">
                 {u.role === "contributor" && (
                   <button
                     onClick={() => {

@@ -11,6 +11,7 @@ import { Toast, useToast } from "@/components/toast";
 import { FormInput, FormSelect } from "@/components/form-field";
 import { majorSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
+import { FormModal } from "@/components/form-modal";
 
 const generateSlug = (name: string) =>
   name.trim().replace(/\s+/g, "-").toLowerCase();
@@ -99,14 +100,17 @@ export default function AdminMajorsPage() {
     alias?: string;
     treeDiagramUrl?: string;
   }) => {
-    form.reset({
-      universityId: major.universityId,
-      name: major.name,
-      slug: major.slug,
-      order: major.order.toString(),
-      alias: major.alias ?? "",
-      treeDiagramUrl: major.treeDiagramUrl ?? "",
-    });
+    form.reset(
+      {
+        universityId: major.universityId,
+        name: major.name,
+        slug: major.slug,
+        order: major.order.toString(),
+        alias: major.alias ?? "",
+        treeDiagramUrl: major.treeDiagramUrl ?? "",
+      },
+      { keepDefaultValues: true },
+    );
     setEditingId(major._id);
     setShowForm(true);
   };
@@ -192,19 +196,18 @@ export default function AdminMajorsPage() {
         </button>
       </motion.div>
 
-      {/* Form */}
-      {showForm && (
+      <FormModal
+        open={showForm}
+        title={editingId ? "تعديل التخصص" : "إضافة تخصص جديد"}
+        onClose={resetForm}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
-          <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-            {editingId ? "تعديل التخصص" : "إضافة تخصص جديد"}
-          </h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <FormSelect
               form={form}
@@ -274,7 +277,7 @@ export default function AdminMajorsPage() {
             </button>
           </div>
         </form>
-      )}
+      </FormModal>
 
       {/* List */}
       {majors === undefined ? (
@@ -353,7 +356,7 @@ export default function AdminMajorsPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="flex items-center gap-1 ">
                 <button
                   onClick={() => handleEdit(major)}
                   className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"

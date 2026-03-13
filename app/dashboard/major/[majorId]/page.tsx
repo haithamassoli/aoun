@@ -17,6 +17,7 @@ import { motion } from "motion/react";
 import { NewsList } from "@/components/dashboard/news-list";
 import { NewsForm } from "@/components/dashboard/news-form";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { FormModal } from "@/components/form-modal";
 
 const generateSlug = (name: string) =>
   name.trim().replace(/\s+/g, "-").toLowerCase();
@@ -162,14 +163,17 @@ export default function MajorCoursesPage() {
   };
 
   const handleEdit = (course: CourseListItem) => {
-    form.reset({
-      name: course.name,
-      slug: course.slug,
-      courseCode: course.courseCode ?? "",
-      semester: course.semester?.toString() ?? "",
-      order: course.order.toString(),
-      alias: course.alias ?? "",
-    });
+    form.reset(
+      {
+        name: course.name,
+        slug: course.slug,
+        courseCode: course.courseCode ?? "",
+        semester: course.semester?.toString() ?? "",
+        order: course.order.toString(),
+        alias: course.alias ?? "",
+      },
+      { keepDefaultValues: true },
+    );
     setEditingId(course._id);
     setShowForm(true);
   };
@@ -305,14 +309,8 @@ export default function MajorCoursesPage() {
         {activeTab === "courses" ? (
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => {
-                setShowMajorLinkForm((current) => !current);
-              }}
-              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium shadow-sm transition-colors ${
-                showMajorLinkForm
-                  ? "border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700"
-                  : "border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 dark:border-emerald-900 dark:bg-surface-900 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
-              }`}
+              onClick={() => setShowMajorLinkForm(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-emerald-50 dark:border-emerald-900 dark:bg-surface-900 dark:text-emerald-300 dark:hover:bg-emerald-950/40 text-emerald-700"
             >
               <svg
                 className="h-4 w-4 shrink-0"
@@ -329,7 +327,7 @@ export default function MajorCoursesPage() {
                 <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
                 <path d="M12 12V8" />
               </svg>
-              {showMajorLinkForm ? "إخفاء شجرة المسار" : "شجرة المسار"}
+              شجرة المسار
             </button>
             <button
               onClick={() => {
@@ -380,87 +378,71 @@ export default function MajorCoursesPage() {
         )}
       </motion.div>
 
-      {showMajorLinkForm && (
-        <motion.section
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.04 }}
-          className="mb-6 rounded-3xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 via-white to-cyan-50 p-5 shadow-sm dark:border-emerald-900/60 dark:from-emerald-950/50 dark:via-surface-900 dark:to-cyan-950/40"
+      <FormModal
+        open={showMajorLinkForm}
+        title="شجرة المسار"
+        onClose={() => setShowMajorLinkForm(false)}
+      >
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <p className="text-sm text-surface-600 dark:text-surface-300">
+            أضف الرابط الذي سيظهر للطلاب في صفحة التخصص العامة.
+          </p>
+          {major.treeDiagramUrl && (
+            <a
+              href={major.treeDiagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 self-start rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:border-emerald-900 dark:bg-surface-800 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
+            >
+              فتح الرابط الحالي
+              <svg
+                className="h-3.5 w-3.5 shrink-0 opacity-60"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </a>
+          )}
+        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            majorLinkForm.handleSubmit();
+          }}
+          className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]"
         >
-          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-3 py-1 text-[11px] font-semibold text-emerald-700 dark:border-emerald-900 dark:bg-surface-900/80 dark:text-emerald-300">
-                إعدادات التخصص
-              </div>
-              <h2 className="mt-3 text-base font-semibold text-surface-900 dark:text-surface-50">
-                شجرة المسار
-              </h2>
-              <p className="mt-1 text-sm text-surface-600 dark:text-surface-300">
-                أضف الرابط الذي سيظهر للطلاب في صفحة التخصص العامة.
-              </p>
-            </div>
-            {major.treeDiagramUrl ? (
-              <a
-                href={major.treeDiagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 self-start rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:border-emerald-900 dark:bg-surface-900 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
-              >
-                فتح الرابط الحالي
-                <svg
-                  className="h-3.5 w-3.5 shrink-0 opacity-60"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
+          <FormInput
+            form={majorLinkForm}
+            name="treeDiagramUrl"
+            label="رابط شجرة المسار"
+            placeholder="https://drive.google.com/..."
+            dir="ltr"
+          />
+          <div className="flex items-end gap-3">
+            <majorLinkForm.Subscribe
+              selector={(s) => [s.canSubmit, s.isSubmitting]}
+            >
+              {([canSubmit, isSubmitting]) => (
+                <button
+                  type="submit"
+                  disabled={!canSubmit || isSubmitting}
+                  className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-50"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </a>
-            ) : (
-              <span className="inline-flex items-center gap-2 self-start rounded-full border border-dashed border-surface-300 px-3 py-1.5 text-xs font-medium text-surface-500 dark:border-surface-700 dark:text-surface-400">
-                لا يوجد رابط محفوظ بعد
-              </span>
-            )}
+                  {isSubmitting ? "جاري الحفظ..." : "حفظ الرابط"}
+                </button>
+              )}
+            </majorLinkForm.Subscribe>
           </div>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              majorLinkForm.handleSubmit();
-            }}
-            className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]"
-          >
-            <FormInput
-              form={majorLinkForm}
-              name="treeDiagramUrl"
-              label="رابط شجرة المسار"
-              placeholder="https://drive.google.com/..."
-              dir="ltr"
-            />
-            <div className="flex items-end gap-3">
-              <majorLinkForm.Subscribe
-                selector={(s) => [s.canSubmit, s.isSubmitting]}
-              >
-                {([canSubmit, isSubmitting]) => (
-                  <button
-                    type="submit"
-                    disabled={!canSubmit || isSubmitting}
-                    className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-50"
-                  >
-                    {isSubmitting ? "جاري الحفظ..." : "حفظ الرابط"}
-                  </button>
-                )}
-              </majorLinkForm.Subscribe>
-            </div>
-          </form>
-        </motion.section>
-      )}
+        </form>
+      </FormModal>
 
       {/* Tab bar */}
       <div className="mb-4 flex gap-2">
@@ -500,19 +482,18 @@ export default function MajorCoursesPage() {
       {/* Courses tab content */}
       {activeTab === "courses" && (
         <>
-          {/* Add/Edit form */}
-          {showForm && (
+          <FormModal
+            open={showForm}
+            title={editingId ? "تعديل المادة" : "إضافة مادة جديدة"}
+            onClose={resetForm}
+          >
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 form.handleSubmit();
               }}
-              className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
             >
-              <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-                {editingId ? "تعديل المادة" : "إضافة مادة جديدة"}
-              </h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormInput
                   form={form}
@@ -582,7 +563,7 @@ export default function MajorCoursesPage() {
                 </button>
               </div>
             </form>
-          )}
+          </FormModal>
 
           {courses.length > 0 ? (
             <motion.section
@@ -704,7 +685,7 @@ export default function MajorCoursesPage() {
                       </div>
                     </div>
                   </Link>
-                  <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleEdit(course)}
                       className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
@@ -724,25 +705,6 @@ export default function MajorCoursesPage() {
                         />
                       </svg>
                     </button>
-                    <Link
-                      href={`/dashboard/major/${majorId}/course/${course._id}`}
-                      className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
-                      title="المصادر"
-                    >
-                      <svg
-                        className="h-4 w-4 rotate-180"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </Link>
                   </div>
                 </motion.div>
               ))}
@@ -754,7 +716,11 @@ export default function MajorCoursesPage() {
       {/* News tab content */}
       {activeTab === "news" && (
         <>
-          {showNewsForm && (
+          <FormModal
+            open={showNewsForm}
+            title={editingNewsId ? "تعديل الخبر" : "إضافة خبر جديد"}
+            onClose={resetNewsForm}
+          >
             <NewsForm
               majorId={majorIdValue}
               editingId={editingNewsId}
@@ -763,7 +729,7 @@ export default function MajorCoursesPage() {
               onCancel={resetNewsForm}
               showToast={(msg, type) => toast.show(msg, type)}
             />
-          )}
+          </FormModal>
 
           <NewsList
             majorId={majorIdValue}

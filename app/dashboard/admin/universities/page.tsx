@@ -11,6 +11,7 @@ import { Toast, useToast } from "@/components/toast";
 import { FormInput } from "@/components/form-field";
 import { universitySchema } from "@/lib/schemas";
 import { motion } from "motion/react";
+import { FormModal } from "@/components/form-modal";
 
 const generateSlug = (name: string) =>
   name.trim().replace(/\s+/g, "-").toLowerCase();
@@ -57,7 +58,10 @@ const getQuickLinksFieldErrors = (quickLinks: QuickLinkInput[]) => {
     quickLinks,
   });
 
-  const errors = new Map<number, Partial<Record<keyof QuickLinkInput, string>>>();
+  const errors = new Map<
+    number,
+    Partial<Record<keyof QuickLinkInput, string>>
+  >();
 
   if (parsed.success) {
     return errors;
@@ -146,7 +150,8 @@ export default function AdminUniversitiesPage() {
         setShowForm(false);
       } catch (error) {
         const message =
-          error instanceof Error && error.message.includes("UNIVERSITY_SLUG_EXISTS")
+          error instanceof Error &&
+          error.message.includes("UNIVERSITY_SLUG_EXISTS")
             ? "الرابط (slug) مستخدم بالفعل"
             : error instanceof Error &&
                 error.message.includes("UNIVERSITY_QUICK_LINK_INVALID")
@@ -177,14 +182,17 @@ export default function AdminUniversitiesPage() {
       url: link.url,
     }));
 
-    form.reset({
-      name: uni.name,
-      slug: uni.slug,
-      logoUrl: uni.logoUrl ?? "",
-      order: uni.order.toString(),
-      alias: uni.alias ?? "",
-      quickLinks: nextQuickLinks,
-    });
+    form.reset(
+      {
+        name: uni.name,
+        slug: uni.slug,
+        logoUrl: uni.logoUrl ?? "",
+        order: uni.order.toString(),
+        alias: uni.alias ?? "",
+        quickLinks: nextQuickLinks,
+      },
+      { keepDefaultValues: true },
+    );
     setQuickLinks(nextQuickLinks);
     setEditingId(uni._id);
     setShowForm(true);
@@ -223,7 +231,9 @@ export default function AdminUniversitiesPage() {
   };
 
   const removeQuickLink = (index: number) => {
-    syncQuickLinks(quickLinks.filter((_, currentIndex) => currentIndex !== index));
+    syncQuickLinks(
+      quickLinks.filter((_, currentIndex) => currentIndex !== index),
+    );
   };
 
   const moveQuickLink = (index: number, direction: -1 | 1) => {
@@ -303,19 +313,18 @@ export default function AdminUniversitiesPage() {
         </button>
       </motion.div>
 
-      {showForm && (
+      <FormModal
+        open={showForm}
+        title={editingId ? "تعديل الجامعة" : "إضافة جامعة جديدة"}
+        onClose={resetForm}
+      >
         <form
           onSubmit={(event) => {
             event.preventDefault();
             event.stopPropagation();
             form.handleSubmit();
           }}
-          className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
-          <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-            {editingId ? "تعديل الجامعة" : "إضافة جامعة جديدة"}
-          </h3>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <FormInput
               form={form}
@@ -361,7 +370,8 @@ export default function AdminUniversitiesPage() {
                   الروابط السريعة
                 </h4>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  تظهر هذه الروابط في شريط الجامعة داخل صفحات الجامعة والتخصصات والمواد.
+                  تظهر هذه الروابط في شريط الجامعة داخل صفحات الجامعة والتخصصات
+                  والمواد.
                 </p>
               </div>
               <button
@@ -475,7 +485,11 @@ export default function AdminUniversitiesPage() {
                             type="text"
                             value={quickLink.title}
                             onChange={(event) =>
-                              updateQuickLink(index, "title", event.target.value)
+                              updateQuickLink(
+                                index,
+                                "title",
+                                event.target.value,
+                              )
                             }
                             placeholder="مثال: خدمات الطالب"
                             className={`w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none transition focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-surface-800 dark:text-surface-100 ${
@@ -533,7 +547,9 @@ export default function AdminUniversitiesPage() {
           </div>
 
           <div className="mt-4 flex items-center gap-3">
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            <form.Subscribe
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
+            >
               {([canSubmit, isSubmitting]) => (
                 <button
                   type="submit"
@@ -557,7 +573,7 @@ export default function AdminUniversitiesPage() {
             </button>
           </div>
         </form>
-      )}
+      </FormModal>
 
       {universities === undefined ? (
         <div className="space-y-3">
@@ -612,7 +628,7 @@ export default function AdminUniversitiesPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="flex items-center gap-1 ">
                 <button
                   onClick={() => handleEdit(uni as UniversityListItem)}
                   className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"

@@ -11,6 +11,7 @@ import { Toast, useToast } from "@/components/toast";
 import { FormInput, FormSelect } from "@/components/form-field";
 import { courseSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
+import { FormModal } from "@/components/form-modal";
 
 const generateSlug = (name: string) =>
   name.trim().replace(/\s+/g, "-").toLowerCase();
@@ -106,15 +107,18 @@ export default function AdminCoursesPage() {
     order: number;
     alias?: string;
   }) => {
-    form.reset({
-      majorId: course.majorId,
-      name: course.name,
-      slug: course.slug,
-      courseCode: course.courseCode ?? "",
-      semester: course.semester?.toString() ?? "",
-      order: course.order.toString(),
-      alias: course.alias ?? "",
-    });
+    form.reset(
+      {
+        majorId: course.majorId,
+        name: course.name,
+        slug: course.slug,
+        courseCode: course.courseCode ?? "",
+        semester: course.semester?.toString() ?? "",
+        order: course.order.toString(),
+        alias: course.alias ?? "",
+      },
+      { keepDefaultValues: true },
+    );
     setEditingId(course._id);
     setShowForm(true);
   };
@@ -206,19 +210,18 @@ export default function AdminCoursesPage() {
         </button>
       </motion.div>
 
-      {/* Form */}
-      {showForm && (
+      <FormModal
+        open={showForm}
+        title={editingId ? "تعديل المادة" : "إضافة مادة جديدة"}
+        onClose={resetForm}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
-          <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-            {editingId ? "تعديل المادة" : "إضافة مادة جديدة"}
-          </h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <FormSelect
               form={form}
@@ -295,7 +298,7 @@ export default function AdminCoursesPage() {
             </button>
           </div>
         </form>
-      )}
+      </FormModal>
 
       {/* List */}
       {courses === undefined ? (
@@ -350,7 +353,7 @@ export default function AdminCoursesPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="flex items-center gap-1 ">
                 <button
                   onClick={() => handleEdit(course)}
                   className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"

@@ -14,6 +14,7 @@ import { TiptapEditor } from "@/components/tiptap-editor";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { resourceSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
+import { FormModal } from "@/components/form-modal";
 import { CATEGORIES, CategoryValue } from "@/constant/resource-categories";
 
 const CATEGORY_LABELS: Record<CategoryValue, string> = Object.fromEntries(
@@ -119,15 +120,18 @@ export default function AdminResourcesPage() {
     content?: string;
     order: number;
   }) => {
-    form.reset({
-      courseId: resource.courseId,
-      title: resource.title,
-      category: resource.category,
-      type: resource.type,
-      url: resource.url ?? "",
-      content: resource.content ?? "",
-      order: resource.order.toString(),
-    });
+    form.reset(
+      {
+        courseId: resource.courseId,
+        title: resource.title,
+        category: resource.category,
+        type: resource.type,
+        url: resource.url ?? "",
+        content: resource.content ?? "",
+        order: resource.order.toString(),
+      },
+      { keepDefaultValues: true },
+    );
     setEditingId(resource._id);
     setShowForm(true);
   };
@@ -219,19 +223,18 @@ export default function AdminResourcesPage() {
         </button>
       </motion.div>
 
-      {/* Form */}
-      {showForm && (
+      <FormModal
+        open={showForm}
+        title={editingId ? "تعديل المصدر" : "إضافة مصدر جديد"}
+        onClose={resetForm}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
-          <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-            {editingId ? "تعديل المصدر" : "إضافة مصدر جديد"}
-          </h3>
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <FormSelect
@@ -355,7 +358,7 @@ export default function AdminResourcesPage() {
             </button>
           </div>
         </form>
-      )}
+      </FormModal>
 
       {/* List */}
       {resources === undefined ? (
@@ -421,7 +424,7 @@ export default function AdminResourcesPage() {
                     </a>
                   )}
                 </div>
-                <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="flex shrink-0 items-center gap-1 ">
                   <button
                     onClick={() =>
                       handleEdit(resource as Parameters<typeof handleEdit>[0])

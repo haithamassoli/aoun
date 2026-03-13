@@ -73,11 +73,7 @@ export function NewsForm({
         e.stopPropagation();
         form.handleSubmit();
       }}
-      className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
     >
-      <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-        {editingId ? "تعديل الخبر" : "إضافة خبر جديد"}
-      </h3>
       <div className="space-y-4">
         <FormInput form={form} name="title" label="العنوان *" />
 
