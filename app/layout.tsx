@@ -92,7 +92,7 @@ export default async function RootLayout({
                   </Link>
                   <nav
                     aria-label="التنقل الرئيسي"
-                    className="flex items-center gap-4 text-sm font-medium text-surface-600 dark:text-surface-300"
+                    className="flex items-center gap-1 text-sm font-medium text-surface-600 dark:text-surface-300"
                   >
                     <Link
                       href="/gpa-calculator"

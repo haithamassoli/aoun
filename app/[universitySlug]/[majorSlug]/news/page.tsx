@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchQuery } from "convex/nextjs";
@@ -15,12 +14,6 @@ type Params = {
   universitySlug: string;
   majorSlug: string;
 };
-
-function formatDate(timestamp: number) {
-  return new Intl.DateTimeFormat("ar-JO", {
-    dateStyle: "medium",
-  }).format(new Date(timestamp));
-}
 
 export async function generateMetadata({
   params,
@@ -96,105 +89,90 @@ export default async function MajorNewsPage({
     continueCursor: string;
   };
 
-  const latestNews = initialNews.page[0] ?? null;
-
   return (
     <div>
-      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 via-white to-sky-50 px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:via-surface-950 dark:to-surface-900 sm:px-6 sm:py-16 lg:px-8">
-        <div className="mx-auto max-w-6xl">
+      {/* Page Header */}
+      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-10 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mx-auto max-w-3xl">
           <Breadcrumb
             items={[
               { label: "الرئيسية", href: "/" },
               { label: university.name, href: `/${universitySlug}` },
-              {
-                label: major.name,
-                href: `/${universitySlug}/${majorSlug}`,
-              },
+              { label: major.name, href: `/${universitySlug}/${majorSlug}` },
               { label: "الأخبار" },
             ]}
           />
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-                className="flex items-center gap-3"
+                transition={{ duration: 0.5 }}
+                className="mb-2 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 dark:border-primary-800 dark:bg-primary-950/60"
               >
-                <span className="inline-flex items-center rounded-full border border-primary-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-primary-700 shadow-sm dark:border-primary-800 dark:bg-surface-900/80 dark:text-primary-300">
-                  نافذة الأخبار
+                <svg
+                  className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                  />
+                </svg>
+                <span className="text-[11px] font-semibold text-primary-700 dark:text-primary-300">
+                  أخبار ومستجدات
                 </span>
-                <NotificationToggle majorId={major._id} />
               </motion.div>
+
               <motion.h1
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.05 }}
-                className="mt-4 text-3xl font-bold text-surface-950 dark:text-white sm:text-4xl lg:text-5xl"
+                className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl"
               >
-                أخبار {major.name}
+                {major.name}
               </motion.h1>
               <motion.p
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="mt-3 max-w-2xl text-base leading-8 text-surface-600 dark:text-surface-300"
+                className="mt-1.5 text-surface-500 dark:text-surface-400"
               >
-                صفحة مخصصة لمتابعة الإعلانات والمستجدات الأكاديمية الخاصة
-                بتخصص {major.name} في {university.name}، مع تحديثات مرتبة من
-                الأحدث إلى الأقدم.
+                {university.name}
               </motion.p>
             </div>
 
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="w-full max-w-md rounded-[28px] border border-primary-200/80 bg-white/90 p-5 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.3)] dark:border-primary-800/80 dark:bg-surface-900/90"
+              className="shrink-0 pt-1"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-medium text-surface-500 dark:text-surface-400">
-                    ملخص سريع
-                  </p>
-                  <p className="mt-1 text-lg font-semibold text-surface-950 dark:text-white">
-                    {latestNews ? "آخر خبر منشور" : "لا توجد أخبار منشورة بعد"}
-                  </p>
-                </div>
-                <Link
-                  href={`/${universitySlug}/${majorSlug}`}
-                  className="inline-flex items-center gap-1 rounded-full border border-surface-300 px-3 py-1.5 text-xs font-medium text-surface-600 transition-colors hover:border-primary-300 hover:text-primary-700 dark:border-surface-700 dark:text-surface-300 dark:hover:border-primary-700 dark:hover:text-primary-300"
-                >
-                  العودة للتخصص
-                </Link>
-              </div>
-
-              {latestNews ? (
-                <div className="mt-4 rounded-2xl bg-surface-50 p-4 dark:bg-surface-800/70">
-                  <p className="line-clamp-2 text-sm font-semibold leading-7 text-surface-900 dark:text-surface-50">
-                    {latestNews.title}
-                  </p>
-                  <p className="mt-2 text-xs leading-6 text-surface-500 dark:text-surface-400">
-                    نُشر بواسطة {latestNews.authorName} بتاريخ{" "}
-                    {formatDate(latestNews.createdAt)}
-                  </p>
-                </div>
-              ) : (
-                <p className="mt-4 text-sm leading-7 text-surface-500 dark:text-surface-400">
-                  سيتم عرض آخر مستجدات القسم هنا فور نشرها من قبل المساهمين.
-                </p>
-              )}
+              <NotificationToggle majorId={major._id} />
             </motion.div>
           </div>
         </div>
       </section>
 
-      <NewsPageContent
-        majorId={major._id}
-        majorName={major.name}
-        initialItems={initialNews.page}
-      />
+      {/* News Feed */}
+      <section className="px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          {initialNews.page.length > 0 && (
+            <p className="mb-4 text-xs font-medium text-surface-400 dark:text-surface-500">
+              {initialNews.isDone
+                ? `${initialNews.page.length} خبر`
+                : `أحدث ${initialNews.page.length} أخبار`}
+            </p>
+          )}
+          <NewsPageContent majorId={major._id} initialNews={initialNews} />
+        </div>
+      </section>
     </div>
   );
 }
