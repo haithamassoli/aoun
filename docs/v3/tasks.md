@@ -8,31 +8,31 @@ Schema, indexes, and server-side functions for the news system. No UI. Everythin
 
 ### Tasks
 
-- [ ] **M1-T1: Add `news` table to schema**
+- [x] **M1-T1: Add `news` table to schema**
   Add `news` table in `convex/schema.ts` with fields: `majorId` (Id → majors), `title` (string), `content` (string, HTML), `createdBy` (Id → users), `createdAt` (number), `updatedAt` (number), `deletedAt` (optional number), `deletedBy` (optional Id → users). Add index `by_majorId` on `[majorId, createdAt]` for paginated queries.
 
-- [ ] **M1-T2: Add `pushSubscriptions` table to schema**
+- [x] **M1-T2: Add `pushSubscriptions` table to schema**
   Add `pushSubscriptions` table in `convex/schema.ts` with fields: `endpoint` (string), `p256dh` (string), `auth` (string), `majorIds` (array of Id → majors), `createdAt` (number), `updatedAt` (number). Add index `by_endpoint` on `[endpoint]` for upsert lookups.
 
-- [ ] **M1-T3: Create `convex/news.ts` — `add` mutation**
+- [x] **M1-T3: Create `convex/news.ts` — `add` mutation**
   Create `news.add({ token, majorId, title, content })` mutation. Authenticate user via `authenticateUser()`. Check permission via `assertCanEditMajor()`. Validate title is non-empty. Sanitize HTML content with `sanitizeRichText()`. Insert into `news` table with `createdAt`, `updatedAt` set to `Date.now()`, `createdBy` set to authenticated user.
 
-- [ ] **M1-T4: Create `news.update` mutation**
+- [x] **M1-T4: Create `news.update` mutation**
   Create `news.update({ token, newsId, title, content })` mutation. Authenticate user. Fetch news doc, assert not deleted. Resolve majorId from news doc, check permission via `assertCanEditMajor()`. Sanitize content. Patch `title`, `content`, `updatedAt`.
 
-- [ ] **M1-T5: Create `news.remove` mutation**
+- [x] **M1-T5: Create `news.remove` mutation**
   Create `news.remove({ token, newsId })` mutation. Authenticate user. Fetch news doc, assert not deleted. Resolve majorId, check permission via `assertCanEditMajor()`. Apply soft delete: set `deletedAt = Date.now()`, `deletedBy = userId`.
 
-- [ ] **M1-T6: Create `news.listByMajor` query (paginated)**
+- [x] **M1-T6: Create `news.listByMajor` query (paginated)**
   Create `news.listByMajor({ majorId, paginationOpts })` paginated query. Query `news` table using `by_majorId` index filtered by `majorId`. Filter out soft-deleted items (`deletedAt` is undefined). Order by `createdAt` descending (newest first). Return paginated results.
 
-- [ ] **M1-T7: Create `pushSubscriptions.subscribe` mutation**
+- [x] **M1-T7: Create `pushSubscriptions.subscribe` mutation**
   Create `pushSubscriptions.subscribe({ endpoint, p256dh, auth, majorId })` mutation (no auth required — public students). Query `by_endpoint` index. If subscription exists, add `majorId` to `majorIds` array (if not already present), update `updatedAt`. If not exists, insert new record with `majorIds: [majorId]`, `createdAt`, `updatedAt`.
 
-- [ ] **M1-T8: Create `pushSubscriptions.unsubscribe` mutation**
+- [x] **M1-T8: Create `pushSubscriptions.unsubscribe` mutation**
   Create `pushSubscriptions.unsubscribe({ endpoint, majorId })` mutation. Query `by_endpoint` index. If found, remove `majorId` from `majorIds`. If `majorIds` is now empty, hard-delete the subscription record. Otherwise patch with updated `majorIds` and `updatedAt`.
 
-- [ ] **M1-T9: Create `pushSubscriptions.getByEndpoint` query**
+- [x] **M1-T9: Create `pushSubscriptions.getByEndpoint` query**
   Create `pushSubscriptions.getByEndpoint({ endpoint })` query. Return the subscription doc (or null) for the given endpoint. Used by frontend to derive toggle state per major.
 
 ---

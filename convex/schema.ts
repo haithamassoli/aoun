@@ -148,4 +148,23 @@ export default defineSchema({
     uniqueVisitors: v.number(),
     updatedAt: v.number(),
   }).index("by_dateKey", ["dateKey"]),
+
+  news: defineTable({
+    majorId: v.id("majors"),
+    title: v.string(),
+    content: v.string(),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    ...softDeleteFields,
+  }).index("by_majorId", ["majorId", "createdAt"]),
+
+  pushSubscriptions: defineTable({
+    endpoint: v.string(),
+    p256dh: v.string(),
+    auth: v.string(),
+    majorIds: v.array(v.id("majors")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_endpoint", ["endpoint"]),
 });
