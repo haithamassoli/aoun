@@ -130,3 +130,8 @@ export const editUserSchema = z.object({
   email: z.string().email("البريد الإلكتروني غير صالح"),
   role: z.enum(["admin", "contributor"]),
 });
+
+export const newsSchema = z.object({
+  title: z.string().min(1, "العنوان مطلوب"),
+  content: z.string().min(1, "المحتوى مطلوب"),
+});

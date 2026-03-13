@@ -45,19 +45,19 @@ Dashboard UI for contributors to manage news items within their assigned majors.
 
 ### Tasks
 
-- [ ] **M2-T1: Add "News" tab to contributor major dashboard**
+- [x] **M2-T1: Add "News" tab to contributor major dashboard**
   In `app/dashboard/major/[majorId]/page.tsx`, add a "الأخبار" (News) tab alongside the existing courses section. Use the same tab/navigation pattern already in the dashboard. When active, render the news management component.
 
-- [ ] **M2-T2: Create news list component for dashboard**
+- [x] **M2-T2: Create news list component for dashboard**
   Create a `components/dashboard/news-list.tsx` component. Fetch news via `news.listByMajor` query with the current `majorId`. Display a table or card list with columns: title, date (formatted), actions (edit, delete). Include empty state. Use the same patterns as the existing resources list (motion animations, staggered entrance).
 
-- [ ] **M2-T3: Create news form component (add/edit)**
+- [x] **M2-T3: Create news form component (add/edit)**
   Create a `components/dashboard/news-form.tsx` component using `@tanstack/react-form` with Zod validation. Fields: title (text input, required, Arabic label), content (Tiptap editor, reuse existing `TiptapEditor` component). On submit, call `news.add` or `news.update` mutation with session token. Show toast on success/error. Reset form after successful add.
 
-- [ ] **M2-T4: Wire up soft-delete action for news**
+- [x] **M2-T4: Wire up soft-delete action for news**
   Add delete button to each news item in the list. On click, show confirmation dialog (same pattern as resource delete). Call `news.remove` mutation. Show success toast. List auto-refreshes via Convex reactivity.
 
-- [ ] **M2-T5: Add news count indicator**
+- [x] **M2-T5: Add news count indicator**
   Show news count badge on the "News" tab label so contributors can see at a glance how many news items exist for the major. Query count from `news.listByMajor`.
 
 ---
