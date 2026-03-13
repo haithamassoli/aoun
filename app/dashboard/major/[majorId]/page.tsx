@@ -16,6 +16,7 @@ import { contributorCourseSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { NewsList } from "@/components/dashboard/news-list";
 import { NewsForm } from "@/components/dashboard/news-form";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 const generateSlug = (name: string) =>
   name.trim().replace(/\s+/g, "-").toLowerCase();
@@ -56,6 +57,7 @@ export default function MajorCoursesPage() {
     api.courses.searchByMajor,
     search.isEmpty ? "skip" : { majorId: majorIdValue, query: search.query },
   );
+  const newsCount = useQuery(api.news.countByMajor, { majorId: majorIdValue });
 
   const addCourse = useMutation(api.courses.add);
   const updateCourse = useMutation(api.courses.update);
@@ -73,6 +75,10 @@ export default function MajorCoursesPage() {
     content: string;
   } | undefined>(undefined);
   const [deletingNews, setDeletingNews] = useState<string | null>(null);
+  const [pendingDeleteNews, setPendingDeleteNews] = useState<{
+    _id: Id<"news">;
+    title: string;
+  } | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -150,16 +156,19 @@ export default function MajorCoursesPage() {
     setShowNewsForm(true);
   };
 
-  const handleNewsDelete = async (newsId: Id<"news">) => {
+  const handleNewsDelete = async () => {
     if (!sessionToken) return;
-    setDeletingNews(newsId);
+    if (!pendingDeleteNews) return;
+
+    setDeletingNews(pendingDeleteNews._id);
     try {
-      await removeNews({ token: sessionToken, newsId });
+      await removeNews({ token: sessionToken, newsId: pendingDeleteNews._id });
       toast.show("تم حذف الخبر", "success");
     } catch {
       toast.show("حدث خطأ أثناء الحذف", "error");
     } finally {
       setDeletingNews(null);
+      setPendingDeleteNews(null);
     }
   };
 
@@ -312,13 +321,24 @@ export default function MajorCoursesPage() {
         </button>
         <button
           onClick={() => setActiveTab("news")}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "news"
               ? "bg-primary-600 text-white"
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
           }`}
         >
-          الأخبار
+          <span>الأخبار</span>
+          {typeof newsCount === "number" && (
+            <span
+              className={`inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold ${
+                activeTab === "news"
+                  ? "bg-white/20 text-white"
+                  : "bg-white text-primary-700 dark:bg-surface-900 dark:text-primary-300"
+              }`}
+            >
+              {newsCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -592,11 +612,32 @@ export default function MajorCoursesPage() {
           <NewsList
             majorId={majorIdValue}
             onEdit={handleNewsEdit}
-            onDelete={handleNewsDelete}
+            onDelete={(news) =>
+              setPendingDeleteNews({ _id: news._id, title: news.title })
+            }
             deleting={deletingNews}
           />
         </>
       )}
+
+      <ConfirmDialog
+        open={pendingDeleteNews !== null}
+        title="تأكيد حذف الخبر"
+        description={
+          pendingDeleteNews
+            ? `سيتم حذف خبر «${pendingDeleteNews.title}» من القائمة العامة ولوحة التحكم.`
+            : ""
+        }
+        confirmLabel="تأكيد الحذف"
+        cancelLabel="إلغاء"
+        isLoading={deletingNews !== null}
+        onConfirm={handleNewsDelete}
+        onCancel={() => {
+          if (!deletingNews) {
+            setPendingDeleteNews(null);
+          }
+        }}
+      />
     </div>
   );
 }

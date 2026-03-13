@@ -13,7 +13,10 @@ export function TiptapEditor({ content, onChange }: Props) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      // Tiptap v3 includes Link in StarterKit, so disable it before mounting our custom Link config.
+      StarterKit.configure({
+        link: false,
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: { class: "text-primary-600 underline" },

@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aoun.jo";
+import { SITE_URL } from "@/lib/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let urls: { path: string }[] = [];
@@ -19,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const segmentCount = entry.path.split("/").filter(Boolean).length;
 
     return {
-      url: `${BASE_URL}${entry.path}`,
+      url: `${SITE_URL}${entry.path}`,
       lastModified: new Date(),
       changeFrequency: isHome
         ? "daily"

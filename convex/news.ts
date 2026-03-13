@@ -140,6 +140,19 @@ export const listByMajor = query({
   },
 });
 
+export const countByMajor = query({
+  args: { majorId: v.id("majors") },
+  returns: v.number(),
+  handler: async (ctx, args) => {
+    const items = await ctx.db
+      .query("news")
+      .withIndex("by_majorId", (q) => q.eq("majorId", args.majorId))
+      .collect();
+
+    return items.filter(isNotDeleted).length;
+  },
+});
+
 export const getLatestByMajor = query({
   args: { majorId: v.id("majors") },
   handler: async (ctx, args) => {

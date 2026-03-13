@@ -9,6 +9,7 @@ import { getSessionToken } from "@/app/actions/auth";
 import { PWARegister } from "@/components/pwa-register";
 import { PWAInstallBanner } from "@/components/pwa-install-banner";
 import { VisitorTracker } from "@/components/visitor-tracker";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -18,11 +19,8 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   display: "swap",
 });
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://aoun-jo.netlify.app";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "عون — مصادر أكاديمية للجامعات الأردنية",
     template: "%s — عون",
@@ -55,7 +53,7 @@ export const metadata: Metadata = {
     title: "عون — مصادر أكاديمية للجامعات الأردنية",
     description:
       "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
-    url: BASE_URL,
+    url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",

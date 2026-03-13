@@ -160,10 +160,10 @@ End-to-end validation across all milestones.
 
 ### Tasks
 
-- [ ] **M6-T1: Test contributor news CRUD flow**
+- [x] **M6-T1: Test contributor news CRUD flow**
   Verify: contributor can create news with title + rich text for assigned major. Can edit existing news. Can soft-delete news. Cannot create/edit news for unassigned major (permission error). Soft-deleted news doesn't appear in list.
 
-- [ ] **M6-T2: Test public news page**
+- [x] **M6-T2: Test public news page**
   Verify: news page loads with SSR. Newest items appear first. Infinite scroll loads more items. Empty state shows correctly. Breadcrumbs and back navigation work. HTML content renders correctly with RTL. Page metadata is correct.
 
 - [ ] **M6-T3: Test push notification subscription flow**
@@ -175,8 +175,8 @@ End-to-end validation across all milestones.
 - [ ] **M6-T5: Test edge cases**
   Verify: notification permission denied shows disabled state. Service worker updates correctly. Multiple rapid toggles don't create duplicate subscriptions. Deleted major's subscriptions don't cause errors. News for soft-deleted major doesn't trigger notifications.
 
-- [ ] **M6-T6: SEO & sitemap audit**
+- [x] **M6-T6: SEO & sitemap audit**
   Verify: news pages appear in sitemap. Meta tags render correctly. OG tags work for social sharing. SSR output is correct (view source check).
 
-- [ ] **M6-T7: RTL & Arabic polish**
+- [x] **M6-T7: RTL & Arabic polish**
   Verify: all new UI labels are in Arabic. News cards render RTL correctly. Tiptap content in news cards respects RTL. Dates formatted in Arabic locale. Toast messages in Arabic.

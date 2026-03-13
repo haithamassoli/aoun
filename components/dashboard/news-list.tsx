@@ -17,7 +17,7 @@ type NewsItem = {
 type NewsListProps = {
   majorId: Id<"majors">;
   onEdit: (news: NewsItem) => void;
-  onDelete: (newsId: Id<"news">) => void;
+  onDelete: (news: NewsItem) => void;
   deleting: string | null;
 };
 
@@ -131,7 +131,7 @@ export function NewsList({ majorId, onEdit, onDelete, deleting }: NewsListProps)
                 </svg>
               </button>
               <button
-                onClick={() => onDelete(news._id)}
+                onClick={() => onDelete(news as NewsItem)}
                 disabled={deleting === news._id}
                 className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"
                 title="حذف"

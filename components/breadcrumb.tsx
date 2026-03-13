@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site-url";
 
 interface BreadcrumbItem {
   label: string;
@@ -13,7 +14,7 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
       "@type": "ListItem",
       position: index + 1,
       name: item.label,
-      ...(item.href ? { item: `https://aoun.jo${item.href}` } : {}),
+      ...(item.href ? { item: `${SITE_URL}${item.href}` } : {}),
     })),
   };
 
@@ -21,7 +22,9 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <nav aria-label="مسار التنقل" className="mb-6">
         <ol className="flex flex-wrap items-center gap-1.5 text-sm text-surface-500 dark:text-surface-400">
