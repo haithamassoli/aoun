@@ -110,7 +110,7 @@ export default async function MajorPage({
       />
 
       {/* Major Header */}
-      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-16 lg:px-8">
+      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-10 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-14 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             items={[
@@ -119,34 +119,46 @@ export default async function MajorPage({
               { label: major.name },
             ]}
           />
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl lg:text-4xl"
-          >
-            {major.name}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-2 text-surface-500 dark:text-surface-400"
-          >
-            {university.name} ·{" "}
-            {courses.length > 0
-              ? `${courses.length} مادة`
-              : "لا توجد مواد حالياً"}
-          </motion.p>
+
+          {/* Title row — notification lives here, next to subject it controls */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl lg:text-4xl"
+              >
+                {major.name}
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="mt-2 text-surface-500 dark:text-surface-400"
+              >
+                {university.name} ·{" "}
+                {courses.length > 0
+                  ? `${courses.length} مادة`
+                  : "لا توجد مواد حالياً"}
+              </motion.p>
+            </div>
+            <div className="shrink-0 pt-1">
+              <NotificationToggle majorId={major._id} />
+            </div>
+          </div>
+
+          {/* Action cards — equal-width grid */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-5 flex flex-wrap gap-3"
+            className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2"
           >
+            {/* News card */}
             <Link
               href={`/${universitySlug}/${majorSlug}/news`}
-              className="group flex min-w-[280px] flex-1 items-start justify-between gap-4 rounded-[24px] border border-primary-200 bg-white/90 px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(37,99,235,0.35)] dark:border-primary-800/80 dark:bg-surface-900/80 dark:hover:border-primary-700"
+              className="group flex items-start justify-between gap-4 rounded-2xl border border-primary-200 bg-white/90 px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(37,99,235,0.35)] dark:border-primary-800/80 dark:bg-surface-900/80 dark:hover:border-primary-700"
             >
               <div className="min-w-0">
                 <span className="inline-flex rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/80 dark:text-primary-300">
@@ -173,6 +185,7 @@ export default async function MajorPage({
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   strokeWidth={2}
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -183,47 +196,47 @@ export default async function MajorPage({
               </span>
             </Link>
 
-            <NotificationToggle majorId={major._id} />
-
+            {/* Tree diagram card — same visual weight as news card */}
             {major.treeDiagramUrl && (
               <a
                 href={major.treeDiagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-[24px] border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+                className="group flex items-start justify-between gap-4 rounded-2xl border border-surface-200 bg-white/90 px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(37,99,235,0.25)] dark:border-surface-700/80 dark:bg-surface-900/80 dark:hover:border-primary-700"
               >
-                <svg
-                  className="h-4 w-4 shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.75}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="16" y="16" width="6" height="6" rx="1.5" />
-                  <rect x="2" y="16" width="6" height="6" rx="1.5" />
-                  <rect x="9" y="2" width="6" height="6" rx="1.5" />
-                  <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
-                  <path d="M12 12V8" />
-                </svg>
-                شجرة مسار التخصص
-                <svg
-                  className="h-3.5 w-3.5 shrink-0 opacity-60"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
+                <div className="min-w-0">
+                  <span className="inline-flex rounded-full bg-surface-100 px-3 py-1 text-xs font-semibold text-surface-600 dark:bg-surface-800 dark:text-surface-300">
+                    خطة التخصص
+                  </span>
+                  <p className="mt-3 text-base font-semibold text-surface-950 dark:text-surface-50">
+                    شجرة مسار التخصص
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-surface-500 dark:text-surface-400">
+                    تصفح الخريطة البيانية للمواد والمتطلبات السابقة.
+                  </p>
+                </div>
+                <span className="mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-100 text-surface-600 transition-all group-hover:bg-primary-50 group-hover:text-primary-700 dark:bg-surface-800 dark:text-surface-300 dark:group-hover:bg-primary-950/80 dark:group-hover:text-primary-300">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.75}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
+                    aria-hidden="true"
+                  >
+                    <rect x="16" y="16" width="6" height="6" rx="1.5" />
+                    <rect x="2" y="16" width="6" height="6" rx="1.5" />
+                    <rect x="9" y="2" width="6" height="6" rx="1.5" />
+                    <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+                    <path d="M12 12V8" />
+                  </svg>
+                </span>
               </a>
             )}
           </motion.div>
+
           <UniversityQuickLinks links={university.quickLinks} />
         </div>
       </section>
