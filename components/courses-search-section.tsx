@@ -701,7 +701,7 @@ export function CoursesSearchSection({
                 {!isCollapsed ? (
                   <div
                     id={panelId}
-                    className="grid grid-cols-2 gap-2.5 lg:grid-cols-3"
+                    className="grid grid-cols-2 gap-1 sm:gap-2.5 lg:grid-cols-3"
                   >
                     {semester.courses.map((course) => (
                       <CourseCard
