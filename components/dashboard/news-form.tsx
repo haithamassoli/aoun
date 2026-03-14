@@ -104,22 +104,7 @@ export function NewsForm({
         </form.Field>
       </div>
 
-      <div className="mt-4 flex items-center gap-3">
-        <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <button
-              type="submit"
-              disabled={!canSubmit || isSubmitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
-            >
-              {isSubmitting
-                ? "جاري الحفظ..."
-                : editingId
-                  ? "تحديث"
-                  : "إضافة"}
-            </button>
-          )}
-        </form.Subscribe>
+      <div className="mt-4 flex items-center justify-end gap-3">
         <button
           type="button"
           onClick={onCancel}
@@ -127,6 +112,17 @@ export function NewsForm({
         >
           إلغاء
         </button>
+        <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
+          {([canSubmit, isSubmitting]) => (
+            <button
+              type="submit"
+              disabled={!canSubmit || isSubmitting}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
+            >
+              {isSubmitting ? "جاري الحفظ..." : editingId ? "تحديث" : "إضافة"}
+            </button>
+          )}
+        </form.Subscribe>
       </div>
     </form>
   );

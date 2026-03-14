@@ -549,7 +549,14 @@ export default function MajorCoursesPage() {
                   min="0"
                 />
               </div>
-              <div className="mt-4 flex items-center gap-3">
+              <div className="mt-4 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+                >
+                  إلغاء
+                </button>
                 <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
                   {([canSubmit, isSubmitting]) => (
                     <button
@@ -565,13 +572,6 @@ export default function MajorCoursesPage() {
                     </button>
                   )}
                 </form.Subscribe>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
-                >
-                  إلغاء
-                </button>
               </div>
             </form>
           </FormModal>

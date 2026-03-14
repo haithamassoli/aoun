@@ -127,14 +127,17 @@ export default function CourseResourcesPage() {
     content?: string;
     order: number;
   }) => {
-    form.reset({
-      title: resource.title,
-      category: resource.category,
-      type: resource.type,
-      url: resource.url ?? "",
-      content: resource.content ?? "",
-      order: resource.order.toString(),
-    });
+    form.reset(
+      {
+        title: resource.title,
+        category: resource.category,
+        type: resource.type,
+        url: resource.url ?? "",
+        content: resource.content ?? "",
+        order: resource.order.toString(),
+      },
+      { keepDefaultValues: true },
+    );
     setEditingId(resource._id);
     setShowForm(true);
   };
@@ -406,7 +409,14 @@ export default function CourseResourcesPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+            >
+              إلغاء
+            </button>
             <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
                 <button
@@ -422,13 +432,6 @@ export default function CourseResourcesPage() {
                 </button>
               )}
             </form.Subscribe>
-            <button
-              type="button"
-              onClick={resetForm}
-              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
-            >
-              إلغاء
-            </button>
           </div>
         </form>
       )}

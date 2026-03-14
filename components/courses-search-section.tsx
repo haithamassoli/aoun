@@ -199,7 +199,7 @@ function CourseCard({
   return (
     <article className="group flex h-full flex-col rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(14,165,233,0.45)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none dark:hover:border-primary-600 sm:p-4">
       <div className="flex items-start justify-between gap-2 sm:gap-3">
-        <div className="min-w-0 flex-1 space-y-2">
+        <Link href={href} className="min-w-0 flex-1 space-y-2">
           {badge ? (
             <span className="inline-flex max-w-full truncate rounded-full border border-primary-200/70 bg-primary-50/80 px-2.5 py-1 text-[10px] font-semibold text-primary-700 dark:border-primary-900 dark:bg-primary-950/80 dark:text-primary-300">
               {badge}
@@ -224,12 +224,11 @@ function CourseCard({
                 aria-hidden="true"
               />
               <div>
-                <Link
-                  href={href}
-                  className={`block min-w-0 flex-1 line-clamp-2 text-sm font-semibold leading-6 text-surface-800 transition-colors hover:text-primary-600 dark:text-surface-100 dark:hover:text-primary-400 sm:text-base`}
+                <h4
+                  className={`dark:group-hover:text-primary-400 group-hover:text-primary-600 block min-w-0 flex-1 line-clamp-2 text-sm font-semibold leading-6 text-surface-800 transition-colors hover:text-primary-600 dark:text-surface-100 dark:hover:text-primary-400 sm:text-base`}
                 >
                   {course.name}
-                </Link>
+                </h4>
                 {course.courseCode ? (
                   <p className="truncate text-[11px] font-medium tracking-[0.14em] text-surface-500 dark:text-surface-400">
                     {course.courseCode}
@@ -237,13 +236,8 @@ function CourseCard({
                 ) : null}
               </div>
             </div>
-            {/* {course.courseCode ? (
-              <p className="truncate text-[11px] font-medium tracking-[0.14em] text-surface-500 dark:text-surface-400">
-                {course.courseCode}
-              </p>
-            ) : null} */}
           </div>
-        </div>
+        </Link>
 
         <div className="flex shrink-0 items-center gap-2">
           <CourseStatusMenu
@@ -251,43 +245,8 @@ function CourseCard({
             value={status}
             onChange={onStatusChange}
           />
-          {/* <Link
-            href={href}
-            aria-label={`اذهب إلى مادة ${course.name}`}
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-surface-200/80 bg-surface-50 text-surface-500 transition-all duration-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600 group-hover:-translate-x-0.5 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-400 dark:hover:border-primary-600 dark:hover:bg-primary-950/60 dark:hover:text-primary-300"
-          >
-            <svg
-              className="h-4 w-4 rotate-180"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link> */}
         </div>
       </div>
-
-      {/* <div className="mt-auto pt-3">
-        <div className="rounded-xl border border-surface-100/80 bg-surface-50/80 p-2.5 dark:border-surface-800 dark:bg-surface-950/40">
-          <p className="mb-2 text-[10px] font-semibold text-surface-500 dark:text-surface-400">
-            الحالة الحالية
-          </p>
-          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-surface-200/80 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-surface-700 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-200">
-            <span
-              className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusOption.dotClassName}`}
-              aria-hidden="true"
-            />
-            <span className="truncate">{statusOption.label}</span>
-          </div>
-        </div>
-      </div> */}
     </article>
   );
 }
