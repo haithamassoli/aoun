@@ -167,4 +167,12 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_endpoint", ["endpoint"]),
+
+  partners: defineTable({
+    name: v.string(),
+    logoStorageId: v.id("_storage"),
+    websiteUrl: v.optional(v.string()),
+    order: v.number(),
+    ...softDeleteFields,
+  }).index("by_order", ["order"]),
 });

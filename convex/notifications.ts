@@ -19,13 +19,13 @@ export const send = action({
 
     const university = await ctx.runQuery(
       internal.newsInternal.getUniversityById,
-      { universityId: major.universityId }
+      { universityId: major.universityId },
     );
     if (!university || university.deletedAt !== undefined) return null;
 
     const subscriptions = await ctx.runQuery(
       internal.newsInternal.getSubscriptionsByMajor,
-      { majorId: news.majorId }
+      { majorId: news.majorId },
     );
 
     if (subscriptions.length === 0) return null;
@@ -39,20 +39,21 @@ export const send = action({
     const newsUrl = `/${university.slug}/${major.slug}/news`;
     const payload = JSON.stringify({
       title: news.title,
-      body: "اضغط لعرض الأخبار",
+      body: "اضغط لعرض الخبر",
       url: newsUrl,
     });
 
     const results = await Promise.allSettled(
-      subscriptions.map((sub: { endpoint: string; p256dh: string; auth: string }) =>
-        webpush.sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
-          },
-          payload
-        )
-      )
+      subscriptions.map(
+        (sub: { endpoint: string; p256dh: string; auth: string }) =>
+          webpush.sendNotification(
+            {
+              endpoint: sub.endpoint,
+              keys: { p256dh: sub.p256dh, auth: sub.auth },
+            },
+            payload,
+          ),
+      ),
     );
 
     // Clean up expired subscriptions (410 Gone)
