@@ -6,6 +6,8 @@ import { useQuery } from "convex/react";
 import { Fira_Code } from "next/font/google";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { Toast, useToast } from "@/components/toast";
+import { SendNotificationForm } from "@/components/dashboard/send-notification-form";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -235,6 +237,7 @@ function formatSignedDelta(value: number) {
 export default function DashboardPage() {
   const { user, sessionToken } = useAuth();
   const isAdmin = user?.role === "admin";
+  const toast = useToast();
 
   const majors = useQuery(
     api.dashboard.getMyMajors,
@@ -327,6 +330,7 @@ export default function DashboardPage() {
 
     return (
       <div>
+        <Toast toast={toast} />
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -786,6 +790,23 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.46 }}
+              className="mt-6 overflow-hidden rounded-[28px] border border-primary-200/70 bg-gradient-to-br from-white via-primary-50/40 to-white p-5 dark:border-primary-900/50 dark:from-surface-900 dark:via-primary-950/20 dark:to-surface-900 sm:p-6"
+            >
+              <div className="mb-5">
+                <h2 className="text-lg font-bold text-surface-900 dark:text-surface-50">
+                  إرسال إشعار مخصص
+                </h2>
+                <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                  أرسل إشعارا مباشرا لجميع المشتركين أو لمشتركي تخصص محدد.
+                </p>
+              </div>
+              <SendNotificationForm showToast={(msg, type) => toast.show(msg, type)} />
             </motion.section>
           </>
         )}

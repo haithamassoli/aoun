@@ -16,6 +16,7 @@ import { contributorCourseSchema, contributorMajorSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { NewsList } from "@/components/dashboard/news-list";
 import { NewsForm } from "@/components/dashboard/news-form";
+import { SendNotificationForm } from "@/components/dashboard/send-notification-form";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormModal } from "@/components/form-modal";
 
@@ -33,7 +34,7 @@ type CourseListItem = {
   alias?: string;
 };
 
-type ActiveTab = "courses" | "news";
+type ActiveTab = "courses" | "news" | "notifications";
 
 export default function MajorCoursesPage() {
   const { user, sessionToken } = useAuth();
@@ -352,7 +353,7 @@ export default function MajorCoursesPage() {
               إضافة مادة
             </button>
           </div>
-        ) : (
+        ) : activeTab === "news" ? (
           <button
             onClick={() => {
               resetNewsForm();
@@ -375,7 +376,7 @@ export default function MajorCoursesPage() {
             </svg>
             إضافة خبر
           </button>
-        )}
+        ) : null}
       </motion.div>
 
       <FormModal
@@ -476,6 +477,16 @@ export default function MajorCoursesPage() {
               {newsCount}
             </span>
           )}
+        </button>
+        <button
+          onClick={() => setActiveTab("notifications")}
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeTab === "notifications"
+              ? "bg-primary-600 text-white"
+              : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+          }`}
+        >
+          الإشعارات
         </button>
       </div>
 
@@ -740,6 +751,24 @@ export default function MajorCoursesPage() {
             deleting={deletingNews}
           />
         </>
+      )}
+
+      {/* Notifications tab content */}
+      {activeTab === "notifications" && (
+        <div className="rounded-2xl border border-surface-200 bg-white p-5 dark:border-surface-700 dark:bg-surface-900">
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+              إرسال إشعار مخصص
+            </h2>
+            <p className="mt-0.5 text-xs text-surface-500 dark:text-surface-400">
+              سيُرسل الإشعار لجميع المشتركين في هذا التخصص.
+            </p>
+          </div>
+          <SendNotificationForm
+            majorId={majorIdValue}
+            showToast={(msg, type) => toast.show(msg, type)}
+          />
+        </div>
       )}
 
       <ConfirmDialog
