@@ -170,7 +170,9 @@ function buildChartX(index: number, total: number) {
 function buildChartY(value: number, maxValue: number) {
   const safeMaxValue = Math.max(maxValue, 1);
   const drawableHeight =
-    ENTITY_CHART_HEIGHT - ENTITY_CHART_PADDING_TOP - ENTITY_CHART_PADDING_BOTTOM;
+    ENTITY_CHART_HEIGHT -
+    ENTITY_CHART_PADDING_TOP -
+    ENTITY_CHART_PADDING_BOTTOM;
   return (
     ENTITY_CHART_HEIGHT -
     ENTITY_CHART_PADDING_BOTTOM -
@@ -241,11 +243,11 @@ export default function DashboardPage() {
 
   const majors = useQuery(
     api.dashboard.getMyMajors,
-    !isAdmin && user && sessionToken ? { token: sessionToken } : "skip"
+    !isAdmin && user && sessionToken ? { token: sessionToken } : "skip",
   );
   const analytics = useQuery(
     api.dashboard.getAdminDashboardAnalytics,
-    isAdmin && sessionToken ? { token: sessionToken, days: 30 } : "skip"
+    isAdmin && sessionToken ? { token: sessionToken, days: 30 } : "skip",
   );
 
   if (!user) return null;
@@ -263,23 +265,28 @@ export default function DashboardPage() {
       1,
       ...resolvedAnalytics.entitySeries.flatMap((point) =>
         ENTITY_CHART_METRICS.map((metric) =>
-          Math.max(point[metric.key] - (firstEntityPoint?.[metric.key] ?? 0), 0)
-        )
-      )
+          Math.max(
+            point[metric.key] - (firstEntityPoint?.[metric.key] ?? 0),
+            0,
+          ),
+        ),
+      ),
     );
     const entityChartTicks = buildChartTicks(highestEntityGrowthValue);
     const entityMidpointIndex = Math.floor(
-      Math.max(resolvedAnalytics.entitySeries.length - 1, 0) / 2
+      Math.max(resolvedAnalytics.entitySeries.length - 1, 0) / 2,
     );
     const entityChartSeries = ENTITY_CHART_METRICS.map((metric) => {
       const startingValue = firstEntityPoint?.[metric.key] ?? 0;
-      const coordinates = resolvedAnalytics.entitySeries.map((point, index) => ({
-        x: buildChartX(index, resolvedAnalytics.entitySeries.length),
-        y: buildChartY(
-          Math.max(point[metric.key] - startingValue, 0),
-          highestEntityGrowthValue
-        ),
-      }));
+      const coordinates = resolvedAnalytics.entitySeries.map(
+        (point, index) => ({
+          x: buildChartX(index, resolvedAnalytics.entitySeries.length),
+          y: buildChartY(
+            Math.max(point[metric.key] - startingValue, 0),
+            highestEntityGrowthValue,
+          ),
+        }),
+      );
       const currentValue = latestEntityPoint?.[metric.key] ?? 0;
 
       return {
@@ -295,15 +302,15 @@ export default function DashboardPage() {
       resolvedAnalytics.entitySeries.length > 0
         ? buildChartX(
             resolvedAnalytics.entitySeries.length - 1,
-            resolvedAnalytics.entitySeries.length
+            resolvedAnalytics.entitySeries.length,
           )
         : ENTITY_CHART_WIDTH - ENTITY_CHART_PADDING_X;
     const hasEntityGrowthData = entityChartSeries.some(
-      (series) => series.delta > 0
+      (series) => series.delta > 0,
     );
     const highestVisitorCount = Math.max(
       1,
-      ...resolvedAnalytics.visitorSeries.map((point) => point.uniqueVisitors)
+      ...resolvedAnalytics.visitorSeries.map((point) => point.uniqueVisitors),
     );
     const visitorChartBars = resolvedAnalytics.visitorSeries.map((point) => ({
       ...point,
@@ -312,20 +319,20 @@ export default function DashboardPage() {
           ? 6
           : Math.max(
               12,
-              Math.round((point.uniqueVisitors / highestVisitorCount) * 100)
+              Math.round((point.uniqueVisitors / highestVisitorCount) * 100),
             ),
     }));
     const visitorPeakPoint =
       resolvedAnalytics.visitorSeries.reduce<VisitorSeriesPoint>(
         (peak, point) =>
           point.uniqueVisitors > peak.uniqueVisitors ? point : peak,
-        { dateKey: "", label: "", uniqueVisitors: 0 }
+        { dateKey: "", label: "", uniqueVisitors: 0 },
       );
     const midpointIndex = Math.floor(
-      Math.max(resolvedAnalytics.visitorSeries.length - 1, 0) / 2
+      Math.max(resolvedAnalytics.visitorSeries.length - 1, 0) / 2,
     );
     const hasVisitorData = visitorChartBars.some(
-      (point) => point.uniqueVisitors > 0
+      (point) => point.uniqueVisitors > 0,
     );
 
     return (
@@ -450,7 +457,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="grid min-w-[220px] gap-3 sm:grid-cols-2">
                     <div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-[0_18px_30px_-24px_rgba(15,23,42,0.35)] backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none">
-                      <p className="text-xs text-slate-500 dark:text-slate-300">إجمالي الزوار</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-300">
+                        إجمالي الزوار
+                      </p>
                       <p
                         className={`${firaCode.className} mt-2 text-3xl font-bold`}
                       >
@@ -458,7 +467,9 @@ export default function DashboardPage() {
                       </p>
                     </div>
                     <div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-[0_18px_30px_-24px_rgba(15,23,42,0.35)] backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none">
-                      <p className="text-xs text-slate-500 dark:text-slate-300">أعلى يوم</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-300">
+                        أعلى يوم
+                      </p>
                       <p
                         className={`${firaCode.className} mt-2 text-3xl font-bold`}
                       >
@@ -494,7 +505,7 @@ export default function DashboardPage() {
                             className="group flex h-full flex-1 items-end"
                             title={`${point.label}: ${point.uniqueVisitors}`}
                           >
-                            <div className="relative w-full rounded-t-[14px] bg-emerald-950/5 dark:bg-white/8">
+                            <div className="relative flex h-full w-full items-end rounded-t-[14px] bg-emerald-950/5 dark:bg-white/8">
                               <div
                                 className="w-full rounded-t-[14px] bg-gradient-to-t from-emerald-500 via-teal-400 to-amber-200 shadow-[0_14px_28px_-14px_rgba(16,185,129,0.55)] transition-all duration-500 motion-reduce:duration-0 dark:from-emerald-300 dark:via-emerald-400 dark:to-teal-200 dark:shadow-[0_14px_28px_-14px_rgba(52,211,153,0.85)]"
                                 style={{ height: `${point.heightPercent}%` }}
@@ -506,7 +517,10 @@ export default function DashboardPage() {
                       <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300">
                         <span>{resolvedAnalytics.visitorSeries[0]?.label}</span>
                         <span>
-                          {resolvedAnalytics.visitorSeries[midpointIndex]?.label}
+                          {
+                            resolvedAnalytics.visitorSeries[midpointIndex]
+                              ?.label
+                          }
                         </span>
                         <span>
                           {
@@ -593,7 +607,11 @@ export default function DashboardPage() {
                             {entityChartTicks.map((tick, index) => (
                               <span
                                 key={`${tick}-${index}`}
-                                className={index === entityChartTicks.length - 1 ? "translate-y-1" : ""}
+                                className={
+                                  index === entityChartTicks.length - 1
+                                    ? "translate-y-1"
+                                    : ""
+                                }
                               >
                                 {tick}
                               </span>
@@ -654,7 +672,10 @@ export default function DashboardPage() {
                                   <line
                                     key={index}
                                     x1={ENTITY_CHART_PADDING_X}
-                                    x2={ENTITY_CHART_WIDTH - ENTITY_CHART_PADDING_X}
+                                    x2={
+                                      ENTITY_CHART_WIDTH -
+                                      ENTITY_CHART_PADDING_X
+                                    }
                                     y1={y}
                                     y2={y}
                                     stroke="currentColor"
@@ -704,7 +725,7 @@ export default function DashboardPage() {
                                         strokeWidth="3"
                                       />
                                     </g>
-                                  )
+                                  ),
                               )}
                             </svg>
                           </div>
@@ -714,11 +735,14 @@ export default function DashboardPage() {
                           dir="ltr"
                           className="mt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300"
                         >
-                          <span>{resolvedAnalytics.entitySeries[0]?.label}</span>
+                          <span>
+                            {resolvedAnalytics.entitySeries[0]?.label}
+                          </span>
                           <span>
                             {
-                              resolvedAnalytics.entitySeries[entityMidpointIndex]
-                                ?.label
+                              resolvedAnalytics.entitySeries[
+                                entityMidpointIndex
+                              ]?.label
                             }
                           </span>
                           <span>
@@ -806,7 +830,9 @@ export default function DashboardPage() {
                   أرسل إشعارا مباشرا لجميع المشتركين أو لمشتركي تخصص محدد.
                 </p>
               </div>
-              <SendNotificationForm showToast={(msg, type) => toast.show(msg, type)} />
+              <SendNotificationForm
+                showToast={(msg, type) => toast.show(msg, type)}
+              />
             </motion.section>
           </>
         )}
@@ -823,9 +849,14 @@ export default function DashboardPage() {
         transition={{ duration: 0.4 }}
         className="mb-6"
       >
-        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">لوحة التحكم</h1>
+        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
+          لوحة التحكم
+        </h1>
         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-          مرحبا، {user.name}. {user.role === "admin" ? "لديك صلاحيات كاملة." : "اختر تخصصا لإدارة محتواه."}
+          مرحبا، {user.name}.{" "}
+          {user.role === "admin"
+            ? "لديك صلاحيات كاملة."
+            : "اختر تخصصا لإدارة محتواه."}
         </p>
       </motion.div>
 
@@ -833,47 +864,93 @@ export default function DashboardPage() {
       {majors === undefined ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900" />
+            <div
+              key={i}
+              className="h-32 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+            />
           ))}
         </div>
       ) : majors.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800">
-            <svg className="h-6 w-6 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            <svg
+              className="h-6 w-6 text-surface-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
             </svg>
           </div>
-          <p className="text-sm font-medium text-surface-700 dark:text-surface-200">لا توجد تخصصات مخصصة لك</p>
-          <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">تواصل مع المدير لإضافة صلاحيات</p>
+          <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
+            لا توجد تخصصات مخصصة لك
+          </p>
+          <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
+            تواصل مع المدير لإضافة صلاحيات
+          </p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {majors.map((major: { _id: string; name: string; universityName: string }, index: number) => (
-            <motion.div
-              key={major._id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.1 + index * 0.07 }}
-            >
-            <Link
-              href={`/dashboard/major/${major._id}`}
-              className="group rounded-2xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-200 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-700 block"
-            >
-              <div className="mb-3 flex items-start justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                </div>
-                <svg className="h-5 w-5 text-surface-300 transition-colors group-hover:text-primary-400 dark:text-surface-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-              </div>
-              <h3 className="text-base font-semibold text-surface-900 dark:text-surface-50">{major.name}</h3>
-              <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">{major.universityName}</p>
-            </Link>
-            </motion.div>
-          ))}
+          {majors.map(
+            (
+              major: { _id: string; name: string; universityName: string },
+              index: number,
+            ) => (
+              <motion.div
+                key={major._id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 + index * 0.07 }}
+              >
+                <Link
+                  href={`/dashboard/major/${major._id}`}
+                  className="group rounded-2xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-200 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-700 block"
+                >
+                  <div className="mb-3 flex items-start justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                    </div>
+                    <svg
+                      className="h-5 w-5 text-surface-300 transition-colors group-hover:text-primary-400 dark:text-surface-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-semibold text-surface-900 dark:text-surface-50">
+                    {major.name}
+                  </h3>
+                  <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                    {major.universityName}
+                  </p>
+                </Link>
+              </motion.div>
+            ),
+          )}
         </div>
       )}
     </div>

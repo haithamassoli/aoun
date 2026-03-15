@@ -47,6 +47,19 @@ body {
   color: var(--color-surface-100);
 }
 
+html {
+  cursor: url("/assets/cursor.png"), auto;
+  scrollbar-color: var(--color-primary-500) transparent;
+}
+
+/* Pointer cursor on interactive elements */
+html a,
+html button,
+html [role="button"],
+html input[type="submit"] {
+  cursor: url("/assets/pointer.png"), pointer;
+}
+
 /* Accessible focus styles */
 a:focus-visible,
 button:focus-visible,
