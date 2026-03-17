@@ -7,6 +7,7 @@ import * as motion from "motion/react-client";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { UniversityQuickLinks } from "@/components/university-quick-links";
 import { CourseResourcesSection } from "@/components/course-resources-section";
+import { decodeSlugParam } from "@/lib/slug";
 
 type Params = {
   universitySlug: string;
@@ -20,18 +21,21 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, majorSlug, courseSlug } = await params;
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
+  const normalizedMajorSlug = decodeSlugParam(majorSlug);
+  const normalizedCourseSlug = decodeSlugParam(courseSlug);
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) return {};
   const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
     universityId: university._id,
-    slug: majorSlug,
+    slug: normalizedMajorSlug,
   });
   if (!major || major.universityId !== university._id) return {};
   const course = await fetchQuery(api.courses.getByMajorAndSlug, {
     majorId: major._id,
-    slug: courseSlug,
+    slug: normalizedCourseSlug,
   });
   if (!course || course.majorId !== major._id) return {};
   const title = `${course.name} — ${major.name} — ${university.name}`;
@@ -42,7 +46,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${title} — عون`,
       description,
-      url: `/${universitySlug}/${majorSlug}/${courseSlug}`,
+      url: `/${university.slug}/${major.slug}/${course.slug}`,
       type: "article",
     },
   };
@@ -54,21 +58,26 @@ export default async function CoursePage({
   params: Promise<Params>;
 }) {
   const { universitySlug, majorSlug, courseSlug } = await params;
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
+  const normalizedMajorSlug = decodeSlugParam(majorSlug);
+  const normalizedCourseSlug = decodeSlugParam(courseSlug);
 
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) notFound();
   const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
     universityId: university._id,
-    slug: majorSlug,
+    slug: normalizedMajorSlug,
   });
   if (!major || major.universityId !== university._id) notFound();
   const course = await fetchQuery(api.courses.getByMajorAndSlug, {
     majorId: major._id,
-    slug: courseSlug,
+    slug: normalizedCourseSlug,
   });
   if (!course || course.majorId !== major._id) notFound();
+  const canonicalUniversitySlug = university.slug;
+  const canonicalMajorSlug = major.slug;
 
   const resources = await fetchQuery(api.resources.listByCourse, {
     courseId: course._id,
@@ -93,10 +102,10 @@ export default async function CoursePage({
           <Breadcrumb
             items={[
               { label: "الرئيسية", href: "/" },
-              { label: university.name, href: `/${universitySlug}` },
+              { label: university.name, href: `/${canonicalUniversitySlug}` },
               {
                 label: major.name,
-                href: `/${universitySlug}/${majorSlug}`,
+                href: `/${canonicalUniversitySlug}/${canonicalMajorSlug}`,
               },
               { label: course.name },
             ]}

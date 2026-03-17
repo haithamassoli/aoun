@@ -12,9 +12,7 @@ import { FormInput, FormSelect } from "@/components/form-field";
 import { courseSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
-
-const generateSlug = (name: string) =>
-  name.trim().replace(/\s+/g, "-").toLowerCase();
+import { generateSlug, normalizeSlug } from "@/lib/slug";
 
 export default function AdminCoursesPage() {
   const { user, sessionToken } = useAuth();
@@ -56,7 +54,7 @@ export default function AdminCoursesPage() {
             token: sessionToken,
             courseId: editingId as Id<"courses">,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester ? Number(value.semester) : undefined,
             order: Number(value.order) || 0,
@@ -68,7 +66,7 @@ export default function AdminCoursesPage() {
             token: sessionToken,
             majorId: value.majorId as Id<"majors">,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester ? Number(value.semester) : undefined,
             order: Number(value.order) || 0,

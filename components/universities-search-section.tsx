@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { PublicSearchInput } from "@/components/public-search-input";
 import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
+import { decodeSlugParam } from "@/lib/slug";
 
 type UniversityListItem = {
   _id: Id<"universities">;
@@ -91,7 +92,7 @@ export function UniversitiesSearchSection({
           {activeUniversities.map((uni: UniversityListItem) => (
             <Link
               key={uni._id}
-              href={`/${uni.slug}`}
+              href={`/${decodeSlugParam(uni.slug)}`}
               className="group flex flex-col items-center gap-4 rounded-2xl border border-surface-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
             >
               {uni.logoUrl ? (
@@ -106,7 +107,7 @@ export function UniversitiesSearchSection({
                 />
               ) : (
                 <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-primary-100 text-3xl font-bold text-primary-600 dark:bg-primary-950 dark:text-primary-400">
-                  {uni.slug.toUpperCase().slice(0, 4)}
+                  {decodeSlugParam(uni.slug).toUpperCase().slice(0, 4)}
                 </div>
               )}
               <h3 className="text-center text-lg font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">

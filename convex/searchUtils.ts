@@ -84,11 +84,17 @@ export function buildCourseSearchToken(fields: {
  * 1. Collect source fields in order
  * 2. Drop null/empty values
  * 3. Normalize each value
- * 4. Join with single spaces
+ * 4. Remove duplicate tokens
+ * 5. Join with single spaces
  */
 function buildToken(values: (string | undefined | null)[]): string {
-  return values
+  const normalized = values
     .filter((v): v is string => !!v && v.trim().length > 0)
-    .map(normalize)
-    .join(" ");
+    .map(normalize);
+  
+  // Split into individual tokens, deduplicate, and rejoin
+  const tokens = normalized.flatMap(text => text.split(" "));
+  const uniqueTokens = [...new Set(tokens)];
+  
+  return uniqueTokens.join(" ");
 }

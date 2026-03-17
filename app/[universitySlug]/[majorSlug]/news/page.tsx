@@ -7,6 +7,7 @@ import { NewsPageContent } from "@/components/news-page-content";
 import type { NewsWithAuthor } from "@/components/news-card";
 import { api } from "@/convex/_generated/api";
 import { NotificationToggle } from "@/components/notification-toggle";
+import { decodeSlugParam } from "@/lib/slug";
 
 const INITIAL_PAGE_SIZE = 8;
 
@@ -21,8 +22,10 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, majorSlug } = await params;
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
+  const normalizedMajorSlug = decodeSlugParam(majorSlug);
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) {
     return {};
@@ -30,7 +33,7 @@ export async function generateMetadata({
 
   const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
     universityId: university._id,
-    slug: majorSlug,
+    slug: normalizedMajorSlug,
   });
   if (!major || major.universityId !== university._id) {
     return {};
@@ -38,7 +41,7 @@ export async function generateMetadata({
 
   const absoluteTitle = `أخبار ${major.name} - ${university.name} | عون`;
   const description = `اطلع على آخر الأخبار والإعلانات الخاصة بتخصص ${major.name} في ${university.name} عبر منصة عون.`;
-  const url = `/${universitySlug}/${majorSlug}/news`;
+  const url = `/${university.slug}/${major.slug}/news`;
 
   return {
     title: { absolute: absoluteTitle },
@@ -61,9 +64,11 @@ export default async function MajorNewsPage({
   params: Promise<Params>;
 }) {
   const { universitySlug, majorSlug } = await params;
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
+  const normalizedMajorSlug = decodeSlugParam(majorSlug);
 
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) {
     notFound();
@@ -71,11 +76,13 @@ export default async function MajorNewsPage({
 
   const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
     universityId: university._id,
-    slug: majorSlug,
+    slug: normalizedMajorSlug,
   });
   if (!major || major.universityId !== university._id) {
     notFound();
   }
+  const canonicalUniversitySlug = university.slug;
+  const canonicalMajorSlug = major.slug;
 
   const initialNews = (await fetchQuery(api.news.listByMajor, {
     majorId: major._id,
@@ -97,8 +104,11 @@ export default async function MajorNewsPage({
           <Breadcrumb
             items={[
               { label: "الرئيسية", href: "/" },
-              { label: university.name, href: `/${universitySlug}` },
-              { label: major.name, href: `/${universitySlug}/${majorSlug}` },
+              { label: university.name, href: `/${canonicalUniversitySlug}` },
+              {
+                label: major.name,
+                href: `/${canonicalUniversitySlug}/${canonicalMajorSlug}`,
+              },
               { label: "الأخبار" },
             ]}
           />

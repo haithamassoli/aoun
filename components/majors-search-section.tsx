@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { PublicSearchInput } from "@/components/public-search-input";
 import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
+import { decodeSlugParam } from "@/lib/slug";
 
 type MajorListItem = {
   _id: Id<"majors">;
@@ -85,11 +86,11 @@ export function MajorsSearchSection({
           {activeMajors.map((major: MajorListItem) => (
             <Link
               key={major._id}
-              href={`/${universitySlug}/${major.slug}`}
+              href={`/${universitySlug}/${decodeSlugParam(major.slug)}`}
               className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-lg font-bold text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
-                {major.slug.toUpperCase().slice(0, 4)}
+                {decodeSlugParam(major.slug).toUpperCase().slice(0, 4)}
               </div>
               <div className="min-w-0">
                 <h3 className="truncate text-base font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">

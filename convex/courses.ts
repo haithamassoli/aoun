@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
 import { mutation, query } from "./_generated/server";
 import { assertCanEditCourse, assertCanEditMajor, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildCourseSearchToken, normalize } from "./searchUtils";
@@ -57,12 +58,20 @@ export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(v.null(), courseDoc),
   handler: async (ctx, args) => {
+    const slug = normalizeSlugLookup(args.slug);
     const course = await ctx.db
       .query("courses")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
       .first();
-    if (!course || course.deletedAt !== undefined) return null;
-    return course;
+    if (course && course.deletedAt === undefined) {
+      return course;
+    }
+
+    const courses = await ctx.db.query("courses").collect();
+    const normalizedMatch = courses.find(
+      (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
+    );
+    return normalizedMatch ?? null;
   },
 });
 
@@ -73,14 +82,26 @@ export const getByMajorAndSlug = query({
   },
   returns: v.union(v.null(), courseDoc),
   handler: async (ctx, args) => {
+    const slug = normalizeSlugLookup(args.slug);
     const results = await ctx.db
       .query("courses")
       .withIndex("by_majorId_slug", (q) =>
-        q.eq("majorId", args.majorId).eq("slug", args.slug)
+        q.eq("majorId", args.majorId).eq("slug", slug)
       )
       .collect();
     const course = results.find(isNotDeleted);
-    return course ?? null;
+    if (course) {
+      return course;
+    }
+
+    const courses = await ctx.db
+      .query("courses")
+      .withIndex("by_majorId", (q) => q.eq("majorId", args.majorId))
+      .collect();
+    const normalizedMatch = courses.find(
+      (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
+    );
+    return normalizedMatch ?? null;
   },
 });
 

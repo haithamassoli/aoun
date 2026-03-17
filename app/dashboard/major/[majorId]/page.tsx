@@ -19,9 +19,7 @@ import { NewsForm } from "@/components/dashboard/news-form";
 import { SendNotificationForm } from "@/components/dashboard/send-notification-form";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormModal } from "@/components/form-modal";
-
-const generateSlug = (name: string) =>
-  name.trim().replace(/\s+/g, "-").toLowerCase();
+import { generateSlug, normalizeSlug } from "@/lib/slug";
 
 type CourseListItem = {
   _id: Id<"courses">;
@@ -108,7 +106,7 @@ export default function MajorCoursesPage() {
             token: sessionToken,
             courseId: editingId as Id<"courses">,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester ? Number(value.semester) : undefined,
             order: Number(value.order) || 0,
@@ -120,7 +118,7 @@ export default function MajorCoursesPage() {
             token: sessionToken,
             majorId: majorIdValue,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester ? Number(value.semester) : undefined,
             order: Number(value.order) || 0,

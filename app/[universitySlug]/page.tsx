@@ -7,6 +7,7 @@ import { UniversityQuickLinks } from "@/components/university-quick-links";
 import type { Metadata } from "next";
 import Image from "next/image";
 import * as motion from "motion/react-client";
+import { decodeSlugParam } from "@/lib/slug";
 
 type Params = { universitySlug: string };
 
@@ -16,8 +17,10 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug } = await params;
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
+
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) return {};
   const title = university.name;
@@ -28,7 +31,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${title} — عون`,
       description,
-      url: `/${universitySlug}`,
+      url: `/${university.slug}`,
       type: "website",
     },
   };
@@ -40,9 +43,10 @@ export default async function UniversityPage({
   params: Promise<Params>;
 }) {
   const { universitySlug } = await params;
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
 
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) notFound();
 
@@ -102,7 +106,7 @@ export default async function UniversityPage({
 
       <MajorsSearchSection
         universityId={university._id}
-        universitySlug={universitySlug}
+        universitySlug={university.slug}
         majors={sortedMajors}
       />
     </div>

@@ -12,9 +12,7 @@ import { FormInput } from "@/components/form-field";
 import { universitySchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
-
-const generateSlug = (name: string) =>
-  name.trim().replace(/\s+/g, "-").toLowerCase();
+import { generateSlug, normalizeSlug } from "@/lib/slug";
 
 type QuickLinkInput = {
   title: string;
@@ -124,7 +122,7 @@ export default function AdminUniversitiesPage() {
             token: sessionToken,
             universityId: editingId as Id<"universities">,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             logoUrl: value.logoUrl.trim() || undefined,
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
@@ -135,7 +133,7 @@ export default function AdminUniversitiesPage() {
           await addUniversity({
             token: sessionToken,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             logoUrl: value.logoUrl.trim() || undefined,
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,

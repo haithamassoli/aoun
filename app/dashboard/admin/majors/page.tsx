@@ -12,9 +12,7 @@ import { FormInput, FormSelect } from "@/components/form-field";
 import { majorSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
-
-const generateSlug = (name: string) =>
-  name.trim().replace(/\s+/g, "-").toLowerCase();
+import { generateSlug, normalizeSlug } from "@/lib/slug";
 
 export default function AdminMajorsPage() {
   const { user, sessionToken } = useAuth();
@@ -52,7 +50,7 @@ export default function AdminMajorsPage() {
             token: sessionToken,
             majorId: editingId as Id<"majors">,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
@@ -63,7 +61,7 @@ export default function AdminMajorsPage() {
             token: sessionToken,
             universityId: value.universityId as Id<"universities">,
             name: value.name.trim(),
-            slug: value.slug.trim(),
+            slug: normalizeSlug(value.slug),
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,

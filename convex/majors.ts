@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
 import { mutation, query } from "./_generated/server";
 import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildMajorSearchToken, normalize } from "./searchUtils";
@@ -63,12 +64,20 @@ export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(v.null(), majorDoc),
   handler: async (ctx, args) => {
+    const slug = normalizeSlugLookup(args.slug);
     const major = await ctx.db
       .query("majors")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
       .first();
-    if (!major || major.deletedAt !== undefined) return null;
-    return major;
+    if (major && major.deletedAt === undefined) {
+      return major;
+    }
+
+    const majors = await ctx.db.query("majors").collect();
+    const normalizedMatch = majors.find(
+      (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
+    );
+    return normalizedMatch ?? null;
   },
 });
 
@@ -79,14 +88,26 @@ export const getByUniversityAndSlug = query({
   },
   returns: v.union(v.null(), majorDoc),
   handler: async (ctx, args) => {
+    const slug = normalizeSlugLookup(args.slug);
     const results = await ctx.db
       .query("majors")
       .withIndex("by_universityId_slug", (q) =>
-        q.eq("universityId", args.universityId).eq("slug", args.slug)
+        q.eq("universityId", args.universityId).eq("slug", slug)
       )
       .collect();
     const major = results.find(isNotDeleted);
-    return major ?? null;
+    if (major) {
+      return major;
+    }
+
+    const majors = await ctx.db
+      .query("majors")
+      .withIndex("by_universityId", (q) => q.eq("universityId", args.universityId))
+      .collect();
+    const normalizedMatch = majors.find(
+      (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
+    );
+    return normalizedMatch ?? null;
   },
 });
 
@@ -97,11 +118,19 @@ export const validateLastVisitedMajor = query({
   },
   returns: v.union(v.null(), redirectTarget),
   handler: async (ctx, args) => {
+    const universitySlug = normalizeSlugLookup(args.universitySlug);
+    const majorSlug = normalizeSlugLookup(args.majorSlug);
     const universities = await ctx.db
       .query("universities")
-      .withIndex("by_slug", (q) => q.eq("slug", args.universitySlug))
+      .withIndex("by_slug", (q) => q.eq("slug", universitySlug))
       .collect();
-    const university = universities.find(isNotDeleted);
+    let university = universities.find(isNotDeleted);
+    if (!university) {
+      const allUniversities = await ctx.db.query("universities").withIndex("by_order").collect();
+      university = allUniversities.find(
+        (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, universitySlug),
+      );
+    }
     if (!university) {
       return null;
     }
@@ -109,10 +138,19 @@ export const validateLastVisitedMajor = query({
     const majors = await ctx.db
       .query("majors")
       .withIndex("by_universityId_slug", (q) =>
-        q.eq("universityId", university._id).eq("slug", args.majorSlug)
+        q.eq("universityId", university._id).eq("slug", majorSlug)
       )
       .collect();
-    const major = majors.find(isNotDeleted);
+    let major = majors.find(isNotDeleted);
+    if (!major) {
+      const allMajors = await ctx.db
+        .query("majors")
+        .withIndex("by_universityId", (q) => q.eq("universityId", university._id))
+        .collect();
+      major = allMajors.find(
+        (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, majorSlug),
+      );
+    }
     if (!major) {
       return null;
     }

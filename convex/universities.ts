@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
@@ -136,12 +137,23 @@ export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(v.null(), universityDoc),
   handler: async (ctx, args) => {
+    const slug = normalizeSlugLookup(args.slug);
     const university = await ctx.db
       .query("universities")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
       .first();
-    if (!university || university.deletedAt !== undefined) return null;
-    return normalizeUniversityDoc(university);
+    if (university && university.deletedAt === undefined) {
+      return normalizeUniversityDoc(university);
+    }
+
+    const universities = await ctx.db
+      .query("universities")
+      .withIndex("by_order")
+      .collect();
+    const normalizedMatch = universities.find(
+      (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
+    );
+    return normalizedMatch ? normalizeUniversityDoc(normalizedMatch) : null;
   },
 });
 

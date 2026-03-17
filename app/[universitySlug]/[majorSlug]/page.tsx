@@ -9,6 +9,7 @@ import Link from "next/link";
 import * as motion from "motion/react-client";
 import { MajorLastVisitTracker } from "@/components/major-last-visit-tracker";
 import { NotificationToggle } from "@/components/notification-toggle";
+import { decodeSlugParam } from "@/lib/slug";
 
 type Params = { universitySlug: string; majorSlug: string };
 type SearchParams = {
@@ -42,13 +43,15 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { universitySlug, majorSlug } = await params;
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
+  const normalizedMajorSlug = decodeSlugParam(majorSlug);
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) return {};
   const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
     universityId: university._id,
-    slug: majorSlug,
+    slug: normalizedMajorSlug,
   });
   if (!major || major.universityId !== university._id) return {};
   const title = `${major.name} — ${university.name}`;
@@ -59,7 +62,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${title} — عون`,
       description,
-      url: `/${universitySlug}/${majorSlug}`,
+      url: `/${university.slug}/${major.slug}`,
       type: "website",
     },
   };
@@ -74,19 +77,23 @@ export default async function MajorPage({
 }) {
   const [{ universitySlug, majorSlug }, resolvedSearchParams] =
     await Promise.all([params, searchParams]);
+  const normalizedUniversitySlug = decodeSlugParam(universitySlug);
+  const normalizedMajorSlug = decodeSlugParam(majorSlug);
   const initialStatusFilter = normalizeStatusFilter(
     resolvedSearchParams.status,
   );
 
   const university = await fetchQuery(api.universities.getBySlug, {
-    slug: universitySlug,
+    slug: normalizedUniversitySlug,
   });
   if (!university) notFound();
   const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
     universityId: university._id,
-    slug: majorSlug,
+    slug: normalizedMajorSlug,
   });
   if (!major || major.universityId !== university._id) notFound();
+  const canonicalUniversitySlug = university.slug;
+  const canonicalMajorSlug = major.slug;
 
   const [courses, latestNews] = await Promise.all([
     fetchQuery(api.courses.listByMajor, {
@@ -100,8 +107,8 @@ export default async function MajorPage({
   return (
     <div>
       <MajorLastVisitTracker
-        universitySlug={universitySlug}
-        majorSlug={majorSlug}
+        universitySlug={canonicalUniversitySlug}
+        majorSlug={canonicalMajorSlug}
       />
 
       {/* Major Header */}
@@ -110,7 +117,7 @@ export default async function MajorPage({
           <Breadcrumb
             items={[
               { label: "الرئيسية", href: "/" },
-              { label: university.name, href: `/${universitySlug}` },
+              { label: university.name, href: `/${canonicalUniversitySlug}` },
               { label: major.name },
             ]}
           />
@@ -182,7 +189,7 @@ export default async function MajorPage({
               className="mt-4"
             >
               <Link
-                href={`/${universitySlug}/${majorSlug}/news`}
+                href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
                 className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
               >
                 <svg
@@ -210,7 +217,7 @@ export default async function MajorPage({
                 className="mt-4 w-full"
               >
                 <Link
-                  href={`/${universitySlug}/${majorSlug}/news`}
+                  href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
                   className="group flex w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-primary-200/80 bg-white/90 px-4 py-3 text-right shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800/80 dark:bg-primary-950/50 dark:hover:border-primary-700 dark:hover:bg-primary-950"
                 >
                   <div className="flex min-w-0 items-center gap-3">
@@ -234,8 +241,8 @@ export default async function MajorPage({
 
       <CoursesSearchSection
         majorId={major._id}
-        universitySlug={universitySlug}
-        majorSlug={majorSlug}
+        universitySlug={canonicalUniversitySlug}
+        majorSlug={canonicalMajorSlug}
         courses={courses}
         initialStatusFilter={initialStatusFilter}
       />
