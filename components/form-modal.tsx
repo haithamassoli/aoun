@@ -19,6 +19,17 @@ export function FormModal({ open, title, onClose, children }: FormModalProps) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
