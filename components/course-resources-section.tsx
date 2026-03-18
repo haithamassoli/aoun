@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import * as motion from "motion/react-client";
@@ -86,9 +86,9 @@ export function CourseResourcesSection({
 }: {
   resources: CourseResource[];
 }) {
-  const [activeCategory, setActiveCategory] = useState<"all" | ResourceCategory>(
-    "all",
-  );
+  const [activeCategory, setActiveCategory] = useState<
+    "all" | ResourceCategory
+  >("all");
 
   if (resources.length === 0) {
     return (
@@ -176,7 +176,7 @@ export function CourseResourcesSection({
                     href={resource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-start gap-3 overflow-hidden p-4 text-primary-600 transition-colors hover:bg-surface-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-surface-800 dark:hover:text-primary-300 sm:items-center"
+                    className="group flex items-center gap-3 overflow-hidden p-4 text-primary-600 transition-colors hover:bg-surface-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-surface-800 dark:hover:text-primary-300"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
                       <svg
