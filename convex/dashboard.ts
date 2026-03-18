@@ -9,6 +9,13 @@ import {
   isNotDeleted,
 } from "./helpers";
 
+const socialLinks = v.object({
+  instagram: v.optional(v.string()),
+  facebook: v.optional(v.string()),
+  facebookGroup: v.optional(v.string()),
+  telegram: v.optional(v.string()),
+});
+
 const majorWithUniversity = v.object({
   _id: v.id("majors"),
   _creationTime: v.number(),
@@ -18,6 +25,7 @@ const majorWithUniversity = v.object({
   order: v.number(),
   alias: v.optional(v.string()),
   treeDiagramUrl: v.optional(v.string()),
+  socialLinks: v.optional(socialLinks),
   universityName: v.string(),
 });
 
@@ -298,6 +306,7 @@ export const getMajorWithUniversity = query({
       order: major.order,
       alias: major.alias,
       treeDiagramUrl: major.treeDiagramUrl,
+      socialLinks: major.socialLinks,
       universityName: university?.name ?? "",
     };
   },
@@ -308,9 +317,10 @@ export const updateMajorTreeDiagramUrl = mutation({
     token: v.string(),
     majorId: v.id("majors"),
     treeDiagramUrl: v.optional(v.string()),
+    socialLinks: v.optional(socialLinks),
   },
   returns: v.null(),
-  handler: async (ctx, { token, majorId, treeDiagramUrl }) => {
+  handler: async (ctx, { token, majorId, treeDiagramUrl, socialLinks }) => {
     const user = await authenticateUser(ctx, token);
     await assertCanEditMajor(ctx, user._id, majorId);
 
@@ -321,6 +331,7 @@ export const updateMajorTreeDiagramUrl = mutation({
 
     await ctx.db.patch("majors", majorId, {
       treeDiagramUrl,
+      socialLinks,
     });
 
     return null;
@@ -494,6 +505,7 @@ export const adminListMajors = query({
       order: v.number(),
       alias: v.optional(v.string()),
       treeDiagramUrl: v.optional(v.string()),
+      socialLinks: v.optional(socialLinks),
       universityName: v.string(),
     })
   ),
@@ -514,6 +526,7 @@ export const adminListMajors = query({
           order: major.order,
           alias: major.alias,
           treeDiagramUrl: major.treeDiagramUrl,
+          socialLinks: major.socialLinks,
           universityName: university?.name ?? "",
         };
       })

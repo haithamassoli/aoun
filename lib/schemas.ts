@@ -44,6 +44,11 @@ export const loginSchema = z.object({
   password: z.string().min(1, "كلمة المرور مطلوبة"),
 });
 
+const optionalUrlField = z.union([
+  z.literal(""),
+  z.string().url("رابط غير صالح"),
+]);
+
 export const universitySchema = z.object({
   name: z.string().min(1, "اسم الجامعة مطلوب"),
   slug: z.string().min(1, "الرابط مطلوب"),
@@ -59,7 +64,11 @@ export const majorSchema = z.object({
   slug: z.string().min(1, "الرابط مطلوب"),
   order: z.string(),
   alias: z.string(),
-  treeDiagramUrl: z.union([z.literal(""), z.string().url("رابط غير صالح")]),
+  treeDiagramUrl: optionalUrlField,
+  instagram: optionalUrlField,
+  facebook: optionalUrlField,
+  facebookGroup: optionalUrlField,
+  telegram: optionalUrlField,
 });
 
 export const courseSchema = z.object({
@@ -101,7 +110,11 @@ export const contributorCourseSchema = z.object({
 });
 
 export const contributorMajorSchema = z.object({
-  treeDiagramUrl: z.union([z.literal(""), z.string().url("رابط غير صالح")]),
+  treeDiagramUrl: optionalUrlField,
+  instagram: optionalUrlField,
+  facebook: optionalUrlField,
+  facebookGroup: optionalUrlField,
+  telegram: optionalUrlField,
 });
 
 export const contributorResourceSchema = z

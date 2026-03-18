@@ -2,6 +2,12 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 const resourceType = v.union(v.literal("link"), v.literal("richtext"));
+const socialLinks = v.object({
+  instagram: v.optional(v.string()),
+  facebook: v.optional(v.string()),
+  facebookGroup: v.optional(v.string()),
+  telegram: v.optional(v.string()),
+});
 const resourceCategory = v.union(
   v.literal("notes"),
   v.literal("exams"),
@@ -55,6 +61,7 @@ export default defineSchema({
     order: v.number(),
     alias: v.optional(v.string()),
     treeDiagramUrl: v.optional(v.string()),
+    socialLinks: v.optional(socialLinks),
     searchToken: v.optional(v.string()),
     ...softDeleteFields,
   })

@@ -14,6 +14,22 @@ import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
 
+function buildSocialLinks(value: {
+  instagram: string;
+  facebook: string;
+  facebookGroup: string;
+  telegram: string;
+}) {
+  const socialLinks = {
+    instagram: value.instagram.trim() || undefined,
+    facebook: value.facebook.trim() || undefined,
+    facebookGroup: value.facebookGroup.trim() || undefined,
+    telegram: value.telegram.trim() || undefined,
+  };
+
+  return Object.values(socialLinks).some(Boolean) ? socialLinks : undefined;
+}
+
 export default function AdminMajorsPage() {
   const { user, sessionToken } = useAuth();
   const toast = useToast();
@@ -40,6 +56,10 @@ export default function AdminMajorsPage() {
       order: "0",
       alias: "",
       treeDiagramUrl: "",
+      instagram: "",
+      facebook: "",
+      facebookGroup: "",
+      telegram: "",
     },
     validators: { onChange: majorSchema },
     onSubmit: async ({ value, formApi }) => {
@@ -54,6 +74,7 @@ export default function AdminMajorsPage() {
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
+            socialLinks: buildSocialLinks(value),
           });
           toast.show("تم تحديث التخصص بنجاح", "success");
         } else {
@@ -65,6 +86,7 @@ export default function AdminMajorsPage() {
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
+            socialLinks: buildSocialLinks(value),
           });
           toast.show("تم إضافة التخصص بنجاح", "success");
         }
@@ -97,6 +119,12 @@ export default function AdminMajorsPage() {
     order: number;
     alias?: string;
     treeDiagramUrl?: string;
+    socialLinks?: {
+      instagram?: string;
+      facebook?: string;
+      facebookGroup?: string;
+      telegram?: string;
+    };
   }) => {
     form.reset(
       {
@@ -106,6 +134,10 @@ export default function AdminMajorsPage() {
         order: major.order.toString(),
         alias: major.alias ?? "",
         treeDiagramUrl: major.treeDiagramUrl ?? "",
+        instagram: major.socialLinks?.instagram ?? "",
+        facebook: major.socialLinks?.facebook ?? "",
+        facebookGroup: major.socialLinks?.facebookGroup ?? "",
+        telegram: major.socialLinks?.telegram ?? "",
       },
       { keepDefaultValues: true },
     );
@@ -205,52 +237,170 @@ export default function AdminMajorsPage() {
             e.stopPropagation();
             form.handleSubmit();
           }}
+          className="space-y-6"
         >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormSelect
-              form={form}
-              name="universityId"
-              label="الجامعة *"
-              options={universityOptions}
-              placeholder="اختر الجامعة"
-              disabled={!!editingId}
-            />
-            <FormInput
-              form={form}
-              name="name"
-              label="اسم التخصص *"
-              onChangeCallback={(val) => {
-                if (!editingId) form.setFieldValue("slug", generateSlug(val));
-              }}
-            />
-            <FormInput
-              form={form}
-              name="slug"
-              label="الرابط (slug) *"
-              dir="ltr"
-            />
-            <FormInput
-              form={form}
-              name="alias"
-              label="الاسم البديل (alias)"
-              placeholder="اسم بديل للبحث"
-            />
-            <FormInput
-              form={form}
-              name="order"
-              label="الترتيب"
-              type="number"
-              min="0"
-            />
+          {/* Basic Info Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/40">
+                <svg
+                  className="h-4 w-4 text-primary-600 dark:text-primary-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                المعلومات الأساسية
+              </h3>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormSelect
+                form={form}
+                name="universityId"
+                label="الجامعة *"
+                options={universityOptions}
+                placeholder="اختر الجامعة"
+                disabled={!!editingId}
+              />
+              <FormInput
+                form={form}
+                name="name"
+                label="اسم التخصص *"
+                onChangeCallback={(val) => {
+                  if (!editingId) form.setFieldValue("slug", generateSlug(val));
+                }}
+              />
+              <FormInput
+                form={form}
+                name="slug"
+                label="الرابط (slug) *"
+                dir="ltr"
+              />
+              <FormInput
+                form={form}
+                name="alias"
+                label="الاسم البديل (alias)"
+                placeholder="اسم بديل للبحث"
+              />
+              <FormInput
+                form={form}
+                name="order"
+                label="الترتيب"
+                type="number"
+                min="0"
+              />
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-surface-200 dark:border-surface-700" />
+
+          {/* Tree Diagram Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/40">
+                <svg
+                  className="h-4 w-4 text-emerald-600 dark:text-emerald-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="16" y="16" width="6" height="6" rx="1.5" />
+                  <rect x="2" y="16" width="6" height="6" rx="1.5" />
+                  <rect x="9" y="2" width="6" height="6" rx="1.5" />
+                  <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+                  <path d="M12 12V8" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                شجرة المسار الدراسي
+              </h3>
+            </div>
+            <p className="text-xs text-surface-500 dark:text-surface-400">
+              رابط مخطط المواد والمتطلبات الدراسية للتخصص
+            </p>
             <FormInput
               form={form}
               name="treeDiagramUrl"
-              label="رابط شجرة المسار (اختياري)"
+              label="رابط شجرة المسار"
               placeholder="https://drive.google.com/..."
               dir="ltr"
             />
           </div>
-          <div className="mt-4 flex items-center justify-end gap-3">
+
+          {/* Divider */}
+          <div className="border-t border-surface-200 dark:border-surface-700" />
+
+          {/* Social Links Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                <svg
+                  className="h-4 w-4 text-blue-600 dark:text-blue-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                حسابات التواصل الاجتماعي
+              </h3>
+            </div>
+            <p className="text-xs text-surface-500 dark:text-surface-400">
+              روابط حسابات التخصص على منصات التواصل الاجتماعي
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormInput
+                form={form}
+                name="instagram"
+                label="Instagram"
+                placeholder="https://instagram.com/..."
+                dir="ltr"
+              />
+              <FormInput
+                form={form}
+                name="facebook"
+                label="Facebook Page"
+                placeholder="https://facebook.com/..."
+                dir="ltr"
+              />
+              <FormInput
+                form={form}
+                name="facebookGroup"
+                label="Facebook Group"
+                placeholder="https://facebook.com/groups/..."
+                dir="ltr"
+              />
+              <FormInput
+                form={form}
+                name="telegram"
+                label="Telegram"
+                placeholder="https://t.me/..."
+                dir="ltr"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 border-t border-surface-200 pt-4 dark:border-surface-700">
             <button
               type="button"
               onClick={resetForm}
@@ -265,11 +415,47 @@ export default function AdminMajorsPage() {
                   disabled={!canSubmit || isSubmitting}
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
-                  {isSubmitting
-                    ? "جاري الحفظ..."
-                    : editingId
-                      ? "تحديث"
-                      : "إضافة"}
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="h-4 w-4 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      جاري الحفظ...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {editingId ? "تحديث التخصص" : "إضافة التخصص"}
+                    </>
+                  )}
                 </button>
               )}
             </form.Subscribe>

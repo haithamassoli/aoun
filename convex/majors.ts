@@ -4,6 +4,13 @@ import { mutation, query } from "./_generated/server";
 import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildMajorSearchToken, normalize } from "./searchUtils";
 
+const socialLinks = v.object({
+  instagram: v.optional(v.string()),
+  facebook: v.optional(v.string()),
+  facebookGroup: v.optional(v.string()),
+  telegram: v.optional(v.string()),
+});
+
 const majorDoc = v.object({
   _id: v.id("majors"),
   _creationTime: v.number(),
@@ -13,6 +20,7 @@ const majorDoc = v.object({
   order: v.number(),
   alias: v.optional(v.string()),
   treeDiagramUrl: v.optional(v.string()),
+  socialLinks: v.optional(socialLinks),
   searchToken: v.optional(v.string()),
 });
 
@@ -171,6 +179,7 @@ export const add = mutation({
     order: v.number(),
     alias: v.optional(v.string()),
     treeDiagramUrl: v.optional(v.string()),
+    socialLinks: v.optional(socialLinks),
   },
   returns: v.id("majors"),
   handler: async (ctx, args) => {
@@ -201,6 +210,7 @@ export const add = mutation({
       order: args.order,
       alias: args.alias,
       treeDiagramUrl: args.treeDiagramUrl,
+      socialLinks: args.socialLinks,
       searchToken,
     });
   },
@@ -215,6 +225,7 @@ export const update = mutation({
     order: v.optional(v.number()),
     alias: v.optional(v.string()),
     treeDiagramUrl: v.optional(v.string()),
+    socialLinks: v.optional(socialLinks),
   },
   returns: v.null(),
   handler: async (ctx, args) => {

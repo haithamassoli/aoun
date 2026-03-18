@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Toast, useToast } from "@/components/toast";
 import { FormInput } from "@/components/form-field";
@@ -33,6 +33,22 @@ type CourseListItem = {
 };
 
 type ActiveTab = "courses" | "news" | "notifications";
+
+function buildSocialLinks(value: {
+  instagram: string;
+  facebook: string;
+  facebookGroup: string;
+  telegram: string;
+}) {
+  const socialLinks = {
+    instagram: value.instagram.trim() || undefined,
+    facebook: value.facebook.trim() || undefined,
+    facebookGroup: value.facebookGroup.trim() || undefined,
+    telegram: value.telegram.trim() || undefined,
+  };
+
+  return Object.values(socialLinks).some(Boolean) ? socialLinks : undefined;
+}
 
 export default function MajorCoursesPage() {
   const { user, sessionToken } = useAuth();
@@ -86,7 +102,6 @@ export default function MajorCoursesPage() {
     _id: Id<"news">;
     title: string;
   } | null>(null);
-  const lastSyncedTreeDiagramUrl = useRef<string | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -138,6 +153,10 @@ export default function MajorCoursesPage() {
   const majorLinkForm = useForm({
     defaultValues: {
       treeDiagramUrl: "",
+      instagram: "",
+      facebook: "",
+      facebookGroup: "",
+      telegram: "",
     },
     validators: { onChange: contributorMajorSchema },
     onSubmit: async ({ value }) => {
@@ -147,10 +166,12 @@ export default function MajorCoursesPage() {
           token: sessionToken,
           majorId: majorIdValue,
           treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
+          socialLinks: buildSocialLinks(value),
         });
-        toast.show("تم حفظ رابط شجرة المسار", "success");
+        toast.show("تم حفظ الروابط بنجاح", "success");
+        setShowMajorLinkForm(false);
       } catch {
-        toast.show("حدث خطأ أثناء حفظ الرابط", "error");
+        toast.show("حدث خطأ أثناء حفظ الروابط", "error");
       }
     },
   });
@@ -209,21 +230,16 @@ export default function MajorCoursesPage() {
     setNewsFormValues(undefined);
   };
 
-  useEffect(() => {
-    if (!major) {
-      return;
+  const openMajorLinkForm = () => {
+    if (major) {
+      majorLinkForm.setFieldValue("treeDiagramUrl", major.treeDiagramUrl ?? "");
+      majorLinkForm.setFieldValue("instagram", major.socialLinks?.instagram ?? "");
+      majorLinkForm.setFieldValue("facebook", major.socialLinks?.facebook ?? "");
+      majorLinkForm.setFieldValue("facebookGroup", major.socialLinks?.facebookGroup ?? "");
+      majorLinkForm.setFieldValue("telegram", major.socialLinks?.telegram ?? "");
     }
-
-    const nextTreeDiagramUrl = major.treeDiagramUrl ?? "";
-    if (lastSyncedTreeDiagramUrl.current === nextTreeDiagramUrl) {
-      return;
-    }
-
-    lastSyncedTreeDiagramUrl.current = nextTreeDiagramUrl;
-    majorLinkForm.reset({
-      treeDiagramUrl: nextTreeDiagramUrl,
-    });
-  }, [major, majorLinkForm]);
+    setShowMajorLinkForm(true);
+  };
 
   if (major === undefined || courses === undefined) {
     return (
@@ -308,8 +324,8 @@ export default function MajorCoursesPage() {
         {activeTab === "courses" ? (
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setShowMajorLinkForm(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-emerald-50 dark:border-emerald-900 dark:bg-surface-900 dark:text-emerald-300 dark:hover:bg-emerald-950/40 text-emerald-700"
+              onClick={openMajorLinkForm}
+              className="inline-flex items-center gap-2 rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm font-medium text-surface-700 shadow-sm transition-colors hover:border-surface-300 hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300 dark:hover:border-surface-600 dark:hover:bg-surface-800"
             >
               <svg
                 className="h-4 w-4 shrink-0"
@@ -317,16 +333,19 @@ export default function MajorCoursesPage() {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={1.75}
-                strokeLinecap="round"
-                strokeLinejoin="round"
               >
-                <rect x="16" y="16" width="6" height="6" rx="1.5" />
-                <rect x="2" y="16" width="6" height="6" rx="1.5" />
-                <rect x="9" y="2" width="6" height="6" rx="1.5" />
-                <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
-                <path d="M12 12V8" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
-              شجرة المسار
+              إعدادات التخصص
             </button>
             <button
               onClick={() => {
@@ -379,53 +398,145 @@ export default function MajorCoursesPage() {
 
       <FormModal
         open={showMajorLinkForm}
-        title="شجرة المسار"
+        title="إعدادات التخصص"
         onClose={() => setShowMajorLinkForm(false)}
       >
-        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-          <p className="text-sm text-surface-600 dark:text-surface-300">
-            أضف الرابط الذي سيظهر للطلاب في صفحة التخصص العامة.
-          </p>
-          {major.treeDiagramUrl && (
-            <a
-              href={major.treeDiagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 self-start rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:border-emerald-900 dark:bg-surface-800 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
-            >
-              فتح الرابط الحالي
-              <svg
-                className="h-3.5 w-3.5 shrink-0 opacity-60"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
-            </a>
-          )}
-        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
             majorLinkForm.handleSubmit();
           }}
-          className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]"
+          className="space-y-6"
         >
-          <FormInput
-            form={majorLinkForm}
-            name="treeDiagramUrl"
-            label="رابط شجرة المسار"
-            placeholder="https://drive.google.com/..."
-            dir="ltr"
-          />
-          <div className="flex items-end gap-3">
+          {/* Tree Diagram Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/40">
+                <svg
+                  className="h-4 w-4 text-emerald-600 dark:text-emerald-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="16" y="16" width="6" height="6" rx="1.5" />
+                  <rect x="2" y="16" width="6" height="6" rx="1.5" />
+                  <rect x="9" y="2" width="6" height="6" rx="1.5" />
+                  <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+                  <path d="M12 12V8" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                شجرة المسار الدراسي
+              </h3>
+            </div>
+            <p className="text-xs text-surface-500 dark:text-surface-400">
+              رابط مخطط المواد والمتطلبات الدراسية للتخصص
+            </p>
+            <FormInput
+              form={majorLinkForm}
+              name="treeDiagramUrl"
+              label="رابط شجرة المسار"
+              placeholder="https://drive.google.com/..."
+              dir="ltr"
+            />
+            {major.treeDiagramUrl && (
+              <a
+                href={major.treeDiagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-950/60"
+              >
+                <svg
+                  className="h-3.5 w-3.5 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+                معاينة الرابط الحالي
+              </a>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-surface-200 dark:border-surface-700" />
+
+          {/* Social Links Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                <svg
+                  className="h-4 w-4 text-blue-600 dark:text-blue-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                حسابات التواصل الاجتماعي
+              </h3>
+            </div>
+            <p className="text-xs text-surface-500 dark:text-surface-400">
+              روابط حسابات التخصص على منصات التواصل الاجتماعي
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormInput
+                form={majorLinkForm}
+                name="instagram"
+                label="Instagram"
+                placeholder="https://instagram.com/..."
+                dir="ltr"
+              />
+              <FormInput
+                form={majorLinkForm}
+                name="facebook"
+                label="Facebook Page"
+                placeholder="https://facebook.com/..."
+                dir="ltr"
+              />
+              <FormInput
+                form={majorLinkForm}
+                name="facebookGroup"
+                label="Facebook Group"
+                placeholder="https://facebook.com/groups/..."
+                dir="ltr"
+              />
+              <FormInput
+                form={majorLinkForm}
+                name="telegram"
+                label="Telegram"
+                placeholder="https://t.me/..."
+                dir="ltr"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 border-t border-surface-200 pt-4 dark:border-surface-700">
+            <button
+              type="button"
+              onClick={() => setShowMajorLinkForm(false)}
+              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+            >
+              إلغاء
+            </button>
             <majorLinkForm.Subscribe
               selector={(s) => [s.canSubmit, s.isSubmitting]}
             >
@@ -433,9 +544,49 @@ export default function MajorCoursesPage() {
                 <button
                   type="submit"
                   disabled={!canSubmit || isSubmitting}
-                  className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
-                  {isSubmitting ? "جاري الحفظ..." : "حفظ الرابط"}
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="h-4 w-4 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      جاري الحفظ...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      حفظ التغييرات
+                    </>
+                  )}
                 </button>
               )}
             </majorLinkForm.Subscribe>

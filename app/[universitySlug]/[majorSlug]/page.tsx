@@ -17,6 +17,61 @@ type SearchParams = {
 };
 type CourseStatusFilter = "all" | "completed" | "in_progress" | "none";
 
+const socialPlatforms = [
+  {
+    key: "instagram",
+    label: "Instagram",
+    className:
+      "border-pink-200 bg-pink-50/80 text-pink-700 hover:border-pink-300 hover:bg-pink-100 dark:border-pink-900/70 dark:bg-pink-950/30 dark:text-pink-200 dark:hover:border-pink-800 dark:hover:bg-pink-950/50",
+    icon: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16.5 7.5h.01M8 3.75h8A4.25 4.25 0 0 1 20.25 8v8A4.25 4.25 0 0 1 16 20.25H8A4.25 4.25 0 0 1 3.75 16V8A4.25 4.25 0 0 1 8 3.75Zm4 4.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z"
+      />
+    ),
+  },
+  {
+    key: "facebook",
+    label: "Facebook Page",
+    className:
+      "border-sky-200 bg-sky-50/80 text-sky-700 hover:border-sky-300 hover:bg-sky-100 dark:border-sky-900/70 dark:bg-sky-950/30 dark:text-sky-200 dark:hover:border-sky-800 dark:hover:bg-sky-950/50",
+    icon: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M14.5 20.25v-6h2.25l.75-3h-3V9.5c0-.966.784-1.75 1.75-1.75H18V4.875A16.8 16.8 0 0 0 15.75 4.5 4.5 4.5 0 0 0 11.25 9v2.25H9v3h2.25v6"
+      />
+    ),
+  },
+  {
+    key: "facebookGroup",
+    label: "Facebook Group",
+    className:
+      "border-indigo-200 bg-indigo-50/80 text-indigo-700 hover:border-indigo-300 hover:bg-indigo-100 dark:border-indigo-900/70 dark:bg-indigo-950/30 dark:text-indigo-200 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/50",
+    icon: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+      />
+    ),
+  },
+  {
+    key: "telegram",
+    label: "Telegram",
+    className:
+      "border-cyan-200 bg-cyan-50/80 text-cyan-700 hover:border-cyan-300 hover:bg-cyan-100 dark:border-cyan-900/70 dark:bg-cyan-950/30 dark:text-cyan-200 dark:hover:border-cyan-800 dark:hover:bg-cyan-950/50",
+    icon: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m21 4.5-3.75 15-5.485-4.238a1.5 1.5 0 0 0-1.728-.08L7.5 16.5l.948-4.265a1.5 1.5 0 0 1 .642-.925L17.25 5.25 7.485 10.322a1.5 1.5 0 0 1-1.119.114L3 9.375 21 4.5Z"
+      />
+    ),
+  },
+] as const;
+
 function normalizeStatusFilter(
   value: string | string[] | undefined,
 ): CourseStatusFilter | undefined {
@@ -103,6 +158,14 @@ export default async function MajorPage({
       majorId: major._id,
     }),
   ]);
+  const majorSocialLinks = socialPlatforms.flatMap((platform) => {
+    const url = major.socialLinks?.[platform.key];
+    if (!url) {
+      return [];
+    }
+
+    return [{ ...platform, url }];
+  });
 
   return (
     <div>
@@ -149,14 +212,14 @@ export default async function MajorPage({
               <NotificationToggle majorId={major._id} />
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {major.treeDiagramUrl && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mt-4"
-              >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-4 flex flex-wrap items-center justify-between gap-2"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              {major.treeDiagramUrl && (
                 <a
                   href={major.treeDiagramUrl}
                   target="_blank"
@@ -180,14 +243,7 @@ export default async function MajorPage({
                   </svg>
                   شجرة مسار التخصص
                 </a>
-              </motion.div>
-            )}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-4"
-            >
+              )}
               <Link
                 href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
                 className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
@@ -208,33 +264,57 @@ export default async function MajorPage({
                 </svg>
                 الأخبار والمستجدات
               </Link>
-            </motion.div>
-            {latestNews ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mt-4 w-full"
+            </div>
+            {majorSocialLinks.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {majorSocialLinks.map((platform) => (
+                  <a
+                    key={platform.key}
+                    href={platform.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${platform.className}`}
+                  >
+                    <svg
+                      className="h-4 w-4 shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                    >
+                      {platform.icon}
+                    </svg>
+                  </a>
+                ))}
+              </div>
+            )}
+          </motion.div>
+          {latestNews && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="mt-4"
+            >
+              <Link
+                href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
+                className="group flex w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-primary-200/80 bg-white/90 px-4 py-3 text-right shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800/80 dark:bg-primary-950/50 dark:hover:border-primary-700 dark:hover:bg-primary-950"
               >
-                <Link
-                  href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
-                  className="group flex w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-primary-200/80 bg-white/90 px-4 py-3 text-right shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-50 hover:shadow-md dark:border-primary-800/80 dark:bg-primary-950/50 dark:hover:border-primary-700 dark:hover:bg-primary-950"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="inline-flex shrink-0 items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-700 dark:border-primary-700 dark:bg-primary-900/60 dark:text-primary-200">
-                      News
-                    </span>
-                    <p className="line-clamp-1 text-sm font-medium text-surface-800 transition-colors group-hover:text-primary-700 dark:text-surface-100 dark:group-hover:text-primary-200">
-                      {latestNews.title}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-xs font-medium text-surface-500 transition-colors group-hover:text-primary-700 dark:text-surface-400 dark:group-hover:text-primary-300">
-                    عرض الخبر
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="inline-flex shrink-0 items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-700 dark:border-primary-700 dark:bg-primary-900/60 dark:text-primary-200">
+                    News
                   </span>
-                </Link>
-              </motion.div>
-            ) : null}
-          </div>
+                  <p className="line-clamp-1 text-sm font-medium text-surface-800 transition-colors group-hover:text-primary-700 dark:text-surface-100 dark:group-hover:text-primary-200">
+                    {latestNews.title}
+                  </p>
+                </div>
+                <span className="shrink-0 text-xs font-medium text-surface-500 transition-colors group-hover:text-primary-700 dark:text-surface-400 dark:group-hover:text-primary-300">
+                  عرض الخبر
+                </span>
+              </Link>
+            </motion.div>
+          )}
           <UniversityQuickLinks links={university.quickLinks} />
         </div>
       </section>
