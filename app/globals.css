@@ -52,6 +52,60 @@ html {
   scrollbar-color: var(--color-primary-500) transparent;
 }
 
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-200);
+}
+
+.dark .skeleton {
+  background: color-mix(
+    in srgb,
+    var(--color-surface-700) 78%,
+    var(--color-surface-800)
+  );
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 46%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0.18) 54%,
+    transparent 100%
+  );
+  animation: skeleton-shimmer 1.7s linear infinite reverse;
+}
+
+.dark .skeleton-shimmer::after {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 46%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 54%,
+    transparent 100%
+  );
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after {
+    animation: none;
+    display: none;
+  }
+}
+
 /* Pointer cursor on interactive elements */
 html a,
 html button,

@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useAuth } from "./auth-provider";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function HeaderAuth() {
   const { user, isLoading } = useAuth();
 
   if (isLoading)
-    return (
-      <div className="h-7 w-20 animate-pulse rounded-lg bg-surface-200 dark:bg-surface-700" />
-    );
+    return <Skeleton className="h-7 w-20 rounded-lg" />;
 
   if (user) {
     return (
