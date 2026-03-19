@@ -198,7 +198,7 @@ function CourseCard({
 
   return (
     <article className="group flex h-full flex-col rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(14,165,233,0.45)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none dark:hover:border-primary-600 sm:p-4">
-      <div className="flex items-start justify-between gap-2 sm:gap-3">
+      <div className="flex items-center justify-between sm:gap-3">
         <Link href={href} className="min-w-0 flex-1 space-y-2">
           {badge ? (
             <span className="inline-flex max-w-full truncate rounded-full border border-primary-200/70 bg-primary-50/80 px-2.5 py-1 text-[10px] font-semibold text-primary-700 dark:border-primary-900 dark:bg-primary-950/80 dark:text-primary-300">

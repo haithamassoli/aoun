@@ -44,12 +44,14 @@ export const courseStatusOptions: CourseStatusOption[] = [
   },
 ];
 
-const courseStatusOptionsByValue: Record<CourseProgressStatus, CourseStatusOption> =
-  {
-    none: courseStatusOptions[0],
-    in_progress: courseStatusOptions[1],
-    completed: courseStatusOptions[2],
-  };
+const courseStatusOptionsByValue: Record<
+  CourseProgressStatus,
+  CourseStatusOption
+> = {
+  none: courseStatusOptions[0],
+  in_progress: courseStatusOptions[1],
+  completed: courseStatusOptions[2],
+};
 
 export function getCourseStatusOption(value: CourseProgressStatus) {
   return courseStatusOptionsByValue[value];
@@ -177,7 +179,7 @@ export function CourseStatusMenu({
         aria-expanded={isOpen}
         aria-controls={isOpen ? menuId : undefined}
         onClick={() => setIsOpen((open) => !open)}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-surface-200/80 bg-surface-50 text-surface-500 transition-all duration-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-400 dark:hover:border-primary-600 dark:hover:bg-primary-950/60 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950"
+        className="inline-flex h-4 w-4 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:border border-surface-200/80 sm:bg-surface-50 text-surface-500 transition-all duration-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:border-surface-700 dark:sm:bg-surface-800/80 dark:text-surface-400 dark:hover:border-primary-600 dark:hover:bg-primary-950/60 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950"
       >
         <span className="sr-only">تغيير الحالة</span>
         <svg
