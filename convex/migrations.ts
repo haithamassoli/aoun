@@ -15,9 +15,10 @@ import {
  * 2. Run backfillUniversities
  * 3. Run backfillMajors
  * 4. Run backfillCourses
- * 5. Run backfillResources
- * 6. Run backfillUsers
- * 7. Run backfillPermissions
+ * 5. Run backfillCourseSemesterStrings
+ * 6. Run backfillResources
+ * 7. Run backfillUsers
+ * 8. Run backfillPermissions
  */
 
 export const backfillUniversities = internalMutation({
@@ -101,6 +102,43 @@ export const backfillCourses = internalMutation({
         count++;
       }
     }
+    return count;
+  },
+});
+
+export const backfillCourseSemesterStrings = internalMutation({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const courses = await ctx.db.query("courses").collect();
+    let count = 0;
+
+    for (const course of courses) {
+      const rawSemester = (course as { semester?: unknown }).semester;
+
+      if (typeof rawSemester === "number") {
+        await ctx.db.patch("courses", course._id, {
+          semester: String(rawSemester),
+        });
+        count += 1;
+        continue;
+      }
+
+      if (typeof rawSemester !== "string") {
+        continue;
+      }
+
+      const normalized = rawSemester.trim();
+      if (normalized === rawSemester) {
+        continue;
+      }
+
+      await ctx.db.patch("courses", course._id, {
+        semester: normalized || undefined,
+      });
+      count += 1;
+    }
+
     return count;
   },
 });

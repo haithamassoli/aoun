@@ -3,6 +3,7 @@ import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
 import { mutation, query } from "./_generated/server";
 import { assertCanEditCourse, assertCanEditMajor, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildCourseSearchToken, normalize } from "./searchUtils";
+import { normalizeCourseSemesterInput } from "../lib/course-semester";
 
 const courseDoc = v.object({
   _id: v.id("courses"),
@@ -11,7 +12,7 @@ const courseDoc = v.object({
   name: v.string(),
   slug: v.string(),
   courseCode: v.optional(v.string()),
-  semester: v.optional(v.number()),
+  semester: v.optional(v.string()),
   order: v.number(),
   alias: v.optional(v.string()),
   searchToken: v.optional(v.string()),
@@ -112,7 +113,7 @@ export const add = mutation({
     name: v.string(),
     slug: v.string(),
     courseCode: v.optional(v.string()),
-    semester: v.optional(v.number()),
+    semester: v.optional(v.string()),
     order: v.number(),
     alias: v.optional(v.string()),
   },
@@ -139,12 +140,14 @@ export const add = mutation({
       courseCode: args.courseCode,
     });
 
+    const semester = normalizeCourseSemesterInput(args.semester);
+
     return await ctx.db.insert("courses", {
       majorId: args.majorId,
       name: args.name,
       slug: args.slug,
       courseCode: args.courseCode,
-      semester: args.semester,
+      semester,
       order: args.order,
       alias: args.alias,
       searchToken,
@@ -159,7 +162,7 @@ export const update = mutation({
     name: v.optional(v.string()),
     slug: v.optional(v.string()),
     courseCode: v.optional(v.string()),
-    semester: v.optional(v.number()),
+    semester: v.optional(v.string()),
     order: v.optional(v.number()),
     alias: v.optional(v.string()),
   },
@@ -201,10 +204,21 @@ export const update = mutation({
       courseCode: newCourseCode,
     });
 
-    const { courseId, token: _token, ...rawUpdates } = args;
-    const filtered = Object.fromEntries(
+    const courseId = args.courseId;
+    const semester = args.semester;
+    const rawUpdates = {
+      name: args.name,
+      slug: args.slug,
+      courseCode: args.courseCode,
+      order: args.order,
+      alias: args.alias,
+    };
+    const filtered: Record<string, unknown> = Object.fromEntries(
       Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
     );
+    if (semester !== undefined) {
+      filtered.semester = normalizeCourseSemesterInput(semester);
+    }
 
     await ctx.db.patch("courses", courseId, {
       ...filtered,

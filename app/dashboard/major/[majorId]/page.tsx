@@ -20,13 +20,14 @@ import { SendNotificationForm } from "@/components/dashboard/send-notification-f
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
+import { formatCourseSemesterLabel } from "@/lib/course-semester";
 
 type CourseListItem = {
   _id: Id<"courses">;
   name: string;
   slug: string;
   courseCode?: string;
-  semester?: number;
+  semester?: string;
   order: number;
   resourceCount: number;
   alias?: string;
@@ -123,7 +124,7 @@ export default function MajorCoursesPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester ? Number(value.semester) : undefined,
+            semester: value.semester,
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
           });
@@ -135,7 +136,7 @@ export default function MajorCoursesPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester ? Number(value.semester) : undefined,
+            semester: value.semester,
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
           });
@@ -188,7 +189,7 @@ export default function MajorCoursesPage() {
         name: course.name,
         slug: course.slug,
         courseCode: course.courseCode ?? "",
-        semester: course.semester?.toString() ?? "",
+        semester: course.semester ?? "",
         order: course.order.toString(),
         alias: course.alias ?? "",
       },
@@ -260,9 +261,10 @@ export default function MajorCoursesPage() {
     );
   }
 
-  const courseLookup = new Map(courses.map((course) => [course._id, course]));
+  const baseCourses = courses as CourseListItem[];
+  const courseLookup = new Map(baseCourses.map((course) => [course._id, course]));
   const activeCourses: CourseListItem[] = search.isEmpty
-    ? courses
+    ? baseCourses
     : (searchedCourses ?? []).map((course) => {
         const existingCourse = courseLookup.get(course._id);
 
@@ -680,9 +682,8 @@ export default function MajorCoursesPage() {
                 <FormInput
                   form={form}
                   name="semester"
-                  label="المستوى الدراسي"
-                  type="number"
-                  min="1"
+                  label="المستوى أو المسار"
+                  placeholder="مثال: 1 أو القدرة أو الاتصالات"
                 />
                 <FormInput
                   form={form}
@@ -816,58 +817,59 @@ export default function MajorCoursesPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {activeCourses.map((course, index: number) => (
-                <motion.div
-                  key={course._id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.04 }}
-                  className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
-                >
-                  <Link
-                    href={`/dashboard/major/${majorId}/course/${course._id}`}
-                    className="min-w-0 flex-1"
+              {activeCourses.map((course, index: number) => {
+                const semesterLabel = formatCourseSemesterLabel(course.semester);
+                return (
+                  <motion.div
+                    key={course._id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.04 }}
+                    className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
-                        {course.courseCode || "#"}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
-                          {course.name}
-                        </h3>
-                        <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
-                          {course.semester && (
-                            <span>المستوى {course.semester}</span>
-                          )}
-                          <span>{course.resourceCount} مصدر</span>
+                    <Link
+                      href={`/dashboard/major/${majorId}/course/${course._id}`}
+                      className="min-w-0 flex-1"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
+                          {course.courseCode || "#"}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
+                            {course.name}
+                          </h3>
+                          <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+                            {semesterLabel && <span>{semesterLabel}</span>}
+                            <span>{course.resourceCount} مصدر</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleEdit(course)}
-                      className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
-                      title="تعديل"
-                    >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
+                    </Link>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEdit(course)}
+                        className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
+                        title="تعديل"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </>

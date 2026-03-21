@@ -17,13 +17,18 @@ import {
   loadCourseStatuses,
   setCourseStatus,
 } from "@/lib/student-progress";
+import {
+  formatCourseSemesterLabel,
+  getCourseSemesterGroupKey,
+} from "@/lib/course-semester";
 
 type CourseListItem = {
   _id: Id<"courses">;
+  _creationTime: number;
   slug: string;
   name: string;
   courseCode?: string;
-  semester?: number;
+  semester?: string;
   order: number;
 };
 type CourseStatusFilter = "all" | CourseProgressStatus;
@@ -34,18 +39,6 @@ type StatusFilterOption = {
 };
 type CourseStatusCounts = Record<CourseStatusFilter, number>;
 
-const semesterLabels: Record<number, string> = {
-  1: "المستوى الأول",
-  2: "المستوى الثاني",
-  3: "المستوى الثالث",
-  4: "المستوى الرابع",
-  5: "المستوى الخامس",
-  6: "المستوى السادس",
-  7: "المستوى السابع",
-  8: "المستوى الثامن",
-  9: "المستوى التاسع",
-  10: "المستوى العاشر",
-};
 const STATUS_FILTER_STORAGE_KEY = "aoun:student:course-filter:v1";
 const baseStatusFilterOptions: StatusFilterOption[] = [
   {
@@ -131,42 +124,73 @@ function getFilterButtonClassName(isActive: boolean) {
 }
 
 function groupCoursesBySemester(courses: CourseListItem[]) {
-  const grouped = new Map<number | null, CourseListItem[]>();
+  const grouped = new Map<string | null, CourseListItem[]>();
+  const orderedCourses = courses.toSorted((a, b) => a.order - b.order);
 
-  for (const course of courses) {
-    const key = course.semester ?? null;
+  for (const course of orderedCourses) {
+    const key = getCourseSemesterGroupKey(course.semester);
     if (!grouped.has(key)) {
       grouped.set(key, []);
     }
     grouped.get(key)!.push(course);
   }
 
-  const sortedKeys = [...grouped.keys()].sort((a, b) => {
-    if (a === null) return 1;
-    if (b === null) return -1;
-    return a - b;
+  const groups = Array.from(grouped.entries()).map(
+    ([semesterKey, semesterCourses]) => {
+      const label = formatCourseSemesterLabel(semesterKey, {
+        emptyLabel: "مواد أخرى",
+      })!;
+      const firstCreatedAt = Math.min(
+        ...semesterCourses.map((course) => course._creationTime),
+      );
+      const isNumericSemester =
+        semesterKey !== null && /^\d+$/.test(semesterKey);
+      const numericSemester = isNumericSemester
+        ? Number.parseInt(semesterKey, 10)
+        : null;
+
+      return {
+        key: semesterKey,
+        label,
+        courses: semesterCourses,
+        firstCreatedAt,
+        isNumericSemester,
+        numericSemester,
+      };
+    },
+  );
+
+  groups.sort((a, b) => {
+    if (a.isNumericSemester && b.isNumericSemester) {
+      return (a.numericSemester ?? 0) - (b.numericSemester ?? 0);
+    }
+
+    if (a.isNumericSemester) return -1;
+    if (b.isNumericSemester) return 1;
+
+    if (a.key === null && b.key !== null) return 1;
+    if (b.key === null && a.key !== null) return -1;
+
+    if (a.firstCreatedAt !== b.firstCreatedAt) {
+      return a.firstCreatedAt - b.firstCreatedAt;
+    }
+
+    return a.label.localeCompare(b.label, "ar");
   });
 
-  return sortedKeys.map((semesterKey) => {
-    const semesterCourses = (grouped.get(semesterKey) ?? []).toSorted(
-      (a, b) => a.order - b.order,
-    );
-
-    const label =
-      semesterKey !== null
-        ? semesterLabels[semesterKey] || `المستوى ${semesterKey}`
-        : "مواد أخرى";
-
-    return {
-      key: semesterKey,
+  return groups.map(
+    ({ key, label, courses: groupedCourses }) => ({
+      key,
       label,
-      courses: semesterCourses,
-    };
-  });
+      courses: groupedCourses,
+    }),
+  );
 }
 
-function getSemesterGroupKey(semesterKey: number | null) {
-  return semesterKey === null ? "other" : `semester-${semesterKey}`;
+function getSemesterGroupKey(semesterKey: string | null) {
+  return semesterKey === null
+    ? "other"
+    : `semester-${encodeURIComponent(semesterKey)}`;
 }
 
 function matchesStatusFilter(
@@ -665,7 +689,11 @@ export function CoursesSearchSection({
                 >
                   <span className="flex min-w-0 items-center gap-3">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
-                      {semester.key ?? "—"}
+                      {semester.key && /^\d+$/.test(semester.key)
+                        ? String(Number.parseInt(semester.key, 10))
+                        : semester.key
+                          ? "•"
+                          : "—"}
                     </span>
                     <span className="min-w-0">
                       <span className="block truncate text-base font-semibold text-surface-800 dark:text-surface-100 sm:text-lg">
@@ -732,10 +760,9 @@ export function CoursesSearchSection({
                 course={course}
                 href={`/${universitySlug}/${majorSlug}/${course.slug}`}
                 badge={
-                  course.semester
-                    ? semesterLabels[course.semester] ||
-                      `فصل ${course.semester}`
-                    : "مادة عامة"
+                  formatCourseSemesterLabel(course.semester, {
+                    emptyLabel: "مواد أخرى",
+                  })
                 }
                 status={getStatus(course._id)}
                 onStatusChange={(status) =>

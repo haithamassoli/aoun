@@ -79,7 +79,7 @@ export default defineSchema({
     name: v.string(),
     slug: v.string(),
     courseCode: v.optional(v.string()),
-    semester: v.optional(v.number()),
+    semester: v.optional(v.string()),
     order: v.number(),
     alias: v.optional(v.string()),
     searchToken: v.optional(v.string()),

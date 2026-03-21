@@ -3,6 +3,7 @@ import justEeCourses from "../seed-date/just-ee.json";
 import type { Id } from "./_generated/dataModel";
 import { internalMutation } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
+import { normalizeCourseSemesterInput } from "../lib/course-semester";
 import {
   buildCourseSearchToken,
   buildMajorSearchToken,
@@ -66,7 +67,7 @@ type ActiveCourse = {
   alias?: string;
   order: number;
   courseCode?: string;
-  semester?: number;
+  semester?: string;
   searchToken?: string;
 };
 
@@ -136,7 +137,15 @@ function getSeedCourseOrder(item: SeedItem, fallbackOrder: number) {
 }
 
 function getSeedCourseSemester(item: SeedItem) {
-  return typeof item.semester === "number" ? item.semester : undefined;
+  if (typeof item.semester === "number") {
+    return String(item.semester);
+  }
+
+  if (typeof item.semester === "string") {
+    return normalizeCourseSemesterInput(item.semester);
+  }
+
+  return undefined;
 }
 
 function getSeedCourseSearchToken(

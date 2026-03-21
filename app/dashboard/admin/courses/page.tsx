@@ -13,6 +13,7 @@ import { courseSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
+import { formatCourseSemesterLabel } from "@/lib/course-semester";
 
 export default function AdminCoursesPage() {
   const { user, sessionToken } = useAuth();
@@ -56,7 +57,7 @@ export default function AdminCoursesPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester ? Number(value.semester) : undefined,
+            semester: value.semester,
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
           });
@@ -68,7 +69,7 @@ export default function AdminCoursesPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester ? Number(value.semester) : undefined,
+            semester: value.semester,
             order: Number(value.order) || 0,
             alias: value.alias.trim() || undefined,
           });
@@ -101,7 +102,7 @@ export default function AdminCoursesPage() {
     name: string;
     slug: string;
     courseCode?: string;
-    semester?: number;
+    semester?: string;
     order: number;
     alias?: string;
   }) => {
@@ -111,7 +112,7 @@ export default function AdminCoursesPage() {
         name: course.name,
         slug: course.slug,
         courseCode: course.courseCode ?? "",
-        semester: course.semester?.toString() ?? "",
+        semester: course.semester ?? "",
         order: course.order.toString(),
         alias: course.alias ?? "",
       },
@@ -138,7 +139,7 @@ export default function AdminCoursesPage() {
   };
 
   const majorOptions =
-    majors?.map((m) => ({
+    majors?.map((m: { _id: Id<"majors">; name: string; universityName: string }) => ({
       value: m._id,
       label: `${m.name} — ${m.universityName}`,
     })) ?? [];
@@ -259,9 +260,8 @@ export default function AdminCoursesPage() {
             <FormInput
               form={form}
               name="semester"
-              label="المستوى الدراسي"
-              type="number"
-              min="1"
+              label="المستوى أو المسار"
+              placeholder="مثال: 1 أو القدرة أو الاتصالات"
             />
             <FormInput
               form={form}
@@ -319,65 +319,79 @@ export default function AdminCoursesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {courses.map((course, index) => (
-            <motion.div
-              key={course._id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.2) }}
-              className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
-                    {course.courseCode || "#"}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
-                      {course.name}
-                    </h3>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
-                      <span>{course.majorName}</span>
-                      <span>{course.universityName}</span>
-                      {course.semester && (
-                        <span>المستوى {course.semester}</span>
-                      )}
-                      {course.alias && (
-                        <span className="rounded bg-surface-100 px-1.5 py-0.5 dark:bg-surface-800">
-                          {course.alias}
-                        </span>
-                      )}
+          {courses.map((course: {
+            _id: string;
+            majorId: string;
+            name: string;
+            slug: string;
+            courseCode?: string;
+            semester?: string;
+            order: number;
+            alias?: string;
+            majorName: string;
+            universityName: string;
+          }, index: number) => {
+            const semesterLabel = formatCourseSemesterLabel(course.semester);
+            return (
+              <motion.div
+                key={course._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.3,
+                  delay: Math.min(index * 0.04, 0.2),
+                }}
+                className="group flex items-center justify-between rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-100 text-xs font-bold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
+                      {course.courseCode || "#"}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
+                        {course.name}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+                        <span>{course.majorName}</span>
+                        <span>{course.universityName}</span>
+                        {semesterLabel && <span>{semesterLabel}</span>}
+                        {course.alias && (
+                          <span className="rounded bg-surface-100 px-1.5 py-0.5 dark:bg-surface-800">
+                            {course.alias}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-1 ">
-                <button
-                  onClick={() => handleEdit(course)}
-                  className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
-                  title="تعديل"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
+                <div className="flex items-center gap-1 ">
+                  <button
+                    onClick={() => handleEdit(course)}
+                    className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
+                    title="تعديل"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => handleDelete(course._id)}
-                  disabled={deleting === course._id}
-                  className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"
-                  title="حذف"
-                >
-                  <svg
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(course._id)}
+                    disabled={deleting === course._id}
+                    className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"
+                    title="حذف"
+                  >
+                    <svg
                     className="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -390,10 +404,11 @@ export default function AdminCoursesPage() {
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
-                </button>
-              </div>
-            </motion.div>
-          ))}
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

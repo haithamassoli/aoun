@@ -33,7 +33,7 @@ export const seedAll = internalMutation({
         name: string;
         slug: string;
         courseCode?: string;
-        semester?: number;
+        semester?: number | string;
         order: number;
       }[];
     };
@@ -343,7 +343,10 @@ export const seedAll = internalMutation({
             name: course.name,
             slug: course.slug,
             courseCode: course.courseCode,
-            semester: course.semester,
+            semester:
+              course.semester === undefined
+                ? undefined
+                : String(course.semester),
             majorId,
             order: course.order,
           });
