@@ -210,7 +210,7 @@ export default async function MajorPage({
               >
                 {university.name} ·{" "}
                 {courses.length > 0
-                  ? `${courses.length} مادة`
+                  ? `${courses.length} مواد`
                   : "لا توجد مواد حالياً"}
               </motion.p>
             </div>
