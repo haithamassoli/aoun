@@ -13,22 +13,41 @@ export function HomePageSkeleton() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => (
+        <div className="mb-8 space-y-4">
+          <Skeleton className="mx-auto h-10 w-36" />
+          <div className="mx-auto max-w-2xl">
+            <Skeleton className="h-12 w-full rounded-xl" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, index) => (
             <div
               key={index}
-              className="rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+              className="flex flex-col items-center gap-4 rounded-2xl border border-surface-200 bg-white p-8 shadow-sm dark:border-surface-700 dark:bg-surface-900"
             >
-              <div className="flex items-start gap-4">
-                <Skeleton className="h-16 w-16 shrink-0 rounded-2xl" />
-                <div className="min-w-0 flex-1 space-y-3">
-                  <Skeleton className="h-5 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-full" />
-                </div>
-              </div>
+              <Skeleton className="h-20 w-20 rounded-xl" />
+              <Skeleton className="h-6 w-3/4" />
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-t border-surface-200 bg-surface-50 px-4 py-12 dark:border-surface-700 dark:bg-surface-950">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 flex items-center justify-between">
+            <Skeleton className="h-5 w-36 rounded-full" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="rounded-2xl border border-surface-200 bg-white p-6 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+              >
+                <Skeleton className="mx-auto h-40 w-32 rounded-lg" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>
@@ -59,17 +78,25 @@ export function UniversityPageSkeleton() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mb-8 space-y-4">
+          <Skeleton className="h-8 w-32" />
+          <div className="max-w-2xl">
+            <Skeleton className="h-12 w-full rounded-xl" />
+          </div>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <div
               key={index}
-              className="rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+              className="flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900"
             >
-              <Skeleton className="h-5 w-2/3" />
-              <Skeleton className="mt-4 h-4 w-full" />
-              <Skeleton className="mt-2 h-4 w-3/4" />
-              <Skeleton className="mt-5 h-10 w-32 rounded-xl" />
+              <Skeleton className="h-12 w-12 shrink-0 rounded-lg" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+              <Skeleton className="h-5 w-5 shrink-0 rounded-full" />
             </div>
           ))}
         </div>
@@ -98,33 +125,199 @@ export function MajorPageSkeleton() {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {Array.from({ length: 4 }).map((_, index) => (
+            {Array.from({ length: 2 }).map((_, index) => (
               <Skeleton key={index} className="h-11 w-36 rounded-xl" />
+            ))}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-11 w-28 rounded-xl" />
+            ))}
+          </div>
+
+          <Skeleton className="mt-4 h-14 w-full rounded-2xl" />
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-10 w-28 rounded-xl" />
             ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-surface-200 bg-white p-4 shadow-sm dark:border-surface-700 dark:bg-surface-900">
-          <div className="mb-4 flex flex-wrap gap-2">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mb-8 space-y-4">
+          <Skeleton className="h-8 w-40" />
+          <div className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-28" />
+                <Skeleton className="h-4 w-44 rounded-full" />
+              </div>
+              <div className="space-y-2 sm:text-left">
+                <Skeleton className="h-4 w-14 rounded-full" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </div>
+            <Skeleton className="mt-4 h-3 w-full rounded-full" />
+            <div className="mt-4 flex flex-wrap gap-2">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Skeleton key={index} className="h-8 w-24 rounded-full" />
+              ))}
+            </div>
+          </div>
+
+          <div className="max-w-5xl space-y-3 md:flex md:items-start md:gap-3 md:space-y-0">
+            <div className="w-full md:max-w-sm lg:max-w-lg">
+              <Skeleton className="h-12 w-full rounded-xl" />
+            </div>
+            <div className="flex-1 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 dark:border-surface-700 dark:bg-surface-900 md:w-[320px] md:shrink-0 lg:w-[360px]">
+              <Skeleton className="mb-2 h-4 w-32 rounded-full" />
+              <div className="flex flex-wrap gap-2">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={index} className="h-8 w-24 rounded-full" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-10">
+          {Array.from({ length: 2 }).map((_, groupIndex) => (
+            <div key={groupIndex} className="space-y-4">
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-surface-200/80 bg-white/90 px-4 py-3 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.55)] dark:border-surface-700/80 dark:bg-surface-900/90 dark:shadow-none">
+                <span className="flex min-w-0 items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
+                  <span className="space-y-2">
+                    <Skeleton className="h-5 w-36" />
+                    <Skeleton className="h-4 w-20 rounded-full" />
+                  </span>
+                </span>
+                <Skeleton className="h-8 w-24 rounded-full" />
+              </div>
+              <div className="grid grid-cols-2 gap-1 sm:gap-2.5 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, cardIndex) => (
+                  <div
+                    key={cardIndex}
+                    className="rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none sm:p-4"
+                  >
+                    <div className="space-y-2">
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-1/2 rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export function CoursePageSkeleton() {
+  return (
+    <div>
+      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-5 flex gap-2">
             {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={index} className="h-9 w-28 rounded-full" />
+              <Skeleton key={index} className="h-4 w-20 rounded-full" />
             ))}
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 9 }).map((_, index) => (
+          <Skeleton className="h-10 w-72 max-w-full sm:h-12 sm:w-96" />
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <Skeleton className="h-8 w-20 rounded-md" />
+            <Skeleton className="h-5 w-52 rounded-full" />
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-10 w-28 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="space-y-10">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <Skeleton key={index} className="h-8 w-24 rounded-lg" />
+            ))}
+          </div>
+
+          {Array.from({ length: 2 }).map((_, groupIndex) => (
+            <div key={groupIndex}>
+              <div className="mb-4 flex items-center gap-2">
+                <Skeleton className="h-7 w-44" />
+                <Skeleton className="h-6 w-10 rounded-full" />
+              </div>
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, resourceIndex) => (
+                  <div
+                    key={resourceIndex}
+                    className="rounded-xl border border-surface-200 bg-white p-4 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <Skeleton className="h-5 flex-1" />
+                      <Skeleton className="h-4 w-4 rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export function MajorNewsPageSkeleton() {
+  return (
+    <div>
+      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-10 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-5 flex gap-2">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="h-4 w-20 rounded-full" />
+            ))}
+          </div>
+
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 space-y-2">
+              <Skeleton className="h-7 w-28 rounded-full" />
+              <Skeleton className="h-10 w-56 max-w-full" />
+              <Skeleton className="h-5 w-40 rounded-full" />
+            </div>
+            <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <Skeleton className="mb-4 h-4 w-24 rounded-full" />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
-                className="rounded-2xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900"
+                className="rounded-2xl border border-surface-200 bg-white/90 p-5 dark:border-surface-700 dark:bg-surface-900"
               >
-                <Skeleton className="h-4 w-24 rounded-full" />
-                <Skeleton className="mt-4 h-6 w-3/4" />
-                <Skeleton className="mt-3 h-4 w-full" />
-                <Skeleton className="mt-2 h-4 w-2/3" />
-                <div className="mt-5 flex gap-2">
-                  <Skeleton className="h-9 w-24 rounded-xl" />
-                  <Skeleton className="h-9 w-24 rounded-xl" />
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 space-y-1.5">
+                    <Skeleton className="h-3 w-8" />
+                    <Skeleton className="h-6 w-8" />
+                  </div>
+                  <div className="mt-1 h-10 w-px shrink-0 bg-surface-200 dark:bg-surface-700" />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-3 w-1/2 rounded-full" />
+                  </div>
                 </div>
               </div>
             ))}

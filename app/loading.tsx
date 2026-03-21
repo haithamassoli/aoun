@@ -1,5 +1,5 @@
 import { HomePageSkeleton } from "@/components/loading-shells";
 
-export default function Loading() {
+export default function HomeLoading() {
   return <HomePageSkeleton />;
 }
