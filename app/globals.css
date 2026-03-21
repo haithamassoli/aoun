@@ -48,7 +48,11 @@ body {
 }
 
 html {
-  cursor: url("/assets/cursor.png"), auto;
+  cursor: url("/assets/cursor.svg"), auto;
+  /* cursor:
+    url('data:image/svg+xml;utf8,<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 3.21V20.8L10.11 16.19L13.11 23.35L16.29 22.1L13.29 14.94L20.01 14.94L5.5 3.21Z" fill="%23007AFF" stroke="%2387cefa" stroke-width="1" stroke-linejoin="round"/></svg>')
+      0 0,
+    auto; */
   scrollbar-color: var(--color-primary-500) transparent;
 }
 
@@ -111,7 +115,11 @@ html a,
 html button,
 html [role="button"],
 html input[type="submit"] {
-  cursor: url("/assets/pointer.png"), pointer;
+  cursor: url("/assets/pointer.svg"), pointer;
+  /* cursor:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18px" height="18px"><path d="M 13 2 C 11.355469 2 10 3.355469 10 5 L 10 16.8125 L 9.34375 16.125 L 9.09375 15.90625 C 7.941406 14.753906 6.058594 14.753906 4.90625 15.90625 C 3.753906 17.058594 3.753906 18.941406 4.90625 20.09375 L 4.90625 20.125 L 13.09375 28.21875 L 13.15625 28.25 L 13.1875 28.3125 C 14.535156 29.324219 16.253906 30 18.1875 30 L 19.90625 30 C 24.441406 30 28.09375 26.347656 28.09375 21.8125 L 28.09375 14 C 28.09375 12.355469 26.738281 11 25.09375 11 C 24.667969 11 24.273438 11.117188 23.90625 11.28125 C 23.578125 9.980469 22.394531 9 21 9 C 20.234375 9 19.53125 9.300781 19 9.78125 C 18.46875 9.300781 17.765625 9 17 9 C 16.648438 9 16.316406 9.074219 16 9.1875 L 16 5 C 16 3.355469 14.644531 2 13 2 Z" fill="%23007AFF" stroke="%2387cefa" stroke-width="1" stroke-linejoin="round"/></svg>')
+      10 2,
+    pointer; */
 }
 
 /* Accessible focus styles */
