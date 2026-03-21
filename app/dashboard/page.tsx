@@ -8,6 +8,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { Toast, useToast } from "@/components/toast";
 import { SendNotificationForm } from "@/components/dashboard/send-notification-form";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -373,14 +374,14 @@ export default function DashboardPage() {
           <div className="space-y-6">
             <div className="grid gap-4 lg:grid-cols-4">
               {KPI_METRICS.map((metric) => (
-                <div
+                <Skeleton
                   key={metric.key}
-                  className="h-36 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+                  className="h-36 rounded-2xl border border-surface-200 dark:border-surface-700"
                 />
               ))}
             </div>
-            <div className="h-96 animate-pulse rounded-[28px] border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900" />
-            <div className="h-80 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900" />
+            <Skeleton className="h-96 rounded-[28px] border border-surface-200 dark:border-surface-700" />
+            <Skeleton className="h-80 rounded-2xl border border-surface-200 dark:border-surface-700" />
           </div>
         ) : (
           <>
@@ -864,9 +865,9 @@ export default function DashboardPage() {
       {majors === undefined ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[1, 2, 3].map((i) => (
-            <div
+            <Skeleton
               key={i}
-              className="h-32 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+              className="h-32 rounded-2xl border border-surface-200 dark:border-surface-700"
             />
           ))}
         </div>

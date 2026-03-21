@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
-import { DashboardShellSkeleton } from "@/components/loading-shells";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Link from "next/link";
@@ -36,7 +36,53 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   };
 
   if (isLoading) {
-    return <DashboardShellSkeleton />;
+    return (
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-row gap-3 overflow-x-auto px-3 py-4 sm:gap-4 sm:px-4 sm:py-5 md:px-6 lg:gap-6 lg:px-8 lg:py-6">
+        <aside className="shrink-0 w-64">
+          <div className="rounded-2xl border border-surface-200 bg-white p-4 shadow-sm dark:border-surface-700 dark:bg-surface-900">
+            <div className="mb-4 border-b border-surface-100 pb-4 dark:border-surface-800">
+              <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                لوحة التحكم
+              </p>
+              <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                جاري تحميل بيانات الحساب...
+              </p>
+            </div>
+
+            <nav className="space-y-1">
+              <div className="rounded-xl bg-primary-50 px-3 py-2.5 text-sm font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-300">
+                الرئيسية
+              </div>
+              <div className="rounded-xl px-3 py-2.5 text-sm text-surface-500 dark:text-surface-400">
+                الإعدادات
+              </div>
+            </nav>
+          </div>
+        </aside>
+
+        <main className="min-w-[18rem] flex-1 space-y-6 lg:min-w-0">
+          <div className="space-y-3 rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900">
+            <Skeleton className="h-8 w-56" />
+            <Skeleton className="h-4 w-72 max-w-full rounded-full" />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+              >
+                <Skeleton className="h-4 w-24 rounded-full" />
+                <Skeleton className="mt-4 h-10 w-28" />
+                <Skeleton className="mt-4 h-2 w-full rounded-full" />
+              </div>
+            ))}
+          </div>
+
+          <Skeleton className="h-96 rounded-[28px] border border-surface-200 dark:border-surface-700" />
+        </main>
+      </div>
+    );
   }
 
   if (!user) return null;
@@ -290,9 +336,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               title="الإعدادات"
               aria-label="الإعدادات"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
               {isSidebarExpanded && <span>الإعدادات</span>}
             </Link>
