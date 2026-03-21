@@ -15,7 +15,12 @@ type Params = { universitySlug: string; majorSlug: string };
 type SearchParams = {
   status?: string | string[];
 };
-type CourseStatusFilter = "all" | "completed" | "in_progress" | "none";
+type CourseStatusFilter =
+  | "all"
+  | "completed"
+  | "in_progress"
+  | "hidden"
+  | "none";
 
 const socialPlatforms = [
   {
@@ -84,6 +89,7 @@ function normalizeStatusFilter(
     singleValue === "all" ||
     singleValue === "completed" ||
     singleValue === "in_progress" ||
+    singleValue === "hidden" ||
     singleValue === "none"
   ) {
     return singleValue;

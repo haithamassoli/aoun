@@ -1,4 +1,8 @@
-export type CourseProgressStatus = "completed" | "in_progress" | "none";
+export type CourseProgressStatus =
+  | "completed"
+  | "in_progress"
+  | "hidden"
+  | "none";
 
 export type LastVisitedMajor = {
   universitySlug: string;
@@ -16,6 +20,7 @@ export const LAST_MAJOR_STORAGE_KEY =
 const VALID_STATUSES = new Set<CourseProgressStatus>([
   "completed",
   "in_progress",
+  "hidden",
   "none",
 ]);
 

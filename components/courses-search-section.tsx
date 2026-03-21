@@ -68,6 +68,11 @@ const baseStatusFilterOptions: StatusFilterOption[] = [
     label: "مكتمل",
     dotClassName: "bg-emerald-500",
   },
+  {
+    value: "hidden",
+    label: "مخفي من الخطة",
+    dotClassName: "bg-slate-500",
+  },
 ];
 
 function parseCourseStatusFilter(
@@ -77,7 +82,8 @@ function parseCourseStatusFilter(
     raw === "all" ||
     raw === "none" ||
     raw === "in_progress" ||
-    raw === "completed"
+    raw === "completed" ||
+    raw === "hidden"
   ) {
     return raw;
   }
@@ -163,19 +169,36 @@ function getSemesterGroupKey(semesterKey: number | null) {
   return semesterKey === null ? "other" : `semester-${semesterKey}`;
 }
 
+function matchesStatusFilter(
+  status: CourseProgressStatus,
+  filter: CourseStatusFilter,
+) {
+  if (filter === "all") {
+    return status !== "hidden";
+  }
+
+  return status === filter;
+}
+
 function getCourseStatusCounts(
   courses: CourseListItem[],
   courseStatuses: Record<string, CourseProgressStatus>,
 ): CourseStatusCounts {
   const counts: CourseStatusCounts = {
-    all: courses.length,
+    all: 0,
     none: 0,
     in_progress: 0,
     completed: 0,
+    hidden: 0,
   };
 
   for (const course of courses) {
-    counts[courseStatuses[course._id] ?? "none"] += 1;
+    const status = courseStatuses[course._id] ?? "none";
+    counts[status] += 1;
+
+    if (status !== "hidden") {
+      counts.all += 1;
+    }
   }
 
   return counts;
@@ -252,26 +275,40 @@ function CourseCard({
 }
 
 function CourseProgressStats({
-  total,
   courseStatuses,
   courses,
 }: {
-  total: number;
   courseStatuses: Record<string, CourseProgressStatus>;
   courses: CourseListItem[];
 }) {
+  const total = courses.length;
+  const hidden = courses.filter(
+    (course) => courseStatuses[course._id] === "hidden",
+  ).length;
+  const visibleTotal = total - hidden;
   const completed = courses.filter(
     (course) => courseStatuses[course._id] === "completed",
   ).length;
   const inProgress = courses.filter(
     (course) => courseStatuses[course._id] === "in_progress",
   ).length;
-  const none = total - completed - inProgress;
-  const completedPct = total > 0 ? Math.round((completed / total) * 100) : 0;
-  const inProgressPct = total > 0 ? Math.round((inProgress / total) * 100) : 0;
-  const nonePct = 100 - completedPct - inProgressPct;
+  const none = visibleTotal - completed - inProgress;
+  const completedPct =
+    visibleTotal > 0 ? Math.round((completed / visibleTotal) * 100) : 0;
+  const inProgressPct =
+    visibleTotal > 0 ? Math.round((inProgress / visibleTotal) * 100) : 0;
+  const nonePct = Math.max(0, 100 - completedPct - inProgressPct);
+  const hiddenPct = total > 0 ? Math.round((hidden / total) * 100) : 0;
 
   const stats = [
+    {
+      key: "hidden",
+      label: "مخفي",
+      count: hidden,
+      percentage: hiddenPct,
+      dotClassName: "bg-slate-500",
+      textClassName: "text-slate-600 dark:text-slate-300",
+    },
     {
       key: "completed",
       label: "مكتمل",
@@ -306,7 +343,9 @@ function CourseProgressStats({
             تقدم الدراسة
           </p>
           <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            توزيع حالة {total} مادة ضمن الخطة.
+            {hidden > 0
+              ? `توزيع حالة ${visibleTotal} مادة ضمن الخطة بعد إخفاء ${hidden} مادة.`
+              : `توزيع حالة ${visibleTotal} مادة ضمن الخطة.`}
           </p>
         </div>
 
@@ -319,7 +358,7 @@ function CourseProgressStats({
               {completedPct}%
             </span>
             <span className="text-sm text-surface-500 dark:text-surface-400">
-              {completed} / {total}
+              {completed} / {visibleTotal}
             </span>
           </div>
         </div>
@@ -443,8 +482,7 @@ export function CoursesSearchSection({
     () =>
       defaultCourses.filter(
         (course) =>
-          statusFilter === "all" ||
-          (courseStatuses[course._id] ?? "none") === statusFilter,
+          matchesStatusFilter(courseStatuses[course._id] ?? "none", statusFilter),
       ),
     [courseStatuses, defaultCourses, statusFilter],
   );
@@ -476,8 +514,7 @@ export function CoursesSearchSection({
     () =>
       activeSearchedCourses.filter(
         (course: CourseListItem) =>
-          statusFilter === "all" ||
-          (courseStatuses[course._id] ?? "none") === statusFilter,
+          matchesStatusFilter(courseStatuses[course._id] ?? "none", statusFilter),
       ),
     [activeSearchedCourses, courseStatuses, statusFilter],
   );
@@ -489,7 +526,6 @@ export function CoursesSearchSection({
   const isEmptyList = search.isEmpty && defaultCourses.length === 0;
   const isNoFilterResults =
     search.isEmpty &&
-    statusFilter !== "all" &&
     defaultCourses.length > 0 &&
     filteredDefaultCourses.length === 0;
 
@@ -520,7 +556,6 @@ export function CoursesSearchSection({
 
         {isStatusFilterReady && courses.length > 0 ? (
           <CourseProgressStats
-            total={courses.length}
             courseStatuses={courseStatuses}
             courses={courses}
           />
@@ -602,10 +637,14 @@ export function CoursesSearchSection({
       ) : isNoFilterResults ? (
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
-            لا توجد مواد بهذه الحالة حالياً
+            {statusFilter === "all"
+              ? "تم إخفاء جميع المواد من الخطة"
+              : "لا توجد مواد بهذه الحالة حالياً"}
           </p>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            غيّر فلتر الحالة لعرض مواد إضافية.
+            {statusFilter === "all"
+              ? "اعرض المواد المخفية أو غيّر حالة بعض المواد لتظهر مجدداً."
+              : "غيّر فلتر الحالة لعرض مواد إضافية."}
           </p>
         </div>
       ) : search.isEmpty ? (

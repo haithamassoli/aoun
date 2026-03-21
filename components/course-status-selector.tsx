@@ -42,6 +42,12 @@ export const courseStatusOptions: CourseStatusOption[] = [
     compactLabel: "مكتمل",
     dotClassName: "bg-emerald-500",
   },
+  {
+    value: "hidden",
+    label: "مخفي من الخطة",
+    compactLabel: "مخفي",
+    dotClassName: "bg-slate-500",
+  },
 ];
 
 const courseStatusOptionsByValue: Record<
@@ -51,6 +57,7 @@ const courseStatusOptionsByValue: Record<
   none: courseStatusOptions[0],
   in_progress: courseStatusOptions[1],
   completed: courseStatusOptions[2],
+  hidden: courseStatusOptions[3],
 };
 
 export function getCourseStatusOption(value: CourseProgressStatus) {
@@ -59,10 +66,10 @@ export function getCourseStatusOption(value: CourseProgressStatus) {
 
 function getSelectorClassName(compact: boolean) {
   if (compact) {
-    return "grid grid-cols-3 gap-1 rounded-xl border border-surface-200/80 bg-surface-100/80 p-1 dark:border-surface-700 dark:bg-surface-950/50";
+    return "grid grid-cols-2 gap-1 rounded-xl border border-surface-200/80 bg-surface-100/80 p-1 dark:border-surface-700 dark:bg-surface-950/50 sm:grid-cols-4";
   }
 
-  return "grid grid-cols-1 gap-1.5 rounded-2xl border border-surface-200/80 bg-surface-50/80 p-1.5 dark:border-surface-700 dark:bg-surface-900/70 sm:grid-cols-3";
+  return "grid grid-cols-1 gap-1.5 rounded-2xl border border-surface-200/80 bg-surface-50/80 p-1.5 dark:border-surface-700 dark:bg-surface-900/70 sm:grid-cols-4";
 }
 
 function getButtonClassName(isActive: boolean, compact: boolean) {
