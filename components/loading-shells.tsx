@@ -118,29 +118,55 @@ export function MajorPageSkeleton() {
 
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1 space-y-3">
-              <Skeleton className="h-10 w-64 max-w-full" />
+              <Skeleton className="h-10 w-72 max-w-full sm:h-12" />
               <Skeleton className="h-5 w-48 rounded-full" />
             </div>
-            <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+            <Skeleton className="h-10 w-10 shrink-0 rounded-full sm:h-10 sm:w-28 sm:rounded-full" />
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {Array.from({ length: 2 }).map((_, index) => (
-              <Skeleton key={index} className="h-11 w-36 rounded-xl" />
-            ))}
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-11 w-28 rounded-xl" />
-            ))}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {Array.from({ length: 2 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 rounded-xl border border-surface-200/80 bg-white/90 px-4 py-2.5 shadow-sm dark:border-surface-700/80 dark:bg-surface-900/70"
+                >
+                  <Skeleton className="h-4 w-4 rounded-full" />
+                  <Skeleton className="h-4 w-24 rounded-full" />
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Skeleton key={index} className="h-11 w-11 rounded-xl" />
+              ))}
+            </div>
           </div>
 
-          <Skeleton className="mt-4 h-14 w-full rounded-2xl" />
+          <div className="mt-4 rounded-2xl border border-primary-200/80 bg-white/90 px-4 py-3 shadow-sm dark:border-primary-800/80 dark:bg-primary-950/40">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <Skeleton className="h-7 w-14 rounded-full" />
+                <Skeleton className="h-5 w-64 max-w-[60vw]" />
+              </div>
+              <Skeleton className="h-4 w-16 rounded-full" />
+            </div>
+          </div>
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-10 w-28 rounded-xl" />
-            ))}
+          <div className="mt-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-20 rounded-full" />
+                <Skeleton className="h-4 w-44 rounded-full" />
+              </div>
+              <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <div className="flex min-w-max items-center gap-2 pb-1">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Skeleton key={index} className="h-11 w-32 rounded-full" />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -159,7 +185,11 @@ export function MajorPageSkeleton() {
                 <Skeleton className="h-8 w-24" />
               </div>
             </div>
-            <Skeleton className="mt-4 h-3 w-full rounded-full" />
+            <div className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800">
+              <Skeleton className="h-full w-[35%] rounded-none" variant="pulse" />
+              <Skeleton className="h-full w-[25%] rounded-none" variant="pulse" />
+              <Skeleton className="h-full w-[40%] rounded-none" variant="pulse" />
+            </div>
             <div className="mt-4 flex flex-wrap gap-2">
               {Array.from({ length: 3 }).map((_, index) => (
                 <Skeleton key={index} className="h-8 w-24 rounded-full" />
@@ -186,13 +216,13 @@ export function MajorPageSkeleton() {
           {Array.from({ length: 2 }).map((_, groupIndex) => (
             <div key={groupIndex} className="space-y-4">
               <div className="flex items-center justify-between gap-3 rounded-2xl border border-surface-200/80 bg-white/90 px-4 py-3 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.55)] dark:border-surface-700/80 dark:bg-surface-900/90 dark:shadow-none">
-                <span className="flex min-w-0 items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <Skeleton className="h-10 w-10 rounded-xl" />
-                  <span className="space-y-2">
+                  <div className="space-y-2">
                     <Skeleton className="h-5 w-36" />
                     <Skeleton className="h-4 w-20 rounded-full" />
-                  </span>
-                </span>
+                  </div>
+                </div>
                 <Skeleton className="h-8 w-24 rounded-full" />
               </div>
               <div className="grid grid-cols-2 gap-1 sm:gap-2.5 lg:grid-cols-3">
@@ -201,9 +231,15 @@ export function MajorPageSkeleton() {
                     key={cardIndex}
                     className="rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none sm:p-4"
                   >
-                    <div className="space-y-2">
-                      <Skeleton className="h-5 w-3/4" />
-                      <Skeleton className="h-4 w-1/2 rounded-full" />
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-2.5 w-2.5 rounded-full" variant="pulse" />
+                          <Skeleton className="h-5 w-3/4" />
+                        </div>
+                        <Skeleton className="h-4 w-1/2 rounded-full" />
+                      </div>
+                      <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
                     </div>
                   </div>
                 ))}
