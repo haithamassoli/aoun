@@ -26,6 +26,7 @@ type CourseListItem = {
   _id: Id<"courses">;
   name: string;
   slug: string;
+  credits: number;
   courseCode?: string;
   semester?: string;
   order: number;
@@ -108,6 +109,7 @@ export default function MajorCoursesPage() {
     defaultValues: {
       name: "",
       slug: "",
+      credits: "3",
       courseCode: "",
       semester: "",
       order: "0",
@@ -123,6 +125,7 @@ export default function MajorCoursesPage() {
             courseId: editingId as Id<"courses">,
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
+            credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester,
             order: Number(value.order) || 0,
@@ -135,6 +138,7 @@ export default function MajorCoursesPage() {
             majorId: majorIdValue,
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
+            credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester,
             order: Number(value.order) || 0,
@@ -188,6 +192,7 @@ export default function MajorCoursesPage() {
       {
         name: course.name,
         slug: course.slug,
+        credits: course.credits.toString(),
         courseCode: course.courseCode ?? "",
         semester: course.semester ?? "",
         order: course.order.toString(),
@@ -681,6 +686,14 @@ export default function MajorCoursesPage() {
                 />
                 <FormInput
                   form={form}
+                  name="credits"
+                  label="الساعات المعتمدة *"
+                  type="number"
+                  min="1"
+                  step="1"
+                />
+                <FormInput
+                  form={form}
                   name="semester"
                   label="المستوى أو المسار"
                   placeholder="مثال: 1 أو القدرة أو الاتصالات"
@@ -840,6 +853,7 @@ export default function MajorCoursesPage() {
                             {course.name}
                           </h3>
                           <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+                            <span>{course.credits} ساعات</span>
                             {semesterLabel && <span>{semesterLabel}</span>}
                             <span>{course.resourceCount} مصدر</span>
                           </div>

@@ -20,7 +20,7 @@ const resourceCategory = v.union(
   v.literal("previous_years"),
   v.literal("explanations_notebooks"),
   v.literal("course_drive"),
-  v.literal("other")
+  v.literal("other"),
 );
 
 // Shared soft-delete fields used by all entities
@@ -41,8 +41,8 @@ export default defineSchema({
         v.object({
           title: v.string(),
           url: v.string(),
-        })
-      )
+        }),
+      ),
     ),
     searchToken: v.optional(v.string()),
     ...softDeleteFields,
@@ -78,6 +78,7 @@ export default defineSchema({
     majorId: v.id("majors"),
     name: v.string(),
     slug: v.string(),
+    credits: v.number(),
     courseCode: v.optional(v.string()),
     semester: v.optional(v.string()),
     order: v.number(),

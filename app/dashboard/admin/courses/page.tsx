@@ -41,6 +41,7 @@ export default function AdminCoursesPage() {
       majorId: "",
       name: "",
       slug: "",
+      credits: "3",
       courseCode: "",
       semester: "",
       order: "0",
@@ -56,6 +57,7 @@ export default function AdminCoursesPage() {
             courseId: editingId as Id<"courses">,
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
+            credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester,
             order: Number(value.order) || 0,
@@ -68,6 +70,7 @@ export default function AdminCoursesPage() {
             majorId: value.majorId as Id<"majors">,
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
+            credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester,
             order: Number(value.order) || 0,
@@ -101,6 +104,7 @@ export default function AdminCoursesPage() {
     majorId: string;
     name: string;
     slug: string;
+    credits: number;
     courseCode?: string;
     semester?: string;
     order: number;
@@ -111,6 +115,7 @@ export default function AdminCoursesPage() {
         majorId: course.majorId,
         name: course.name,
         slug: course.slug,
+        credits: course.credits.toString(),
         courseCode: course.courseCode ?? "",
         semester: course.semester ?? "",
         order: course.order.toString(),
@@ -259,6 +264,14 @@ export default function AdminCoursesPage() {
             />
             <FormInput
               form={form}
+              name="credits"
+              label="الساعات المعتمدة *"
+              type="number"
+              min="1"
+              step="1"
+            />
+            <FormInput
+              form={form}
               name="semester"
               label="المستوى أو المسار"
               placeholder="مثال: 1 أو القدرة أو الاتصالات"
@@ -324,6 +337,7 @@ export default function AdminCoursesPage() {
             majorId: string;
             name: string;
             slug: string;
+            credits: number;
             courseCode?: string;
             semester?: string;
             order: number;
@@ -355,6 +369,7 @@ export default function AdminCoursesPage() {
                       <div className="flex flex-wrap items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
                         <span>{course.majorName}</span>
                         <span>{course.universityName}</span>
+                        <span>{course.credits} ساعات</span>
                         {semesterLabel && <span>{semesterLabel}</span>}
                         {course.alias && (
                           <span className="rounded bg-surface-100 px-1.5 py-0.5 dark:bg-surface-800">

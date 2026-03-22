@@ -17,6 +17,7 @@ interface FormInputProps {
   dir?: string;
   disabled?: boolean;
   min?: string;
+  step?: string;
   onChangeCallback?: (value: string) => void;
 }
 
@@ -29,6 +30,7 @@ export function FormInput({
   dir,
   disabled,
   min,
+  step,
   onChangeCallback,
 }: FormInputProps) {
   return (
@@ -54,6 +56,7 @@ export function FormInput({
               dir={dir}
               disabled={disabled}
               min={min}
+              step={step}
               className={`${inputCls}${hasError ? inputErrorCls : ""}`}
             />
             {hasError && (

@@ -48,6 +48,9 @@ const optionalUrlField = z.union([
   z.literal(""),
   z.string().url("رابط غير صالح"),
 ]);
+const creditsStringField = z
+  .string()
+  .regex(/^[1-9]\d*$/, "عدد الساعات يجب أن يكون رقماً صحيحاً موجباً");
 
 export const universitySchema = z.object({
   name: z.string().min(1, "اسم الجامعة مطلوب"),
@@ -75,6 +78,7 @@ export const courseSchema = z.object({
   majorId: z.string().min(1, "يجب اختيار التخصص"),
   name: z.string().min(1, "اسم المادة مطلوب"),
   slug: z.string().min(1, "الرابط مطلوب"),
+  credits: creditsStringField,
   courseCode: z.string(),
   semester: z.string(),
   order: z.string(),
@@ -103,6 +107,7 @@ export const resourceSchema = z
 export const contributorCourseSchema = z.object({
   name: z.string().min(1, "اسم المادة مطلوب"),
   slug: z.string().min(1, "الرابط مطلوب"),
+  credits: creditsStringField,
   courseCode: z.string(),
   semester: z.string(),
   order: z.string(),

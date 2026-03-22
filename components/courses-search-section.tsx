@@ -27,6 +27,7 @@ type CourseListItem = {
   _creationTime: number;
   slug: string;
   name: string;
+  credits: number;
   courseCode?: string;
   semester?: string;
   order: number;
@@ -305,30 +306,49 @@ function CourseProgressStats({
   courseStatuses: Record<string, CourseProgressStatus>;
   courses: CourseListItem[];
 }) {
-  const total = courses.length;
-  const hidden = courses.filter(
-    (course) => courseStatuses[course._id] === "hidden",
-  ).length;
-  const visibleTotal = total - hidden;
-  const completed = courses.filter(
-    (course) => courseStatuses[course._id] === "completed",
-  ).length;
-  const inProgress = courses.filter(
-    (course) => courseStatuses[course._id] === "in_progress",
-  ).length;
-  const none = visibleTotal - completed - inProgress;
+  let totalCredits = 0;
+  let hiddenCredits = 0;
+  let completedCredits = 0;
+  let inProgressCredits = 0;
+
+  for (const course of courses) {
+    totalCredits += course.credits;
+
+    const status = courseStatuses[course._id] ?? "none";
+    if (status === "hidden") {
+      hiddenCredits += course.credits;
+      continue;
+    }
+
+    if (status === "completed") {
+      completedCredits += course.credits;
+      continue;
+    }
+
+    if (status === "in_progress") {
+      inProgressCredits += course.credits;
+    }
+  }
+
+  const visibleCredits = totalCredits - hiddenCredits;
+  const noneCredits = visibleCredits - completedCredits - inProgressCredits;
   const completedPct =
-    visibleTotal > 0 ? Math.round((completed / visibleTotal) * 100) : 0;
+    visibleCredits > 0
+      ? Math.round((completedCredits / visibleCredits) * 100)
+      : 0;
   const inProgressPct =
-    visibleTotal > 0 ? Math.round((inProgress / visibleTotal) * 100) : 0;
+    visibleCredits > 0
+      ? Math.round((inProgressCredits / visibleCredits) * 100)
+      : 0;
   const nonePct = Math.max(0, 100 - completedPct - inProgressPct);
-  const hiddenPct = total > 0 ? Math.round((hidden / total) * 100) : 0;
+  const hiddenPct =
+    totalCredits > 0 ? Math.round((hiddenCredits / totalCredits) * 100) : 0;
 
   const stats = [
     {
       key: "hidden",
       label: "مخفي",
-      count: hidden,
+      count: hiddenCredits,
       percentage: hiddenPct,
       dotClassName: "bg-slate-500",
       textClassName: "text-slate-600 dark:text-slate-300",
@@ -336,7 +356,7 @@ function CourseProgressStats({
     {
       key: "completed",
       label: "مكتمل",
-      count: completed,
+      count: completedCredits,
       percentage: completedPct,
       dotClassName: "bg-emerald-500",
       textClassName: "text-emerald-600 dark:text-emerald-400",
@@ -344,7 +364,7 @@ function CourseProgressStats({
     {
       key: "in_progress",
       label: "قيد الدراسة",
-      count: inProgress,
+      count: inProgressCredits,
       percentage: inProgressPct,
       dotClassName: "bg-amber-500",
       textClassName: "text-amber-600 dark:text-amber-400",
@@ -352,7 +372,7 @@ function CourseProgressStats({
     {
       key: "none",
       label: "لم يُبدأ",
-      count: none,
+      count: noneCredits,
       percentage: nonePct,
       dotClassName: "bg-surface-300 dark:bg-surface-600",
       textClassName: "text-surface-600 dark:text-surface-300",
@@ -367,9 +387,9 @@ function CourseProgressStats({
             تقدم الدراسة
           </p>
           <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            {hidden > 0
-              ? `توزيع حالة ${visibleTotal} مادة ضمن الخطة بعد إخفاء ${hidden} مادة.`
-              : `توزيع حالة ${visibleTotal} مادة ضمن الخطة.`}
+            {hiddenCredits > 0
+              ? `توزيع ${visibleCredits} ساعة ضمن الخطة بعد إخفاء ${hiddenCredits} ساعة من أصل ${totalCredits}.`
+              : `توزيع ${visibleCredits} ساعة ضمن الخطة.`}
           </p>
         </div>
 
@@ -382,7 +402,7 @@ function CourseProgressStats({
               {completedPct}%
             </span>
             <span className="text-sm text-surface-500 dark:text-surface-400">
-              {completed} / {visibleTotal}
+              {completedCredits} / {visibleCredits} ساعة
             </span>
           </div>
         </div>
@@ -427,7 +447,7 @@ function CourseProgressStats({
               {stat.label}
             </span>
             <span className={`font-semibold ${stat.textClassName}`}>
-              {stat.count}
+              {stat.count} ساعة
             </span>
             <span className="text-surface-500 dark:text-surface-400">
               ({stat.percentage}%)

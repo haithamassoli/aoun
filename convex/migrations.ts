@@ -15,10 +15,11 @@ import {
  * 2. Run backfillUniversities
  * 3. Run backfillMajors
  * 4. Run backfillCourses
- * 5. Run backfillCourseSemesterStrings
- * 6. Run backfillResources
- * 7. Run backfillUsers
- * 8. Run backfillPermissions
+ * 5. Run backfillCourseCredits
+ * 6. Run backfillCourseSemesterStrings
+ * 7. Run backfillResources
+ * 8. Run backfillUsers
+ * 9. Run backfillPermissions
  */
 
 export const backfillUniversities = internalMutation({
@@ -102,6 +103,26 @@ export const backfillCourses = internalMutation({
         count++;
       }
     }
+    return count;
+  },
+});
+
+export const backfillCourseCredits = internalMutation({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const courses = await ctx.db.query("courses").collect();
+    let count = 0;
+
+    for (const course of courses) {
+      if ((course as { credits?: unknown }).credits !== undefined) {
+        continue;
+      }
+
+      await ctx.db.patch("courses", course._id, { credits: 3 });
+      count += 1;
+    }
+
     return count;
   },
 });
