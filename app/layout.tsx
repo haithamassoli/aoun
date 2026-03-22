@@ -67,6 +67,8 @@ export const viewport: Viewport = {
   themeColor: "#2563eb",
 };
 
+const NEW_DOMAIN_URL = "https://aoun.assoli.site";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -77,12 +79,26 @@ export default async function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${ibmPlexArabic.className} font-sans antialiased`}>
-        <PWARegister />
-        <PWAInstallBanner />
         <ThemeProvider>
           <ConvexClientProvider sessionToken={sessionToken}>
             <VisitorTracker />
             <div className="flex min-h-screen flex-col">
+              <div className="border-b border-primary-400 bg-primary-600 text-white dark:border-primary-500 dark:bg-primary-700">
+                <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-2 text-center text-sm sm:flex-row sm:gap-3 sm:px-6 lg:px-8">
+                  <p className="font-medium">
+                    تم نقل منصة عون إلى النطاق الجديد.
+                  </p>
+                  <a
+                    href={NEW_DOMAIN_URL}
+                    className="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-3 py-1 font-semibold text-white transition-colors hover:bg-white/20"
+                  >
+                    انتقل إلى{" "}
+                    <span dir="ltr" className="mx-1">
+                      aoun.assoli.site
+                    </span>
+                  </a>
+                </div>
+              </div>
               <header className="sticky top-0 z-50 border-b border-surface-200 bg-white/80 backdrop-blur-md dark:border-surface-700 dark:bg-surface-950/80">
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                   <Link href="/" className="flex items-center gap-2">
