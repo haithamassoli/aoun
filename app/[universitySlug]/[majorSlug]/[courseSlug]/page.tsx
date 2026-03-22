@@ -88,9 +88,13 @@ export default async function CoursePage({
     contentHtml: resource.content
       ? sanitizeRichText(resource.content)
       : undefined,
+    helpfulnessScore: resource.helpfulnessScore,
+    notUsefulCount: resource.notUsefulCount,
     order: resource.order,
+    totalFeedback: resource.totalFeedback,
     title: resource.title,
     type: resource.type,
+    usefulCount: resource.usefulCount,
     url: resource.url,
   }));
 
@@ -139,7 +143,7 @@ export default async function CoursePage({
 
       {/* Resources */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <CourseResourcesSection resources={resourceCards} />
+        <CourseResourcesSection courseId={course._id} resources={resourceCards} />
       </section>
     </div>
   );

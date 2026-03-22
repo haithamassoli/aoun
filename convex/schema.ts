@@ -2,6 +2,10 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 const resourceType = v.union(v.literal("link"), v.literal("richtext"));
+const resourceVoteType = v.union(
+  v.literal("useful"),
+  v.literal("not_useful"),
+);
 const socialLinks = v.object({
   instagram: v.optional(v.string()),
   facebook: v.optional(v.string()),
@@ -110,6 +114,19 @@ export default defineSchema({
   })
     .index("by_courseId", ["courseId"])
     .index("by_courseId_order", ["courseId", "order"]),
+
+  resourceVotes: defineTable({
+    resourceId: v.id("resources"),
+    courseId: v.id("courses"),
+    visitorKey: v.string(),
+    vote: resourceVoteType,
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_resourceId", ["resourceId"])
+    .index("by_resourceId_visitorKey", ["resourceId", "visitorKey"])
+    .index("by_courseId", ["courseId"])
+    .index("by_visitorKey_courseId", ["visitorKey", "courseId"]),
 
   users: defineTable({
     name: v.string(),
