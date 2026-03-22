@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import Link from "next/link";
+import Script from "next/script";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -68,6 +69,7 @@ export const viewport: Viewport = {
 };
 
 const NEW_DOMAIN_URL = "https://aoun.assoli.site";
+const REDIRECT_DELAY_MS = 5000;
 
 export default async function RootLayout({
   children,
@@ -79,6 +81,22 @@ export default async function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${ibmPlexArabic.className} font-sans antialiased`}>
+        <Script id="legacy-domain-redirect" strategy="afterInteractive">
+          {`
+            (() => {
+              const targetHost = "aoun.assoli.site";
+              if (window.location.hostname === targetHost) return;
+
+              window.setTimeout(() => {
+                const targetUrl = new URL(window.location.href);
+                targetUrl.protocol = "https:";
+                targetUrl.hostname = targetHost;
+                targetUrl.port = "";
+                window.location.replace(targetUrl.toString());
+              }, ${REDIRECT_DELAY_MS});
+            })();
+          `}
+        </Script>
         <ThemeProvider>
           <ConvexClientProvider sessionToken={sessionToken}>
             <VisitorTracker />
@@ -86,7 +104,8 @@ export default async function RootLayout({
               <div className="border-b border-primary-400 bg-primary-600 text-white dark:border-primary-500 dark:bg-primary-700">
                 <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-2 text-center text-sm sm:flex-row sm:gap-3 sm:px-6 lg:px-8">
                   <p className="font-medium">
-                    تم نقل منصة عون إلى النطاق الجديد.
+                    تم نقل منصة عون إلى النطاق الجديد. سيتم إعادة توجيهك
+                    تلقائيًا بعد 5 ثواني...
                   </p>
                   <a
                     href={NEW_DOMAIN_URL}
