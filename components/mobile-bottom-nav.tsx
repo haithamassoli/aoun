@@ -142,7 +142,9 @@ export function MobileBottomNav() {
       href: isAuthenticated ? "/dashboard" : "/login",
       label: isAuthenticated ? "لوحتي" : "الدخول",
       isActive: (currentPath) =>
-        isAuthenticated ? isDashboardPath(currentPath) : currentPath === "/login",
+        isAuthenticated
+          ? isDashboardPath(currentPath)
+          : currentPath === "/login",
       icon: <DashboardIcon />,
     },
   ];
@@ -152,7 +154,7 @@ export function MobileBottomNav() {
       aria-label="شريط التنقل السفلي"
       className="fixed inset-x-0 bottom-0 z-40 md:hidden"
     >
-      <div className="fixed bottom-[calc(6.25rem+env(safe-area-inset-bottom))] left-4 z-40 md:hidden">
+      <div className="fixed bottom-[calc(5.42rem+env(safe-area-inset-bottom))] left-4 z-40 md:hidden">
         <div className="rounded-full border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
           <ThemeToggle />
         </div>
@@ -168,7 +170,7 @@ export function MobileBottomNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-center text-[0.7rem] font-semibold transition-all ${
+                className={`flex h-12 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-center text-[0.7rem] font-semibold transition-all ${
                   active
                     ? "bg-[linear-gradient(135deg,rgba(37,99,235,0.16),rgba(59,130,246,0.08))] text-primary-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:bg-[linear-gradient(135deg,rgba(37,99,235,0.26),rgba(59,130,246,0.1))] dark:text-primary-300"
                     : "text-surface-500 hover:bg-surface-100/90 hover:text-surface-900 dark:text-surface-400 dark:hover:bg-surface-800/90 dark:hover:text-surface-100"
@@ -177,13 +179,12 @@ export function MobileBottomNav() {
                 <span
                   className={`flex h-9 w-9 items-center justify-center rounded-2xl transition-colors ${
                     active
-                      ? "bg-white/80 text-primary-700 dark:bg-surface-900/90 dark:text-primary-300"
+                      ? "text-primary-700 dark:text-primary-300"
                       : "bg-transparent"
                   }`}
                 >
                   {item.icon}
                 </span>
-                <span>{item.label}</span>
               </Link>
             );
           })}
