@@ -384,17 +384,14 @@ function CourseProgressStats({
           <p className="text-sm font-semibold text-surface-800 dark:text-surface-100">
             تقدم الدراسة
           </p>
-          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+          {/* <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
             {hiddenCredits > 0
               ? `توزيع ${visibleCredits} ساعة ضمن الخطة بعد إخفاء ${hiddenCredits} ساعة من أصل ${totalCredits}.`
               : `توزيع ${visibleCredits} ساعة ضمن الخطة.`}
-          </p>
+          </p> */}
         </div>
 
         <div className="sm:text-left">
-          <p className="text-xs font-medium text-surface-500 dark:text-surface-400">
-            مكتمل
-          </p>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {completedPct}%
