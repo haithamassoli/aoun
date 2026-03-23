@@ -329,7 +329,7 @@ function CourseProgressStats({
   }
 
   const visibleCredits = totalCredits - hiddenCredits;
-  const noneCredits = visibleCredits - completedCredits - inProgressCredits;
+  // const noneCredits = visibleCredits - completedCredits - inProgressCredits;
   const completedPct =
     visibleCredits > 0
       ? Math.round((completedCredits / visibleCredits) * 100)
@@ -339,39 +339,39 @@ function CourseProgressStats({
       ? Math.round((inProgressCredits / visibleCredits) * 100)
       : 0;
   const nonePct = Math.max(0, 100 - completedPct - inProgressPct);
-  const hiddenPct =
-    totalCredits > 0 ? Math.round((hiddenCredits / totalCredits) * 100) : 0;
+  // const hiddenPct =
+  //   totalCredits > 0 ? Math.round((hiddenCredits / totalCredits) * 100) : 0;
 
   const stats = [
-    {
-      key: "hidden",
-      label: "مخفي",
-      count: hiddenCredits,
-      percentage: hiddenPct,
-      dotClassName: "bg-slate-500",
-      textClassName: "text-slate-600 dark:text-slate-300",
-    },
+    // {
+    //   key: "hidden",
+    //   label: "مخفي",
+    //   count: hiddenCredits,
+    //   percentage: hiddenPct,
+    //   dotClassName: "bg-slate-500",
+    //   textClassName: "text-slate-600 dark:text-slate-300",
+    // },
     {
       key: "completed",
       label: "مكتمل",
-      count: completedCredits,
-      percentage: completedPct,
+      // count: completedCredits,
+      // percentage: completedPct,
       dotClassName: "bg-emerald-500",
       textClassName: "text-emerald-600 dark:text-emerald-400",
     },
     {
       key: "in_progress",
       label: "قيد الدراسة",
-      count: inProgressCredits,
-      percentage: inProgressPct,
+      // count: inProgressCredits,
+      // percentage: inProgressPct,
       dotClassName: "bg-amber-500",
       textClassName: "text-amber-600 dark:text-amber-400",
     },
     {
       key: "none",
       label: "لم يُبدأ",
-      count: noneCredits,
-      percentage: nonePct,
+      // count: noneCredits,
+      // percentage: nonePct,
       dotClassName: "bg-surface-300 dark:bg-surface-600",
       textClassName: "text-surface-600 dark:text-surface-300",
     },
@@ -444,12 +444,12 @@ function CourseProgressStats({
             <span className="text-surface-700 dark:text-surface-200">
               {stat.label}
             </span>
-            <span className={`font-semibold ${stat.textClassName}`}>
+            {/* <span className={`font-semibold ${stat.textClassName}`}>
               {stat.count} ساعة
             </span>
             <span className="text-surface-500 dark:text-surface-400">
               ({stat.percentage}%)
-            </span>
+            </span> */}
           </div>
         ))}
       </div>
