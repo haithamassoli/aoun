@@ -3,10 +3,16 @@
 import { startTransition, useEffect, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin, { type DateClickArg } from "@fullcalendar/interaction";
+import interactionPlugin, {
+  type DateClickArg,
+} from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import arLocale from "@fullcalendar/core/locales/ar";
-import type { EventClickArg, EventContentArg, EventInput } from "@fullcalendar/core";
+import type {
+  EventClickArg,
+  EventContentArg,
+  EventInput,
+} from "@fullcalendar/core";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Toast, useToast } from "@/components/toast";
 import {
@@ -45,28 +51,28 @@ const CATEGORY_META: Record<
     chipClassName:
       "border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300",
     softClassName:
-      "from-red-500/15 via-orange-500/10 to-transparent text-red-700 dark:text-red-300",
+      "from-red-50 via-white to-red-100/70 dark:from-red-950/30 dark:via-surface-900 dark:to-red-950/10",
   },
   registration: {
     label: "تسجيل",
     chipClassName:
       "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900/60 dark:bg-sky-950/40 dark:text-sky-300",
     softClassName:
-      "from-sky-500/15 via-blue-500/10 to-transparent text-sky-700 dark:text-sky-300",
+      "from-sky-50 via-white to-sky-100/70 dark:from-sky-950/30 dark:via-surface-900 dark:to-sky-950/10",
   },
   add_drop: {
     label: "سحب وإضافة",
     chipClassName:
       "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900/60 dark:bg-violet-950/40 dark:text-violet-300",
     softClassName:
-      "from-violet-500/15 via-fuchsia-500/10 to-transparent text-violet-700 dark:text-violet-300",
+      "from-violet-50 via-white to-violet-100/70 dark:from-violet-950/30 dark:via-surface-900 dark:to-violet-950/10",
   },
   project: {
     label: "مشروع",
     chipClassName:
       "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300",
     softClassName:
-      "from-emerald-500/15 via-teal-500/10 to-transparent text-emerald-700 dark:text-emerald-300",
+      "from-emerald-50 via-white to-emerald-100/70 dark:from-emerald-950/30 dark:via-surface-900 dark:to-emerald-950/10",
   },
 };
 
@@ -78,6 +84,8 @@ const EMPTY_FORM_VALUES: AcademicCalendarFormValues = {
   startTime: "",
   endTime: "",
 };
+
+const FEATURE_BADGES = ["عرض شهري", "عرض أسبوعي", "بدون تسجيل"];
 
 function pad(value: number) {
   return value.toString().padStart(2, "0");
@@ -105,7 +113,9 @@ function createEventId() {
   return `event-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-function toFormValues(event: AcademicCalendarEvent): AcademicCalendarFormValues {
+function toFormValues(
+  event: AcademicCalendarEvent,
+): AcademicCalendarFormValues {
   if (event.allDay) {
     return {
       title: event.title,
@@ -127,11 +137,15 @@ function toFormValues(event: AcademicCalendarEvent): AcademicCalendarFormValues 
     hasTime: true,
     startTime: formatTimeInput(startDate),
     endTime:
-      endDate && !Number.isNaN(endDate.getTime()) ? formatTimeInput(endDate) : "",
+      endDate && !Number.isNaN(endDate.getTime())
+        ? formatTimeInput(endDate)
+        : "",
   };
 }
 
-function buildFormValuesFromDateClick(arg: DateClickArg): AcademicCalendarFormValues {
+function buildFormValuesFromDateClick(
+  arg: DateClickArg,
+): AcademicCalendarFormValues {
   if (arg.allDay) {
     return {
       ...EMPTY_FORM_VALUES,
@@ -155,6 +169,48 @@ function combineDateAndTime(date: string, time: string) {
   return `${date}T${time}:00`;
 }
 
+const DATE_FORMATTER = new Intl.DateTimeFormat("ar", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+});
+
+const TIME_FORMATTER = new Intl.DateTimeFormat("ar", {
+  hour: "numeric",
+  minute: "2-digit",
+});
+
+function getEventStartDate(event: AcademicCalendarEvent) {
+  const parsed = new Date(
+    event.allDay ? `${event.start}T12:00:00` : event.start,
+  );
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
+function getEventEndDate(event: AcademicCalendarEvent) {
+  if (!event.end) {
+    return null;
+  }
+
+  const parsed = new Date(event.end);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatEventSchedule(event: AcademicCalendarEvent) {
+  const start = getEventStartDate(event);
+
+  if (event.allDay) {
+    return DATE_FORMATTER.format(start);
+  }
+
+  const end = getEventEndDate(event);
+  const timeLabel = end
+    ? `${TIME_FORMATTER.format(start)} - ${TIME_FORMATTER.format(end)}`
+    : TIME_FORMATTER.format(start);
+
+  return `${DATE_FORMATTER.format(start)} · ${timeLabel}`;
+}
+
 function toCalendarInput(event: AcademicCalendarEvent): EventInput {
   return {
     id: event.id,
@@ -163,22 +219,16 @@ function toCalendarInput(event: AcademicCalendarEvent): EventInput {
     end: event.end,
     allDay: event.allDay,
     classNames: [`planner-event--${event.category}`],
-    extendedProps: {
-      category: event.category,
-    },
   };
 }
 
 function renderEventContent(content: EventContentArg) {
-  const category = content.event.extendedProps.category as AcademicCalendarCategory;
-
   return (
     <div className={styles.eventCard}>
       {content.timeText ? (
         <span className={styles.eventTime}>{content.timeText}</span>
       ) : null}
       <span className={styles.eventTitle}>{content.event.title}</span>
-      <span className={styles.eventCategory}>{CATEGORY_META[category].label}</span>
     </div>
   );
 }
@@ -231,7 +281,9 @@ export function AcademicCalendar() {
     );
   };
 
-  const openCreateDialog = (values: AcademicCalendarFormValues = EMPTY_FORM_VALUES) => {
+  const openCreateDialog = (
+    values: AcademicCalendarFormValues = EMPTY_FORM_VALUES,
+  ) => {
     setDialogState({
       open: true,
       mode: "create",
@@ -271,7 +323,9 @@ export function AcademicCalendar() {
     const eventRecord: AcademicCalendarEvent = values.hasTime
       ? {
           id:
-            dialogState.open && dialogState.mode === "edit" && dialogState.eventId
+            dialogState.open &&
+            dialogState.mode === "edit" &&
+            dialogState.eventId
               ? dialogState.eventId
               : createEventId(),
           title: values.title,
@@ -284,7 +338,9 @@ export function AcademicCalendar() {
         }
       : {
           id:
-            dialogState.open && dialogState.mode === "edit" && dialogState.eventId
+            dialogState.open &&
+            dialogState.mode === "edit" &&
+            dialogState.eventId
               ? dialogState.eventId
               : createEventId(),
           title: values.title,
@@ -293,7 +349,11 @@ export function AcademicCalendar() {
           allDay: true,
         };
 
-    if (dialogState.open && dialogState.mode === "edit" && dialogState.eventId) {
+    if (
+      dialogState.open &&
+      dialogState.mode === "edit" &&
+      dialogState.eventId
+    ) {
       const nextEvents = events.map((event) =>
         event.id === dialogState.eventId ? eventRecord : event,
       );
@@ -353,212 +413,298 @@ export function AcademicCalendar() {
 
   const categoryCounts = {
     exam: events.filter((event) => event.category === "exam").length,
-    registration: events.filter((event) => event.category === "registration").length,
+    registration: events.filter((event) => event.category === "registration")
+      .length,
     add_drop: events.filter((event) => event.category === "add_drop").length,
     project: events.filter((event) => event.category === "project").length,
   } satisfies Record<AcademicCalendarCategory, number>;
 
+  const sortedEvents = [...events].sort(
+    (left, right) =>
+      getEventStartDate(left).getTime() - getEventStartDate(right).getTime(),
+  );
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingEvents = sortedEvents.filter(
+    (event) => getEventStartDate(event).getTime() >= today.getTime(),
+  );
+  const previewEvents =
+    upcomingEvents.length > 0
+      ? upcomingEvents.slice(0, 4)
+      : sortedEvents.slice(0, 4);
+  const nextEvent = upcomingEvents[0] ?? null;
+
   return (
     <>
-      <section className="space-y-6">
-        <div className="rounded-[32px] border border-primary-100 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.18),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.95),rgba(239,246,255,0.85))] p-6 shadow-[0_28px_90px_-52px_rgba(37,99,235,0.55)] dark:border-primary-900/40 dark:bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.2),transparent_42%),linear-gradient(180deg,rgba(2,6,23,0.95),rgba(15,23,42,0.92))]">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary-200/80 bg-white/80 px-3 py-1 text-[11px] font-semibold tracking-[0.24em] text-primary-700 uppercase shadow-sm dark:border-primary-800/50 dark:bg-primary-950/40 dark:text-primary-200">
-                مخطط أكاديمي محلي
-              </div>
-              <h2 className="mt-4 text-2xl font-bold text-surface-950 dark:text-surface-50 sm:text-3xl">
-                رتّب الامتحانات والمشاريع ومواعيد التسجيل في مساحة واحدة
-              </h2>
-              <p className="mt-3 max-w-xl text-sm leading-8 text-surface-600 dark:text-surface-300">
-                كل المواعيد تُحفظ محلياً على نفس الجهاز والمتصفح. اضغط على أي
-                يوم لإضافة موعد جديد، أو افتح الحدث لتعديله وحذفه.
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2 lg:w-[26rem]">
-              {(Object.entries(CATEGORY_META) as [
-                AcademicCalendarCategory,
-                (typeof CATEGORY_META)[AcademicCalendarCategory],
-              ][]).map(([category, meta]) => (
-                <div
-                  key={category}
-                  className={`rounded-2xl border border-white/70 bg-linear-to-br ${meta.softClassName} border-surface-200/80 px-4 py-3 shadow-sm backdrop-blur-sm dark:border-surface-700/80`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm font-semibold">{meta.label}</span>
-                    <span className="rounded-full bg-white/85 px-2.5 py-1 text-xs font-bold text-surface-900 dark:bg-surface-900/85 dark:text-surface-50">
-                      {categoryCounts[category]}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            <span className="rounded-full border border-surface-200 bg-white/85 px-3 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900/85 dark:text-surface-300">
-              عرض شهري سريع للمواعيد الكثيفة
-            </span>
-            <span className="rounded-full border border-surface-200 bg-white/85 px-3 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900/85 dark:text-surface-300">
-              عرض أسبوعي قابل للتمرير للأوقات الدقيقة
-            </span>
-            <span className="rounded-full border border-surface-200 bg-white/85 px-3 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900/85 dark:text-surface-300">
-              حفظ محلي بدون تسجيل دخول
-            </span>
-          </div>
-        </div>
-
+      <section className="space-y-4">
         {storageState !== "ready" ? (
-          <div className="rounded-[28px] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-7 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
             {storageState === "blocked"
               ? "التخزين المحلي غير متاح الآن. يمكنك استخدام التقويم مؤقتاً، لكن التغييرات قد لا تبقى بعد إعادة التحميل."
               : "تم العثور على بيانات محلية غير صالحة وتم تجاهلها لحماية الصفحة من التعطل."}
           </div>
         ) : null}
 
-        <div className="rounded-[32px] border border-surface-200 bg-white/90 p-4 shadow-[0_26px_90px_-56px_rgba(15,23,42,0.45)] backdrop-blur-sm dark:border-surface-700 dark:bg-surface-900/85">
-          <div className="flex flex-col gap-4 border-b border-surface-100 px-2 pb-4 dark:border-surface-800 sm:px-3">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.18em] text-surface-400 uppercase dark:text-surface-500">
-                  نافذة العرض
-                </p>
-                <h3 className="mt-1 text-xl font-bold text-surface-950 dark:text-surface-50">
-                  {currentRangeLabel}
-                </h3>
-              </div>
+        <div className="space-y-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <span className="text-xs font-semibold tracking-[0.22em] text-primary-600 uppercase dark:text-primary-400">
+                Academic Planner
+              </span>
+              <h1 className="mt-1 text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl">
+                تقويم أكاديمي شخصي
+              </h1>
+              <p className="mt-1.5 max-w-lg text-sm leading-7 text-surface-500 dark:text-surface-400">
+                امتحانات وتسليمات ومواعيد تسجيل في واجهة بسيطة، محفوظة محلياً
+                على جهازك بدون حساب.
+              </p>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center gap-2 rounded-full border border-surface-200 bg-surface-50 p-1 dark:border-surface-700 dark:bg-surface-800">
-                  <button
-                    type="button"
-                    onClick={() => changeView("dayGridMonth")}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      currentView === "dayGridMonth"
-                        ? "bg-white text-primary-600 shadow-sm dark:bg-surface-900 dark:text-primary-300"
-                        : "text-surface-500 hover:text-surface-800 dark:text-surface-300 dark:hover:text-surface-100"
-                    }`}
-                  >
-                    شهري
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => changeView("timeGridWeek")}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      currentView === "timeGridWeek"
-                        ? "bg-white text-primary-600 shadow-sm dark:bg-surface-900 dark:text-primary-300"
-                        : "text-surface-500 hover:text-surface-800 dark:text-surface-300 dark:hover:text-surface-100"
-                    }`}
-                  >
-                    أسبوعي
-                  </button>
+            <div className="flex flex-wrap gap-1.5 sm:flex-nowrap sm:shrink-0">
+              {FEATURE_BADGES.map((label) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 text-xs text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300"
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {(
+              Object.entries(CATEGORY_META) as [
+                AcademicCalendarCategory,
+                (typeof CATEGORY_META)[AcademicCalendarCategory],
+              ][]
+            ).map(([category, meta]) => (
+              <div
+                key={category}
+                className={`rounded-2xl border border-surface-200/80 bg-linear-to-br ${meta.softClassName} px-4 py-3 dark:border-surface-700/70`}
+              >
+                <p className="text-xs font-medium text-surface-500 dark:text-surface-400">
+                  {meta.label}
+                </p>
+                <p className="mt-0.5 text-xl font-bold text-surface-900 dark:text-surface-50">
+                  {categoryCounts[category]}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-[28px] border border-surface-200 bg-white/90 p-4 shadow-[0_20px_55px_-48px_rgba(15,23,42,0.38)] backdrop-blur-sm dark:border-surface-700 dark:bg-surface-900/85 sm:p-5">
+            <div className="border-b border-surface-100 pb-5 dark:border-surface-800">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.18em] text-surface-400 uppercase dark:text-surface-500">
+                    التقويم
+                  </p>
+                  <h2 className="mt-1 text-2xl font-bold text-surface-950 dark:text-surface-50">
+                    {currentRangeLabel}
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-7 text-surface-500 dark:text-surface-400">
+                    اضغط على أي يوم فارغ لإضافة موعد جديد، أو افتح أي موعد داخل
+                    التقويم لتعديله أو حذفه بسرعة.
+                  </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => openCreateDialog()}
-                  className="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-400"
+                  className="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-400"
                 >
                   إضافة موعد
                 </button>
               </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <div className="rounded-full border border-surface-200 bg-surface-50 px-3 py-1.5 text-sm text-surface-600 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-300">
+                  <span className="font-semibold text-surface-900 dark:text-surface-50">
+                    {events.length}
+                  </span>{" "}
+                  إجمالي المواعيد
+                </div>
+                <div className="rounded-full border border-surface-200 bg-surface-50 px-3 py-1.5 text-sm text-surface-600 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-300">
+                  <span className="font-semibold text-surface-900 dark:text-surface-50">
+                    {upcomingEvents.length}
+                  </span>{" "}
+                  مواعيد قادمة
+                </div>
+                <div className="rounded-full border border-surface-200 bg-surface-50 px-3 py-1.5 text-sm text-surface-600 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-300">
+                  أقرب موعد:
+                  <span className="mr-1 font-semibold text-surface-900 dark:text-surface-50">
+                    {nextEvent ? nextEvent.title : "لا يوجد"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => navigateCalendar("prev")}
+                    className="rounded-full border border-surface-200 px-3 py-1.5 text-sm font-medium text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
+                  >
+                    السابق
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigateCalendar("today")}
+                    className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 transition hover:bg-primary-100 dark:border-primary-900/50 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:bg-primary-950/70"
+                  >
+                    اليوم
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigateCalendar("next")}
+                    className="rounded-full border border-surface-200 px-3 py-1.5 text-sm font-medium text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
+                  >
+                    التالي
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 rounded-full border border-surface-200 bg-surface-50 p-1 dark:border-surface-700 dark:bg-surface-800">
+                    <button
+                      type="button"
+                      onClick={() => changeView("dayGridMonth")}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        currentView === "dayGridMonth"
+                          ? "bg-white text-primary-600 shadow-sm dark:bg-surface-900 dark:text-primary-300"
+                          : "text-surface-500 hover:text-surface-800 dark:text-surface-300 dark:hover:text-surface-100"
+                      }`}
+                    >
+                      شهري
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => changeView("timeGridWeek")}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        currentView === "timeGridWeek"
+                          ? "bg-white text-primary-600 shadow-sm dark:bg-surface-900 dark:text-primary-300"
+                          : "text-surface-500 hover:text-surface-800 dark:text-surface-300 dark:hover:text-surface-100"
+                      }`}
+                    >
+                      أسبوعي
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <p className="text-xs font-semibold tracking-[0.18em] text-surface-400 uppercase dark:text-surface-500">
+                  {upcomingEvents.length > 0
+                    ? "أقرب المواعيد"
+                    : "ملاحظات سريعة"}
+                </p>
+
+                {previewEvents.length === 0 ? (
+                  <div className="mt-3 rounded-2xl border border-dashed border-surface-200 bg-surface-50/80 px-4 py-3 text-sm leading-7 text-surface-500 dark:border-surface-700 dark:bg-surface-800/50 dark:text-surface-400">
+                    لا توجد مواعيد بعد. أضف أول امتحان أو موعد تسليم ليظهر هنا
+                    الملخص السريع تلقائياً.
+                  </div>
+                ) : (
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {previewEvents.map((event) => (
+                      <button
+                        key={event.id}
+                        type="button"
+                        onClick={() => openEditDialog(event)}
+                        className="rounded-2xl border border-surface-200 px-4 py-3 text-right transition hover:border-primary-300 hover:bg-primary-50/60 dark:border-surface-700 dark:hover:border-primary-700 dark:hover:bg-primary-950/20"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CATEGORY_META[event.category].chipClassName}`}
+                          >
+                            {CATEGORY_META[event.category].label}
+                          </span>
+                          <span className="text-xs text-surface-400 dark:text-surface-500">
+                            {event.allDay ? "طوال اليوم" : "بوقت محدد"}
+                          </span>
+                        </div>
+                        <p className="mt-3 text-sm font-semibold text-surface-900 dark:text-surface-50">
+                          {event.title}
+                        </p>
+                        <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                          {formatEventSchedule(event)}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => navigateCalendar("prev")}
-                className="rounded-full border border-surface-200 px-3 py-1.5 text-sm font-medium text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
-              >
-                السابق
-              </button>
-              <button
-                type="button"
-                onClick={() => navigateCalendar("today")}
-                className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 transition hover:bg-primary-100 dark:border-primary-900/50 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:bg-primary-950/70"
-              >
-                اليوم
-              </button>
-              <button
-                type="button"
-                onClick={() => navigateCalendar("next")}
-                className="rounded-full border border-surface-200 px-3 py-1.5 text-sm font-medium text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
-              >
-                التالي
-              </button>
-              <span className="ms-auto text-xs text-surface-400 dark:text-surface-500">
-                اضغط على أي خانة فارغة لإضافة موعد بسرعة
-              </span>
-            </div>
-          </div>
+            {events.length === 0 ? (
+              <div className="mt-5 rounded-[24px] border border-dashed border-surface-200 bg-surface-50 px-6 py-8 text-center dark:border-surface-700 dark:bg-surface-800/60">
+                <p className="text-lg font-semibold text-surface-800 dark:text-surface-100">
+                  لا توجد مواعيد بعد
+                </p>
+                <p className="mt-2 text-sm leading-7 text-surface-500 dark:text-surface-400">
+                  ابدأ بإضافة أول امتحان أو موعد تسجيل، ثم راجع خطتك من العرض
+                  الشهري أو الأسبوعي حسب ما يناسبك.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => openCreateDialog()}
+                  className="mt-5 inline-flex items-center justify-center rounded-full bg-surface-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-surface-800 dark:bg-surface-100 dark:text-surface-950 dark:hover:bg-white"
+                >
+                  أضف أول موعد
+                </button>
+              </div>
+            ) : null}
 
-          {events.length === 0 ? (
-            <div className="mx-2 mt-6 rounded-[28px] border border-dashed border-surface-200 bg-surface-50 px-6 py-8 text-center dark:border-surface-700 dark:bg-surface-800/60">
-              <p className="text-lg font-semibold text-surface-800 dark:text-surface-100">
-                لا توجد مواعيد بعد
-              </p>
-              <p className="mt-2 text-sm leading-7 text-surface-500 dark:text-surface-400">
-                ابدأ بإضافة أول امتحان أو موعد تسجيل، ثم بدّل بين العرض الشهري
-                والأسبوعي لترى الخطة كاملة.
-              </p>
-              <button
-                type="button"
-                onClick={() => openCreateDialog()}
-                className="mt-5 inline-flex items-center justify-center rounded-full bg-surface-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-surface-800 dark:bg-surface-100 dark:text-surface-950 dark:hover:bg-white"
+            <div className="mt-5 overflow-x-auto pb-1">
+              <div
+                className={`${styles.planner} ${
+                  currentView === "timeGridWeek"
+                    ? "min-w-[780px]"
+                    : "min-w-full"
+                }`}
               >
-                أضف أول موعد
-              </button>
-            </div>
-          ) : null}
-
-          <div className="mt-6 overflow-x-auto px-2 pb-2 sm:px-3">
-            <div
-              className={`${styles.planner} ${
-                currentView === "timeGridWeek" ? "min-w-[860px]" : "min-w-full"
-              }`}
-            >
-              <FullCalendar
-                ref={calendarRef}
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                locale={arLocale}
-                direction="rtl"
-                firstDay={0}
-                height={currentView === "timeGridWeek" ? 720 : "auto"}
-                editable={false}
-                selectable={false}
-                eventDisplay="block"
-                dayMaxEventRows={3}
-                weekends
-                nowIndicator
-                allDaySlot
-                headerToolbar={false}
-                moreLinkText={(count) => `+${count} مواعيد`}
-                dayHeaderFormat={{ weekday: "short" }}
-                eventTimeFormat={{
-                  hour: "numeric",
-                  minute: "2-digit",
-                  meridiem: "short",
-                }}
-                slotLabelFormat={{
-                  hour: "numeric",
-                  minute: "2-digit",
-                  hour12: true,
-                }}
-                slotMinTime="08:00:00"
-                slotMaxTime="22:00:00"
-                scrollTime="08:00:00"
-                scrollTimeReset
-                eventContent={renderEventContent}
-                datesSet={(arg) => {
-                  setCurrentRangeLabel(arg.view.title);
-                  setCurrentView(arg.view.type as PlannerView);
-                }}
-                dateClick={handleDateClick}
-                eventClick={handleEventClick}
-                events={events.map(toCalendarInput)}
-              />
+                <FullCalendar
+                  ref={calendarRef}
+                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                  initialView="dayGridMonth"
+                  locale={arLocale}
+                  direction="rtl"
+                  firstDay={0}
+                  height={currentView === "timeGridWeek" ? 680 : "auto"}
+                  editable={false}
+                  selectable={false}
+                  eventDisplay="block"
+                  dayMaxEventRows={3}
+                  weekends
+                  nowIndicator
+                  allDaySlot
+                  headerToolbar={false}
+                  moreLinkText={(count) => `+${count} مواعيد`}
+                  dayHeaderFormat={{ weekday: "short" }}
+                  eventTimeFormat={{
+                    hour: "numeric",
+                    minute: "2-digit",
+                    meridiem: "short",
+                  }}
+                  slotLabelFormat={{
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  }}
+                  slotMinTime="08:00:00"
+                  slotMaxTime="22:00:00"
+                  scrollTime="08:00:00"
+                  scrollTimeReset
+                  eventContent={renderEventContent}
+                  datesSet={(arg) => {
+                    setCurrentRangeLabel(arg.view.title);
+                    setCurrentView(arg.view.type as PlannerView);
+                  }}
+                  dateClick={handleDateClick}
+                  eventClick={handleEventClick}
+                  events={events.map(toCalendarInput)}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -572,7 +718,9 @@ export function AcademicCalendar() {
         }
         open={dialogState.open}
         mode={dialogState.open ? dialogState.mode : "create"}
-        initialValues={dialogState.open ? dialogState.values : EMPTY_FORM_VALUES}
+        initialValues={
+          dialogState.open ? dialogState.values : EMPTY_FORM_VALUES
+        }
         onClose={closeDialog}
         onDelete={
           dialogState.open && dialogState.mode === "edit" && dialogState.eventId
