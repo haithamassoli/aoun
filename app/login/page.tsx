@@ -47,7 +47,8 @@ export default function LoginPage() {
             تسجيل الدخول
           </h1>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            سجّل دخولك للوصول إلى لوحة التحكم
+            هذه الصفحة مخصصة للمشرفين والمساهمين الذين يرفعون المواد والموارد
+            الدراسية إلى التطبيق
           </p>
         </div>
 
