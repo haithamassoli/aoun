@@ -10,6 +10,7 @@ import {
 } from "@/lib/gpa-utils";
 import {
   loadSupports42ScalePreference,
+  useGradeTypePreference,
   saveSupports42ScalePreference,
 } from "@/lib/gpa-preferences";
 import { SemesterGpaForm } from "./semester-gpa-form";
@@ -104,7 +105,12 @@ export function GpaCalculatorTabs() {
   const [supports42Scale, setSupports42Scale] = useState(
     DEFAULT_GRADE_SCALE === "just",
   );
-  const activeScale: GradeScale = supports42Scale ? "just" : "jordan_plus_minus";
+  const gradeTypePreference = useGradeTypePreference();
+  const isPercentageGradeType = gradeTypePreference === "percentage";
+  const effectiveSupports42Scale = supports42Scale && !isPercentageGradeType;
+  const activeScale: GradeScale = effectiveSupports42Scale
+    ? "just"
+    : "jordan_plus_minus";
   const activeScaleInfo = GRADE_SCALES[activeScale];
 
   useEffect(() => {
@@ -235,13 +241,19 @@ export function GpaCalculatorTabs() {
           <label className="inline-flex items-center gap-2 self-start rounded-full border border-surface-200 bg-white px-3 py-1.5 text-[11px] font-medium text-surface-600 shadow-sm dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
             <input
               type="checkbox"
-              checked={supports42Scale}
+              checked={effectiveSupports42Scale}
               onChange={(event) => setSupports42Scale(event.target.checked)}
+              disabled={isPercentageGradeType}
               className="h-3.5 w-3.5 rounded border-surface-300 text-primary-600 focus:ring-primary-500 dark:border-surface-600"
             />
             جامعتي تعتمد نظام 4.2
           </label>
         </div>
+        {isPercentageGradeType && (
+          <p className="mt-2 text-[11px] text-surface-500 dark:text-surface-400">
+            غير متاح مع اختيار الدرجة المئوية.
+          </p>
+        )}
       </div>
 
       {/* Tabs */}

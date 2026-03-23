@@ -14,10 +14,42 @@ const VALID_GRADE_TYPES = new Set<GradeType>([
   "percentage",
   "points",
 ]);
-const noopSubscribe = () => () => {};
+const GPA_PREFERENCES_CHANGE_EVENT = "aoun:gpa-preferences-changed";
 
 function canUseStorage() {
   return typeof window !== "undefined";
+}
+
+function subscribeToPreferenceChanges(listener: () => void) {
+  if (!canUseStorage()) {
+    return () => {};
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (
+      event.storageArea === window.localStorage &&
+      (event.key === GPA_SUPPORTS_42_SCALE_STORAGE_KEY ||
+        event.key === GPA_GRADE_TYPE_STORAGE_KEY)
+    ) {
+      listener();
+    }
+  };
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(GPA_PREFERENCES_CHANGE_EVENT, listener);
+
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(GPA_PREFERENCES_CHANGE_EVENT, listener);
+  };
+}
+
+function notifyPreferenceChange() {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  window.dispatchEvent(new Event(GPA_PREFERENCES_CHANGE_EVENT));
 }
 
 export function loadSupports42ScalePreference() {
@@ -52,6 +84,7 @@ export function saveSupports42ScalePreference(supports42Scale: boolean) {
       GPA_SUPPORTS_42_SCALE_STORAGE_KEY,
       supports42Scale ? "1" : "0",
     );
+    notifyPreferenceChange();
   } catch {
     // Local storage may be blocked by the browser.
   }
@@ -82,6 +115,7 @@ export function saveGradeTypePreference(gradeType: GradeType) {
 
   try {
     window.localStorage.setItem(GPA_GRADE_TYPE_STORAGE_KEY, gradeType);
+    notifyPreferenceChange();
   } catch {
     // Local storage may be blocked by the browser.
   }
@@ -89,7 +123,7 @@ export function saveGradeTypePreference(gradeType: GradeType) {
 
 export function useGradeTypePreference(defaultGradeType: GradeType = "letter") {
   return useSyncExternalStore(
-    noopSubscribe,
+    subscribeToPreferenceChanges,
     () => loadGradeTypePreference(defaultGradeType),
     () => defaultGradeType,
   );
