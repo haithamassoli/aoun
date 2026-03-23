@@ -3,7 +3,7 @@ import * as motion from "motion/react-client";
 import { AcademicCalendar } from "@/components/academic-calendar/academic-calendar";
 
 export const metadata: Metadata = {
-  title: "المخطط الأكاديمي",
+  title: "التقويم",
   description:
     "نظّم الامتحانات والمشاريع ومواعيد التسجيل في تقويم أكاديمي عربي محفوظ محلياً على جهازك.",
 };
