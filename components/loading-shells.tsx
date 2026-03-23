@@ -307,6 +307,21 @@ export function MajorPageSkeleton() {
       <section className="hidden mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 md:block">
         <div className="mb-8 space-y-4">
           <Skeleton className="h-8 w-40" />
+          <div className="rounded-[32px] border border-surface-200 bg-white/80 p-4 dark:border-surface-700 dark:bg-surface-900/80">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-3">
+                <Skeleton className="h-3 w-24 rounded-full" />
+                <Skeleton className="h-6 w-56 rounded-full" />
+                <Skeleton className="h-4 w-80 max-w-full rounded-full" />
+              </div>
+              <Skeleton className="h-11 w-32 rounded-2xl" />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="h-8 w-24 rounded-full" />
+              ))}
+            </div>
+          </div>
           <div className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">

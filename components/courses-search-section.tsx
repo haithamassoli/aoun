@@ -17,6 +17,7 @@ import {
   loadCourseStatuses,
   setCourseStatus,
 } from "@/lib/student-progress";
+import { CustomCourseTracker } from "@/components/custom-course-tracker";
 import {
   formatCourseSemesterLabel,
   getCourseSemesterGroupKey,
@@ -686,6 +687,7 @@ export function CoursesSearchSection({
         </div>
       ) : search.isEmpty ? (
         <div className="space-y-10">
+          <CustomCourseTracker majorId={majorId} />
           {groupedDefaultCourses.map((semester) => {
             const groupKey = getSemesterGroupKey(semester.key);
             const panelId = `courses-semester-panel-${groupKey}`;
