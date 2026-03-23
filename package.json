@@ -9,6 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/react": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
     "@tanstack/react-form": "^1.28.4",
     "@tanstack/react-form-nextjs": "^1.28.4",
     "@tanstack/react-store": "^0.9.1",

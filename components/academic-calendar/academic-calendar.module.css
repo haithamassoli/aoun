@@ -1,0 +1,197 @@
+.planner {
+  position: relative;
+}
+
+.planner :global(.fc) {
+  --fc-border-color: color-mix(in srgb, var(--color-surface-200) 88%, white);
+  --fc-neutral-bg-color: var(--color-surface-50);
+  --fc-list-event-hover-bg-color: var(--color-surface-50);
+  --fc-page-bg-color: transparent;
+  --fc-now-indicator-color: var(--color-primary-500);
+  direction: rtl;
+  font-family: var(--font-sans);
+}
+
+.planner :global(.fc .fc-scrollgrid),
+.planner :global(.fc .fc-timegrid-slot),
+.planner :global(.fc .fc-col-header-cell),
+.planner :global(.fc .fc-daygrid-day),
+.planner :global(.fc .fc-timegrid-axis),
+.planner :global(.fc .fc-timegrid-divider) {
+  border-color: color-mix(in srgb, var(--color-surface-200) 90%, white);
+}
+
+.planner :global(.fc .fc-toolbar) {
+  display: none;
+}
+
+.planner :global(.fc .fc-scrollgrid) {
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.92)),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 40%);
+}
+
+.planner :global(.fc .fc-col-header-cell) {
+  background: color-mix(in srgb, var(--color-primary-50) 72%, white);
+}
+
+.planner :global(.fc .fc-col-header-cell-cushion) {
+  padding: 0.95rem 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-surface-700);
+}
+
+.planner :global(.fc .fc-daygrid-day-number),
+.planner :global(.fc .fc-timegrid-axis-cushion),
+.planner :global(.fc .fc-timegrid-slot-label-cushion) {
+  color: var(--color-surface-500);
+  font-size: 0.78rem;
+}
+
+.planner :global(.fc .fc-day-other .fc-daygrid-day-top),
+.planner :global(.fc .fc-day-other .fc-daygrid-day-number) {
+  opacity: 0.45;
+}
+
+.planner :global(.fc .fc-daygrid-day.fc-day-today),
+.planner :global(.fc .fc-timegrid-col.fc-day-today) {
+  background:
+    linear-gradient(180deg, rgba(191, 219, 254, 0.18), rgba(191, 219, 254, 0.04));
+}
+
+.planner :global(.fc .fc-highlight) {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.planner :global(.fc .fc-more-link) {
+  color: var(--color-primary-600);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.planner :global(.fc .fc-event) {
+  border: 0;
+  border-radius: 1rem;
+  padding: 0.12rem;
+  box-shadow: 0 14px 30px -22px rgba(15, 23, 42, 0.7);
+}
+
+.planner :global(.fc .fc-event-main) {
+  padding: 0.22rem 0.4rem;
+}
+
+.planner :global(.fc .fc-daygrid-event-harness) {
+  margin-inline: 0.28rem;
+}
+
+.planner :global(.fc .planner-event--exam) {
+  background: linear-gradient(135deg, #dc2626, #f97316);
+}
+
+.planner :global(.fc .planner-event--registration) {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+}
+
+.planner :global(.fc .planner-event--add_drop) {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+.planner :global(.fc .planner-event--project) {
+  background: linear-gradient(135deg, #059669, #14b8a6);
+}
+
+.eventCard {
+  display: grid;
+  gap: 0.1rem;
+  overflow: hidden;
+  color: white;
+}
+
+.eventTime {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.86;
+}
+
+.eventTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.eventCategory {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.63rem;
+  opacity: 0.82;
+}
+
+.planner :global(.fc .fc-popover) {
+  border: 1px solid var(--color-surface-200);
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 28px 80px -38px rgba(15, 23, 42, 0.45);
+}
+
+.planner :global(.fc .fc-popover-header) {
+  background: var(--color-surface-50);
+}
+
+@media (max-width: 768px) {
+  .planner :global(.fc .fc-col-header-cell-cushion) {
+    font-size: 0.73rem;
+  }
+
+  .planner :global(.fc .fc-daygrid-day-number),
+  .planner :global(.fc .fc-timegrid-slot-label-cushion) {
+    font-size: 0.7rem;
+  }
+}
+
+:global(.dark) .planner :global(.fc) {
+  --fc-border-color: color-mix(in srgb, var(--color-surface-700) 86%, black);
+  --fc-neutral-bg-color: rgba(15, 23, 42, 0.35);
+  --fc-list-event-hover-bg-color: rgba(15, 23, 42, 0.4);
+}
+
+:global(.dark) .planner :global(.fc .fc-scrollgrid) {
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.78), rgba(15, 23, 42, 0.92)),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 42%);
+}
+
+:global(.dark) .planner :global(.fc .fc-col-header-cell) {
+  background: rgba(30, 41, 59, 0.78);
+}
+
+:global(.dark) .planner :global(.fc .fc-col-header-cell-cushion) {
+  color: var(--color-surface-100);
+}
+
+:global(.dark) .planner :global(.fc .fc-daygrid-day-number),
+:global(.dark) .planner :global(.fc .fc-timegrid-axis-cushion),
+:global(.dark) .planner :global(.fc .fc-timegrid-slot-label-cushion) {
+  color: var(--color-surface-400);
+}
+
+:global(.dark) .planner :global(.fc .fc-daygrid-day.fc-day-today),
+:global(.dark) .planner :global(.fc .fc-timegrid-col.fc-day-today) {
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.18), rgba(37, 99, 235, 0.04));
+}
+
+:global(.dark) .planner :global(.fc .fc-popover) {
+  border-color: var(--color-surface-700);
+  background: var(--color-surface-900);
+}
+
+:global(.dark) .planner :global(.fc .fc-popover-header) {
+  background: var(--color-surface-800);
+}

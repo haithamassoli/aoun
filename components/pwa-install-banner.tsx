@@ -30,18 +30,26 @@ function isStandaloneMode(): boolean {
 function wasRecentlyDismissed(): boolean {
   if (typeof window === "undefined") return false;
 
-  const raw = localStorage.getItem(DISMISS_KEY);
-  if (!raw) return false;
+  try {
+    const raw = localStorage.getItem(DISMISS_KEY);
+    if (!raw) return false;
 
-  const dismissedAt = Number(raw);
-  if (!Number.isFinite(dismissedAt)) return false;
+    const dismissedAt = Number(raw);
+    if (!Number.isFinite(dismissedAt)) return false;
 
-  const elapsedMs = Date.now() - dismissedAt;
-  return elapsedMs < DISMISS_DAYS * 24 * 60 * 60 * 1000;
+    const elapsedMs = Date.now() - dismissedAt;
+    return elapsedMs < DISMISS_DAYS * 24 * 60 * 60 * 1000;
+  } catch {
+    return false;
+  }
 }
 
 function markDismissed() {
-  localStorage.setItem(DISMISS_KEY, String(Date.now()));
+  try {
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+  } catch {
+    // Ignore storage failures and fall back to a non-persistent dismiss.
+  }
 }
 
 function shouldStartVisible(): boolean {
