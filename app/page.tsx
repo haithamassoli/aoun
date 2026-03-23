@@ -38,6 +38,15 @@ export default async function Home() {
   } catch {
     // Convex may not have data yet
   }
+  let visitorsTotal: number | null = null;
+  try {
+    const publicVisitors = await fetchQuery(
+      api.dashboard.getPublicVisitorsTotal,
+    );
+    visitorsTotal = publicVisitors.visitorsTotal;
+  } catch {
+    // Convex may not have data yet
+  }
   const sortedUniversities = universities.toSorted(
     (a: { order: number }, b: { order: number }) => a.order - b.order,
   );
@@ -74,6 +83,35 @@ export default async function Home() {
           >
             اختر جامعتك وابدأ بتصفح المواد
           </motion.p>
+          {visitorsTotal !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mx-auto mt-8 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[0_16px_40px_rgba(15,23,42,0.16)] backdrop-blur-md"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15">
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 20h5V18a4 4 0 00-5-3.874M17 20H7m10 0v-2c0-.653-.157-1.269-.436-1.813M7 20H2V18a4 4 0 015-3.874M7 20v-2c0-.653.157-1.269.436-1.813m0 0a5.002 5.002 0 019.128 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </span>
+              <span>إجمالي الزوار</span>
+              <span className="tabular-nums font-semibold">
+                {visitorsTotal}
+              </span>
+            </motion.div>
+          )}
         </div>
       </section>
 

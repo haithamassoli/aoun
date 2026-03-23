@@ -78,6 +78,10 @@ const analyticsTotals = v.object({
   coursesTotal: v.number(),
 });
 
+const publicVisitorsTotal = v.object({
+  visitorsTotal: v.number(),
+});
+
 const visitorSeriesEntry = v.object({
   dateKey: v.string(),
   label: v.string(),
@@ -364,6 +368,18 @@ export const getAdminAnalyticsTotals = query({
   },
 });
 
+export const getPublicVisitorsTotal = query({
+  args: {},
+  returns: publicVisitorsTotal,
+  handler: async (ctx) => {
+    const visitorsTotal = await ctx.db.query("visitors").count();
+
+    return {
+      visitorsTotal,
+    };
+  },
+});
+
 export const trackVisitorVisit = mutation({
   args: {
     visitorKey: v.string(),
@@ -458,7 +474,7 @@ export const getAdminDashboardAnalytics = query({
         ctx.db.query("universities").collect(),
         ctx.db.query("majors").collect(),
         ctx.db.query("courses").collect(),
-        ctx.db.query("visitors").collect(),
+        ctx.db.query("visitors").count(),
         ctx.db.query("visitorDailyStats").collect(),
       ]);
 
@@ -479,7 +495,7 @@ export const getAdminDashboardAnalytics = query({
       universitiesTotal: activeUniversities.length,
       majorsTotal: activeMajors.length,
       coursesTotal: activeCourses.length,
-      visitorsTotal: visitors.length,
+      visitorsTotal: visitors,
       entitySeries: dateKeys.map((dateKey, index) => ({
         dateKey,
         label: formatSeriesLabel(dateKey),
