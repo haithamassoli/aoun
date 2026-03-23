@@ -423,12 +423,6 @@ export default function DashboardPage() {
                     >
                       {metric.value}
                     </p>
-                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                      {metric.label}
-                    </p>
-                    <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
-                      {metric.hint}
-                    </p>
                   </div>
                 </motion.article>
               ))}
