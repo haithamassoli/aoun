@@ -74,32 +74,40 @@ function getStatusStats(courses: CustomCourse[]) {
   return stats;
 }
 
-export function CustomCourseTracker({ majorId }: { majorId: string }) {
+export function CustomCourseTracker({
+  majorId,
+  onCoursesChange,
+}: {
+  majorId: string;
+  onCoursesChange?: (courses: CustomCourse[]) => void;
+}) {
   const toast = useToast();
   const [isReady, setIsReady] = useState(false);
   const [courses, setCourses] = useState<CustomCourse[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
   const [name, setName] = useState("");
-  const [note, setNote] = useState("");
+  const [credits, setCredits] = useState("3");
   const [status, setStatus] = useState<CourseProgressStatus>("none");
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
-      setCourses(loadCustomCourses(majorId));
+      const loadedCourses = loadCustomCourses(majorId);
+      setCourses(loadedCourses);
       setIsReady(true);
+      onCoursesChange?.(loadedCourses);
     });
 
     return () => {
       window.cancelAnimationFrame(frameId);
     };
-  }, [majorId]);
+  }, [majorId, onCoursesChange]);
 
   const stats = useMemo(() => getStatusStats(courses), [courses]);
 
   const resetForm = () => {
     setName("");
-    setNote("");
+    setCredits("3");
     setStatus("none");
     setEditingCourseId(null);
     setShowForm(false);
@@ -112,7 +120,7 @@ export function CustomCourseTracker({ majorId }: { majorId: string }) {
 
   const beginEdit = (course: CustomCourse) => {
     setName(course.name);
-    setNote(course.note ?? "");
+    setCredits(String(course.credits ?? 3));
     setStatus(course.status);
     setEditingCourseId(course.id);
     setShowForm(true);
@@ -126,23 +134,33 @@ export function CustomCourseTracker({ majorId }: { majorId: string }) {
       return;
     }
 
+    const parsedCredits = Number.parseInt(credits, 10);
+    if (
+      Number.isNaN(parsedCredits) ||
+      parsedCredits < 1 ||
+      parsedCredits > 12
+    ) {
+      toast.show("عدد الساعات يجب أن يكون بين 1 و 12", "error");
+      return;
+    }
+
     if (editingCourseId) {
-      setCourses(
-        updateCustomCourse(majorId, editingCourseId, {
-          name: trimmedName,
-          note,
-          status,
-        }),
-      );
+      const updatedCourses = updateCustomCourse(majorId, editingCourseId, {
+        name: trimmedName,
+        credits: parsedCredits,
+        status,
+      });
+      setCourses(updatedCourses);
+      onCoursesChange?.(updatedCourses);
       toast.show("تم تحديث المسار الخاص", "success");
     } else {
-      setCourses(
-        createCustomCourse(majorId, {
-          name: trimmedName,
-          note,
-          status,
-        }),
-      );
+      const newCourses = createCustomCourse(majorId, {
+        name: trimmedName,
+        credits: parsedCredits,
+        status,
+      });
+      setCourses(newCourses);
+      onCoursesChange?.(newCourses);
       toast.show("تمت إضافة المسار الخاص", "success");
     }
 
@@ -150,7 +168,9 @@ export function CustomCourseTracker({ majorId }: { majorId: string }) {
   };
 
   const handleDelete = (courseId: string) => {
-    setCourses(removeCustomCourse(majorId, courseId));
+    const updatedCourses = removeCustomCourse(majorId, courseId);
+    setCourses(updatedCourses);
+    onCoursesChange?.(updatedCourses);
 
     if (editingCourseId === courseId) {
       resetForm();
@@ -163,7 +183,9 @@ export function CustomCourseTracker({ majorId }: { majorId: string }) {
     courseId: string,
     nextStatus: CourseProgressStatus,
   ) => {
-    setCourses(setCustomCourseStatus(majorId, courseId, nextStatus));
+    const updatedCourses = setCustomCourseStatus(majorId, courseId, nextStatus);
+    setCourses(updatedCourses);
+    onCoursesChange?.(updatedCourses);
   };
 
   return (
@@ -236,19 +258,22 @@ export function CustomCourseTracker({ majorId }: { majorId: string }) {
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="مثال: تحضير مقابلة التخرج"
+                placeholder="مثال: عسكرية"
                 className="h-11 w-full rounded-xl border border-surface-300 bg-white px-3 text-sm text-surface-800 outline-none transition-all placeholder:text-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-surface-600 dark:bg-surface-950 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:ring-primary-900"
               />
             </div>
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200">
-                ملاحظة (اختياري)
+                عدد الساعات
               </label>
               <input
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                placeholder="مثال: أراجعها كل يوم سبت"
+                type="number"
+                min="1"
+                max="12"
+                value={credits}
+                onChange={(event) => setCredits(event.target.value)}
+                placeholder="3"
                 className="h-11 w-full rounded-xl border border-surface-300 bg-white px-3 text-sm text-surface-800 outline-none transition-all placeholder:text-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-surface-600 dark:bg-surface-950 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:ring-primary-900"
               />
             </div>
@@ -308,15 +333,28 @@ export function CustomCourseTracker({ majorId }: { majorId: string }) {
                       <span className="inline-flex rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
                         مسار خاص
                       </span>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300">
+                          <svg
+                            className="h-3 w-3"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          {course.credits ?? 3} ساعة
+                        </span>
+                      </div>
                     </div>
                     <h4 className="line-clamp-2 text-sm font-semibold leading-6 text-surface-900 transition-colors group-hover:text-primary-700 dark:text-surface-50 dark:group-hover:text-primary-300 sm:text-base">
                       {course.name}
                     </h4>
-                    {course.note ? (
-                      <p className="line-clamp-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-                        {course.note}
-                      </p>
-                    ) : null}
                   </div>
 
                   <div className="flex shrink-0 items-center gap-1">

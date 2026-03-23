@@ -2,13 +2,13 @@ import type { CourseProgressStatus } from "@/lib/student-progress";
 
 const STORAGE_NAMESPACE = "aoun:student";
 const STORAGE_VERSION = "v1";
-const CUSTOM_COURSES_STORAGE_KEY =
-  `${STORAGE_NAMESPACE}:custom-courses:${STORAGE_VERSION}`;
+const CUSTOM_COURSES_STORAGE_KEY = `${STORAGE_NAMESPACE}:custom-courses:${STORAGE_VERSION}`;
 
 export type CustomCourse = {
   id: string;
   name: string;
   note?: string;
+  credits: number;
   status: CourseProgressStatus;
   createdAt: number;
   updatedAt: number;
@@ -72,10 +72,18 @@ function normalizeCustomCourse(value: unknown): CustomCourse | null {
       ? candidate.note.trim()
       : undefined;
 
+  const credits =
+    typeof candidate.credits === "number" &&
+    candidate.credits >= 1 &&
+    candidate.credits <= 12
+      ? candidate.credits
+      : undefined;
+
   return {
     id,
     name: name.trim(),
     note,
+    credits,
     status,
     createdAt,
     updatedAt,
@@ -209,7 +217,7 @@ export function createCustomCourse(
   majorId: string,
   input: {
     name: string;
-    note?: string;
+    credits?: number;
     status?: CourseProgressStatus;
   },
 ) {
@@ -217,7 +225,7 @@ export function createCustomCourse(
   const course: CustomCourse = {
     id: generateLocalId(),
     name: input.name.trim(),
-    note: input.note?.trim() || undefined,
+    credits: input.credits,
     status: input.status ?? "none",
     createdAt: now,
     updatedAt: now,
@@ -229,7 +237,7 @@ export function createCustomCourse(
 export function updateCustomCourse(
   majorId: string,
   courseId: string,
-  patch: Partial<Pick<CustomCourse, "name" | "note" | "status">>,
+  patch: Partial<Pick<CustomCourse, "name" | "credits" | "status">>,
 ) {
   const courses = loadCustomCourses(majorId);
   const nextCourses = courses.map((course) =>
@@ -238,10 +246,7 @@ export function updateCustomCourse(
       : {
           ...course,
           name: patch.name !== undefined ? patch.name.trim() : course.name,
-          note:
-            patch.note !== undefined
-              ? patch.note.trim() || undefined
-              : course.note,
+          credits: patch.credits !== undefined ? patch.credits : course.credits,
           status: patch.status ?? course.status,
           updatedAt: Date.now(),
         },

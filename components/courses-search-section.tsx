@@ -301,9 +301,11 @@ function CourseCard({
 function CourseProgressStats({
   courseStatuses,
   courses,
+  customCourses = [],
 }: {
   courseStatuses: Record<string, CourseProgressStatus>;
   courses: CourseListItem[];
+  customCourses?: Array<{ id: string; status: CourseProgressStatus; credits?: number }>;
 }) {
   let totalCredits = 0;
   let hiddenCredits = 0;
@@ -326,6 +328,24 @@ function CourseProgressStats({
 
     if (status === "in_progress") {
       inProgressCredits += course.credits;
+    }
+  }
+
+  // Include custom courses in the stats
+  for (const customCourse of customCourses) {
+    const credits = customCourse.credits ?? 3;
+    
+    if (customCourse.status === "completed") {
+      completedCredits += credits;
+      totalCredits += credits;
+    } else if (customCourse.status === "in_progress") {
+      inProgressCredits += credits;
+      totalCredits += credits;
+    } else if (customCourse.status === "hidden") {
+      hiddenCredits += credits;
+      totalCredits += credits;
+    } else {
+      totalCredits += credits;
     }
   }
 
@@ -479,6 +499,9 @@ export function CoursesSearchSection({
   const [collapsedSemesterGroups, setCollapsedSemesterGroups] = useState<
     Record<string, boolean>
   >({});
+  const [customCourses, setCustomCourses] = useState<
+    Array<{ id: string; status: CourseProgressStatus; credits?: number }>
+  >([]);
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
@@ -596,6 +619,7 @@ export function CoursesSearchSection({
           <CourseProgressStats
             courseStatuses={courseStatuses}
             courses={courses}
+            customCourses={customCourses}
           />
         ) : null}
 
@@ -687,7 +711,14 @@ export function CoursesSearchSection({
         </div>
       ) : search.isEmpty ? (
         <div className="space-y-10">
-          <CustomCourseTracker majorId={majorId} />
+          <CustomCourseTracker
+            majorId={majorId}
+            onCoursesChange={(courses) =>
+              setCustomCourses(
+                courses.map((c) => ({ id: c.id, status: c.status, credits: c.credits })),
+              )
+            }
+          />
           {groupedDefaultCourses.map((semester) => {
             const groupKey = getSemesterGroupKey(semester.key);
             const panelId = `courses-semester-panel-${groupKey}`;
