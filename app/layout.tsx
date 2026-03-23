@@ -9,6 +9,7 @@ import { getSessionToken } from "@/app/actions/auth";
 import { PWARegister } from "@/components/pwa-register";
 import { PWAInstallBanner } from "@/components/pwa-install-banner";
 import { VisitorTracker } from "@/components/visitor-tracker";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
@@ -83,7 +84,7 @@ export default async function RootLayout({
           <ConvexClientProvider sessionToken={sessionToken}>
             <VisitorTracker />
             <div className="flex min-h-screen flex-col">
-              <header className="sticky top-0 z-50 border-b border-surface-200 bg-white/80 backdrop-blur-md dark:border-surface-700 dark:bg-surface-950/80">
+              <header className="hidden border-b border-surface-200 bg-white/80 backdrop-blur-md md:sticky md:top-0 md:z-50 md:block dark:border-surface-700 dark:bg-surface-950/80">
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                   <Link href="/" className="flex items-center gap-2">
                     <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
@@ -112,9 +113,13 @@ export default async function RootLayout({
                 </div>
               </header>
 
-              <main className="flex-1">{children}</main>
+              <main className="flex-1 pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
+                {children}
+              </main>
 
-              <footer className="border-t border-surface-200 bg-surface-50 dark:border-surface-700 dark:bg-surface-950">
+              <MobileBottomNav />
+
+              <footer className="hidden border-t border-surface-200 bg-surface-50 md:block dark:border-surface-700 dark:bg-surface-950">
                 <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                   <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
                     <p className="text-sm text-surface-500 dark:text-surface-400">

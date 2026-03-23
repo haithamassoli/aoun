@@ -12,6 +12,8 @@ const labels: Record<Theme, string> = {
   system: "تفعيل الوضع الفاتح",
 };
 
+const emptySubscribe = () => () => {};
+
 function SunIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -54,11 +56,7 @@ const icons: Record<Theme, React.ReactNode> = {
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   if (!mounted) return <div className="h-9 w-9" aria-hidden="true" />;
 

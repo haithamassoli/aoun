@@ -133,7 +133,7 @@ export function PWAInstallBanner() {
   };
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 px-4 sm:px-6">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-50 px-4 md:bottom-4 md:px-6">
       <section className="pointer-events-auto mx-auto w-full max-w-xl rounded-2xl border border-primary-200 bg-white/95 p-4 shadow-xl shadow-primary-900/10 backdrop-blur-md dark:border-primary-800 dark:bg-surface-900/95">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300">
