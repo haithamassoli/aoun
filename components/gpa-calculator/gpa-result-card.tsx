@@ -3,6 +3,7 @@
 import {
   getGpaColors,
   getGpaLabel,
+  getGpaLetter,
   getScaleMaxGpa,
   type GpaResult,
   type GradeScale,
@@ -21,6 +22,7 @@ export function GpaResultCard({
 }: GpaResultCardProps) {
   const colors = getGpaColors(result.gpa);
   const label = getGpaLabel(result.gpa);
+  const letter = getGpaLetter(result.gpa, scale);
   const maxGpa = getScaleMaxGpa(scale);
   const percentage = maxGpa > 0 ? (result.gpa / maxGpa) * 100 : 0;
 
@@ -45,8 +47,11 @@ export function GpaResultCard({
         >
           {label}
         </span>
+        <span className="rounded-full border border-surface-200 bg-white px-3 py-1 text-sm font-semibold text-surface-700 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-200">
+          {letter}
+        </span>
         <p className="text-xs text-surface-500 dark:text-surface-400">
-          النسبة المكافئة والمعدل بالنقاط معاً
+          النسبة المكافئة والمعدل بالنقاط مع الدرجة الحرفية
         </p>
       </div>
       <div className="mt-4 flex justify-center gap-6 border-t border-current/10 pt-4 text-sm text-surface-500 dark:text-surface-400">

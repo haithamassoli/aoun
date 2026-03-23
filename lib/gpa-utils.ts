@@ -115,6 +115,13 @@ export function getScaleMaxGpa(scale: GradeScale): number {
   return GRADE_SCALES[scale].maxGpa;
 }
 
+export function getGpaLetter(gpa: number, scale: GradeScale): string {
+  const grades = GRADE_SCALES[scale].grades;
+  const found = [...grades].find((grade) => gpa >= grade.points);
+
+  return found ? found.letter : grades[grades.length - 1]?.letter ?? "-";
+}
+
 export function gradeToPoints(
   grade: string,
   gradeType: GradeType,
