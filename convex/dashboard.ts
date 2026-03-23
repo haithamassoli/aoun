@@ -13,6 +13,7 @@ const socialLinks = v.object({
   instagram: v.optional(v.string()),
   facebook: v.optional(v.string()),
   facebookGroup: v.optional(v.string()),
+  faculty: v.optional(v.string()),
   telegram: v.optional(v.string()),
 });
 

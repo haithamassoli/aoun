@@ -71,12 +71,14 @@ function buildSocialLinks(value: {
   instagram: string;
   facebook: string;
   facebookGroup: string;
+  faculty: string;
   telegram: string;
 }) {
   const socialLinks = {
     instagram: value.instagram.trim() || undefined,
     facebook: value.facebook.trim() || undefined,
     facebookGroup: value.facebookGroup.trim() || undefined,
+    faculty: value.faculty.trim() || undefined,
     telegram: value.telegram.trim() || undefined,
   };
 
@@ -249,6 +251,7 @@ export default function MajorCoursesPage() {
       instagram: "",
       facebook: "",
       facebookGroup: "",
+      faculty: "",
       telegram: "",
     },
     validators: { onChange: contributorMajorSchema },
@@ -360,6 +363,7 @@ export default function MajorCoursesPage() {
       majorLinkForm.setFieldValue("instagram", major.socialLinks?.instagram ?? "");
       majorLinkForm.setFieldValue("facebook", major.socialLinks?.facebook ?? "");
       majorLinkForm.setFieldValue("facebookGroup", major.socialLinks?.facebookGroup ?? "");
+      majorLinkForm.setFieldValue("faculty", major.socialLinks?.faculty ?? "");
       majorLinkForm.setFieldValue("telegram", major.socialLinks?.telegram ?? "");
     }
     setShowMajorLinkForm(true);
@@ -642,6 +646,13 @@ export default function MajorCoursesPage() {
                 name="facebookGroup"
                 label="Facebook Group"
                 placeholder="https://facebook.com/groups/..."
+                dir="ltr"
+              />
+              <FormInput
+                form={majorLinkForm}
+                name="faculty"
+                label="Faculty"
+                placeholder="https://..."
                 dir="ltr"
               />
               <FormInput

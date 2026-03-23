@@ -73,6 +73,7 @@ export const majorSchema = z.object({
   instagram: optionalUrlField,
   facebook: optionalUrlField,
   facebookGroup: optionalUrlField,
+  faculty: optionalUrlField,
   telegram: optionalUrlField,
 });
 
@@ -121,6 +122,7 @@ export const contributorMajorSchema = z.object({
   instagram: optionalUrlField,
   facebook: optionalUrlField,
   facebookGroup: optionalUrlField,
+  faculty: optionalUrlField,
   telegram: optionalUrlField,
 });
 
