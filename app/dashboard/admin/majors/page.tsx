@@ -13,6 +13,7 @@ import { majorSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
+import { normalizeAlias } from "@/lib/alias";
 
 function buildSocialLinks(value: {
   instagram: string;
@@ -75,7 +76,7 @@ export default function AdminMajorsPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             order: Number(value.order) || 0,
-            alias: value.alias.trim() || undefined,
+            alias: normalizeAlias(value.alias) || undefined,
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
             socialLinks: buildSocialLinks(value),
           });
@@ -87,7 +88,7 @@ export default function AdminMajorsPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             order: Number(value.order) || 0,
-            alias: value.alias.trim() || undefined,
+            alias: normalizeAlias(value.alias) || undefined,
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
             socialLinks: buildSocialLinks(value),
           });
@@ -136,7 +137,7 @@ export default function AdminMajorsPage() {
         name: major.name,
         slug: major.slug,
         order: major.order.toString(),
-        alias: major.alias ?? "",
+        alias: normalizeAlias(major.alias ?? ""),
         treeDiagramUrl: major.treeDiagramUrl ?? "",
         instagram: major.socialLinks?.instagram ?? "",
         facebook: major.socialLinks?.facebook ?? "",

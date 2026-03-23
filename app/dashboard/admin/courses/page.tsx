@@ -13,6 +13,7 @@ import { courseSchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
+import { normalizeAlias } from "@/lib/alias";
 import { formatCourseSemesterLabel } from "@/lib/course-semester";
 
 export default function AdminCoursesPage() {
@@ -61,7 +62,7 @@ export default function AdminCoursesPage() {
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester,
             order: Number(value.order) || 0,
-            alias: value.alias.trim() || undefined,
+            alias: normalizeAlias(value.alias) || undefined,
           });
           toast.show("تم تحديث المادة بنجاح", "success");
         } else {
@@ -74,7 +75,7 @@ export default function AdminCoursesPage() {
             courseCode: value.courseCode.trim() || undefined,
             semester: value.semester,
             order: Number(value.order) || 0,
-            alias: value.alias.trim() || undefined,
+            alias: normalizeAlias(value.alias) || undefined,
           });
           toast.show("تم إضافة المادة بنجاح", "success");
         }
@@ -119,7 +120,7 @@ export default function AdminCoursesPage() {
         courseCode: course.courseCode ?? "",
         semester: course.semester ?? "",
         order: course.order.toString(),
-        alias: course.alias ?? "",
+        alias: normalizeAlias(course.alias ?? ""),
       },
       { keepDefaultValues: true },
     );

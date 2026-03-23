@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
+import { normalizeAlias } from "../lib/alias";
 import { mutation, query } from "./_generated/server";
 import { assertCanEditCourse, assertCanEditMajor, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildCourseSearchToken, normalize } from "./searchUtils";
@@ -138,7 +139,7 @@ export const add = mutation({
     const searchToken = buildCourseSearchToken({
       name: args.name,
       slug: args.slug,
-      alias: args.alias,
+      alias: args.alias ? normalizeAlias(args.alias) : args.alias,
       courseCode: args.courseCode,
     });
 
@@ -152,7 +153,7 @@ export const add = mutation({
       courseCode: args.courseCode,
       semester,
       order: args.order,
-      alias: args.alias,
+      alias: args.alias ? normalizeAlias(args.alias) : args.alias,
       searchToken,
     });
   },
@@ -199,7 +200,12 @@ export const update = mutation({
     // Recompute searchToken
     const newName = args.name ?? current.name;
     const newSlug = args.slug ?? current.slug;
-    const newAlias = args.alias !== undefined ? args.alias : current.alias;
+    const newAlias =
+      args.alias !== undefined
+        ? normalizeAlias(args.alias)
+        : current.alias
+          ? normalizeAlias(current.alias)
+          : current.alias;
     const newCourseCode = args.courseCode !== undefined ? args.courseCode : current.courseCode;
     const searchToken = buildCourseSearchToken({
       name: newName,
@@ -227,6 +233,7 @@ export const update = mutation({
 
     await ctx.db.patch("courses", courseId, {
       ...filtered,
+      alias: filtered.alias ? normalizeAlias(String(filtered.alias)) : filtered.alias,
       searchToken,
     });
 

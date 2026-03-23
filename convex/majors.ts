@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
+import { normalizeAlias } from "../lib/alias";
 import { mutation, query } from "./_generated/server";
 import { assertAdmin, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildMajorSearchToken, normalize } from "./searchUtils";
@@ -201,7 +202,7 @@ export const add = mutation({
     const searchToken = buildMajorSearchToken({
       name: args.name,
       slug: args.slug,
-      alias: args.alias,
+      alias: args.alias ? normalizeAlias(args.alias) : args.alias,
     });
 
     return await ctx.db.insert("majors", {
@@ -209,7 +210,7 @@ export const add = mutation({
       name: args.name,
       slug: args.slug,
       order: args.order,
-      alias: args.alias,
+      alias: args.alias ? normalizeAlias(args.alias) : args.alias,
       treeDiagramUrl: args.treeDiagramUrl,
       socialLinks: args.socialLinks,
       searchToken,
@@ -257,20 +258,26 @@ export const update = mutation({
     // Recompute searchToken
     const newName = args.name ?? current.name;
     const newSlug = args.slug ?? current.slug;
-    const newAlias = args.alias !== undefined ? args.alias : current.alias;
+    const newAlias =
+      args.alias !== undefined
+        ? normalizeAlias(args.alias)
+        : current.alias
+          ? normalizeAlias(current.alias)
+          : current.alias;
     const searchToken = buildMajorSearchToken({
       name: newName,
       slug: newSlug,
       alias: newAlias,
     });
 
-    const { majorId, token: _token, ...rawUpdates } = args;
+    const { majorId, ...rawUpdates } = args;
     const filtered = Object.fromEntries(
       Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
     );
 
     await ctx.db.patch("majors", majorId, {
       ...filtered,
+      alias: filtered.alias ? normalizeAlias(String(filtered.alias)) : filtered.alias,
       searchToken,
     });
 

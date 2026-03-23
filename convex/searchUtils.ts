@@ -92,9 +92,9 @@ function buildToken(values: (string | undefined | null)[]): string {
     .filter((v): v is string => !!v && v.trim().length > 0)
     .map(normalize);
 
-  // Split into individual tokens, treating commas as separators too.
+  // Split into individual tokens, treating commas, dots, and separators as boundaries.
   const tokens = normalized.flatMap((text) =>
-    text.split(/[,\s،]+/).filter(Boolean),
+    text.split(/[,\s،._/-]+/).filter(Boolean),
   );
   const uniqueTokens = [...new Set(tokens)];
 
