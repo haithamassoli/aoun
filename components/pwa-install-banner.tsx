@@ -7,8 +7,7 @@ type DeferredInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
-const DISMISS_KEY = "aoun-install-banner-dismissed-at";
-const DISMISS_DAYS = 3;
+let hasSeenInstallBanner = false;
 
 function isIosSafariBrowser(userAgent: string): boolean {
   const ua = userAgent.toLowerCase();
@@ -27,35 +26,10 @@ function isStandaloneMode(): boolean {
   );
 }
 
-function wasRecentlyDismissed(): boolean {
-  if (typeof window === "undefined") return false;
-
-  try {
-    const raw = localStorage.getItem(DISMISS_KEY);
-    if (!raw) return false;
-
-    const dismissedAt = Number(raw);
-    if (!Number.isFinite(dismissedAt)) return false;
-
-    const elapsedMs = Date.now() - dismissedAt;
-    return elapsedMs < DISMISS_DAYS * 24 * 60 * 60 * 1000;
-  } catch {
-    return false;
-  }
-}
-
-function markDismissed() {
-  try {
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
-  } catch {
-    // Ignore storage failures and fall back to a non-persistent dismiss.
-  }
-}
-
 function shouldStartVisible(): boolean {
   if (typeof window === "undefined") return false;
   if (isStandaloneMode()) return false;
-  if (wasRecentlyDismissed()) return false;
+  if (hasSeenInstallBanner) return false;
   return isIosSafariBrowser(window.navigator.userAgent);
 }
 
@@ -83,12 +57,15 @@ export function PWAInstallBanner() {
 
   useEffect(() => {
     const onBeforeInstallPrompt = (event: Event) => {
+      if (hasSeenInstallBanner) return;
+
       event.preventDefault();
       setDeferredPrompt(event as DeferredInstallPromptEvent);
       setIsVisible(true);
     };
 
     const onAppInstalled = () => {
+      hasSeenInstallBanner = true;
       setIsVisible(false);
       setDeferredPrompt(null);
     };
@@ -117,18 +94,19 @@ export function PWAInstallBanner() {
     await deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
 
+    hasSeenInstallBanner = true;
+
     if (choice.outcome === "accepted") {
       setIsVisible(false);
       setDeferredPrompt(null);
       return;
     }
 
-    markDismissed();
     setIsVisible(false);
   };
 
   const handleDismiss = () => {
-    markDismissed();
+    hasSeenInstallBanner = true;
     setIsVisible(false);
   };
 
