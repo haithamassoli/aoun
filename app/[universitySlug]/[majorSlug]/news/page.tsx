@@ -8,6 +8,9 @@ import type { NewsWithAuthor } from "@/components/news-card";
 import { api } from "@/convex/_generated/api";
 import { NotificationToggle } from "@/components/notification-toggle";
 import { decodeSlugParam } from "@/lib/slug";
+import Link from "next/link";
+import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
+import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
 
 const INITIAL_PAGE_SIZE = 8;
 
@@ -83,6 +86,7 @@ export default async function MajorNewsPage({
   }
   const canonicalUniversitySlug = university.slug;
   const canonicalMajorSlug = major.slug;
+  const newsSummary = `${major.name} · ${university.name}`;
 
   const initialNews = (await fetchQuery(api.news.listByMajor, {
     majorId: major._id,
@@ -98,8 +102,53 @@ export default async function MajorNewsPage({
 
   return (
     <div>
+      <MobilePageHeaderMenu title={major.name} subtitle={newsSummary}>
+        <div className="rounded-[28px] border border-surface-200 bg-gradient-to-br from-white to-primary-50/70 p-4 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] dark:border-surface-700 dark:from-surface-900 dark:to-primary-950/40 dark:shadow-none">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
+                الأخبار
+              </p>
+              <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
+                {major.name}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
+                {newsSummary}
+              </p>
+            </div>
+
+            <div className="shrink-0 pt-1">
+              <NotificationToggle majorId={major._id} />
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}`}
+          className="flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+        >
+          <span>العودة للتخصص</span>
+          <svg
+            className="h-4 w-4 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19.5 8.25 12 15 4.5"
+            />
+          </svg>
+        </Link>
+
+        <UniversityMobileQuickLinks links={university.quickLinks} />
+      </MobilePageHeaderMenu>
+
       {/* Page Header */}
-      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-10 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-14 lg:px-8">
+      <section className="hidden border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-10 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-14 lg:px-8 md:block">
         <div className="mx-auto max-w-3xl">
           <Breadcrumb
             items={[
