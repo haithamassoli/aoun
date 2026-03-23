@@ -14,3 +14,7 @@ export const CATEGORIES = [
 ] as const;
 
 export type CategoryValue = (typeof CATEGORIES)[number]["value"];
+
+export const CATEGORY_VALUES = CATEGORIES.map(
+  (category) => category.value,
+) as [CategoryValue, ...CategoryValue[]];

@@ -4,6 +4,7 @@ import { useAuth } from "@/components/auth-provider";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { CATEGORIES, type CategoryValue } from "@/constant/resource-categories";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -21,6 +22,10 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
 import { formatCourseSemesterLabel } from "@/lib/course-semester";
+import {
+  REQUEST_KIND_LABELS,
+  type RequestKind,
+} from "@/lib/resource-requests";
 
 type CourseListItem = {
   _id: Id<"courses">;
@@ -34,7 +39,33 @@ type CourseListItem = {
   alias?: string;
 };
 
-type ActiveTab = "courses" | "news" | "notifications";
+type OpenResourceRequest = {
+  _id: Id<"resourceRequests">;
+  courseId: Id<"courses">;
+  majorId: Id<"majors">;
+  kind: RequestKind;
+  category?: CategoryValue;
+  note: string;
+  suggestedUrl?: string;
+  createdAt: number;
+  courseName: string;
+};
+
+type ActiveTab = "courses" | "news" | "requests" | "notifications";
+
+const CATEGORY_LABELS: Record<CategoryValue, string> = Object.fromEntries(
+  CATEGORIES.map((category) => [category.value, category.label]),
+) as Record<CategoryValue, string>;
+const REQUEST_KIND_TONES: Record<RequestKind, string> = {
+  missing_resource:
+    "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300",
+  resource_suggestion:
+    "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300",
+};
+const requestDateFormatter = new Intl.DateTimeFormat("ar-JO", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
 
 function buildSocialLinks(value: {
   instagram: string;
@@ -50,6 +81,51 @@ function buildSocialLinks(value: {
   };
 
   return Object.values(socialLinks).some(Boolean) ? socialLinks : undefined;
+}
+
+function buildRequestGroups(requests: OpenResourceRequest[]) {
+  const grouped = new Map<
+    string,
+    {
+      courseId: Id<"courses">;
+      courseName: string;
+      newestCreatedAt: number;
+      requests: OpenResourceRequest[];
+    }
+  >();
+
+  for (const request of requests) {
+    const existingGroup = grouped.get(request.courseId);
+
+    if (!existingGroup) {
+      grouped.set(request.courseId, {
+        courseId: request.courseId,
+        courseName: request.courseName,
+        newestCreatedAt: request.createdAt,
+        requests: [request],
+      });
+      continue;
+    }
+
+    existingGroup.requests.push(request);
+    existingGroup.newestCreatedAt = Math.max(
+      existingGroup.newestCreatedAt,
+      request.createdAt,
+    );
+  }
+
+  return Array.from(grouped.values())
+    .map((group) => ({
+      ...group,
+      requests: group.requests.toSorted(
+        (left, right) => right.createdAt - left.createdAt,
+      ),
+    }))
+    .toSorted((left, right) => right.newestCreatedAt - left.newestCreatedAt);
+}
+
+function formatRequestDate(timestamp: number) {
+  return requestDateFormatter.format(new Date(timestamp));
 }
 
 export default function MajorCoursesPage() {
@@ -76,10 +152,19 @@ export default function MajorCoursesPage() {
     search.isEmpty ? "skip" : { majorId: majorIdValue, query: search.query },
   );
   const newsCount = useQuery(api.news.countByMajor, { majorId: majorIdValue });
+  const openResourceRequests = useQuery(
+    api.resourceRequests.listOpenForMajor,
+    user && sessionToken
+      ? { token: sessionToken, majorId: majorIdValue }
+      : "skip",
+  );
 
   const addCourse = useMutation(api.courses.add);
   const updateCourse = useMutation(api.courses.update);
   const removeNews = useMutation(api.news.remove);
+  const markResourceRequestFulfilled = useMutation(
+    api.resourceRequests.markFulfilled,
+  );
   const updateMajorTreeDiagramUrl = useMutation(
     api.dashboard.updateMajorTreeDiagramUrl,
   );
@@ -104,6 +189,9 @@ export default function MajorCoursesPage() {
     _id: Id<"news">;
     title: string;
   } | null>(null);
+  const [pendingRequestIds, setPendingRequestIds] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const form = useForm({
     defaultValues: {
@@ -236,6 +324,36 @@ export default function MajorCoursesPage() {
     setNewsFormValues(undefined);
   };
 
+  const handleMarkRequestFulfilled = async (
+    requestId: Id<"resourceRequests">,
+  ) => {
+    if (!sessionToken || pendingRequestIds.has(requestId)) {
+      return;
+    }
+
+    setPendingRequestIds((current) => {
+      const next = new Set(current);
+      next.add(requestId);
+      return next;
+    });
+
+    try {
+      await markResourceRequestFulfilled({
+        token: sessionToken,
+        requestId,
+      });
+      toast.show("تم تحديث الطلب", "success");
+    } catch {
+      toast.show("حدث خطأ أثناء تحديث الطلب", "error");
+    } finally {
+      setPendingRequestIds((current) => {
+        const next = new Set(current);
+        next.delete(requestId);
+        return next;
+      });
+    }
+  };
+
   const openMajorLinkForm = () => {
     if (major) {
       majorLinkForm.setFieldValue("treeDiagramUrl", major.treeDiagramUrl ?? "");
@@ -286,6 +404,7 @@ export default function MajorCoursesPage() {
     !search.isEmpty && (search.isDebouncing || searchedCourses === undefined);
   const isNoSearchResults =
     !search.isEmpty && !isSearchLoading && activeCourses.length === 0;
+  const requestGroups = buildRequestGroups(openResourceRequests ?? []);
 
   return (
     <div>
@@ -635,6 +754,27 @@ export default function MajorCoursesPage() {
           )}
         </button>
         <button
+          onClick={() => setActiveTab("requests")}
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeTab === "requests"
+              ? "bg-primary-600 text-white"
+              : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+          }`}
+        >
+          <span>الطلبات</span>
+          {typeof openResourceRequests?.length === "number" ? (
+            <span
+              className={`inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold ${
+                activeTab === "requests"
+                  ? "bg-white/20 text-white"
+                  : "bg-white text-primary-700 dark:bg-surface-900 dark:text-primary-300"
+              }`}
+            >
+              {openResourceRequests.length}
+            </span>
+          ) : null}
+        </button>
+        <button
           onClick={() => setActiveTab("notifications")}
           className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "notifications"
@@ -915,6 +1055,154 @@ export default function MajorCoursesPage() {
             }
             deleting={deletingNews}
           />
+        </>
+      )}
+
+      {/* Requests tab content */}
+      {activeTab === "requests" && (
+        <>
+          {openResourceRequests === undefined ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="h-32 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+                />
+              ))}
+            </div>
+          ) : requestGroups.length === 0 ? (
+            <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800">
+                <svg
+                  className="h-6 w-6 text-surface-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
+                لا توجد طلبات مفتوحة
+              </p>
+              <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
+                ستظهر هنا طلبات المصادر الواردة من صفحات المواد في هذا التخصص.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {requestGroups.map((group, groupIndex) => (
+                <motion.section
+                  key={group.courseId}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: groupIndex * 0.05 }}
+                  className="rounded-3xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+                >
+                  <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h2 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                        {group.courseName}
+                      </h2>
+                      <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                        {group.requests.length} طلب مفتوح
+                      </p>
+                    </div>
+                    <Link
+                      href={`/dashboard/major/${majorId}/course/${group.courseId}`}
+                      className="inline-flex items-center justify-center rounded-xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-semibold text-surface-700 transition-colors hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-700"
+                    >
+                      فتح صفحة المادة
+                    </Link>
+                  </div>
+
+                  <div className="space-y-3">
+                    {group.requests.map((request) => (
+                      <article
+                        key={request._id}
+                        className="rounded-2xl border border-surface-200/80 bg-surface-50/70 p-4 dark:border-surface-700 dark:bg-surface-950/30"
+                      >
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2 text-xs">
+                              <span className="rounded-full border border-surface-200 bg-white px-2.5 py-1 font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
+                                {request.courseName}
+                              </span>
+                              <span
+                                className={`rounded-full border px-2.5 py-1 font-semibold ${REQUEST_KIND_TONES[request.kind]}`}
+                              >
+                                {REQUEST_KIND_LABELS[request.kind]}
+                              </span>
+                              {request.category ? (
+                                <span className="rounded-full border border-surface-200 bg-white px-2.5 py-1 font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
+                                  {CATEGORY_LABELS[request.category]}
+                                </span>
+                              ) : null}
+                              <span className="text-surface-500 dark:text-surface-400">
+                                {formatRequestDate(request.createdAt)}
+                              </span>
+                            </div>
+
+                            <p className="mt-3 whitespace-pre-line text-sm leading-7 text-surface-700 dark:text-surface-200">
+                              {request.note}
+                            </p>
+
+                            {request.suggestedUrl ? (
+                              <a
+                                href={request.suggestedUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                              >
+                                <span className="truncate">{request.suggestedUrl}</span>
+                                <svg
+                                  className="h-4 w-4 shrink-0"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                  />
+                                </svg>
+                              </a>
+                            ) : null}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Link
+                              href={`/dashboard/major/${majorId}/course/${request.courseId}`}
+                              className="inline-flex items-center justify-center rounded-xl border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-surface-700 transition-colors hover:border-surface-300 hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-800"
+                            >
+                              فتح صفحة المادة
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleMarkRequestFulfilled(request._id)}
+                              disabled={pendingRequestIds.has(request._id)}
+                              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
+                            >
+                              {pendingRequestIds.has(request._id)
+                                ? "جارٍ التحديث..."
+                                : "تمت التلبية"}
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </motion.section>
+              ))}
+            </div>
+          )}
         </>
       )}
 

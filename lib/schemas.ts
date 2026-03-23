@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { CATEGORY_VALUES } from "@/constant/resource-categories";
+import { RESOURCE_REQUEST_KINDS } from "@/lib/resource-requests";
 
 const quickLinkSchema = z
   .object({
@@ -139,6 +141,36 @@ export const contributorResourceSchema = z
     (data) => data.type !== "richtext" || data.content.trim().length > 0,
     { message: "المحتوى مطلوب", path: ["content"] },
   );
+
+function isHttpUrl(value: string) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+export const publicResourceRequestSchema = z
+  .object({
+    kind: z.enum(RESOURCE_REQUEST_KINDS, {
+      message: "نوع الطلب مطلوب",
+    }),
+    category: z.union([z.literal(""), z.enum(CATEGORY_VALUES)]),
+    note: z.string().trim().min(1, "التفاصيل مطلوبة"),
+    suggestedUrl: z.string(),
+  })
+  .superRefine((value, ctx) => {
+    const suggestedUrl = value.suggestedUrl.trim();
+
+    if (value.kind === "resource_suggestion" && suggestedUrl && !isHttpUrl(suggestedUrl)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["suggestedUrl"],
+        message: "رابط غير صالح",
+      });
+    }
+  });
 
 export const createUserSchema = z.object({
   name: z.string().min(1, "الاسم مطلوب"),

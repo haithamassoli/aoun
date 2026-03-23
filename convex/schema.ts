@@ -1,10 +1,22 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import {
+  RESOURCE_REQUEST_KINDS,
+  RESOURCE_REQUEST_STATUSES,
+} from "../lib/resource-requests";
 
 const resourceType = v.union(v.literal("link"), v.literal("richtext"));
 const resourceVoteType = v.union(
   v.literal("useful"),
   v.literal("not_useful"),
+);
+const requestKind = v.union(
+  v.literal(RESOURCE_REQUEST_KINDS[0]),
+  v.literal(RESOURCE_REQUEST_KINDS[1]),
+);
+const requestStatus = v.union(
+  v.literal(RESOURCE_REQUEST_STATUSES[0]),
+  v.literal(RESOURCE_REQUEST_STATUSES[1]),
 );
 const socialLinks = v.object({
   instagram: v.optional(v.string()),
@@ -126,6 +138,23 @@ export default defineSchema({
     .index("by_resourceId", ["resourceId"])
     .index("by_resourceId_visitorKey", ["resourceId", "visitorKey"])
     .index("by_courseId", ["courseId"])
+    .index("by_visitorKey_courseId", ["visitorKey", "courseId"]),
+
+  resourceRequests: defineTable({
+    courseId: v.id("courses"),
+    majorId: v.id("majors"),
+    visitorKey: v.string(),
+    kind: requestKind,
+    category: v.optional(resourceCategory),
+    note: v.string(),
+    suggestedUrl: v.optional(v.string()),
+    status: requestStatus,
+    createdAt: v.number(),
+    fulfilledAt: v.optional(v.number()),
+    fulfilledBy: v.optional(v.id("users")),
+  })
+    .index("by_majorId_status_createdAt", ["majorId", "status", "createdAt"])
+    .index("by_courseId_status_createdAt", ["courseId", "status", "createdAt"])
     .index("by_visitorKey_courseId", ["visitorKey", "courseId"]),
 
   users: defineTable({

@@ -1,13 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import * as motion from "motion/react-client";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
+import { CATEGORIES, type CategoryValue } from "@/constant/resource-categories";
+import { FormModal } from "@/components/form-modal";
+import { Toast, useToast } from "@/components/toast";
+import { publicResourceRequestSchema } from "@/lib/schemas";
+import {
+  REQUEST_KIND_OPTIONS,
+  type RequestKind,
+} from "@/lib/resource-requests";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { getOrCreateVisitorKey } from "@/lib/visitor-analytics";
-import { Toast, useToast } from "@/components/toast";
 
 const categoryConfig = {
   course_intro: { label: "التعريف بالمادة", icon: "🧭" },
@@ -24,7 +31,7 @@ const categoryConfig = {
   other: { label: "أخرى", icon: "📎" },
 } as const;
 
-const categoryOrder: (keyof typeof categoryConfig)[] = [
+const categoryOrder: CategoryValue[] = [
   "course_intro",
   "comprehensive_post",
   "textbook",
@@ -39,8 +46,22 @@ const categoryOrder: (keyof typeof categoryConfig)[] = [
   "other",
 ];
 
-type ResourceCategory = keyof typeof categoryConfig;
+const CATEGORY_OPTIONS = CATEGORIES.map((category) => ({
+  value: category.value,
+  label: category.label,
+}));
+const REQUEST_CTA_COPY = "اطلب مصدر لهذه المادة او اقترح مصدر جديد";
+
+type ResourceCategory = CategoryValue;
 type ResourceVote = "useful" | "not_useful";
+type RequestFormValues = {
+  kind: RequestKind;
+  category: "" | CategoryValue;
+  note: string;
+  suggestedUrl: string;
+};
+type RequestFormField = keyof RequestFormValues;
+type RequestFormErrors = Partial<Record<RequestFormField, string>>;
 
 type CourseResource = {
   _id: string;
@@ -145,6 +166,52 @@ function formatFeedbackCount(totalFeedback: number) {
   }
 
   return `${totalFeedback} تقييم`;
+}
+
+function buildRequestFieldErrors(
+  issues: Array<{
+    path: Array<string | number>;
+    message: string;
+  }>,
+): RequestFormErrors {
+  const nextErrors: RequestFormErrors = {};
+
+  for (const issue of issues) {
+    const field = issue.path[0];
+
+    if (typeof field === "string" && nextErrors[field as RequestFormField] === undefined) {
+      nextErrors[field as RequestFormField] = issue.message;
+    }
+  }
+
+  return nextErrors;
+}
+
+function getResourceRequestErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return "تعذر إرسال الطلب. حاول مرة أخرى.";
+  }
+
+  if (error.message.includes("RESOURCE_REQUEST_DUPLICATE")) {
+    return "تم إرسال هذا الطلب مسبقاً لهذه المادة.";
+  }
+
+  if (error.message.includes("RESOURCE_REQUEST_LIMIT_REACHED")) {
+    return "يمكنك إرسال 3 طلبات مفتوحة كحد أقصى لهذه المادة.";
+  }
+
+  if (
+    error.message.includes("INVALID_URL") ||
+    error.message.includes("INVALID_URL_PROTOCOL")
+  ) {
+    return "الرابط المقترح غير صالح.";
+  }
+
+  if (error.message.includes("INVALID_VISITOR_KEY")) {
+    return "تعذر تهيئة الطلب. أعد تحميل الصفحة وحاول مرة أخرى.";
+  }
+
+  return "تعذر إرسال الطلب. حاول مرة أخرى.";
 }
 
 function VoteButton({
@@ -338,6 +405,42 @@ function ResourceCard({
   );
 }
 
+function ResourceRequestCtaCard({
+  hasResources,
+  onOpen,
+  visitorReady,
+}: {
+  hasResources: boolean;
+  onOpen: () => void;
+  visitorReady: boolean;
+}) {
+  return (
+    <div className="rounded-[28px] border border-dashed border-primary-200 bg-gradient-to-bl from-primary-50 via-white to-surface-50 p-5 shadow-sm dark:border-primary-900/70 dark:from-primary-950/50 dark:via-surface-900 dark:to-surface-950 sm:p-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+            هل تحتاج مصدراً إضافياً؟
+          </p>
+          <p className="mt-1 text-sm leading-7 text-surface-600 dark:text-surface-300">
+            {hasResources
+              ? "إذا كان هناك مصدر ناقص أو لديك اقتراح مفيد، أرسله مباشرة ليظهر في قائمة الطلبات لدى المساهمين."
+              : "هذه المادة لا تحتوي على مصادر حالياً. يمكنك طلب مصدر لها أو اقتراح رابط مناسب ليتم مراجعته وإضافته."}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onOpen}
+          disabled={!visitorReady}
+          className="inline-flex items-center justify-center rounded-2xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {REQUEST_CTA_COPY}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function CourseResourcesSection({
   courseId,
   resources,
@@ -353,6 +456,15 @@ export function CourseResourcesSection({
   const [pendingResourceIds, setPendingResourceIds] = useState<Set<string>>(
     () => new Set(),
   );
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [requestValues, setRequestValues] = useState<RequestFormValues>({
+    kind: "missing_resource",
+    category: "",
+    note: "",
+    suggestedUrl: "",
+  });
+  const [requestErrors, setRequestErrors] = useState<RequestFormErrors>({});
 
   const liveResources = useQuery(api.resources.listByCourse, { courseId });
   const viewerVotes = useQuery(
@@ -360,6 +472,7 @@ export function CourseResourcesSection({
     visitorKey ? { courseId, visitorKey } : "skip",
   );
   const setVote = useMutation(api.resources.setVote);
+  const submitResourceRequest = useMutation(api.resourceRequests.submitPublic);
 
   useEffect(() => {
     setVisitorKey(getOrCreateVisitorKey());
@@ -379,6 +492,32 @@ export function CourseResourcesSection({
   const visibleGroups = categoryGroups.filter(
     (group) => group.value === selectedCategory,
   );
+
+  function resetRequestForm() {
+    setRequestValues({
+      kind: "missing_resource",
+      category: "",
+      note: "",
+      suggestedUrl: "",
+    });
+    setRequestErrors({});
+    setShowRequestForm(false);
+    setIsSubmittingRequest(false);
+  }
+
+  function updateRequestField<Field extends RequestFormField>(
+    field: Field,
+    value: RequestFormValues[Field],
+  ) {
+    setRequestValues((current) => ({
+      ...current,
+      [field]: value,
+    }));
+    setRequestErrors((current) => ({
+      ...current,
+      [field]: undefined,
+    }));
+  }
 
   async function handleVote(resourceId: string, vote: ResourceVote) {
     if (!visitorKey || pendingResourceIds.has(resourceId)) {
@@ -408,113 +547,283 @@ export function CourseResourcesSection({
     }
   }
 
-  if (resolvedResources.length === 0) {
-    return (
-      <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-100 text-3xl dark:bg-surface-800">
-          📚
-        </div>
-        <p className="text-lg font-medium text-surface-700 dark:text-surface-200">
-          لا توجد مصادر بعد
-        </p>
-        <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-          ستُضاف المصادر قريباً. ترقبوا التحديثات!
-        </p>
-      </div>
-    );
+  async function handleSubmitResourceRequest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const result = publicResourceRequestSchema.safeParse(requestValues);
+    if (!result.success) {
+      setRequestErrors(buildRequestFieldErrors(result.error.issues));
+      return;
+    }
+
+    if (!visitorKey) {
+      toast.show("تعذر تهيئة الطلب. أعد تحميل الصفحة وحاول مرة أخرى.", "error");
+      return;
+    }
+
+    setIsSubmittingRequest(true);
+
+    try {
+      await submitResourceRequest({
+        courseId,
+        visitorKey,
+        kind: result.data.kind,
+        category: result.data.category || undefined,
+        note: result.data.note,
+        suggestedUrl:
+          result.data.kind === "resource_suggestion"
+            ? result.data.suggestedUrl.trim() || undefined
+            : undefined,
+      });
+      toast.show("تم إرسال الطلب بنجاح", "success");
+      resetRequestForm();
+    } catch (error) {
+      toast.show(getResourceRequestErrorMessage(error), "error");
+      setIsSubmittingRequest(false);
+    }
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <Toast toast={toast} />
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setActiveCategory("all")}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-            selectedCategory === "all"
-              ? "bg-primary-600 text-white"
-              : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
-          }`}
-        >
-          كل المصادر ({resolvedResources.length})
-        </button>
-        {categoryGroups.map((group) => (
-          <button
-            key={group.value}
-            type="button"
-            onClick={() => setActiveCategory(group.value)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-              selectedCategory === group.value
-                ? "bg-primary-600 text-white"
-                : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
-            }`}
-          >
-            {group.label} ({group.resources.length})
-          </button>
-        ))}
-      </div>
-
-      {selectedCategory === "all" ? (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-        >
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 dark:text-surface-100 sm:text-xl">
-            <span className="text-xl">📊</span>
-            جميع المصادر
-            <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500 dark:bg-surface-800 dark:text-surface-400">
-              {allResourcesByVotes.length}
-            </span>
-          </h2>
-
-          <div className="space-y-3">
-            {allResourcesByVotes.map((resource) => (
-              <ResourceCard
-                key={resource._id}
-                isPending={pendingResourceIds.has(resource._id)}
-                onVote={handleVote}
-                resource={resource}
-                showCategory
-                viewerVote={viewerVotes?.[resource._id]}
-                visitorReady={visitorKey !== null}
-              />
+      {resolvedResources.length === 0 ? (
+        <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-100 text-3xl dark:bg-surface-800">
+            📚
+          </div>
+          <p className="text-lg font-medium text-surface-700 dark:text-surface-200">
+            لا توجد مصادر بعد
+          </p>
+          <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+            ستُضاف المصادر قريباً. ترقبوا التحديثات!
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-10">
+          <div className="mb-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveCategory("all")}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                selectedCategory === "all"
+                  ? "bg-primary-600 text-white"
+                  : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+              }`}
+            >
+              كل المصادر ({resolvedResources.length})
+            </button>
+            {categoryGroups.map((group) => (
+              <button
+                key={group.value}
+                type="button"
+                onClick={() => setActiveCategory(group.value)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                  selectedCategory === group.value
+                    ? "bg-primary-600 text-white"
+                    : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+                }`}
+              >
+                {group.label} ({group.resources.length})
+              </button>
             ))}
           </div>
-        </motion.div>
-      ) : null}
 
-      {visibleGroups.map((group, groupIndex) => (
-        <motion.div
-          key={group.value}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 + groupIndex * 0.08 }}
-        >
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 dark:text-surface-100 sm:text-xl">
-            <span className="text-xl">{group.icon}</span>
-            {group.label}
-            <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500 dark:bg-surface-800 dark:text-surface-400">
-              {group.resources.length}
-            </span>
-          </h2>
+          {selectedCategory === "all" ? (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 dark:text-surface-100 sm:text-xl">
+                <span className="text-xl">📊</span>
+                جميع المصادر
+                <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500 dark:bg-surface-800 dark:text-surface-400">
+                  {allResourcesByVotes.length}
+                </span>
+              </h2>
 
-          <div className="space-y-3">
-            {group.resources.map((resource) => (
-              <ResourceCard
-                key={resource._id}
-                isPending={pendingResourceIds.has(resource._id)}
-                onVote={handleVote}
-                resource={resource}
-                viewerVote={viewerVotes?.[resource._id]}
-                visitorReady={visitorKey !== null}
-              />
-            ))}
+              <div className="space-y-3">
+                {allResourcesByVotes.map((resource) => (
+                  <ResourceCard
+                    key={resource._id}
+                    isPending={pendingResourceIds.has(resource._id)}
+                    onVote={handleVote}
+                    resource={resource}
+                    showCategory
+                    viewerVote={viewerVotes?.[resource._id]}
+                    visitorReady={visitorKey !== null}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          ) : null}
+
+          {visibleGroups.map((group, groupIndex) => (
+            <motion.div
+              key={group.value}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 + groupIndex * 0.08 }}
+            >
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 dark:text-surface-100 sm:text-xl">
+                <span className="text-xl">{group.icon}</span>
+                {group.label}
+                <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500 dark:bg-surface-800 dark:text-surface-400">
+                  {group.resources.length}
+                </span>
+              </h2>
+
+              <div className="space-y-3">
+                {group.resources.map((resource) => (
+                  <ResourceCard
+                    key={resource._id}
+                    isPending={pendingResourceIds.has(resource._id)}
+                    onVote={handleVote}
+                    resource={resource}
+                    viewerVote={viewerVotes?.[resource._id]}
+                    visitorReady={visitorKey !== null}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      <ResourceRequestCtaCard
+        hasResources={resolvedResources.length > 0}
+        onOpen={() => setShowRequestForm(true)}
+        visitorReady={visitorKey !== null}
+      />
+
+      <FormModal
+        open={showRequestForm}
+        title="اطلب مصدراً أو اقترح مصدراً جديداً"
+        onClose={resetRequestForm}
+      >
+        <form onSubmit={handleSubmitResourceRequest} className="space-y-5">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+              نوع الطلب
+            </label>
+            <select
+              value={requestValues.kind}
+              onChange={(event) => {
+                const nextKind = event.target.value as RequestKind;
+                updateRequestField("kind", nextKind);
+                if (nextKind !== "resource_suggestion") {
+                  updateRequestField("suggestedUrl", "");
+                }
+              }}
+              className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
+            >
+              {REQUEST_KIND_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {requestErrors.kind ? (
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">
+                {requestErrors.kind}
+              </p>
+            ) : null}
           </div>
-        </motion.div>
-      ))}
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+              التصنيف
+              <span className="ms-1 text-surface-400">اختياري</span>
+            </label>
+            <select
+              value={requestValues.category}
+              onChange={(event) =>
+                updateRequestField(
+                  "category",
+                  event.target.value as RequestFormValues["category"],
+                )
+              }
+              className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
+            >
+              <option value="">اختر تصنيفاً إن رغبت</option>
+              {CATEGORY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {requestErrors.category ? (
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">
+                {requestErrors.category}
+              </p>
+            ) : null}
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+              تفاصيل الطلب
+            </label>
+            <textarea
+              value={requestValues.note}
+              onChange={(event) => updateRequestField("note", event.target.value)}
+              rows={4}
+              placeholder="اكتب ما الذي تحتاجه أو ما الذي تقترحه لهذه المادة"
+              className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
+            />
+            {requestErrors.note ? (
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">
+                {requestErrors.note}
+              </p>
+            ) : null}
+          </div>
+
+          {requestValues.kind === "resource_suggestion" ? (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+                الرابط المقترح
+                <span className="ms-1 text-surface-400">اختياري</span>
+              </label>
+              <input
+                type="url"
+                value={requestValues.suggestedUrl}
+                onChange={(event) =>
+                  updateRequestField("suggestedUrl", event.target.value)
+                }
+                dir="ltr"
+                placeholder="https://example.com/resource"
+                className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
+              />
+              {requestErrors.suggestedUrl ? (
+                <p className="mt-1 text-xs text-red-500 dark:text-red-400">
+                  {requestErrors.suggestedUrl}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="rounded-2xl bg-surface-50 px-4 py-3 text-xs leading-6 text-surface-500 dark:bg-surface-800/80 dark:text-surface-300">
+            سيصل الطلب إلى قائمة داخلية لدى المساهمين في هذا التخصص، ولن يظهر للعامة.
+          </div>
+
+          <div className="flex items-center justify-end gap-3 border-t border-surface-200 pt-4 dark:border-surface-700">
+            <button
+              type="button"
+              onClick={resetRequestForm}
+              className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+            >
+              إلغاء
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmittingRequest}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+            >
+              {isSubmittingRequest ? "جارٍ الإرسال..." : "إرسال الطلب"}
+            </button>
+          </div>
+        </form>
+      </FormModal>
     </div>
   );
 }

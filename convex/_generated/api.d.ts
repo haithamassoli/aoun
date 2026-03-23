@@ -21,6 +21,7 @@ import type * as notifications from "../notifications.js";
 import type * as notificationsInternal from "../notificationsInternal.js";
 import type * as partners from "../partners.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
+import type * as resourceRequests from "../resourceRequests.js";
 import type * as resources from "../resources.js";
 import type * as searchUtils from "../searchUtils.js";
 import type * as seed from "../seed.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   notificationsInternal: typeof notificationsInternal;
   partners: typeof partners;
   pushSubscriptions: typeof pushSubscriptions;
+  resourceRequests: typeof resourceRequests;
   resources: typeof resources;
   searchUtils: typeof searchUtils;
   seed: typeof seed;
