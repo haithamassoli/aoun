@@ -179,13 +179,11 @@ function groupCoursesBySemester(courses: CourseListItem[]) {
     return a.label.localeCompare(b.label, "ar");
   });
 
-  return groups.map(
-    ({ key, label, courses: groupedCourses }) => ({
-      key,
-      label,
-      courses: groupedCourses,
-    }),
-  );
+  return groups.map(({ key, label, courses: groupedCourses }) => ({
+    key,
+    label,
+    courses: groupedCourses,
+  }));
 }
 
 function getSemesterGroupKey(semesterKey: string | null) {
@@ -524,9 +522,8 @@ export function CoursesSearchSection({
   );
   const filteredDefaultCourses = useMemo(
     () =>
-      defaultCourses.filter(
-        (course) =>
-          matchesStatusFilter(courseStatuses[course._id] ?? "none", statusFilter),
+      defaultCourses.filter((course) =>
+        matchesStatusFilter(courseStatuses[course._id] ?? "none", statusFilter),
       ),
     [courseStatuses, defaultCourses, statusFilter],
   );
@@ -556,9 +553,8 @@ export function CoursesSearchSection({
   );
   const filteredSearchedCourses = useMemo(
     () =>
-      activeSearchedCourses.filter(
-        (course: CourseListItem) =>
-          matchesStatusFilter(courseStatuses[course._id] ?? "none", statusFilter),
+      activeSearchedCourses.filter((course: CourseListItem) =>
+        matchesStatusFilter(courseStatuses[course._id] ?? "none", statusFilter),
       ),
     [activeSearchedCourses, courseStatuses, statusFilter],
   );
@@ -592,7 +588,7 @@ export function CoursesSearchSection({
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8  pb-10 pt-4 sm:py-8">
       <div className="mb-8 space-y-4">
         <h2 className="text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
           الخطة الدراسية
@@ -779,11 +775,9 @@ export function CoursesSearchSection({
                 key={course._id}
                 course={course}
                 href={`/${universitySlug}/${majorSlug}/${course.slug}`}
-                badge={
-                  formatCourseSemesterLabel(course.semester, {
-                    emptyLabel: "مواد أخرى",
-                  })
-                }
+                badge={formatCourseSemesterLabel(course.semester, {
+                  emptyLabel: "مواد أخرى",
+                })}
                 status={getStatus(course._id)}
                 onStatusChange={(status) =>
                   handleStatusChange(course._id, status)

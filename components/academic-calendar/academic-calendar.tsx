@@ -85,7 +85,7 @@ const EMPTY_FORM_VALUES: AcademicCalendarFormValues = {
   endTime: "",
 };
 
-const FEATURE_BADGES = ["عرض شهري", "عرض أسبوعي", "بدون تسجيل"];
+// const FEATURE_BADGES = ["عرض شهري", "عرض أسبوعي", "بدون تسجيل"];
 
 function pad(value: number) {
   return value.toString().padStart(2, "0");
@@ -447,32 +447,6 @@ export function AcademicCalendar() {
         ) : null}
 
         <div className="space-y-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <span className="text-xs font-semibold tracking-[0.22em] text-primary-600 uppercase dark:text-primary-400">
-                Academic Planner
-              </span>
-              <h1 className="mt-1 text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl">
-                تقويم أكاديمي شخصي
-              </h1>
-              <p className="mt-1.5 max-w-lg text-sm leading-7 text-surface-500 dark:text-surface-400">
-                امتحانات وتسليمات ومواعيد تسجيل في واجهة بسيطة، محفوظة محلياً
-                على جهازك بدون حساب.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-1.5 sm:flex-nowrap sm:shrink-0">
-              {FEATURE_BADGES.map((label) => (
-                <span
-                  key={label}
-                  className="inline-flex items-center rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 text-xs text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300"
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
-
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {(
               Object.entries(CATEGORY_META) as [
@@ -540,7 +514,7 @@ export function AcademicCalendar() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="mt-4 flex gap-3 flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
@@ -724,7 +698,7 @@ export function AcademicCalendar() {
         onClose={closeDialog}
         onDelete={
           dialogState.open && dialogState.mode === "edit" && dialogState.eventId
-            ? () => setDeleteTargetId(dialogState.eventId)
+            ? () => setDeleteTargetId(dialogState.eventId ?? null)
             : undefined
         }
         onSubmit={handleSubmit}

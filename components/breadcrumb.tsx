@@ -6,7 +6,13 @@ interface BreadcrumbItem {
   href?: string;
 }
 
-export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
+export function Breadcrumb({
+  items,
+  includeStructuredData = true,
+}: {
+  items: BreadcrumbItem[];
+  includeStructuredData?: boolean;
+}) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -20,12 +26,14 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      {includeStructuredData ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
+      ) : null}
       <nav aria-label="مسار التنقل" className="mb-6">
         <ol className="flex flex-wrap items-center gap-1.5 text-sm text-surface-500 dark:text-surface-400">
           {items.map((item, index) => (

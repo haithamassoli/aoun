@@ -41,7 +41,10 @@ export function MajorsSearchSection({
   const isEmptyList = search.isEmpty && defaultMajors.length === 0;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+    <section
+      id="majors"
+      className="mx-auto max-w-7xl px-4 pb-10 pt-4 sm:px-6 sm:py-8 lg:px-8"
+    >
       <div className="mb-8 space-y-4">
         <h2 className="text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
           التخصصات

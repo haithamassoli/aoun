@@ -10,6 +10,8 @@ import * as motion from "motion/react-client";
 import { MajorLastVisitTracker } from "@/components/major-last-visit-tracker";
 import { NotificationToggle } from "@/components/notification-toggle";
 import { decodeSlugParam } from "@/lib/slug";
+import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
+import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
 
 type Params = { universitySlug: string; majorSlug: string };
 type SearchParams = {
@@ -172,6 +174,15 @@ export default async function MajorPage({
 
     return [{ ...platform, url }];
   });
+  const majorBreadcrumbItems = [
+    { label: "الرئيسية", href: "/" },
+    { label: university.name, href: `/${canonicalUniversitySlug}` },
+    { label: major.name },
+  ];
+  const majorSummary =
+    courses.length > 0
+      ? `${university.name} · ${courses.length} مواد`
+      : `${university.name} · لا توجد مواد حالياً`;
 
   return (
     <div>
@@ -180,16 +191,127 @@ export default async function MajorPage({
         majorSlug={canonicalMajorSlug}
       />
 
+      <MobilePageHeaderMenu title={major.name} subtitle={majorSummary}>
+        <div className="rounded-[28px] border border-surface-200 bg-gradient-to-br from-white to-primary-50/70 p-4 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] dark:border-surface-700 dark:from-surface-900 dark:to-primary-950/40 dark:shadow-none">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
+                التخصص
+              </p>
+              <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
+                {major.name}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
+                {majorSummary}
+              </p>
+            </div>
+
+            <div className="shrink-0">
+              <NotificationToggle majorId={major._id} />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {major.treeDiagramUrl ? (
+            <a
+              href={major.treeDiagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+            >
+              <span>شجرة مسار التخصص</span>
+              <svg
+                className="h-4 w-4 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              >
+                <rect x="16" y="16" width="6" height="6" rx="1.5" />
+                <rect x="2" y="16" width="6" height="6" rx="1.5" />
+                <rect x="9" y="2" width="6" height="6" rx="1.5" />
+                <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+                <path d="M12 12V8" />
+              </svg>
+            </a>
+          ) : null}
+
+          <Link
+            href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
+            className="flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+          >
+            <span>الأخبار والمستجدات</span>
+            <svg
+              className="h-4 w-4 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+              />
+            </svg>
+          </Link>
+        </div>
+
+        {majorSocialLinks.length > 0 ? (
+          <div className="space-y-3">
+            <div className="grid gap-2 grid-cols-4">
+              {majorSocialLinks.map((platform) => (
+                <a
+                  key={platform.key}
+                  href={platform.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex justify-center items-center grid-cols-4 gap-3 rounded-2xl border px-4 py-3 text-sm font-medium shadow-sm transition-all hover:-translate-y-0.5 ${platform.className}`}
+                >
+                  <svg
+                    className="h-4 w-4 shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  >
+                    {platform.icon}
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {latestNews ? (
+          <Link
+            href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
+            className="group flex w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-primary-200/80 bg-white/90 px-4 py-3 text-right shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800/80 dark:bg-primary-950/50 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="inline-flex shrink-0 items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-700 dark:border-primary-700 dark:bg-primary-900/60 dark:text-primary-200">
+                News
+              </div>
+              <p className="line-clamp-2 text-sm font-medium text-surface-800 transition-colors group-hover:text-primary-700 dark:text-surface-100 dark:group-hover:text-primary-200">
+                {latestNews.title}
+              </p>
+            </div>
+            <div className="shrink-0 text-xs font-medium text-surface-500 transition-colors group-hover:text-primary-700 dark:text-surface-400 dark:group-hover:text-primary-300">
+              عرض
+            </div>
+          </Link>
+        ) : null}
+        <UniversityMobileQuickLinks links={university.quickLinks} />
+      </MobilePageHeaderMenu>
+
       {/* Major Header */}
-      <section className="border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-10 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-14 lg:px-8">
+      <section className="hidden border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-10 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-14 md:block lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <Breadcrumb
-            items={[
-              { label: "الرئيسية", href: "/" },
-              { label: university.name, href: `/${canonicalUniversitySlug}` },
-              { label: major.name },
-            ]}
-          />
+          <Breadcrumb items={majorBreadcrumbItems} />
 
           {/* Title row — notification lives here, next to subject it controls */}
           <div className="flex items-start justify-between gap-4">
@@ -208,10 +330,7 @@ export default async function MajorPage({
                 transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
                 className="mt-2 text-surface-500 dark:text-surface-400"
               >
-                {university.name} ·{" "}
-                {courses.length > 0
-                  ? `${courses.length} مواد`
-                  : "لا توجد مواد حالياً"}
+                {majorSummary}
               </motion.p>
             </div>
             <div className="shrink-0 pt-1">
