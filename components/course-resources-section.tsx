@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import * as motion from "motion/react-client";
 import { api } from "@/convex/_generated/api";
@@ -170,7 +170,7 @@ function formatFeedbackCount(totalFeedback: number) {
 
 function buildRequestFieldErrors(
   issues: Array<{
-    path: Array<string | number>;
+    path: (string | number)[];
     message: string;
   }>,
 ): RequestFormErrors {
@@ -296,40 +296,31 @@ function ResourceCard({
   viewerVote?: ResourceVote;
   visitorReady: boolean;
 }) {
-  const scoreTone =
-    resource.helpfulnessScore > 0
-      ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
-      : resource.helpfulnessScore < 0
-        ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300"
-        : "border-surface-200 bg-surface-50 text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300";
-
   const interactionDisabled = isPending || !visitorReady;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-surface-700 dark:bg-surface-900">
-      {resource.type === "link" && resource.url ? (
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex items-center gap-3 overflow-hidden p-4 text-primary-600 transition-colors hover:bg-surface-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-surface-800 dark:hover:text-primary-300 sm:p-5"
+    <article className="group relative overflow-hidden rounded-xl border border-surface-200/80 bg-white transition-all hover:border-surface-300 hover:shadow-sm dark:border-surface-700/50 dark:bg-surface-900 dark:hover:border-surface-600">
+      {/* Voting buttons - top left for RTL */}
+      <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onVote(resource._id, "useful");
+          }}
+          disabled={interactionDisabled}
+          aria-label="مفيد"
+          title={`مفيد (${resource.usefulCount})`}
+          className={`rounded-lg p-1.5 transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+            viewerVote === "useful"
+              ? "bg-emerald-100 text-emerald-600 shadow-sm dark:bg-emerald-950/70 dark:text-emerald-400"
+              : "bg-white/90 text-surface-400 backdrop-blur-sm hover:bg-emerald-50 hover:text-emerald-600 dark:bg-surface-800/90 dark:text-surface-500 dark:hover:bg-emerald-950/50 dark:hover:text-emerald-400"
+          }`}
         >
-          <div className="min-w-0 flex-1">
-            {showCategory ? (
-              <span className="mb-3 inline-flex rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
-                {categoryConfig[resource.category].label}
-              </span>
-            ) : null}
-            <h3 className="break-words text-sm font-semibold leading-6 text-inherit [overflow-wrap:anywhere] sm:text-base">
-              {resource.title}
-            </h3>
-            <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-              افتح المصدر في نافذة جديدة
-            </p>
-          </div>
           <svg
-            className="mt-1 h-4 w-4 shrink-0 text-surface-400 transition-transform group-hover:-translate-x-0.5 sm:mt-0"
-            fill="none"
+            className="h-4 w-4"
+            fill={viewerVote === "useful" ? "currentColor" : "none"}
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth={2}
@@ -337,75 +328,98 @@ function ResourceCard({
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              d="M14 9V5a3 3 0 00-3-3l-1 4-3 4v10h10.76a2 2 0 001.95-1.55l1.2-6A2 2 0 0018.95 10H14zM7 22H4a2 2 0 01-2-2v-8a2 2 0 012-2h3"
             />
           </svg>
+        </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onVote(resource._id, "not_useful");
+          }}
+          disabled={interactionDisabled}
+          aria-label="غير مفيد"
+          title={`غير مفيد (${resource.notUsefulCount})`}
+          className={`rounded-lg p-1.5 transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+            viewerVote === "not_useful"
+              ? "bg-rose-100 text-rose-600 shadow-sm dark:bg-rose-950/70 dark:text-rose-400"
+              : "bg-white/90 text-surface-400 backdrop-blur-sm hover:bg-rose-50 hover:text-rose-600 dark:bg-surface-800/90 dark:text-surface-500 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
+          }`}
+        >
+          <svg
+            className="h-4 w-4"
+            fill={viewerVote === "not_useful" ? "currentColor" : "none"}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10 15v4a3 3 0 003 3l1-4 3-4V4H6.24a2 2 0 00-1.95 1.55l-1.2 6A2 2 0 005.05 14H10zM17 2h3a2 2 0 012 2v8a2 2 0 01-2 2h-3"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {resource.type === "link" && resource.url ? (
+        <a
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block p-4 pl-20 transition-colors hover:bg-surface-50/50 dark:hover:bg-surface-800/50"
+        >
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              {showCategory && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-surface-500 dark:text-surface-400">
+                  {categoryConfig[resource.category].icon}
+                  <span>{categoryConfig[resource.category].label}</span>
+                </span>
+              )}
+              <h3 className="break-words text-sm font-semibold leading-snug text-surface-900 [overflow-wrap:anywhere] dark:text-surface-50">
+                {resource.title}
+              </h3>
+            </div>
+            <svg
+              className="mt-0.5 h-4 w-4 shrink-0 text-surface-400 transition-transform group-hover:-translate-x-1 dark:text-surface-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
+            </svg>
+          </div>
         </a>
       ) : (
-        <div className="p-5">
-          {showCategory ? (
-            <span className="mb-3 inline-flex rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
-              {categoryConfig[resource.category].label}
+        <div className="p-4 pl-20 space-y-2">
+          {showCategory && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-surface-500 dark:text-surface-400">
+              {categoryConfig[resource.category].icon}
+              <span>{categoryConfig[resource.category].label}</span>
             </span>
-          ) : null}
-          <h3 className="mb-3 text-sm font-semibold text-surface-900 dark:text-surface-50 sm:text-base">
+          )}
+          <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
             {resource.title}
           </h3>
-          {resource.contentHtml ? (
+          {resource.contentHtml && (
             <div
-              className="prose prose-sm max-w-none break-words text-surface-700 [overflow-wrap:anywhere] [&_a]:break-all [&_a]:text-primary-600 [&_a]:[overflow-wrap:anywhere] dark:text-surface-300 dark:[&_a]:text-primary-400"
+              className="prose prose-sm max-w-none break-words text-surface-600 [overflow-wrap:anywhere] [&_a]:break-all [&_a]:text-primary-600 [&_a]:[overflow-wrap:anywhere] dark:text-surface-400 dark:[&_a]:text-primary-400"
               style={{ direction: "rtl" }}
               dangerouslySetInnerHTML={{
                 __html: resource.contentHtml,
               }}
             />
-          ) : null}
+          )}
         </div>
       )}
-
-      <div className="border-t border-surface-100 px-4 py-3 dark:border-surface-800 sm:px-5">
-        <div className="flex flex-col gap-3 ">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex gap-2 items-center">
-              <span
-                className={`rounded-full border px-2.5 py-1 font-semibold ${scoreTone}`}
-              >
-                النتيجة {formatScore(resource.helpfulnessScore)}
-              </span>
-              <span className="rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300">
-                {formatFeedbackCount(resource.totalFeedback)}
-              </span>
-              {resource.totalFeedback > 0 ? (
-                <span className="text-surface-500 dark:text-surface-400">
-                  مفيد {resource.usefulCount} • غير مفيد{" "}
-                  {resource.notUsefulCount}
-                </span>
-              ) : null}
-            </div>
-            <div className="flex gap-2">
-              {isPending ? (
-                <span className="text-xs font-medium text-surface-400 dark:text-surface-500">
-                  جارٍ التحديث...
-                </span>
-              ) : null}
-              <VoteButton
-                active={viewerVote === "useful"}
-                disabled={interactionDisabled}
-                label="مفيد"
-                onClick={() => onVote(resource._id, "useful")}
-                tone="positive"
-              />
-              <VoteButton
-                active={viewerVote === "not_useful"}
-                disabled={interactionDisabled}
-                label="غير مفيد"
-                onClick={() => onVote(resource._id, "not_useful")}
-                tone="negative"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
     </article>
   );
 }
@@ -553,13 +567,22 @@ export function CourseResourcesSection({
   }
 
   async function handleSubmitResourceRequest(
-    event: FormEvent<HTMLFormElement>,
+    event: React.FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
     const result = publicResourceRequestSchema.safeParse(requestValues);
     if (!result.success) {
-      setRequestErrors(buildRequestFieldErrors(result.error.issues));
+      setRequestErrors(
+        buildRequestFieldErrors(
+          result.error.issues.map((issue) => ({
+            path: issue.path.filter(
+              (p): p is string | number => typeof p !== "symbol",
+            ),
+            message: issue.message,
+          })),
+        ),
+      );
       return;
     }
 
