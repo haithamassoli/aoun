@@ -364,7 +364,7 @@ function ResourceCard({
       )}
 
       <div className="border-t border-surface-100 px-4 py-3 dark:border-surface-800 sm:px-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 ">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex gap-2 items-center">
               <span
