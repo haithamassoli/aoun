@@ -1,7 +1,8 @@
 import { ConvexError, v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
 import { normalizeAlias } from "../lib/alias";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { assertCanEditCourse, assertCanEditMajor, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildCourseSearchToken, normalize } from "./searchUtils";
 import { normalizeCourseSemesterInput } from "../lib/course-semester";
@@ -19,6 +20,47 @@ const courseDoc = v.object({
   alias: v.optional(v.string()),
   searchToken: v.optional(v.string()),
 });
+
+const courseInput = v.object({
+  name: v.string(),
+  slug: v.string(),
+  credits: v.number(),
+  courseCode: v.optional(v.string()),
+  semester: v.optional(v.string()),
+  order: v.number(),
+  alias: v.optional(v.string()),
+});
+
+function makeCourseInsert(args: {
+  majorId: Id<"majors">;
+  name: string;
+  slug: string;
+  credits: number;
+  courseCode?: string;
+  semester?: string;
+  order: number;
+  alias?: string;
+}) {
+  const alias = args.alias ? normalizeAlias(args.alias) : args.alias;
+  const searchToken = buildCourseSearchToken({
+    name: args.name,
+    slug: args.slug,
+    alias,
+    courseCode: args.courseCode,
+  });
+
+  return {
+    majorId: args.majorId,
+    name: args.name,
+    slug: args.slug,
+    credits: args.credits,
+    courseCode: args.courseCode,
+    semester: normalizeCourseSemesterInput(args.semester),
+    order: args.order,
+    alias,
+    searchToken,
+  };
+}
 
 export const listByMajor = query({
   args: { majorId: v.id("majors") },
@@ -136,26 +178,75 @@ export const add = mutation({
       throw new ConvexError({ code: "COURSE_SLUG_EXISTS" });
     }
 
-    const searchToken = buildCourseSearchToken({
-      name: args.name,
-      slug: args.slug,
-      alias: args.alias ? normalizeAlias(args.alias) : args.alias,
-      courseCode: args.courseCode,
-    });
+    return await ctx.db.insert(
+      "courses",
+      makeCourseInsert({
+        majorId: args.majorId,
+        name: args.name,
+        slug: args.slug,
+        credits: args.credits,
+        courseCode: args.courseCode,
+        semester: args.semester,
+        order: args.order,
+        alias: args.alias,
+      }),
+    );
+  },
+});
 
-    const semester = normalizeCourseSemesterInput(args.semester);
+export const bulkAddForMajor = internalMutation({
+  args: {
+    majorId: v.id("majors"),
+    courses: v.array(courseInput),
+  },
+  returns: v.array(v.id("courses")),
+  handler: async (ctx, args) => {
+    const seen = new Set<string>();
+    for (const course of args.courses) {
+      if (seen.has(course.slug)) {
+        throw new ConvexError({
+          code: "COURSE_SLUG_DUPLICATE_IN_PAYLOAD",
+          slug: course.slug,
+        });
+      }
+      seen.add(course.slug);
+    }
 
-    return await ctx.db.insert("courses", {
-      majorId: args.majorId,
-      name: args.name,
-      slug: args.slug,
-      credits: args.credits,
-      courseCode: args.courseCode,
-      semester,
-      order: args.order,
-      alias: args.alias ? normalizeAlias(args.alias) : args.alias,
-      searchToken,
-    });
+    for (const course of args.courses) {
+      const existing = await ctx.db
+        .query("courses")
+        .withIndex("by_majorId_slug", (q) =>
+          q.eq("majorId", args.majorId).eq("slug", course.slug)
+        )
+        .collect();
+      if (existing.some(isNotDeleted)) {
+        throw new ConvexError({
+          code: "COURSE_SLUG_EXISTS",
+          slug: course.slug,
+        });
+      }
+    }
+
+    const ids: Id<"courses">[] = [];
+    for (const course of args.courses) {
+      ids.push(
+        await ctx.db.insert(
+          "courses",
+          makeCourseInsert({
+            majorId: args.majorId,
+            name: course.name,
+            slug: course.slug,
+            credits: course.credits,
+            courseCode: course.courseCode,
+            semester: course.semester,
+            order: course.order,
+            alias: course.alias,
+          }),
+        ),
+      );
+    }
+
+    return ids;
   },
 });
 
