@@ -179,7 +179,10 @@ function buildRequestFieldErrors(
   for (const issue of issues) {
     const field = issue.path[0];
 
-    if (typeof field === "string" && nextErrors[field as RequestFormField] === undefined) {
+    if (
+      typeof field === "string" &&
+      nextErrors[field as RequestFormField] === undefined
+    ) {
       nextErrors[field as RequestFormField] = issue.message;
     }
   }
@@ -362,42 +365,44 @@ function ResourceCard({
 
       <div className="border-t border-surface-100 px-4 py-3 dark:border-surface-800 sm:px-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span
-              className={`rounded-full border px-2.5 py-1 font-semibold ${scoreTone}`}
-            >
-              النتيجة {formatScore(resource.helpfulnessScore)}
-            </span>
-            <span className="rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300">
-              {formatFeedbackCount(resource.totalFeedback)}
-            </span>
-            {resource.totalFeedback > 0 ? (
-              <span className="text-surface-500 dark:text-surface-400">
-                مفيد {resource.usefulCount} • غير مفيد {resource.notUsefulCount}
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex gap-2 items-center">
+              <span
+                className={`rounded-full border px-2.5 py-1 font-semibold ${scoreTone}`}
+              >
+                النتيجة {formatScore(resource.helpfulnessScore)}
               </span>
-            ) : null}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {isPending ? (
-              <span className="text-xs font-medium text-surface-400 dark:text-surface-500">
-                جارٍ التحديث...
+              <span className="rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300">
+                {formatFeedbackCount(resource.totalFeedback)}
               </span>
-            ) : null}
-            <VoteButton
-              active={viewerVote === "useful"}
-              disabled={interactionDisabled}
-              label="مفيد"
-              onClick={() => onVote(resource._id, "useful")}
-              tone="positive"
-            />
-            <VoteButton
-              active={viewerVote === "not_useful"}
-              disabled={interactionDisabled}
-              label="غير مفيد"
-              onClick={() => onVote(resource._id, "not_useful")}
-              tone="negative"
-            />
+              {resource.totalFeedback > 0 ? (
+                <span className="text-surface-500 dark:text-surface-400">
+                  مفيد {resource.usefulCount} • غير مفيد{" "}
+                  {resource.notUsefulCount}
+                </span>
+              ) : null}
+            </div>
+            <div className="flex gap-2">
+              {isPending ? (
+                <span className="text-xs font-medium text-surface-400 dark:text-surface-500">
+                  جارٍ التحديث...
+                </span>
+              ) : null}
+              <VoteButton
+                active={viewerVote === "useful"}
+                disabled={interactionDisabled}
+                label="مفيد"
+                onClick={() => onVote(resource._id, "useful")}
+                tone="positive"
+              />
+              <VoteButton
+                active={viewerVote === "not_useful"}
+                disabled={interactionDisabled}
+                label="غير مفيد"
+                onClick={() => onVote(resource._id, "not_useful")}
+                tone="negative"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -547,7 +552,9 @@ export function CourseResourcesSection({
     }
   }
 
-  async function handleSubmitResourceRequest(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmitResourceRequest(
+    event: FormEvent<HTMLFormElement>,
+  ) {
     event.preventDefault();
 
     const result = publicResourceRequestSchema.safeParse(requestValues);
@@ -766,7 +773,9 @@ export function CourseResourcesSection({
             </label>
             <textarea
               value={requestValues.note}
-              onChange={(event) => updateRequestField("note", event.target.value)}
+              onChange={(event) =>
+                updateRequestField("note", event.target.value)
+              }
               rows={4}
               placeholder="اكتب ما الذي تحتاجه أو ما الذي تقترحه لهذه المادة"
               className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
@@ -803,7 +812,8 @@ export function CourseResourcesSection({
           ) : null}
 
           <div className="rounded-2xl bg-surface-50 px-4 py-3 text-xs leading-6 text-surface-500 dark:bg-surface-800/80 dark:text-surface-300">
-            سيصل الطلب إلى قائمة داخلية لدى المساهمين في هذا التخصص، ولن يظهر للعامة.
+            سيصل الطلب إلى قائمة داخلية لدى المساهمين في هذا التخصص، ولن يظهر
+            للعامة.
           </div>
 
           <div className="flex items-center justify-end gap-3 border-t border-surface-200 pt-4 dark:border-surface-700">
