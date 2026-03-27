@@ -244,7 +244,7 @@ function CourseCard({
   const statusOption = getCourseStatusOption(status);
 
   return (
-    <article className="group flex h-full flex-col rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(14,165,233,0.45)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none dark:hover:border-primary-600 sm:p-4">
+    <article className="public-elevated-surface public-interactive-card group flex h-full flex-col rounded-2xl p-3 sm:p-4">
       <div className="flex items-center justify-between sm:gap-3">
         <Link href={href} className="min-w-0 flex-1 space-y-2">
           {badge ? (

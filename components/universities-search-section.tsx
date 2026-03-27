@@ -46,7 +46,7 @@ export function UniversitiesSearchSection({
   return (
     <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <div className="mb-8 space-y-4">
-        <h2 className="text-center text-2xl font-bold text-surface-800 dark:text-surface-100 sm:text-3xl">
+        <h2 className="public-section-title text-center text-2xl font-bold text-surface-800 dark:text-surface-100 sm:text-3xl">
           الجامعات
         </h2>
 
@@ -93,7 +93,7 @@ export function UniversitiesSearchSection({
             <Link
               key={uni._id}
               href={`/${decodeSlugParam(uni.slug)}`}
-              className="group flex flex-col items-center gap-4 rounded-2xl border border-surface-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
+              className="public-elevated-surface public-interactive-card group flex flex-col items-center gap-4 rounded-[1.7rem] p-8"
             >
               {uni.logoUrl ? (
                 <Image

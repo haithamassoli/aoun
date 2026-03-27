@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { fetchQuery } from "convex/nextjs";
-import Link from "next/link";
 import { api } from "@/convex/_generated/api";
 import { GlobalCoursesSearchPage } from "@/components/global-courses-search-page";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
@@ -53,7 +52,7 @@ export default async function CoursesPage({
         title="البحث عن المواد"
         subtitle="ابحث في جميع الجامعات الأردنية من صفحة واحدة"
       >
-        <div className="rounded-[28px] border border-surface-200 bg-gradient-to-br from-white to-primary-50/70 p-4 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] dark:border-surface-700 dark:from-surface-900 dark:to-primary-950/40 dark:shadow-none">
+        <div className="public-elevated-surface rounded-[28px] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
             أداة سريعة
           </p>

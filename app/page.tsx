@@ -56,20 +56,25 @@ export default async function Home() {
       <HomeLastMajorRedirect />
 
       {/* Hero */}
-      <section className="bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
+      <section className="relative overflow-hidden bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-x-[12%] top-0 h-28 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22)_0%,transparent_72%)]" />
+          <div className="absolute end-[-8rem] top-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute start-[-6rem] bottom-0 h-48 w-48 rounded-full bg-cyan-300/15 blur-3xl" />
+        </div>
+        <div className="relative mx-auto max-w-4xl text-center">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl font-bold leading-tight tracking-[-0.04em] sm:text-5xl lg:text-6xl"
           >
             عـــون
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
             className="mt-4 text-lg leading-relaxed text-primary-100 sm:text-xl"
           >
             منصة مجانية تجمع الملخصات، الامتحانات، والمصادر الأكاديمية لطلاب
@@ -78,7 +83,7 @@ export default async function Home() {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
             className="mt-2 text-base text-primary-200"
           >
             اختر جامعتك وابدأ بتصفح المواد
@@ -87,7 +92,7 @@ export default async function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.65, delay: 0.24, ease: [0.16, 1, 0.3, 1] }}
               className="mx-auto mt-8 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[0_16px_40px_rgba(15,23,42,0.16)] backdrop-blur-md"
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15">
@@ -118,10 +123,10 @@ export default async function Home() {
       <UniversitiesSearchSection universities={sortedUniversities} />
 
       {partners.length > 0 && (
-        <section className="border-t border-surface-200 bg-surface-50 px-4 py-12 dark:border-surface-700 dark:bg-surface-950">
+        <section className="border-t border-surface-200/80 bg-surface-50/70 px-4 py-12 dark:border-surface-700/80 dark:bg-surface-950/60">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-8 flex items-center justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500">
+              <h2 className="public-section-title text-sm font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500">
                 شركاؤنا وداعمونا
               </h2>
               <Link
@@ -134,7 +139,7 @@ export default async function Home() {
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
               {partners.map((partner) => {
                 const card = (
-                  <div className="flex flex-col items-center gap-3 rounded-2xl border border-surface-200 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-surface-700 dark:bg-surface-900">
+                  <div className="public-elevated-surface public-interactive-card flex flex-col items-center gap-3 rounded-[1.6rem] p-2">
                     <div className="relative h-40 w-32">
                       <Image
                         src={partner.logoUrl}

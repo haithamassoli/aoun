@@ -10,11 +10,12 @@ export function PartnersGrid() {
   return (
     <div>
       {/* Hero */}
-      <div className="bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-16 text-center sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">
+      <div className="relative overflow-hidden bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-16 text-center sm:px-6 lg:px-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24)_0%,transparent_72%)]" />
+        <h1 className="public-section-title relative text-3xl font-bold text-white sm:text-4xl">
           شركاؤنا وداعمونا
         </h1>
-        <p className="mt-3 text-lg text-primary-100">
+        <p className="relative mt-3 text-lg text-primary-100">
           الجهات التي تساهم في دعم منصة عون وتطويرها
         </p>
       </div>
@@ -39,7 +40,7 @@ export function PartnersGrid() {
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
             {partners.map((partner) => {
               const card = (
-                <div className="flex flex-col items-center gap-3 rounded-2xl border border-surface-200 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-surface-700 dark:bg-surface-900">
+                <div className="public-elevated-surface public-interactive-card flex flex-col items-center gap-3 rounded-[1.6rem] p-2">
                   <div className="relative h-40 w-32">
                     <Image
                       src={partner.logoUrl}

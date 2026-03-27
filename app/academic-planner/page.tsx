@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import * as motion from "motion/react-client";
 import { AcademicCalendar } from "@/components/academic-calendar/academic-calendar";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
@@ -17,7 +16,7 @@ export default function AcademicPlannerPage() {
         title="التقويم"
         subtitle="نظّم الامتحانات والمشاريع ومواعيد التسجيل"
       >
-        <div className="rounded-[28px] border border-surface-200 bg-gradient-to-br from-white to-primary-50/70 p-4 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] dark:border-surface-700 dark:from-surface-900 dark:to-primary-950/40 dark:shadow-none">
+        <div className="public-elevated-surface rounded-[28px] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
             أداة دراسية
           </p>

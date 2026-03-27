@@ -69,7 +69,7 @@ export default async function UniversityPage({
             : "لا توجد تخصصات حالياً"
         }
       >
-        <div className="rounded-[28px] border border-surface-200 bg-gradient-to-br from-white to-primary-50/70 p-4 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] dark:border-surface-700 dark:from-surface-900 dark:to-primary-950/40 dark:shadow-none">
+        <div className="public-elevated-surface rounded-[28px] p-4">
           <div className="flex items-start gap-4">
             {university.logoUrl ? (
               <Image
@@ -107,7 +107,7 @@ export default async function UniversityPage({
       </MobilePageHeaderMenu>
 
       {/* University Header */}
-      <section className="hidden border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-16 lg:px-8 md:block">
+      <section className="hidden border-b border-surface-200/80 bg-gradient-to-bl from-primary-50/90 to-white/80 px-4 py-12 dark:border-surface-700/80 dark:from-primary-950/90 dark:to-surface-950/80 sm:px-6 sm:py-16 lg:px-8 md:block">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             items={[

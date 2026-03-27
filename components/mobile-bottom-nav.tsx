@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -181,14 +182,26 @@ export function MobileBottomNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex h-12 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-center text-[0.7rem] font-semibold transition-all ${
+                className={`relative flex h-12 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-center text-[0.7rem] font-semibold transition-all duration-300 ${
                   active
-                    ? "bg-[linear-gradient(135deg,rgba(37,99,235,0.16),rgba(59,130,246,0.08))] text-primary-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:bg-[linear-gradient(135deg,rgba(37,99,235,0.26),rgba(59,130,246,0.1))] dark:text-primary-300"
+                    ? "text-primary-700 dark:text-primary-300"
                     : "text-surface-500 hover:bg-surface-100/90 hover:text-surface-900 dark:text-surface-400 dark:hover:bg-surface-800/90 dark:hover:text-surface-100"
                 }`}
               >
+                {active ? (
+                  <motion.span
+                    layoutId="mobile-nav-active"
+                    transition={{
+                      type: "spring",
+                      stiffness: 420,
+                      damping: 34,
+                      mass: 0.72,
+                    }}
+                    className="absolute inset-0 rounded-2xl bg-[linear-gradient(135deg,rgba(37,99,235,0.18),rgba(59,130,246,0.08))] shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_16px_30px_-24px_rgba(37,99,235,0.6)] dark:bg-[linear-gradient(135deg,rgba(37,99,235,0.26),rgba(59,130,246,0.12))]"
+                  />
+                ) : null}
                 <span
-                  className={`flex h-9 w-9 items-center justify-center rounded-2xl transition-colors ${
+                  className={`relative z-10 flex h-9 w-9 items-center justify-center rounded-2xl transition-colors ${
                     active
                       ? "text-primary-700 dark:text-primary-300"
                       : "bg-transparent"
@@ -196,6 +209,7 @@ export function MobileBottomNav() {
                 >
                   {item.icon}
                 </span>
+                <span className="relative z-10">{item.label}</span>
               </Link>
             );
           })}

@@ -46,7 +46,7 @@ export function MajorsSearchSection({
       className="mx-auto max-w-7xl px-4 pb-10 pt-4 sm:px-6 sm:py-8 lg:px-8"
     >
       <div className="mb-8 space-y-4">
-        <h2 className="text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
+        <h2 className="public-section-title text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
           التخصصات
         </h2>
 
@@ -90,7 +90,7 @@ export function MajorsSearchSection({
             <Link
               key={major._id}
               href={`/${universitySlug}/${decodeSlugParam(major.slug)}`}
-              className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
+              className="public-elevated-surface public-interactive-card group flex items-center gap-4 rounded-[1.35rem] p-5"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-lg font-bold text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-400 dark:group-hover:bg-primary-900">
                 {decodeSlugParam(major.slug).toUpperCase().slice(0, 4)}

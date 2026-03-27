@@ -10,6 +10,8 @@ import { PWARegister } from "@/components/pwa-register";
 import { PWAInstallBanner } from "@/components/pwa-install-banner";
 import { VisitorTracker } from "@/components/visitor-tracker";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { PublicRouteFrame } from "@/components/public-route-frame";
+import { PublicShellChrome } from "@/components/public-shell-chrome";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
@@ -83,8 +85,9 @@ export default async function RootLayout({
         <ThemeProvider>
           <ConvexClientProvider sessionToken={sessionToken}>
             <VisitorTracker />
+            <PublicShellChrome />
             <div className="flex min-h-screen flex-col">
-              <header className="hidden border-b border-surface-200 bg-white/80 backdrop-blur-md md:sticky md:top-0 md:z-50 md:block dark:border-surface-700 dark:bg-surface-950/80">
+              <header className="hidden border-b border-surface-200/80 bg-white/72 backdrop-blur-xl md:sticky md:top-0 md:z-50 md:block dark:border-surface-700/80 dark:bg-surface-950/72">
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                   <Link href="/" className="flex items-center gap-2">
                     <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
@@ -126,7 +129,7 @@ export default async function RootLayout({
               </header>
 
               <main className="flex-1 pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
-                {children}
+                <PublicRouteFrame>{children}</PublicRouteFrame>
               </main>
 
               <MobileBottomNav />

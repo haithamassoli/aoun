@@ -14,7 +14,7 @@ export function PublicSearchInput({
   onChange,
 }: PublicSearchInputProps) {
   return (
-    <div className="rounded-2xl border border-surface-200 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:border-surface-700 dark:bg-surface-900/85">
+    <div className="public-search-shell public-elevated-surface rounded-[1.6rem] p-4 backdrop-blur-sm">
       <label className="mb-2 block text-sm font-semibold text-surface-700 dark:text-surface-200">
         {label}
       </label>
@@ -40,7 +40,7 @@ export function PublicSearchInput({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
-          className="h-11 w-full rounded-xl border border-surface-300 bg-surface-50 pe-11 ps-11 text-sm text-surface-800 outline-none transition-all placeholder:text-surface-400 focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-200 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:bg-surface-900 dark:focus:ring-primary-900"
+          className="h-11 w-full rounded-xl border border-surface-300 bg-surface-50/92 pe-11 ps-11 text-sm text-surface-800 outline-none transition-all duration-300 placeholder:text-surface-400 focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-200 dark:border-surface-600 dark:bg-surface-800/92 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:bg-surface-900 dark:focus:ring-primary-900"
         />
 
         {value.length > 0 && (

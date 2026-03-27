@@ -56,7 +56,12 @@ export function MobilePageHeaderMenu({
       <section className="sticky top-0 z-40 border-b border-surface-200 bg-white/90 backdrop-blur-xl md:hidden dark:border-surface-700 dark:bg-surface-950/90">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-3">
+            <motion.div
+              initial={false}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-3"
+            >
               <Link
                 href="."
                 aria-label="العودة"
@@ -81,7 +86,7 @@ export function MobilePageHeaderMenu({
               <div className="min-w-0">
                 <p
                   id={titleId}
-                  className="truncate text-base font-semibold text-surface-900 dark:text-surface-50"
+                  className="truncate text-base font-semibold tracking-[-0.015em] text-surface-900 dark:text-surface-50"
                 >
                   {title}
                 </p>
@@ -89,7 +94,7 @@ export function MobilePageHeaderMenu({
                   {subtitle}
                 </p>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           <button
@@ -164,7 +169,8 @@ export function MobilePageHeaderMenu({
                 className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/70 to-transparent dark:via-primary-500/60"
               />
 
-              <div className="flex items-center justify-between gap-3 px-5 pt-5">
+              <div className="relative flex items-center justify-between gap-3 px-5 pt-5">
+                <div className="pointer-events-none absolute inset-x-5 top-2 h-16 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.12)_0%,transparent_72%)] blur-2xl dark:bg-[radial-gradient(circle,rgba(96,165,250,0.16)_0%,transparent_72%)]" />
                 <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   عـون
                 </span>

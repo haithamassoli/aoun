@@ -130,7 +130,7 @@ export default async function CoursePage({
   return (
     <div>
       <MobilePageHeaderMenu title={course.name} subtitle={courseSummary}>
-        <div className="rounded-[28px] border border-surface-200 bg-gradient-to-br from-white to-primary-50/70 p-4 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] dark:border-surface-700 dark:from-surface-900 dark:to-primary-950/40 dark:shadow-none">
+        <div className="public-elevated-surface rounded-[28px] p-4">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
@@ -250,7 +250,7 @@ export default async function CoursePage({
       </MobilePageHeaderMenu>
 
       {/* Course Header */}
-      <section className="hidden border-b border-surface-200 bg-gradient-to-bl from-primary-50 to-white px-4 py-12 dark:border-surface-700 dark:from-primary-950 dark:to-surface-950 sm:px-6 sm:py-16 md:block lg:px-8">
+      <section className="hidden border-b border-surface-200/80 bg-gradient-to-bl from-primary-50/90 to-white/80 px-4 py-12 dark:border-surface-700/80 dark:from-primary-950/90 dark:to-surface-950/80 sm:px-6 sm:py-16 md:block lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb items={courseBreadcrumbItems} />
           <motion.h1
