@@ -726,10 +726,7 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        <div
-                          dir="ltr"
-                          className="mt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300"
-                        >
+                        <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300">
                           <span>
                             {resolvedAnalytics.entitySeries[0]?.label}
                           </span>

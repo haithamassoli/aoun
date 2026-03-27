@@ -417,7 +417,6 @@ export default function AdminResourcesPage() {
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      dir="ltr"
                       className="mt-1 block text-xs text-primary-600 hover:underline dark:text-primary-400"
                     >
                       {resource.url}

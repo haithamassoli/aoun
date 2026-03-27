@@ -733,10 +733,10 @@ export default function MajorCoursesPage() {
       </FormModal>
 
       {/* Tab bar */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           onClick={() => setActiveTab("courses")}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "courses"
               ? "bg-primary-600 text-white"
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
@@ -746,7 +746,7 @@ export default function MajorCoursesPage() {
         </button>
         <button
           onClick={() => setActiveTab("news")}
-          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "news"
               ? "bg-primary-600 text-white"
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
@@ -767,7 +767,7 @@ export default function MajorCoursesPage() {
         </button>
         <button
           onClick={() => setActiveTab("requests")}
-          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "requests"
               ? "bg-primary-600 text-white"
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
@@ -788,7 +788,7 @@ export default function MajorCoursesPage() {
         </button>
         <button
           onClick={() => setActiveTab("notifications")}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "notifications"
               ? "bg-primary-600 text-white"
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
