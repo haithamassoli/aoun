@@ -416,6 +416,3 @@ Easy content sharing:
 ---
 
 **Note**: These features are suggestions based on common student needs and platform capabilities. Prioritize based on user feedback, technical feasibility, and strategic goals. Start with features that enhance existing strengths rather than adding entirely new product areas.
-
-- شريط تقدم لكل مقر
-  (تصدير/استيراد JSON)

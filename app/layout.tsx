@@ -12,6 +12,7 @@ import { VisitorTracker } from "@/components/visitor-tracker";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { PublicRouteFrame } from "@/components/public-route-frame";
 import { PublicShellChrome } from "@/components/public-shell-chrome";
+import { DeveloperSupportButton } from "@/components/developer-support-button";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
@@ -140,9 +141,7 @@ export default async function RootLayout({
                     <p className="text-sm text-surface-500 dark:text-surface-400">
                       عون — مصادر أكاديمية مجانية لطلاب الجامعات الأردنية
                     </p>
-                    <p className="text-sm text-surface-400 dark:text-surface-500">
-                      مشروع تطوعي بإدارة مجتمعية
-                    </p>
+                      <DeveloperSupportButton />
                   </div>
                 </div>
               </footer>

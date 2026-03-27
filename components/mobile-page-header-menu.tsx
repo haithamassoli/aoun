@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { DeveloperSupportButton } from "@/components/developer-support-button";
 
 const ThemeToggle = dynamic(
   () => import("@/components/theme-toggle").then((mod) => mod.ThemeToggle),
@@ -34,9 +35,19 @@ export function MobilePageHeaderMenu({
       return;
     }
 
+    const scrollY = window.scrollY;
     const previousOverflow = document.body.style.overflow;
+    const previousPosition = document.body.style.position;
+    const previousTop = document.body.style.top;
+    const previousWidth = document.body.style.width;
     const previousOverflowX = document.body.style.overflowX;
+    const previousDocumentOverflow = document.documentElement.style.overflow;
     const previousDocumentOverflowX = document.documentElement.style.overflowX;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     document.body.style.overflow = "hidden";
     document.body.style.overflowX = "hidden";
     document.documentElement.style.overflowX = "hidden";
@@ -50,9 +61,14 @@ export function MobilePageHeaderMenu({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
+      document.documentElement.style.overflow = previousDocumentOverflow;
       document.body.style.overflow = previousOverflow;
+      document.body.style.position = previousPosition;
+      document.body.style.top = previousTop;
+      document.body.style.width = previousWidth;
       document.body.style.overflowX = previousOverflowX;
       document.documentElement.style.overflowX = previousDocumentOverflowX;
+      window.scrollTo({ top: scrollY });
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
@@ -191,40 +207,46 @@ export function MobilePageHeaderMenu({
                 </motion.button>
               </div>
 
-              <div className="flex-1 overflow-x-hidden overflow-y-auto px-5 pb-5 pt-4">
+              <div className="flex flex-1 flex-col justify-between overflow-x-hidden px-5 pb-5 pt-4">
                 <div className="space-y-5">
                   {children}
 
-                  <div className="flex items-center gap-3 border-t border-surface-200 pt-2 dark:border-surface-800">
-                    <Link
-                      href="/settings"
-                      onClick={() => setIsOpen(false)}
-                      className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm font-medium text-surface-700 shadow-sm transition-all hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-950/40 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-900"
-                    >
-                      <span>الإعدادات</span>
-                      <svg
-                        className="h-4 w-4 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={1.8}
-                        aria-hidden="true"
+                  <div className="space-y-3 border-t border-surface-200 pt-2 dark:border-surface-800">
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href="/settings"
+                        onClick={() => setIsOpen(false)}
+                        className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm font-medium text-surface-700 shadow-sm transition-all hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-950/40 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-900"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    </Link>
+                        <span>الإعدادات</span>
+                        <svg
+                          className="h-4 w-4 shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={1.8}
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                      </Link>
 
-                    <div className="shrink-0 rounded-2xl border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
-                      <ThemeToggle />
+                      <div className="shrink-0 rounded-2xl border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
+                        <ThemeToggle />
+                      </div>
+                    </div>
+
+                    <div className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-center shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-surface-700 dark:bg-surface-950/40 dark:hover:border-primary-700 dark:hover:bg-primary-950/70">
+                      <DeveloperSupportButton />
                     </div>
                   </div>
                 </div>
