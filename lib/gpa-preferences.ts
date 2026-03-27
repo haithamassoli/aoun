@@ -1,13 +1,9 @@
 import { useSyncExternalStore } from "react";
 import { DEFAULT_GRADE_SCALE, type GradeType } from "@/lib/gpa-utils";
-
-const STORAGE_NAMESPACE = "aoun:gpa";
-const STORAGE_VERSION = "v1";
-
-export const GPA_SUPPORTS_42_SCALE_STORAGE_KEY =
-  `${STORAGE_NAMESPACE}:supports-42-scale:${STORAGE_VERSION}`;
-export const GPA_GRADE_TYPE_STORAGE_KEY =
-  `${STORAGE_NAMESPACE}:grade-type:${STORAGE_VERSION}`;
+import {
+  GPA_GRADE_TYPE_STORAGE_KEY,
+  GPA_SUPPORTS_42_SCALE_STORAGE_KEY,
+} from "@/lib/local-storage-keys";
 
 const VALID_GRADE_TYPES = new Set<GradeType>([
   "letter",

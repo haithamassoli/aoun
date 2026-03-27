@@ -110,6 +110,30 @@ function DashboardIcon() {
   );
 }
 
+function SettingsIcon() {
+  return (
+    <svg
+      className="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.9}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  );
+}
+
 function isDashboardPath(pathname: string) {
   return pathname === "/dashboard" || pathname.startsWith("/dashboard/");
 }
@@ -139,6 +163,12 @@ export function MobileBottomNav() {
       icon: <CalculatorIcon />,
     },
     {
+      href: "/settings",
+      label: "الإعدادات",
+      isActive: (currentPath) => currentPath.startsWith("/settings"),
+      icon: <SettingsIcon />,
+    },
+    {
       href: isAuthenticated ? "/dashboard" : "/login",
       label: isAuthenticated ? "لوحتي" : "الدخول",
       isActive: (currentPath) =>
@@ -161,7 +191,7 @@ export function MobileBottomNav() {
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(180deg,transparent_0%,rgba(248,250,252,0.86)_38%,rgba(248,250,252,0.98)_100%)] dark:bg-[linear-gradient(180deg,transparent_0%,rgba(2,6,23,0.86)_38%,rgba(2,6,23,0.98)_100%)]" />
       <div className="relative px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3">
-        <div className="mx-auto grid max-w-lg grid-cols-4 gap-2 rounded-[1.75rem] border border-surface-200/80 bg-white/92 p-2 shadow-[0_18px_45px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_18px_45px_rgba(2,6,23,0.45)]">
+        <div className="mx-auto grid max-w-lg grid-cols-5 gap-2 rounded-[1.75rem] border border-surface-200/80 bg-white/92 p-2 shadow-[0_18px_45px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_18px_45px_rgba(2,6,23,0.45)]">
           {items.map((item) => {
             const active = item.isActive(pathname);
 

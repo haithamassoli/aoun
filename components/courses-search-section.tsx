@@ -17,6 +17,7 @@ import {
   loadCourseStatuses,
   setCourseStatus,
 } from "@/lib/student-progress";
+import { COURSE_STATUS_FILTER_STORAGE_KEY } from "@/lib/local-storage-keys";
 import { CustomCourseTracker } from "@/components/custom-course-tracker";
 import {
   formatCourseSemesterLabel,
@@ -41,7 +42,6 @@ type StatusFilterOption = {
 };
 type CourseStatusCounts = Record<CourseStatusFilter, number>;
 
-const STATUS_FILTER_STORAGE_KEY = "aoun:student:course-filter:v1";
 const baseStatusFilterOptions: StatusFilterOption[] = [
   {
     value: "all",
@@ -93,7 +93,7 @@ function loadCourseStatusFilter(): CourseStatusFilter | null {
 
   try {
     return parseCourseStatusFilter(
-      window.localStorage.getItem(STATUS_FILTER_STORAGE_KEY),
+      window.localStorage.getItem(COURSE_STATUS_FILTER_STORAGE_KEY),
     );
   } catch {
     return null;
@@ -107,11 +107,11 @@ function persistCourseStatusFilter(filter: CourseStatusFilter) {
 
   try {
     if (filter === "all") {
-      window.localStorage.removeItem(STATUS_FILTER_STORAGE_KEY);
+      window.localStorage.removeItem(COURSE_STATUS_FILTER_STORAGE_KEY);
       return;
     }
 
-    window.localStorage.setItem(STATUS_FILTER_STORAGE_KEY, filter);
+    window.localStorage.setItem(COURSE_STATUS_FILTER_STORAGE_KEY, filter);
   } catch {
     // Local storage may be blocked by the browser.
   }

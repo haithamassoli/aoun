@@ -1,6 +1,6 @@
 "use client";
 
-export const ACADEMIC_CALENDAR_STORAGE_KEY = "aoun:academic-calendar:v1";
+import { ACADEMIC_CALENDAR_STORAGE_KEY } from "@/lib/local-storage-keys";
 
 export type AcademicCalendarCategory =
   | "exam"

@@ -14,6 +14,7 @@ import {
   useGradeTypePreference,
   saveSupports42ScalePreference,
 } from "@/lib/gpa-preferences";
+import { GPA_CALCULATOR_HISTORY_STORAGE_KEY } from "@/lib/local-storage-keys";
 import { SemesterGpaForm } from "./semester-gpa-form";
 import { CumulativeGpaForm } from "./cumulative-gpa-form";
 import { GpaPlannerForm, type PlannerResult } from "./gpa-planner-form";
@@ -35,7 +36,6 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "cumulative", label: "المعدل التراكمي", icon: "📊" },
   { id: "planner", label: "مخطط المعدل", icon: "🎯" },
 ];
-const HISTORY_STORAGE_KEY = "gpaCalculatorHistory:v1";
 const MAX_HISTORY_ITEMS = 12;
 const HISTORY_TONE_STYLES: Record<HistoryTone, string> = {
   default:
@@ -122,7 +122,9 @@ export function GpaCalculatorTabs() {
 
   useEffect(() => {
     try {
-      const rawHistory = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+      const rawHistory = window.localStorage.getItem(
+        GPA_CALCULATOR_HISTORY_STORAGE_KEY,
+      );
 
       if (!rawHistory) {
         return;
@@ -135,7 +137,7 @@ export function GpaCalculatorTabs() {
 
       setHistory(parsed.filter(isHistoryEntry).slice(0, MAX_HISTORY_ITEMS));
     } catch {
-      window.localStorage.removeItem(HISTORY_STORAGE_KEY);
+      window.localStorage.removeItem(GPA_CALCULATOR_HISTORY_STORAGE_KEY);
     } finally {
       setHasLoadedHistory(true);
     }
@@ -155,11 +157,14 @@ export function GpaCalculatorTabs() {
     }
 
     if (history.length === 0) {
-      window.localStorage.removeItem(HISTORY_STORAGE_KEY);
+      window.localStorage.removeItem(GPA_CALCULATOR_HISTORY_STORAGE_KEY);
       return;
     }
 
-    window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+    window.localStorage.setItem(
+      GPA_CALCULATOR_HISTORY_STORAGE_KEY,
+      JSON.stringify(history),
+    );
   }, [hasLoadedHistory, history]);
 
   const addHistoryEntry = ({

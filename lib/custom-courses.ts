@@ -1,8 +1,5 @@
 import type { CourseProgressStatus } from "@/lib/student-progress";
-
-const STORAGE_NAMESPACE = "aoun:student";
-const STORAGE_VERSION = "v1";
-const CUSTOM_COURSES_STORAGE_KEY = `${STORAGE_NAMESPACE}:custom-courses:${STORAGE_VERSION}`;
+import { CUSTOM_COURSES_STORAGE_KEY } from "@/lib/local-storage-keys";
 
 export type CustomCourse = {
   id: string;

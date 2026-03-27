@@ -1,3 +1,8 @@
+import {
+  COURSE_STATUS_STORAGE_KEY,
+  LAST_MAJOR_STORAGE_KEY,
+} from "@/lib/local-storage-keys";
+
 export type CourseProgressStatus =
   | "completed"
   | "in_progress"
@@ -8,14 +13,6 @@ export type LastVisitedMajor = {
   universitySlug: string;
   majorSlug: string;
 };
-
-const STORAGE_NAMESPACE = "aoun:student";
-const STORAGE_VERSION = "v1";
-
-export const COURSE_STATUS_STORAGE_KEY =
-  `${STORAGE_NAMESPACE}:course-status:${STORAGE_VERSION}`;
-export const LAST_MAJOR_STORAGE_KEY =
-  `${STORAGE_NAMESPACE}:last-major:${STORAGE_VERSION}`;
 
 const VALID_STATUSES = new Set<CourseProgressStatus>([
   "completed",
