@@ -7,6 +7,7 @@ import {
   GPA_GRADE_TYPE_STORAGE_KEY,
   GPA_SUPPORTS_42_SCALE_STORAGE_KEY,
   LAST_MAJOR_STORAGE_KEY,
+  RECENT_GLOBAL_COURSE_SEARCHES_STORAGE_KEY,
   THEME_STORAGE_KEY,
   USER_DATA_LOCAL_STORAGE_KEYS,
   type UserDataLocalStorageKey,
@@ -52,12 +53,14 @@ export const USER_DATA_BACKUP_SECTIONS: readonly BackupSection[] = [
   {
     id: "progress",
     title: "الخطة والتقدم",
-    description: "حالات المواد، المواد الإضافية، المرشح الأخير، وفلتر العرض.",
+    description:
+      "حالات المواد، المواد الإضافية، المرشح الأخير، فلاتر العرض، وعمليات البحث الأخيرة عن المواد.",
     keys: [
       COURSE_STATUS_STORAGE_KEY,
       LAST_MAJOR_STORAGE_KEY,
       CUSTOM_COURSES_STORAGE_KEY,
       COURSE_STATUS_FILTER_STORAGE_KEY,
+      RECENT_GLOBAL_COURSE_SEARCHES_STORAGE_KEY,
     ],
   },
   {

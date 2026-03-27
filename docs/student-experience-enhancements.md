@@ -9,9 +9,8 @@ This document outlines feature suggestions to improve the student experience on 
 Add an intelligent search bar that allows students to:
 
 - Search across all universities and majors simultaneously
-- Filter by: university, major, course level (100-400), semester offered
+- Filter by: university, major
 - Show course code + name + university in results
-- Quick preview of available resources (summaries, exams, videos count)
 - Recent searches saved in localStorage
 
 **Why it fits:**

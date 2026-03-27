@@ -182,7 +182,36 @@ export function MobilePageHeaderMenu({
               </div>
 
               <div className="flex-1 overflow-y-auto px-5 pb-5 pt-4">
-                <div className="space-y-5">{children}</div>
+                <div className="space-y-5">
+                  <div className="rounded-[26px] border border-surface-200 bg-surface-50/90 p-4 dark:border-surface-700 dark:bg-surface-900/80">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-surface-500 dark:text-surface-400">
+                      تنقل سريع
+                    </p>
+                    <Link
+                      href="/courses"
+                      onClick={() => setIsOpen(false)}
+                      className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+                    >
+                      <span>بحث المواد في كل الجامعات</span>
+                      <svg
+                        className="h-4 w-4 shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.8}
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 21l-4.35-4.35m1.1-4.65a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                        />
+                      </svg>
+                    </Link>
+                  </div>
+
+                  {children}
+                </div>
               </div>
             </motion.div>
           </div>

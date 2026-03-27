@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import {
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ChangeEvent,
+} from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Toast, useToast } from "@/components/toast";
 import {
@@ -85,11 +90,11 @@ export function LocalDataSettings() {
     null,
   );
   const [isImporting, setIsImporting] = useState(false);
-  const [storageAvailable, setStorageAvailable] = useState(false);
-
-  useEffect(() => {
-    setStorageAvailable(isLocalStorageAvailable());
-  }, []);
+  const storageAvailable = useSyncExternalStore(
+    () => () => undefined,
+    isLocalStorageAvailable,
+    () => false,
+  );
 
   const handleExport = () => {
     if (!storageAvailable) {
@@ -151,7 +156,10 @@ export function LocalDataSettings() {
 
     try {
       importUserLocalDataBackup(pendingImport.backup, window.localStorage);
-      toast.show("تمت استعادة البيانات. ستتم إعادة تحميل الصفحة الآن.", "success");
+      toast.show(
+        "تمت استعادة البيانات. ستتم إعادة تحميل الصفحة الآن.",
+        "success",
+      );
       setPendingImport(null);
       window.setTimeout(() => {
         window.location.reload();
@@ -192,7 +200,7 @@ export function LocalDataSettings() {
                   تصدير نسخة احتياطية
                 </h2>
                 <p className="mt-1 text-sm text-surface-600 dark:text-surface-400">
-                  نزّل ملف يحتوي على بياناتك
+                  نزّل ملفاً يحتوي على بياناتك المحلية، بما فيها عمليات البحث الأخيرة
                 </p>
               </div>
             </button>
@@ -211,7 +219,7 @@ export function LocalDataSettings() {
                   استيراد نسخة محفوظة
                 </h2>
                 <p className="mt-1 text-sm text-surface-600 dark:text-surface-400">
-                  استعد بياناتك من ملف سابق
+                  استعد بياناتك من ملف سابق مع آخر عمليات البحث المحفوظة
                 </p>
               </div>
             </button>
@@ -236,7 +244,7 @@ export function LocalDataSettings() {
               البيانات المشمولة
             </h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {USER_DATA_BACKUP_SECTIONS.map((section) => (
+              {USER_DATA_BACKUP_SECTIONS.map((section, index) => (
                 <div
                   key={section.id}
                   className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900"
@@ -251,7 +259,7 @@ export function LocalDataSettings() {
                       </p>
                     </div>
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-100 text-xs font-medium text-surface-700 dark:bg-surface-800 dark:text-surface-300">
-                      {section.keys.length}
+                      {index + 1}
                     </span>
                   </div>
                 </div>

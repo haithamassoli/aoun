@@ -21,6 +21,22 @@ const courseDoc = v.object({
   searchToken: v.optional(v.string()),
 });
 
+const globalCourseSearchResultDoc = v.object({
+  _id: v.id("courses"),
+  _creationTime: v.number(),
+  slug: v.string(),
+  name: v.string(),
+  credits: v.number(),
+  courseCode: v.optional(v.string()),
+  semester: v.optional(v.string()),
+  order: v.number(),
+  majorName: v.string(),
+  majorSlug: v.string(),
+  universityName: v.string(),
+  universitySlug: v.string(),
+  href: v.string(),
+});
+
 const courseInput = v.object({
   name: v.string(),
   slug: v.string(),
@@ -96,6 +112,107 @@ export const searchByMajor = query({
       .collect();
 
     return matches.filter(isNotDeleted);
+  },
+});
+
+const GLOBAL_PUBLIC_COURSE_SEARCH_LIMIT = 30;
+
+export const searchGlobalPublic = query({
+  args: {
+    query: v.string(),
+    universitySlug: v.optional(v.string()),
+    majorSlug: v.optional(v.string()),
+  },
+  returns: v.array(globalCourseSearchResultDoc),
+  handler: async (ctx, args) => {
+    const queryText = normalize(args.query);
+    if (!queryText) {
+      return [];
+    }
+
+    const normalizedUniversitySlug = args.universitySlug
+      ? normalizeSlugLookup(args.universitySlug)
+      : null;
+    const normalizedMajorSlug = args.majorSlug
+      ? normalizeSlugLookup(args.majorSlug)
+      : null;
+
+    const matches = (await ctx.db
+      .query("courses")
+      .withSearchIndex("search_token", (q) => q.search("searchToken", queryText))
+      .collect()).filter(isNotDeleted);
+
+    if (matches.length === 0) {
+      return [];
+    }
+
+    const majorIds = [...new Set(matches.map((course) => course.majorId))];
+    const majorEntries = await Promise.all(
+      majorIds.map(async (majorId) => [majorId, await ctx.db.get(majorId)] as const),
+    );
+    const majorMap = new Map(
+      majorEntries.flatMap(([majorId, major]) =>
+        major && isNotDeleted(major) ? [[majorId, major] as const] : [],
+      ),
+    );
+
+    const universityIds = [
+      ...new Set(Array.from(majorMap.values()).map((major) => major.universityId)),
+    ];
+    const universityEntries = await Promise.all(
+      universityIds.map(async (universityId) => [
+        universityId,
+        await ctx.db.get(universityId),
+      ] as const),
+    );
+    const universityMap = new Map(
+      universityEntries.flatMap(([universityId, university]) =>
+        university && isNotDeleted(university)
+          ? [[universityId, university] as const]
+          : [],
+      ),
+    );
+
+    return matches.flatMap((course) => {
+      const major = majorMap.get(course.majorId);
+      if (!major) {
+        return [];
+      }
+
+      const university = universityMap.get(major.universityId);
+      if (!university) {
+        return [];
+      }
+
+      if (
+        normalizedUniversitySlug &&
+        normalizeSlugLookup(university.slug) !== normalizedUniversitySlug
+      ) {
+        return [];
+      }
+
+      if (normalizedMajorSlug && normalizeSlugLookup(major.slug) !== normalizedMajorSlug) {
+        return [];
+      }
+
+      return [
+        {
+          _id: course._id,
+          _creationTime: course._creationTime,
+          slug: course.slug,
+          name: course.name,
+          credits: course.credits,
+          courseCode: course.courseCode,
+          semester: course.semester,
+          order: course.order,
+          majorName: major.name,
+          majorSlug: major.slug,
+          universityName: university.name,
+          universitySlug: university.slug,
+          href: `/${university.slug}/${major.slug}/${course.slug}`,
+        },
+      ];
+    }).slice(0, GLOBAL_PUBLIC_COURSE_SEARCH_LIMIT);
   },
 });
 
