@@ -1,9 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+
+const ThemeToggle = dynamic(
+  () => import("@/components/theme-toggle").then((mod) => mod.ThemeToggle),
+  {
+    ssr: false,
+    loading: () => <div className="h-9 w-9" aria-hidden="true" />,
+  },
+);
 
 type MobilePageHeaderMenuProps = {
   title: string;
@@ -155,7 +164,10 @@ export function MobilePageHeaderMenu({
                 className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/70 to-transparent dark:via-primary-500/60"
               />
 
-              <div className="flex items-start justify-end px-5 pt-5">
+              <div className="flex items-center justify-between gap-3 px-5 pt-5">
+                <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                  عـون
+                </span>
                 <motion.button
                   type="button"
                   aria-label="إغلاق القائمة"
@@ -183,16 +195,15 @@ export function MobilePageHeaderMenu({
 
               <div className="flex-1 overflow-y-auto px-5 pb-5 pt-4">
                 <div className="space-y-5">
-                  <div className="rounded-[26px] border border-surface-200 bg-surface-50/90 p-4 dark:border-surface-700 dark:bg-surface-900/80">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-surface-500 dark:text-surface-400">
-                      تنقل سريع
-                    </p>
+                  {children}
+
+                  <div className="flex items-center gap-3 border-t border-surface-200 pt-2 dark:border-surface-800">
                     <Link
-                      href="/courses"
+                      href="/settings"
                       onClick={() => setIsOpen(false)}
-                      className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
+                      className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm font-medium text-surface-700 shadow-sm transition-all hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-950/40 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-900"
                     >
-                      <span>بحث المواد في كل الجامعات</span>
+                      <span>الإعدادات</span>
                       <svg
                         className="h-4 w-4 shrink-0"
                         fill="none"
@@ -204,13 +215,20 @@ export function MobilePageHeaderMenu({
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          d="M21 21l-4.35-4.35m1.1-4.65a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
                     </Link>
-                  </div>
 
-                  {children}
+                    <div className="shrink-0 rounded-2xl border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
+                      <ThemeToggle />
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>

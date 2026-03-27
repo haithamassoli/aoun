@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { GpaCalculatorTabs } from "@/components/gpa-calculator/gpa-calculator-tabs";
 import * as motion from "motion/react-client";
+import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 
 export const metadata: Metadata = {
   title: "حاسبة المعدل",
@@ -10,12 +12,32 @@ export const metadata: Metadata = {
 
 export default function GpaCalculatorPage() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <GpaCalculatorTabs />
-    </motion.div>
+    <div>
+      <MobilePageHeaderMenu
+        title="حاسبة المعدل"
+        subtitle="احسب المعدل الفصلي والتراكمي وخطط للفصل القادم"
+      >
+        <div className="rounded-[28px] border border-surface-200 bg-gradient-to-br from-white to-primary-50/70 p-4 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] dark:border-surface-700 dark:from-surface-900 dark:to-primary-950/40 dark:shadow-none">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
+            أداة حساب
+          </p>
+          <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
+            المعدل الفصلي والتراكمي
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
+            اختر طريقة الحساب المناسبة لجامعتك، ثم راقب النتائج بالنقاط والنسبة
+            المئوية مع سجل محفوظ محلياً.
+          </p>
+        </div>
+      </MobilePageHeaderMenu>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <GpaCalculatorTabs />
+      </motion.div>
+    </div>
   );
 }
