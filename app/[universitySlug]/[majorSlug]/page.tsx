@@ -131,7 +131,7 @@ export default async function MajorPage({
       : `${university.name} · لا توجد مواد حالياً`;
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <MajorLastVisitTracker
         universitySlug={canonicalUniversitySlug}
         majorSlug={canonicalMajorSlug}

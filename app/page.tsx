@@ -56,12 +56,7 @@ export default async function Home() {
       <HomeLastMajorRedirect />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-x-[12%] top-0 h-96 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22)_0%,transparent_72%)]" />
-          <div className="absolute end-[-8rem] top-10 h-96 w-56 rounded-full bg-white/10 blur-3xl" />
-          <div className="absolute start-[-6rem] bottom-0 h-96 w-80 rounded-full bg-cyan-300/15 blur-3xl" />
-        </div>
+      <section className="relative overflow-hidden bg-[linear-gradient(180deg,#407bf3_0%,#356eea_34%,#2d61df_62%,#2957d3_82%,#274fc7_100%)] px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
         <div className="relative mx-auto max-w-4xl text-center">
           <motion.h1
             initial={{ opacity: 0, y: 24, scale: 0.98 }}

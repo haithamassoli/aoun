@@ -171,7 +171,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="شريط التنقل السفلي"
-      className="fixed inset-x-0 bottom-0 z-40 md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 overflow-x-hidden md:hidden"
     >
       {isHomePage ? (
         <div className="fixed bottom-[calc(5.42rem+env(safe-area-inset-bottom))] left-4 z-40 md:hidden">

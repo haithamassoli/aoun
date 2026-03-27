@@ -35,7 +35,11 @@ export function MobilePageHeaderMenu({
     }
 
     const previousOverflow = document.body.style.overflow;
+    const previousOverflowX = document.body.style.overflowX;
+    const previousDocumentOverflowX = document.documentElement.style.overflowX;
     document.body.style.overflow = "hidden";
+    document.body.style.overflowX = "hidden";
+    document.documentElement.style.overflowX = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -47,6 +51,8 @@ export function MobilePageHeaderMenu({
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.overflowX = previousOverflowX;
+      document.documentElement.style.overflowX = previousDocumentOverflowX;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
@@ -126,7 +132,7 @@ export function MobilePageHeaderMenu({
 
       <AnimatePresence initial={false}>
         {isOpen ? (
-          <div className="fixed inset-0 z-50 md:hidden">
+          <div className="fixed inset-0 z-50 overflow-x-hidden md:hidden">
             <motion.button
               type="button"
               aria-label="إغلاق القائمة"
@@ -146,29 +152,15 @@ export function MobilePageHeaderMenu({
               role="dialog"
               aria-modal="true"
               aria-labelledby={titleId}
-              initial={{ opacity: 0, x: -28, scale: 0.98 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -24, scale: 0.985 }}
+              initial={{ opacity: 0, x: -18 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -14 }}
               transition={{
-                type: "spring",
-                stiffness: 380,
-                damping: 34,
-                mass: 0.9,
+                duration: 0.24,
+                ease: [0.22, 1, 0.36, 1],
               }}
-              className="absolute inset-y-0 end-0 flex w-[min(24rem,calc(100vw-1rem))] max-w-full flex-col overflow-hidden border-surface-200 bg-white/95 shadow-[0_24px_80px_-24px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-surface-700 dark:bg-surface-950/95"
+              className="absolute inset-y-0 end-0 flex w-[min(24rem,calc(100vw-1rem))] max-w-full flex-col overflow-hidden border-surface-200 bg-white/95 shadow-[0_24px_80px_-24px_rgba(15,23,42,0.45)] backdrop-blur-xl will-change-transform dark:border-surface-700 dark:bg-surface-950/95"
             >
-              <motion.div
-                aria-hidden="true"
-                initial={false}
-                animate={{ opacity: [0.7, 1, 0.75] }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/70 to-transparent dark:via-primary-500/60"
-              />
-
               <div className="relative flex items-center justify-between gap-3 px-5 pt-5">
                 <div className="pointer-events-none absolute inset-x-5 top-2 h-16 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.12)_0%,transparent_72%)] blur-2xl dark:bg-[radial-gradient(circle,rgba(96,165,250,0.16)_0%,transparent_72%)]" />
                 <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
@@ -199,7 +191,7 @@ export function MobilePageHeaderMenu({
                 </motion.button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-5 pb-5 pt-4">
+              <div className="flex-1 overflow-x-hidden overflow-y-auto px-5 pb-5 pt-4">
                 <div className="space-y-5">
                   {children}
 
