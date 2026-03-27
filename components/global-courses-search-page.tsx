@@ -20,6 +20,7 @@ import { PublicSearchInput } from "@/components/public-search-input";
 import {
   loadRecentGlobalCourseSearches,
   rememberRecentGlobalCourseSearch,
+  removeRecentGlobalCourseSearch,
   saveRecentGlobalCourseSearches,
   subscribeRecentGlobalCourseSearches,
   type RecentGlobalCourseSearch,
@@ -75,6 +76,22 @@ const BookOpenIcon = ({ className }: { className?: string }) => (
       strokeLinejoin="round"
       strokeWidth={2}
       d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+    />
+  </svg>
+);
+
+const XIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
     />
   </svg>
 );
@@ -181,10 +198,12 @@ function formatRecentSearchLabel(
 function EmptyState({
   recentSearches,
   onRecentSearchSelect,
+  onRecentSearchDelete,
   recentLabels,
 }: {
   recentSearches: RecentGlobalCourseSearch[];
   onRecentSearchSelect: (entry: RecentGlobalCourseSearch) => void;
+  onRecentSearchDelete: (entry: RecentGlobalCourseSearch) => void;
   recentLabels: string[];
 }) {
   return (
@@ -219,14 +238,29 @@ function EmptyState({
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {recentSearches.map((entry, index) => (
-              <button
+              <div
                 key={`${entry.query}-${entry.universitySlug ?? "all"}-${entry.majorSlug ?? "all"}-${index}`}
-                type="button"
-                onClick={() => onRecentSearchSelect(entry)}
-                className="inline-flex items-center rounded-lg border border-surface-200 bg-surface-50 px-3 py-1.5 text-sm text-surface-700 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300 dark:hover:border-primary-700 dark:hover:bg-primary-950/50 dark:hover:text-primary-300"
+                className="group inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-surface-50 text-sm text-surface-700 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300 dark:hover:border-primary-700 dark:hover:bg-primary-950/50 dark:hover:text-primary-300"
               >
-                <span className="line-clamp-1">{recentLabels[index]}</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => onRecentSearchSelect(entry)}
+                  className="flex-1 px-3 py-1.5 text-right"
+                >
+                  <span className="line-clamp-1">{recentLabels[index]}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRecentSearchDelete(entry);
+                  }}
+                  className="flex h-full items-center px-2 text-surface-400 transition-colors hover:text-red-600 dark:text-surface-500 dark:hover:text-red-400"
+                  aria-label="حذف"
+                >
+                  <XIcon className="h-3.5 w-3.5" />
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -488,6 +522,14 @@ function GlobalCoursesSearchPageInner({
     saveSearch(entry);
   };
 
+  const handleRecentSearchDelete = (entry: RecentGlobalCourseSearch) => {
+    const nextRecentSearches = removeRecentGlobalCourseSearch(
+      entry,
+      recentSearches,
+    );
+    saveRecentGlobalCourseSearches(nextRecentSearches);
+  };
+
   return (
     <div className="min-h-screen bg-surface-50 dark:bg-surface-950">
       {/* Header Section */}
@@ -606,6 +648,7 @@ function GlobalCoursesSearchPageInner({
           <EmptyState
             recentSearches={recentSearches}
             onRecentSearchSelect={handleRecentSearchSelect}
+            onRecentSearchDelete={handleRecentSearchDelete}
             recentLabels={recentLabels}
           />
         ) : isLoading ? (

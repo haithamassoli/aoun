@@ -167,6 +167,22 @@ export function rememberRecentGlobalCourseSearch(
   return dedupeRecentGlobalCourseSearches([normalizedEntry, ...existingEntries]);
 }
 
+export function removeRecentGlobalCourseSearch(
+  entry: RecentGlobalCourseSearch,
+  existingEntries: RecentGlobalCourseSearch[] = loadRecentGlobalCourseSearches(),
+) {
+  const normalizedEntry = normalizeRecentSearchEntry(entry);
+  if (!normalizedEntry) {
+    return existingEntries;
+  }
+
+  const keyToRemove = getEntryKey(normalizedEntry);
+  return existingEntries.filter((existing) => {
+    const existingKey = getEntryKey(existing);
+    return existingKey !== keyToRemove;
+  });
+}
+
 export function subscribeRecentGlobalCourseSearches(
   onStoreChange: () => void,
 ) {

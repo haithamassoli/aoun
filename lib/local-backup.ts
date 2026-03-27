@@ -54,7 +54,7 @@ export const USER_DATA_BACKUP_SECTIONS: readonly BackupSection[] = [
     id: "progress",
     title: "الخطة والتقدم",
     description:
-      "حالات المواد، المواد الإضافية، المرشح الأخير، فلاتر العرض، وعمليات البحث الأخيرة عن المواد.",
+      "حالات المواد، المواد الإضافية، فلاتر العرض، وعمليات البحث.",
     keys: [
       COURSE_STATUS_STORAGE_KEY,
       LAST_MAJOR_STORAGE_KEY,
