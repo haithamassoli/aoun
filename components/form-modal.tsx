@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 type FormModalProps = {
   open: boolean;
@@ -10,6 +10,10 @@ type FormModalProps = {
 };
 
 export function FormModal({ open, title, onClose, children }: FormModalProps) {
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const scrollPositionRef = useRef(0);
+
   useEffect(() => {
     if (!open) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -20,13 +24,27 @@ export function FormModal({ open, title, onClose, children }: FormModalProps) {
   }, [open, onClose]);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+    if (!open) {
+      return;
     }
+
+    scrollPositionRef.current = window.scrollY;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    const frameId = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "auto" });
+      overlayRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      dialogRef.current?.scrollIntoView({ block: "start" });
+    });
+
     return () => {
+      window.cancelAnimationFrame(frameId);
+      document.documentElement.style.overflow = "";
+      document.body.style.width = "";
       document.body.style.overflow = "";
+      window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
     };
   }, [open]);
 
@@ -34,12 +52,14 @@ export function FormModal({ open, title, onClose, children }: FormModalProps) {
 
   return (
     <div
+      ref={overlayRef}
       className="fixed inset-0 z-50 overflow-y-auto bg-surface-950/45 backdrop-blur-sm"
       onClick={onClose}
       role="presentation"
     >
       <div className="flex min-h-full items-start justify-center p-4 sm:items-center sm:p-8">
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="form-modal-title"
