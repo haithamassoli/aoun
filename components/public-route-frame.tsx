@@ -3,10 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-
-function isStudentFacingPath(pathname: string) {
-  return pathname !== "/login" && !pathname.startsWith("/dashboard");
-}
+import { isStudentFacingPath } from "@/lib/public-shell";
 
 export function PublicRouteFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();

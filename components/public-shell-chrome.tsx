@@ -2,10 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
-
-function isStudentFacingPath(pathname: string) {
-  return pathname !== "/login" && !pathname.startsWith("/dashboard");
-}
+import { isStudentFacingPath } from "@/lib/public-shell";
 
 export function PublicShellChrome() {
   const pathname = usePathname();

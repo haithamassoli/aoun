@@ -3,6 +3,7 @@ import {
   COURSE_STATUS_FILTER_STORAGE_KEY,
   COURSE_STATUS_STORAGE_KEY,
   CUSTOM_COURSES_STORAGE_KEY,
+  FOCUS_SOUND_PREFERENCES_STORAGE_KEY,
   GPA_CALCULATOR_HISTORY_STORAGE_KEY,
   GPA_GRADE_TYPE_STORAGE_KEY,
   GPA_SUPPORTS_42_SCALE_STORAGE_KEY,
@@ -68,6 +69,12 @@ export const USER_DATA_BACKUP_SECTIONS: readonly BackupSection[] = [
     title: "التقويم الأكاديمي",
     description: "الأحداث والمواعيد التي أضفتها في التقويم المحلي.",
     keys: [ACADEMIC_CALENDAR_STORAGE_KEY],
+  },
+  {
+    id: "focus",
+    title: "أصوات التركيز",
+    description: "مستويات الصوت وآخر الأصوات التي فعّلتها في جلسات التركيز.",
+    keys: [FOCUS_SOUND_PREFERENCES_STORAGE_KEY],
   },
 ] as const;
 

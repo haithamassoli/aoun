@@ -103,7 +103,7 @@ function SearchIcon() {
   );
 }
 
-function DashboardIcon() {
+function FocusIcon() {
   return (
     <svg
       className="h-5 w-5"
@@ -116,14 +116,15 @@ function DashboardIcon() {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M4.75 5.75A1.75 1.75 0 0 1 6.5 4h4A1.75 1.75 0 0 1 12.25 5.75v4A1.75 1.75 0 0 1 10.5 11.5h-4a1.75 1.75 0 0 1-1.75-1.75Zm7 0A1.75 1.75 0 0 1 13.5 4h4A1.75 1.75 0 0 1 19.25 5.75v4A1.75 1.75 0 0 1 17.5 11.5h-4a1.75 1.75 0 0 1-1.75-1.75Zm-7 8.5A1.75 1.75 0 0 1 6.5 12.5h4a1.75 1.75 0 0 1 1.75 1.75v4A1.75 1.75 0 0 1 10.5 20h-4a1.75 1.75 0 0 1-1.75-1.75Zm7 0a1.75 1.75 0 0 1 1.75-1.75h4a1.75 1.75 0 0 1 1.75 1.75v4A1.75 1.75 0 0 1 17.5 20h-4a1.75 1.75 0 0 1-1.75-1.75Z"
+        d="M12 6v.01M12 12v.01M12 18v.01M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z"
       />
+      <circle cx="12" cy="12" r="2.5" strokeWidth={1.9} />
     </svg>
   );
 }
 
-function isDashboardPath(pathname: string) {
-  return pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+function isFocusPath(pathname: string) {
+  return pathname === "/focus" || pathname.startsWith("/focus/");
 }
 
 export function MobileBottomNav() {
@@ -158,13 +159,10 @@ export function MobileBottomNav() {
       icon: <CalculatorIcon />,
     },
     {
-      href: isAuthenticated ? "/dashboard" : "/login",
-      label: isAuthenticated ? "لوحتي" : "الدخول",
-      isActive: (currentPath) =>
-        isAuthenticated
-          ? isDashboardPath(currentPath)
-          : currentPath === "/login",
-      icon: <DashboardIcon />,
+      href: "/focus",
+      label: "التركيز",
+      isActive: (currentPath) => isFocusPath(currentPath),
+      icon: <FocusIcon />,
     },
   ];
 

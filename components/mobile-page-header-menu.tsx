@@ -6,8 +6,10 @@ import type { ReactNode } from "react";
 import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
+import { usePathname } from "next/navigation";
 import { DeveloperSupportButton } from "@/components/developer-support-button";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
+import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
 
 const ThemeToggle = dynamic(
   () => import("@/components/theme-toggle").then((mod) => mod.ThemeToggle),
@@ -41,6 +43,7 @@ export function MobilePageHeaderMenu({
   subtitle,
   children,
 }: MobilePageHeaderMenuProps) {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [menuViewportTop, setMenuViewportTop] = useState(0);
   const panelId = useId();
@@ -70,6 +73,9 @@ export function MobilePageHeaderMenu({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
+
+  const isToolActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <>
@@ -213,8 +219,29 @@ export function MobilePageHeaderMenu({
                     <div className="flex flex-1 flex-col justify-between overflow-x-hidden px-5 pb-5 pt-4">
                       <div className="space-y-5">
                         {children}
-
                         <div className="space-y-3 border-t border-surface-200 pt-2 dark:border-surface-800">
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm font-medium text-surface-700 shadow-sm transition-all hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-950/40 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-900"
+                          >
+                            <span>لوحة التحكم</span>
+                            <svg
+                              className="h-4 w-4 shrink-0"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={1.8}
+                              aria-hidden="true"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4.75 5.75A1.75 1.75 0 0 1 6.5 4h4A1.75 1.75 0 0 1 12.25 5.75v4A1.75 1.75 0 0 1 10.5 11.5h-4a1.75 1.75 0 0 1-1.75-1.75Zm7 0A1.75 1.75 0 0 1 13.5 4h4A1.75 1.75 0 0 1 19.25 5.75v4A1.75 1.75 0 0 1 17.5 11.5h-4a1.75 1.75 0 0 1-1.75-1.75Zm-7 8.5A1.75 1.75 0 0 1 6.5 12.5h4a1.75 1.75 0 0 1 1.75 1.75v4A1.75 1.75 0 0 1 10.5 20h-4a1.75 1.75 0 0 1-1.75-1.75Zm7 0a1.75 1.75 0 0 1 1.75-1.75h4a1.75 1.75 0 0 1 1.75 1.75v4A1.75 1.75 0 0 1 17.5 20h-4a1.75 1.75 0 0 1-1.75-1.75Z"
+                              />
+                            </svg>
+                          </Link>
+
                           <div className="flex items-center gap-3">
                             <Link
                               href="/settings"
