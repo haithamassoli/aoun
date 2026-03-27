@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -129,6 +130,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { sessionToken } = useAuth();
   const isAuthenticated = Boolean(sessionToken);
+  const isHomePage = pathname === "/";
 
   const items: NavItem[] = [
     {
@@ -171,6 +173,13 @@ export function MobileBottomNav() {
       aria-label="شريط التنقل السفلي"
       className="fixed inset-x-0 bottom-0 z-40 md:hidden"
     >
+      {isHomePage ? (
+        <div className="fixed bottom-[calc(5.42rem+env(safe-area-inset-bottom))] left-4 z-40 md:hidden">
+          <div className="rounded-full border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
+            <ThemeToggle />
+          </div>
+        </div>
+      ) : null}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(180deg,transparent_0%,rgba(248,250,252,0.86)_38%,rgba(248,250,252,0.98)_100%)] dark:bg-[linear-gradient(180deg,transparent_0%,rgba(2,6,23,0.86)_38%,rgba(2,6,23,0.98)_100%)]" />
       <div className="relative px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3">
         <div className="mx-auto grid max-w-lg grid-cols-5 gap-2 rounded-[1.75rem] border border-surface-200/80 bg-white/92 p-2 shadow-[0_18px_45px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_18px_45px_rgba(2,6,23,0.45)]">
