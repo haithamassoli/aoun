@@ -42,6 +42,42 @@ function createBackupFileName() {
   return `aoun-backup-${stamp}.json`;
 }
 
+function DownloadIcon() {
+  return (
+    <svg
+      className="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3v12m0 0 4-4m-4 4-4-4m-5 8h18"
+      />
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg
+      className="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 16V4m0 12 4-4m-4 4-4-4m-5 8h18"
+      />
+    </svg>
+  );
+}
+
 export function LocalDataSettings() {
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -126,143 +162,98 @@ export function LocalDataSettings() {
     <>
       <Toast toast={toast} />
 
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-[0_24px_80px_-36px_rgba(15,23,42,0.3)] dark:border-surface-700 dark:bg-surface-900">
-          <div className="border-b border-surface-200 bg-[linear-gradient(135deg,rgba(37,99,235,0.08),rgba(37,99,235,0.02)_45%,rgba(15,23,42,0)_100%)] px-6 py-8 dark:border-surface-700 dark:bg-[linear-gradient(135deg,rgba(37,99,235,0.18),rgba(37,99,235,0.06)_45%,rgba(15,23,42,0)_100%)] sm:px-8">
-            <div className="max-w-3xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:border-primary-800 dark:bg-primary-950/60 dark:text-primary-300">
-                <span className="h-2 w-2 rounded-full bg-primary-500" />
-                بيانات الجهاز
-              </span>
-              <h1 className="mt-4 text-2xl font-bold text-surface-950 dark:text-surface-50 sm:text-3xl">
-                الإعدادات والنسخ الاحتياطي المحلي
-              </h1>
-              <p className="mt-3 text-sm leading-7 text-surface-600 dark:text-surface-300">
-                هذه الصفحة تحفظ وتستعيد البيانات المخزنة محلياً على جهازك، مثل
-                تفضيلات السمة، سجل حاسبة المعدل، الخطة الدراسية، والمهام في
-                التقويم الأكاديمي.
-              </p>
-            </div>
-          </div>
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <header className="mb-6 sm:mb-8">
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl">
+            النسخ الاحتياطي المحلي
+          </h1>
+          <p className="mt-2 text-sm text-surface-600 dark:text-surface-400 sm:text-base">
+            احفظ واستعد بياناتك الدراسية المخزنة على جهازك
+          </p>
+        </header>
 
-          <div className="grid gap-6 px-6 py-6 sm:px-8 lg:grid-cols-[1.15fr_0.85fr]">
-            <section className="space-y-4">
-              <div className="rounded-[1.5rem] border border-surface-200 bg-surface-50/70 p-5 dark:border-surface-700 dark:bg-surface-950/40">
-                <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
-                  ما الذي سيتم حفظه؟
-                </h2>
-                <p className="mt-2 text-sm leading-7 text-surface-500 dark:text-surface-400">
-                  سيتم تضمين بياناتك الدراسية وتفضيلاتك على هذا الجهاز فقط.
-                  لن يتم تضمين مفاتيح التحليلات أو إعدادات لوحة التحكم الإدارية.
-                </p>
+        <div className="space-y-4 sm:space-y-6">
+          <section className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={!storageAvailable}
+              className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 text-right transition-all hover:border-primary-300 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-700 sm:p-6"
+            >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100 dark:bg-primary-950/50 dark:text-primary-400 dark:group-hover:bg-primary-950">
+                <DownloadIcon />
               </div>
-
-              <div className="grid gap-4">
-                {USER_DATA_BACKUP_SECTIONS.map((section) => (
-                  <article
-                    key={section.id}
-                    className="rounded-[1.5rem] border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900/80"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="text-base font-semibold text-surface-900 dark:text-surface-50">
-                          {section.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-7 text-surface-500 dark:text-surface-400">
-                          {section.description}
-                        </p>
-                      </div>
-                      <span className="inline-flex min-w-12 items-center justify-center rounded-full border border-surface-200 bg-surface-50 px-3 py-1 text-xs font-semibold text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300">
-                        {section.keys.length}
-                      </span>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="space-y-4">
-              <div className="rounded-[1.5rem] border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900/80">
-                <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base font-semibold text-surface-900 dark:text-surface-50 sm:text-lg">
                   تصدير نسخة احتياطية
                 </h2>
-                <p className="mt-2 text-sm leading-7 text-surface-500 dark:text-surface-400">
-                  نزّل ملف JSON يحتوي على جميع بياناتك المحلية المدعومة، ثم
-                  احتفظ به لاستعادته لاحقاً على هذا الجهاز أو جهاز آخر.
+                <p className="mt-1 text-sm text-surface-600 dark:text-surface-400">
+                  نزّل ملف يحتوي على بياناتك
                 </p>
-                <button
-                  type="button"
-                  onClick={handleExport}
-                  disabled={!storageAvailable}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 3v12m0 0 4-4m-4 4-4-4m-5 8h18"
-                    />
-                  </svg>
-                  تنزيل النسخة الاحتياطية
-                </button>
               </div>
+            </button>
 
-              <div className="rounded-[1.5rem] border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900/80">
-                <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!storageAvailable}
+              className="group flex items-center gap-4 rounded-xl border border-surface-200 bg-white p-5 text-right transition-all hover:border-primary-300 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-700 sm:p-6"
+            >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-50 text-surface-600 transition-colors group-hover:bg-surface-100 dark:bg-surface-800 dark:text-surface-400 dark:group-hover:bg-surface-750">
+                <UploadIcon />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base font-semibold text-surface-900 dark:text-surface-50 sm:text-lg">
                   استيراد نسخة محفوظة
                 </h2>
-                <p className="mt-2 text-sm leading-7 text-surface-500 dark:text-surface-400">
-                  عند الاستيراد سيتم استبدال البيانات المحلية الحالية بالبيانات
-                  الموجودة داخل الملف، ثم إعادة تحميل الصفحة لتطبيق التغييرات.
+                <p className="mt-1 text-sm text-surface-600 dark:text-surface-400">
+                  استعد بياناتك من ملف سابق
                 </p>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={!storageAvailable}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-surface-300 bg-white px-4 py-3 text-sm font-semibold text-surface-700 transition-colors hover:border-primary-300 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-200 dark:hover:border-primary-700 dark:hover:text-primary-300"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 16V4m0 12 4-4m-4 4-4-4m-5 8h18"
-                    />
-                  </svg>
-                  اختيار ملف للاستيراد
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="application/json,.json"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
               </div>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </section>
 
-              <div className="rounded-[1.5rem] border border-amber-200 bg-amber-50/70 p-5 dark:border-amber-900/50 dark:bg-amber-950/20">
-                <h2 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-                  ملاحظة مهمة
-                </h2>
-                <p className="mt-2 text-sm leading-7 text-amber-700 dark:text-amber-300">
-                  الاستيراد لا يدمج البيانات الحالية مع الملف. سيتم استخدام
-                  محتوى الملف كما هو، لذلك صدّر نسخة حديثة قبل الاستبدال إذا
-                  كنت تحتاج للعودة إليها لاحقاً.
-                </p>
-              </div>
-            </section>
-          </div>
+          <section className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20 sm:p-5">
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              الاستيراد يستبدل البيانات الحالية بالكامل. صدّر نسخة حديثة قبل
+              الاستيراد إذا كنت تحتاج للعودة إليها.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-semibold text-surface-900 dark:text-surface-50 sm:mb-4">
+              البيانات المشمولة
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {USER_DATA_BACKUP_SECTIONS.map((section) => (
+                <div
+                  key={section.id}
+                  className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
+                        {section.title}
+                      </h3>
+                      <p className="mt-1 text-xs text-surface-600 dark:text-surface-400">
+                        {section.description}
+                      </p>
+                    </div>
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-100 text-xs font-medium text-surface-700 dark:bg-surface-800 dark:text-surface-300">
+                      {section.keys.length}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
 
