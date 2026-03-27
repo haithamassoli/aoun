@@ -29,7 +29,7 @@ export function Toast({ toast }: { toast: ReturnType<typeof useToast> }) {
   if (!toast.visible) return null;
 
   return (
-    <div className="fixed bottom-6 start-1/2 z-50 -translate-x-1/2">
+    <div className="fixed bottom-6 start-6 z-50">
       <div
         className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium shadow-lg ${
           toast.type === "success"
