@@ -7,6 +7,7 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { DeveloperSupportButton } from "@/components/developer-support-button";
+import { useScrollLock } from "@/hooks/use-scroll-lock";
 
 const ThemeToggle = dynamic(
   () => import("@/components/theme-toggle").then((mod) => mod.ThemeToggle),
@@ -22,6 +23,19 @@ type MobilePageHeaderMenuProps = {
   children: ReactNode;
 };
 
+const MOBILE_MENU_SCROLL_LOCK = {
+  body: {
+    overflow: "hidden",
+    overflowX: "hidden",
+    overscrollBehavior: "none",
+  },
+  documentElement: {
+    overflow: "hidden",
+    overflowX: "hidden",
+    overscrollBehavior: "none",
+  },
+} as const;
+
 export function MobilePageHeaderMenu({
   title,
   subtitle,
@@ -31,6 +45,8 @@ export function MobilePageHeaderMenu({
   const [menuViewportTop, setMenuViewportTop] = useState(0);
   const panelId = useId();
   const titleId = useId();
+
+  useScrollLock(isOpen, MOBILE_MENU_SCROLL_LOCK);
 
   const openMenu = () => {
     setMenuViewportTop(window.scrollY);
@@ -42,21 +58,6 @@ export function MobilePageHeaderMenu({
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
-    const previousOverflowX = document.body.style.overflowX;
-    const previousOverscrollBehavior = document.body.style.overscrollBehavior;
-    const previousDocumentOverflow = document.documentElement.style.overflow;
-    const previousDocumentOverflowX = document.documentElement.style.overflowX;
-    const previousDocumentOverscrollBehavior =
-      document.documentElement.style.overscrollBehavior;
-
-    document.documentElement.style.overflow = "hidden";
-    document.documentElement.style.overscrollBehavior = "none";
-    document.body.style.overflow = "hidden";
-    document.body.style.overflowX = "hidden";
-    document.body.style.overscrollBehavior = "none";
-    document.documentElement.style.overflowX = "hidden";
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsOpen(false);
@@ -66,13 +67,6 @@ export function MobilePageHeaderMenu({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.documentElement.style.overflow = previousDocumentOverflow;
-      document.documentElement.style.overscrollBehavior =
-        previousDocumentOverscrollBehavior;
-      document.body.style.overflow = previousOverflow;
-      document.body.style.overflowX = previousOverflowX;
-      document.body.style.overscrollBehavior = previousOverscrollBehavior;
-      document.documentElement.style.overflowX = previousDocumentOverflowX;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);

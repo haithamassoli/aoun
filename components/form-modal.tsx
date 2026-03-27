@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useScrollLock } from "@/hooks/use-scroll-lock";
 
 type FormModalProps = {
   open: boolean;
@@ -9,10 +10,22 @@ type FormModalProps = {
   children: React.ReactNode;
 };
 
+const FORM_MODAL_SCROLL_LOCK = {
+  body: {
+    overflow: "hidden",
+    width: "100%",
+  },
+  documentElement: {
+    overflow: "hidden",
+  },
+} as const;
+
 export function FormModal({ open, title, onClose, children }: FormModalProps) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const scrollPositionRef = useRef(0);
+
+  useScrollLock(open, FORM_MODAL_SCROLL_LOCK);
 
   useEffect(() => {
     if (!open) return;
@@ -29,9 +42,6 @@ export function FormModal({ open, title, onClose, children }: FormModalProps) {
     }
 
     scrollPositionRef.current = window.scrollY;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.width = "100%";
-    document.body.style.overflow = "hidden";
 
     const frameId = window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: "auto" });
@@ -41,9 +51,6 @@ export function FormModal({ open, title, onClose, children }: FormModalProps) {
 
     return () => {
       window.cancelAnimationFrame(frameId);
-      document.documentElement.style.overflow = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
       window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
     };
   }, [open]);
