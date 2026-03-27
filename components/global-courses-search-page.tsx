@@ -535,7 +535,7 @@ function GlobalCoursesSearchPageInner({
       {/* Header Section */}
       <section className="border-b border-surface-200 bg-white px-4 py-8 dark:border-surface-800 dark:bg-surface-900 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-6">
+          <div className="mb-6 hidden md:block">
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl">
               البحث عن المواد
             </h1>

@@ -42,8 +42,7 @@ const HISTORY_TONE_STYLES: Record<HistoryTone, string> = {
     "border-surface-200 bg-surface-50 dark:border-surface-700 dark:bg-surface-800/50",
   success:
     "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30",
-  danger:
-    "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30",
+  danger: "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30",
 };
 
 function formatPercentRange(
@@ -103,7 +102,8 @@ export function GpaCalculatorTabs() {
   const [activeTab, setActiveTab] = useState<Tab>("semester");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
-  const [hasLoadedScalePreference, setHasLoadedScalePreference] = useState(false);
+  const [hasLoadedScalePreference, setHasLoadedScalePreference] =
+    useState(false);
   const [supports42Scale, setSupports42Scale] = useState(
     DEFAULT_GRADE_SCALE === "just",
   );
@@ -174,18 +174,20 @@ export function GpaCalculatorTabs() {
     details,
     tone = "default",
   }: Omit<HistoryEntry, "id" | "createdAt">) => {
-    setHistory((current) => [
-      {
-        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        tab,
-        label,
-        value,
-        details,
-        tone,
-        createdAt: Date.now(),
-      },
-      ...current,
-    ].slice(0, MAX_HISTORY_ITEMS));
+    setHistory((current) =>
+      [
+        {
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          tab,
+          label,
+          value,
+          details,
+          tone,
+          createdAt: Date.now(),
+        },
+        ...current,
+      ].slice(0, MAX_HISTORY_ITEMS),
+    );
   };
 
   const handleSemesterCalculated = (result: GpaResult) => {
@@ -223,7 +225,7 @@ export function GpaCalculatorTabs() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="mb-8 text-center">
+      <div className="mb-8 text-center hidden md:block">
         <h1 className="text-3xl font-bold text-surface-900 dark:text-surface-50">
           حاسبة المعدل
         </h1>
@@ -240,8 +242,8 @@ export function GpaCalculatorTabs() {
               آلية الحساب
             </p>
             <p className="mt-1 max-w-xl leading-5">
-              النتيجة تظهر كنسبة مئوية وبالنقاط معاً، ويمكنك التبديل بين
-              سلم 4.2 وسلّم 4.0 حسب نظام جامعتك قبل إدخال المواد.
+              النتيجة تظهر كنسبة مئوية وبالنقاط معاً، ويمكنك التبديل بين سلم 4.2
+              وسلّم 4.0 حسب نظام جامعتك قبل إدخال المواد.
             </p>
           </div>
 
@@ -275,7 +277,9 @@ export function GpaCalculatorTabs() {
                 : "text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200"
             }`}
           >
-            <span role="img" aria-hidden="true">{tab.icon}</span>
+            <span role="img" aria-hidden="true">
+              {tab.icon}
+            </span>
             {tab.label}
           </button>
         ))}
@@ -381,7 +385,10 @@ export function GpaCalculatorTabs() {
             </thead>
             <tbody className="divide-y divide-surface-100 dark:divide-surface-700">
               {activeScaleInfo.grades.map((grade, index) => (
-                <tr key={grade.letter} className="text-surface-700 dark:text-surface-300">
+                <tr
+                  key={grade.letter}
+                  className="text-surface-700 dark:text-surface-300"
+                >
                   <td className="py-1 font-medium">{grade.letter}</td>
                   <td className="py-1 text-center text-surface-500 dark:text-surface-400">
                     {formatPercentRange(activeScaleInfo.grades, index)}
