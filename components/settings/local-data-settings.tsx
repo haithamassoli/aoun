@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Toast, useToast } from "@/components/toast";
 import {
@@ -85,7 +85,11 @@ export function LocalDataSettings() {
     null,
   );
   const [isImporting, setIsImporting] = useState(false);
-  const storageAvailable = useMemo(() => isLocalStorageAvailable(), []);
+  const [storageAvailable, setStorageAvailable] = useState(false);
+
+  useEffect(() => {
+    setStorageAvailable(isLocalStorageAvailable());
+  }, []);
 
   const handleExport = () => {
     if (!storageAvailable) {
