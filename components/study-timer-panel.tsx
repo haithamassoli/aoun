@@ -92,13 +92,13 @@ export function StudyTimerPanel() {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/40 backdrop-blur-sm dark:bg-white/10 sm:h-24 sm:w-24"
+          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm dark:bg-white/10 sm:h-24 sm:w-24"
         >
           <div className="text-center">
-            <p className="text-2xl font-bold text-white sm:text-3xl">
+            <p className="text-2xl font-bold text-surface-900 dark:text-white sm:text-3xl">
               {completedSessions}
             </p>
-            <p className="text-xs font-medium text-white/80 sm:text-sm">
+            <p className="text-xs font-medium text-surface-700 dark:text-white/80 sm:text-sm">
               /{settings.sessionsPerCycle}
             </p>
           </div>
@@ -109,7 +109,7 @@ export function StudyTimerPanel() {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15 }}
-          className="relative flex flex-1 items-center justify-center gap-3 rounded-full bg-white/40 px-6 py-5 backdrop-blur-sm dark:bg-white/10 sm:gap-4 sm:px-8 sm:py-6"
+          className="relative flex flex-1 items-center justify-center gap-3 rounded-full bg-white/90 px-6 py-5 backdrop-blur-sm dark:bg-white/10 sm:gap-4 sm:px-8 sm:py-6"
         >
           {runtime.status !== "idle" && (
             <>
@@ -117,7 +117,7 @@ export function StudyTimerPanel() {
               <button
                 type="button"
                 onClick={() => setIsSettingsOpen((current) => !current)}
-                className="absolute start-4 flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition-all hover:bg-white/20 hover:text-white sm:start-6"
+                className="absolute start-4 flex h-10 w-10 items-center justify-center rounded-full text-surface-700 transition-all hover:bg-surface-200 hover:text-surface-900 dark:text-white/90 dark:hover:bg-white/20 dark:hover:text-white sm:start-6"
                 aria-label="الإعدادات"
               >
                 <svg
@@ -139,7 +139,7 @@ export function StudyTimerPanel() {
               <button
                 type="button"
                 onClick={resetTimer}
-                className="absolute end-4 flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition-all hover:bg-white/20 hover:text-white sm:end-6"
+                className="absolute end-4 flex h-10 w-10 items-center justify-center rounded-full text-surface-700 transition-all hover:bg-surface-200 hover:text-surface-900 dark:text-white/90 dark:hover:bg-white/20 dark:hover:text-white sm:end-6"
                 aria-label="إعادة ضبط"
               >
                 <svg
@@ -161,12 +161,12 @@ export function StudyTimerPanel() {
 
           {/* Timer Text */}
           <div className="text-center" aria-live="polite">
-            <p className="text-4xl font-bold tracking-tight text-white tabular-nums sm:text-5xl md:text-6xl">
+            <p className="text-4xl font-bold tracking-tight text-surface-900 tabular-nums dark:text-white sm:text-5xl md:text-6xl">
               {formatTimerClock(remainingMs)}
             </p>
             {runtime.status !== "idle" && (
               <>
-                <p className="mt-1 text-xs font-medium text-white/80 sm:text-sm">
+                <p className="mt-1 text-xs font-medium text-surface-700 dark:text-white/80 sm:text-sm">
                   {getPhaseLabel(runtime.phase)}
                 </p>
                 <span className="sr-only">
@@ -190,7 +190,7 @@ export function StudyTimerPanel() {
                 ? pauseTimer
                 : resumeTimer
           }
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/40 text-white backdrop-blur-sm transition-all hover:bg-white/50 active:scale-95 dark:bg-white/10 dark:hover:bg-white/20 sm:h-24 sm:w-24"
+          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/90 text-surface-900 backdrop-blur-sm transition-all hover:bg-white active:scale-95 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:h-24 sm:w-24"
           aria-label={
             runtime.status === "idle"
               ? "ابدأ الجلسة"
@@ -230,12 +230,12 @@ export function StudyTimerPanel() {
             className="overflow-hidden"
           >
             <div className="mx-auto max-w-4xl px-4">
-              <div className="rounded-2xl border border-white/20 bg-white/30 p-4 backdrop-blur-sm dark:bg-white/5 sm:p-6">
+              <div className="rounded-2xl border border-white/30 bg-white/80 p-4 backdrop-blur-sm dark:border-white/20 dark:bg-white/5 sm:p-6">
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {SETTING_FIELD_CONFIG.map((field) => (
                     <label
                       key={field.key}
-                      className="rounded-xl bg-white/50 p-3 dark:bg-white/10"
+                      className="rounded-xl bg-white/90 p-3 dark:bg-white/10"
                     >
                       <span className="text-xs font-medium text-surface-700 dark:text-white/90">
                         {field.label}
@@ -250,7 +250,7 @@ export function StudyTimerPanel() {
                           onChange={(event) =>
                             handleSettingChange(field.key, event.target.value)
                           }
-                          className="w-full rounded-lg border border-surface-300/50 bg-white/80 px-2.5 py-2 text-sm font-medium text-surface-900 outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-white/20 dark:bg-white/10 dark:text-white"
+                          className="w-full rounded-lg border border-surface-300 bg-white px-2.5 py-2 text-sm font-medium text-surface-900 outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-white/20 dark:bg-white/10 dark:text-white"
                         />
                         <span className="shrink-0 text-xs font-medium text-surface-600 dark:text-white/70">
                           {field.unit}
@@ -293,7 +293,7 @@ export function StudyTimerPanel() {
 
 function StudyTimerStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/20 bg-white/30 px-4 py-3 text-center backdrop-blur-sm dark:bg-white/5">
+    <div className="rounded-xl border border-white/30 bg-white/80 px-4 py-3 text-center backdrop-blur-sm dark:border-white/20 dark:bg-white/5">
       <p className="text-xs font-medium text-surface-600 dark:text-white/70">
         {label}
       </p>
