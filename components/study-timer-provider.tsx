@@ -68,8 +68,10 @@ function getAudioContextConstructor() {
 
   return (
     window.AudioContext ??
-    (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext ??
+    (
+      window as Window &
+        typeof globalThis & { webkitAudioContext?: typeof AudioContext }
+    ).webkitAudioContext ??
     null
   );
 }
@@ -311,34 +313,41 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
     }, 1000);
   }, [ensureCompletionAudioReady]);
 
-  const synchronizeSnapshot = useCallback((
-    currentNow: number,
-    options: { notifyOnCompletedPhase?: boolean } = {},
-  ) => {
-    const currentSnapshot = {
-      settings: settingsRef.current,
-      runtime: runtimeRef.current,
-      history: historyRef.current,
-    };
+  const synchronizeSnapshot = useCallback(
+    (
+      currentNow: number,
+      options: { notifyOnCompletedPhase?: boolean } = {},
+    ) => {
+      const currentSnapshot = {
+        settings: settingsRef.current,
+        runtime: runtimeRef.current,
+        history: historyRef.current,
+      };
 
-    const nextSnapshot = reconcileStudyTimerSnapshot(currentSnapshot, currentNow);
-
-    if (
-      options.notifyOnCompletedPhase &&
-      currentSnapshot.runtime.phaseEndsAt !== null &&
-      lastNotifiedPhaseEndRef.current !== currentSnapshot.runtime.phaseEndsAt &&
-      didCompleteStudyTimerPhase(
-        currentSnapshot.runtime,
-        nextSnapshot.runtime,
+      const nextSnapshot = reconcileStudyTimerSnapshot(
+        currentSnapshot,
         currentNow,
-      )
-    ) {
-      lastNotifiedPhaseEndRef.current = currentSnapshot.runtime.phaseEndsAt;
-      void playCompletionSound();
-    }
+      );
 
-    return nextSnapshot;
-  }, [playCompletionSound]);
+      if (
+        options.notifyOnCompletedPhase &&
+        currentSnapshot.runtime.phaseEndsAt !== null &&
+        lastNotifiedPhaseEndRef.current !==
+          currentSnapshot.runtime.phaseEndsAt &&
+        didCompleteStudyTimerPhase(
+          currentSnapshot.runtime,
+          nextSnapshot.runtime,
+          currentNow,
+        )
+      ) {
+        lastNotifiedPhaseEndRef.current = currentSnapshot.runtime.phaseEndsAt;
+        void playCompletionSound();
+      }
+
+      return nextSnapshot;
+    },
+    [playCompletionSound],
+  );
 
   const withSynchronizedSnapshot = (
     mutate: (
@@ -650,7 +659,7 @@ function FloatingStudyTimerPill() {
   )}/${settings.sessionsPerCycle}`;
   const positionClass = hasFloatingAudio
     ? "bottom-[calc(16rem+env(safe-area-inset-bottom))] md:bottom-48"
-    : "bottom-[calc(6.8rem+env(safe-area-inset-bottom))] md:bottom-6";
+    : "bottom-[calc(5.4rem+env(safe-area-inset-bottom))] md:bottom-6";
   const formattedRemaining = formatStudyTimerClock(remainingMs);
 
   const handleOpenTimer = () => {
@@ -677,18 +686,34 @@ function FloatingStudyTimerPill() {
           className={`fixed inset-x-4 z-50 md:inset-x-auto md:end-6 md:w-auto ${positionClass}`}
         >
           <div className="flex items-center gap-2 rounded-full bg-white/40 p-2 shadow-lg backdrop-blur-xl dark:bg-white/10 sm:gap-3 sm:p-2.5">
-            {/* Progress Circle */}
+            {/* Play/Pause Button */}
             <button
               type="button"
-              onClick={handleOpenTimer}
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/50 text-surface-900 transition-all hover:bg-white/70 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 sm:h-16 sm:w-16"
-              aria-label="فتح مؤقت الدراسة"
+              onClick={runtime.status === "running" ? pauseTimer : resumeTimer}
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/50 text-surface-900 transition-all hover:bg-white/70 active:scale-95 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 sm:h-16 sm:w-16"
+              aria-label={
+                runtime.status === "running"
+                  ? "إيقاف المؤقت مؤقتاً"
+                  : "استئناف المؤقت"
+              }
             >
-              <div className="text-center">
-                <p className="text-base font-bold sm:text-lg">
-                  {progressLabel}
-                </p>
-              </div>
+              {runtime.status === "running" ? (
+                <svg
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M6 4h4v16H6V4Zm8 0h4v16h-4V4Z" />
+                </svg>
+              ) : (
+                <svg
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
             </button>
 
             {/* Timer Display */}
@@ -725,34 +750,18 @@ function FloatingStudyTimerPill() {
               </button>
             </div>
 
-            {/* Play/Pause Button */}
+            {/* Progress Circle */}
             <button
               type="button"
-              onClick={runtime.status === "running" ? pauseTimer : resumeTimer}
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/50 text-surface-900 transition-all hover:bg-white/70 active:scale-95 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 sm:h-16 sm:w-16"
-              aria-label={
-                runtime.status === "running"
-                  ? "إيقاف المؤقت مؤقتاً"
-                  : "استئناف المؤقت"
-              }
+              onClick={handleOpenTimer}
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/50 text-surface-900 transition-all hover:bg-white/70 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 sm:h-16 sm:w-16"
+              aria-label="فتح مؤقت الدراسة"
             >
-              {runtime.status === "running" ? (
-                <svg
-                  className="h-5 w-5 sm:h-6 sm:w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M6 4h4v16H6V4Zm8 0h4v16h-4V4Z" />
-                </svg>
-              ) : (
-                <svg
-                  className="h-5 w-5 sm:h-6 sm:w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
+              <div className="text-center">
+                <p className="text-base font-bold sm:text-lg">
+                  {progressLabel}
+                </p>
+              </div>
             </button>
           </div>
         </motion.div>

@@ -87,22 +87,46 @@ export function StudyTimerPanel() {
     >
       {/* Main Timer Display */}
       <div className="mx-auto mb-6 flex max-w-4xl items-center justify-center gap-3 px-4 sm:gap-4">
-        {/* Progress Circle */}
-        <motion.div
+        {/* Play/Pause Button */}
+        <motion.button
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm dark:bg-white/10 sm:h-24 sm:w-24"
+          transition={{ delay: 0.2 }}
+          type="button"
+          onClick={
+            runtime.status === "idle"
+              ? startTimer
+              : runtime.status === "running"
+                ? pauseTimer
+                : resumeTimer
+          }
+          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/90 text-surface-900 backdrop-blur-sm transition-all hover:bg-white active:scale-95 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:h-24 sm:w-24"
+          aria-label={
+            runtime.status === "idle"
+              ? "ابدأ الجلسة"
+              : runtime.status === "running"
+                ? "إيقاف مؤقت"
+                : "استئناف"
+          }
         >
-          <div className="text-center">
-            <p className="text-2xl font-bold text-surface-900 dark:text-white sm:text-3xl">
-              {completedSessions}
-            </p>
-            <p className="text-xs font-medium text-surface-700 dark:text-white/80 sm:text-sm">
-              /{settings.sessionsPerCycle}
-            </p>
-          </div>
-        </motion.div>
+          {runtime.status === "running" ? (
+            <svg
+              className="h-7 w-7 sm:h-8 sm:w-8"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M6 4h4v16H6V4Zm8 0h4v16h-4V4Z" />
+            </svg>
+          ) : (
+            <svg
+              className="h-7 w-7 sm:h-8 sm:w-8"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </motion.button>
 
         {/* Timer Display */}
         <motion.div
@@ -177,46 +201,22 @@ export function StudyTimerPanel() {
           </div>
         </motion.div>
 
-        {/* Play/Pause Button */}
-        <motion.button
+        {/* Progress Circle */}
+        <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          type="button"
-          onClick={
-            runtime.status === "idle"
-              ? startTimer
-              : runtime.status === "running"
-                ? pauseTimer
-                : resumeTimer
-          }
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/90 text-surface-900 backdrop-blur-sm transition-all hover:bg-white active:scale-95 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:h-24 sm:w-24"
-          aria-label={
-            runtime.status === "idle"
-              ? "ابدأ الجلسة"
-              : runtime.status === "running"
-                ? "إيقاف مؤقت"
-                : "استئناف"
-          }
+          transition={{ delay: 0.1 }}
+          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm dark:bg-white/10 sm:h-24 sm:w-24"
         >
-          {runtime.status === "running" ? (
-            <svg
-              className="h-7 w-7 sm:h-8 sm:w-8"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M6 4h4v16H6V4Zm8 0h4v16h-4V4Z" />
-            </svg>
-          ) : (
-            <svg
-              className="h-7 w-7 sm:h-8 sm:w-8"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          )}
-        </motion.button>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-surface-900 dark:text-white sm:text-3xl">
+              {completedSessions}
+            </p>
+            <p className="text-xs font-medium text-surface-700 dark:text-white/80 sm:text-sm">
+              /{settings.sessionsPerCycle}
+            </p>
+          </div>
+        </motion.div>
       </div>
 
       {/* Settings Panel */}
