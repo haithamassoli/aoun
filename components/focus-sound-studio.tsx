@@ -572,50 +572,62 @@ export function FocusSoundStudio() {
                 </div>
 
                 {/* Description */}
-                <p className="relative px-4 pb-4 text-sm leading-relaxed text-surface-600 dark:text-surface-400">
+                <p className="relative line-clamp-2 h-12 px-4 pb-4 text-sm leading-5 text-surface-600 dark:text-surface-400">
                   {sound.description}
                 </p>
 
-                {/* Volume Control - Only show when enabled */}
+                {/* Volume Control */}
                 {sound.enabled && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="relative border-t p-4"
+                  <div
+                    className="relative border-t"
                     style={{
                       borderColor: withAlpha(accent, 0.18),
-                      background: `linear-gradient(180deg, ${withAlpha(
-                        accent,
-                        0.1,
-                      )} 0%, transparent 100%)`,
                     }}
                   >
-                    <div className="flex items-center gap-3">
-                      <input
-                        aria-label={`مستوى صوت ${sound.label}`}
-                        type="range"
-                        min="0"
-                        max="100"
-                        step="1"
-                        value={Math.round(sound.volume * 100)}
-                        onChange={(event) =>
-                          setVolume(sound.id, Number(event.target.value) / 100)
-                        }
-                        className="h-2 flex-1 cursor-pointer rounded-full"
-                        style={{ accentColor: accent }}
-                      />
-                      <span
-                        className="min-w-[3ch] rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums"
+                    {sound.enabled ? (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="h-[52px] p-4"
                         style={{
-                          backgroundColor: withAlpha(accent, 0.12),
-                          color: accent,
+                          background: `linear-gradient(180deg, ${withAlpha(
+                            accent,
+                            0.1,
+                          )} 0%, transparent 100%)`,
                         }}
                       >
-                        {Math.round(sound.volume * 100)}
-                      </span>
-                    </div>
-                  </motion.div>
+                        <div className="flex h-full items-center gap-3">
+                          <input
+                            aria-label={`مستوى صوت ${sound.label}`}
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={Math.round(sound.volume * 100)}
+                            onChange={(event) =>
+                              setVolume(
+                                sound.id,
+                                Number(event.target.value) / 100,
+                              )
+                            }
+                            className="h-2 flex-1 cursor-pointer rounded-full"
+                            style={{ accentColor: accent }}
+                          />
+                          <span
+                            className="min-w-[3ch] rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums"
+                            style={{
+                              backgroundColor: withAlpha(accent, 0.12),
+                              color: accent,
+                            }}
+                          >
+                            {Math.round(sound.volume * 100)}
+                          </span>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <div className="h-[72px]" />
+                    )}
+                  </div>
                 )}
 
                 {/* Error Message */}
