@@ -117,7 +117,7 @@ export function StudyTimerPanel() {
               <button
                 type="button"
                 onClick={() => setIsSettingsOpen((current) => !current)}
-                className="absolute start-4 flex h-10 w-10 items-center justify-center rounded-full text-surface-700 transition-all hover:bg-surface-200 hover:text-surface-900 dark:text-white/90 dark:hover:bg-white/20 dark:hover:text-white sm:start-6"
+                className="absolute -start-0.5 flex h-10 w-10 items-center justify-center rounded-full text-surface-700 transition-all hover:bg-surface-200 hover:text-surface-900 dark:text-white/90 dark:hover:bg-white/20 dark:hover:text-white sm:start-6"
                 aria-label="الإعدادات"
               >
                 <svg
@@ -139,7 +139,7 @@ export function StudyTimerPanel() {
               <button
                 type="button"
                 onClick={resetTimer}
-                className="absolute end-4 flex h-10 w-10 items-center justify-center rounded-full text-surface-700 transition-all hover:bg-surface-200 hover:text-surface-900 dark:text-white/90 dark:hover:bg-white/20 dark:hover:text-white sm:end-6"
+                className="absolute -end-0.5 flex h-10 w-10 items-center justify-center rounded-full text-surface-700 transition-all hover:bg-surface-200 hover:text-surface-900 dark:text-white/90 dark:hover:bg-white/20 dark:hover:text-white sm:end-6"
                 aria-label="إعادة ضبط"
               >
                 <svg
@@ -272,7 +272,7 @@ export function StudyTimerPanel() {
         transition={{ delay: 0.25 }}
         className="mx-auto mt-6 max-w-4xl px-4"
       >
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 grid-cols-3">
           <StudyTimerStat
             label="التقدم"
             value={`${completedSessions}/${settings.sessionsPerCycle}`}
