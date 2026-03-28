@@ -5,8 +5,8 @@ export default function FocusLoading() {
   return (
     <>
       <MobilePageHeaderMenu
-        title="أصوات التركيز"
-        subtitle="من المطر إلى الضوضاء البيضاء في جلسة واحدة"
+        title="مؤقت الدراسة وأصوات التركيز"
+        subtitle="عدّاد بومودورو وصوتيات هادئة في جلسة واحدة"
       >
         <div className="public-elevated-surface rounded-[28px] p-4">
           <Skeleton className="h-3 w-20 rounded-full" />
@@ -24,7 +24,49 @@ export default function FocusLoading() {
       </MobilePageHeaderMenu>
 
       <section className="px-4 pb-12 pt-8 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(18rem,0.88fr)]">
+        <div className="mx-auto max-w-5xl space-y-6">
+          <div className="rounded-[2rem] border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900">
+            <div className="space-y-3 border-b border-surface-200 px-5 py-5 dark:border-surface-800 sm:px-6">
+              <Skeleton className="h-3 w-24 rounded-full" />
+              <Skeleton className="h-8 w-64" />
+              <Skeleton className="h-4 w-full rounded-full" />
+              <Skeleton className="h-4 w-4/5 rounded-full" />
+              <div className="rounded-[1.7rem] border border-surface-200 bg-surface-50 p-4 dark:border-surface-700 dark:bg-surface-950">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <Skeleton className="h-4 w-24 rounded-full" />
+                    <Skeleton className="mt-3 h-14 w-40 rounded-2xl" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-12 w-28 rounded-2xl" />
+                    <Skeleton className="h-12 w-28 rounded-2xl" />
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <Skeleton className="h-28 w-full rounded-[1.4rem]" />
+                  <Skeleton className="h-28 w-full rounded-[1.4rem]" />
+                  <Skeleton className="h-28 w-full rounded-[1.4rem]" />
+                </div>
+              </div>
+            </div>
+
+            <div className="px-5 py-5 sm:px-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24 rounded-full" />
+                  <Skeleton className="h-4 w-72 rounded-full" />
+                </div>
+                <Skeleton className="h-11 w-36 rounded-2xl" />
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <Skeleton className="h-32 w-full rounded-[1.4rem]" />
+                <Skeleton className="h-32 w-full rounded-[1.4rem]" />
+                <Skeleton className="h-32 w-full rounded-[1.4rem]" />
+                <Skeleton className="h-32 w-full rounded-[1.4rem]" />
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-[2rem] border border-surface-200 bg-white p-5 dark:border-surface-700 dark:bg-surface-900 sm:p-6">
             <div className="space-y-3 border-b border-surface-200 pb-5 dark:border-surface-800">
               <Skeleton className="h-3 w-24 rounded-full" />
@@ -59,31 +101,6 @@ export default function FocusLoading() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-[2rem] border border-surface-200 bg-white p-5 dark:border-surface-700 dark:bg-surface-900 sm:p-6">
-              <Skeleton className="h-3 w-20 rounded-full" />
-              <Skeleton className="mt-2 h-6 w-40" />
-              <div className="mt-3 space-y-2">
-                <Skeleton className="h-4 w-full rounded-full" />
-                <Skeleton className="h-4 w-4/5 rounded-full" />
-              </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <Skeleton className="h-12 w-full rounded-2xl" />
-                <Skeleton className="h-12 w-full rounded-2xl" />
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-surface-200 bg-white p-5 dark:border-surface-700 dark:bg-surface-900 sm:p-6">
-              <Skeleton className="h-3 w-24 rounded-full" />
-              <Skeleton className="mt-2 h-6 w-48" />
-              <div className="mt-5 space-y-3">
-                <Skeleton className="h-16 w-full rounded-2xl" />
-                <Skeleton className="h-16 w-full rounded-2xl" />
-                <Skeleton className="h-16 w-full rounded-2xl" />
-              </div>
             </div>
           </div>
         </div>

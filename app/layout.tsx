@@ -14,6 +14,7 @@ import { PublicRouteFrame } from "@/components/public-route-frame";
 import { PublicShellChrome } from "@/components/public-shell-chrome";
 import { DeveloperSupportButton } from "@/components/developer-support-button";
 import { FocusAudioProvider } from "@/components/focus-audio-provider";
+import { StudyTimerProvider } from "@/components/study-timer-provider";
 import { SITE_URL } from "@/lib/site-url";
 import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
 import "./globals.css";
@@ -128,7 +129,9 @@ export default async function RootLayout({
 
               <main className="flex-1 pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
                 <FocusAudioProvider>
-                  <PublicRouteFrame>{children}</PublicRouteFrame>
+                  <StudyTimerProvider>
+                    <PublicRouteFrame>{children}</PublicRouteFrame>
+                  </StudyTimerProvider>
                 </FocusAudioProvider>
               </main>
 

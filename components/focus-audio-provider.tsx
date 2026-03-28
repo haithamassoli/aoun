@@ -112,7 +112,9 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
   );
   const [hasHydratedPrefs, setHasHydratedPrefs] = useState(false);
 
-  const replaceSavedEnabledSoundIds = (nextSoundIds: readonly FocusSoundId[]) => {
+  const replaceSavedEnabledSoundIds = (
+    nextSoundIds: readonly FocusSoundId[],
+  ) => {
     const normalized = normalizeEnabledSoundIds(nextSoundIds);
     savedEnabledSoundIdsRef.current = normalized;
     setSavedEnabledSoundIds(normalized);
@@ -380,7 +382,9 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    void Promise.all(runtimeEnabledSoundIdsRef.current.map((id) => playSound(id)));
+    void Promise.all(
+      runtimeEnabledSoundIdsRef.current.map((id) => playSound(id)),
+    );
   };
 
   const stopAll = () => {
@@ -463,7 +467,7 @@ function FloatingFocusPlayer() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 18, scale: 0.96 }}
           transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-x-4 bottom-[calc(6.8rem+env(safe-area-inset-bottom))] z-50 md:inset-x-auto md:bottom-6 md:end-6 md:w-[24rem]"
+          className="fixed inset-x-4 bottom-[calc(5.4rem+env(safe-area-inset-bottom))] z-50 md:inset-x-auto md:bottom-6 md:end-6 md:w-[24rem]"
         >
           <div className="rounded-[1.75rem] border border-surface-200/80 bg-white/94 p-3 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.36)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/94 dark:shadow-[0_28px_70px_-28px_rgba(2,6,23,0.72)]">
             <div className="flex items-start gap-3">

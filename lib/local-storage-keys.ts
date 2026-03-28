@@ -25,6 +25,9 @@ export const RECENT_GLOBAL_COURSE_SEARCHES_STORAGE_KEY =
 
 export const ACADEMIC_CALENDAR_STORAGE_KEY = "aoun:academic-calendar:v1";
 export const FOCUS_SOUND_PREFERENCES_STORAGE_KEY = "aoun:focus-sounds:v1";
+export const STUDY_TIMER_SETTINGS_STORAGE_KEY = "aoun:study-timer:settings:v1";
+export const STUDY_TIMER_RUNTIME_STORAGE_KEY = "aoun:study-timer:runtime:v1";
+export const STUDY_TIMER_HISTORY_STORAGE_KEY = "aoun:study-timer:history:v1";
 
 export const USER_DATA_LOCAL_STORAGE_KEYS = [
   THEME_STORAGE_KEY,
@@ -38,6 +41,9 @@ export const USER_DATA_LOCAL_STORAGE_KEYS = [
   RECENT_GLOBAL_COURSE_SEARCHES_STORAGE_KEY,
   ACADEMIC_CALENDAR_STORAGE_KEY,
   FOCUS_SOUND_PREFERENCES_STORAGE_KEY,
+  STUDY_TIMER_SETTINGS_STORAGE_KEY,
+  STUDY_TIMER_RUNTIME_STORAGE_KEY,
+  STUDY_TIMER_HISTORY_STORAGE_KEY,
 ] as const;
 
 export type UserDataLocalStorageKey =

@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { useFocusAudio } from "@/components/focus-audio-provider";
+import { StudyTimerPanel } from "@/components/study-timer-panel";
 import type { FocusSoundIcon } from "@/lib/focus-sounds";
 
 
@@ -313,6 +314,8 @@ export function FocusSoundStudio() {
   return (
     <section className="px-4 pb-20 pt-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
+        <StudyTimerPanel />
+
         {/* Control Bar */}
         {activeSoundCount > 0 && (
           <motion.div
@@ -529,7 +532,7 @@ export function FocusSoundStudio() {
               اختر صوتاً للبدء
             </h3>
             <p className="mt-2 text-sm text-surface-600 dark:text-surface-400">
-              اضغط على "تشغيل" في أي بطاقة لبدء جلسة التركيز
+              اضغط على &quot;تشغيل&quot; في أي بطاقة لبدء جلسة التركيز
             </p>
           </motion.div>
         )}

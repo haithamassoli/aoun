@@ -59,9 +59,6 @@ Add a focused study timer at /study-timer:
 - 25-minute work sessions with 5-minute breaks
 - Customizable intervals
 - Track total study time per day/week (localStorage)
-- Optional course tagging to see time spent per subject
-- Ambient background sounds (white noise, rain, café)
-- Minimal, distraction-free interface
 
 **Why it fits:**
 
