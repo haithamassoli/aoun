@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  useCallback,
   createContext,
   startTransition,
   useContext,
@@ -59,6 +60,19 @@ type StudyTimerSnapshot = {
 
 const STUDY_TIMER_PANEL_ID = "study-timer";
 const StudyTimerContext = createContext<StudyTimerContextValue | null>(null);
+
+function getAudioContextConstructor() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return (
+    window.AudioContext ??
+    (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext ??
+    null
+  );
+}
 
 function createRunningRuntime(
   phase: StudyTimerPhase,
@@ -171,6 +185,28 @@ function reconcileStudyTimerSnapshot(
   };
 }
 
+function didCompleteStudyTimerPhase(
+  previousRuntime: StudyTimerRuntime,
+  nextRuntime: StudyTimerRuntime,
+  now: number,
+) {
+  if (
+    previousRuntime.status !== "running" ||
+    previousRuntime.phaseEndsAt === null ||
+    previousRuntime.phaseEndsAt > now
+  ) {
+    return false;
+  }
+
+  return (
+    previousRuntime.phase !== nextRuntime.phase ||
+    previousRuntime.completedWorkSessionsInCycle !==
+      nextRuntime.completedWorkSessionsInCycle ||
+    previousRuntime.phaseEndsAt !== nextRuntime.phaseEndsAt ||
+    previousRuntime.status !== nextRuntime.status
+  );
+}
+
 export function StudyTimerProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState(DEFAULT_STUDY_TIMER_SETTINGS);
   const [runtime, setRuntime] = useState(createIdleStudyTimerRuntime);
@@ -180,6 +216,8 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
   const settingsRef = useRef(settings);
   const runtimeRef = useRef(runtime);
   const historyRef = useRef(history);
+  const completionAudioContextRef = useRef<AudioContext | null>(null);
+  const lastNotifiedPhaseEndRef = useRef<number | null>(null);
 
   useEffect(() => {
     settingsRef.current = settings;
@@ -202,15 +240,105 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
     setHistory(snapshot.history);
   };
 
-  const synchronizeSnapshot = (currentNow: number) => {
+  const ensureCompletionAudioReady = useCallback(async () => {
+    const AudioContextConstructor = getAudioContextConstructor();
+
+    if (!AudioContextConstructor) {
+      return null;
+    }
+
+    let audioContext = completionAudioContextRef.current;
+
+    if (!audioContext) {
+      audioContext = new AudioContextConstructor();
+      completionAudioContextRef.current = audioContext;
+    }
+
+    if (audioContext.state === "suspended") {
+      try {
+        await audioContext.resume();
+      } catch {
+        return null;
+      }
+    }
+
+    return audioContext.state === "running" ? audioContext : null;
+  }, []);
+
+  const playCompletionSound = useCallback(async () => {
+    const audioContext = await ensureCompletionAudioReady();
+
+    if (!audioContext) {
+      return;
+    }
+
+    const startAt = audioContext.currentTime + 0.01;
+    const output = audioContext.createGain();
+
+    output.gain.setValueAtTime(0.0001, startAt);
+    output.gain.exponentialRampToValueAtTime(0.14, startAt + 0.03);
+    output.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.68);
+    output.connect(audioContext.destination);
+
+    for (const [index, note] of [
+      { frequency: 784, duration: 0.16 },
+      { frequency: 1047, duration: 0.28 },
+    ].entries()) {
+      const oscillator = audioContext.createOscillator();
+      const noteGain = audioContext.createGain();
+      const noteStart = startAt + index * 0.18;
+      const noteEnd = noteStart + note.duration;
+
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(note.frequency, noteStart);
+      oscillator.frequency.exponentialRampToValueAtTime(
+        note.frequency * 1.015,
+        noteEnd,
+      );
+
+      noteGain.gain.setValueAtTime(0.0001, noteStart);
+      noteGain.gain.exponentialRampToValueAtTime(1, noteStart + 0.02);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, noteEnd);
+
+      oscillator.connect(noteGain);
+      noteGain.connect(output);
+      oscillator.start(noteStart);
+      oscillator.stop(noteEnd);
+    }
+
+    window.setTimeout(() => {
+      output.disconnect();
+    }, 1000);
+  }, [ensureCompletionAudioReady]);
+
+  const synchronizeSnapshot = useCallback((
+    currentNow: number,
+    options: { notifyOnCompletedPhase?: boolean } = {},
+  ) => {
     const currentSnapshot = {
       settings: settingsRef.current,
       runtime: runtimeRef.current,
       history: historyRef.current,
     };
 
-    return reconcileStudyTimerSnapshot(currentSnapshot, currentNow);
-  };
+    const nextSnapshot = reconcileStudyTimerSnapshot(currentSnapshot, currentNow);
+
+    if (
+      options.notifyOnCompletedPhase &&
+      currentSnapshot.runtime.phaseEndsAt !== null &&
+      lastNotifiedPhaseEndRef.current !== currentSnapshot.runtime.phaseEndsAt &&
+      didCompleteStudyTimerPhase(
+        currentSnapshot.runtime,
+        nextSnapshot.runtime,
+        currentNow,
+      )
+    ) {
+      lastNotifiedPhaseEndRef.current = currentSnapshot.runtime.phaseEndsAt;
+      void playCompletionSound();
+    }
+
+    return nextSnapshot;
+  }, [playCompletionSound]);
 
   const withSynchronizedSnapshot = (
     mutate: (
@@ -219,10 +347,26 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
     ) => StudyTimerSnapshot,
   ) => {
     const currentNow = Date.now();
-    const nextSnapshot = mutate(synchronizeSnapshot(currentNow), currentNow);
+    const nextSnapshot = mutate(
+      synchronizeSnapshot(currentNow, { notifyOnCompletedPhase: true }),
+      currentNow,
+    );
     commitSnapshot(nextSnapshot);
     startTransition(() => setNow(currentNow));
   };
+
+  useEffect(() => {
+    return () => {
+      const audioContext = completionAudioContextRef.current;
+
+      if (!audioContext) {
+        return;
+      }
+
+      void audioContext.close();
+      completionAudioContextRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     const hydratedSettings = loadStudyTimerSettings();
@@ -275,7 +419,9 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
 
     const intervalId = window.setInterval(() => {
       const currentNow = Date.now();
-      const nextSnapshot = synchronizeSnapshot(currentNow);
+      const nextSnapshot = synchronizeSnapshot(currentNow, {
+        notifyOnCompletedPhase: true,
+      });
 
       if (
         nextSnapshot.history !== historyRef.current ||
@@ -290,7 +436,7 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [hasHydrated, runtime.status]);
+  }, [hasHydrated, runtime.status, synchronizeSnapshot]);
 
   useEffect(() => {
     if (!hasHydrated) {
@@ -319,7 +465,7 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("pagehide", handlePageHide);
     };
-  }, [hasHydrated, runtime.status]);
+  }, [hasHydrated, runtime.status, synchronizeSnapshot]);
 
   const startTimer = () => {
     withSynchronizedSnapshot((snapshot, currentNow) => {
@@ -629,15 +775,4 @@ function formatStudyTimerClock(durationMs: number) {
   }
 
   return `${`${minutes}`.padStart(2, "0")}:${`${seconds}`.padStart(2, "0")}`;
-}
-
-function getPhaseLabel(phase: StudyTimerPhase) {
-  switch (phase) {
-    case "work":
-      return "جلسة عمل";
-    case "shortBreak":
-      return "استراحة قصيرة";
-    case "longBreak":
-      return "استراحة طويلة";
-  }
 }

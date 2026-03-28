@@ -5,8 +5,6 @@ import { useFocusAudio } from "@/components/focus-audio-provider";
 import { StudyTimerPanel } from "@/components/study-timer-panel";
 import type { FocusSoundIcon } from "@/lib/focus-sounds";
 
-
-
 function FocusSoundIcon({ icon }: { icon: FocusSoundIcon }) {
   if (icon === "rain") {
     return (
@@ -24,8 +22,16 @@ function FocusSoundIcon({ icon }: { icon: FocusSoundIcon }) {
           d="M7.5 9a4.5 4.5 0 0 1 8.62-1.66A3.3 3.3 0 0 1 16.75 14H7.75a3.75 3.75 0 1 1-.25-7.5"
         />
         <path strokeLinecap="round" strokeLinejoin="round" d="m8.75 16-.75 2" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="m12 16-.75 2.75" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="m15.25 16-.75 2" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m12 16-.75 2.75"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m15.25 16-.75 2"
+        />
       </svg>
     );
   }
@@ -193,7 +199,11 @@ function FocusSoundIcon({ icon }: { icon: FocusSoundIcon }) {
         strokeWidth={1.9}
         aria-hidden="true"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5V9l5-2.25V19.5" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4.5 19.5V9l5-2.25V19.5"
+        />
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -257,7 +267,11 @@ function FocusSoundIcon({ icon }: { icon: FocusSoundIcon }) {
           strokeLinejoin="round"
           d="M14.75 4.25a7 7 0 1 0 5 12.1 7.25 7.25 0 1 1-5-12.1Z"
         />
-        <path strokeLinecap="round" strokeLinejoin="round" d="m17.5 6.5.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5.5-1.5Z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m17.5 6.5.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5.5-1.5Z"
+        />
       </svg>
     );
   }
@@ -278,7 +292,11 @@ function FocusSoundIcon({ icon }: { icon: FocusSoundIcon }) {
           strokeLinejoin="round"
           d="M4.5 13c0-2.75 3.35-5 7.5-5s7.5 2.25 7.5 5-3.35 5-7.5 5-7.5-2.25-7.5-5Z"
         />
-        <path strokeLinecap="round" strokeLinejoin="round" d="m18.75 8.5 1.5-1" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m18.75 8.5 1.5-1"
+        />
       </svg>
     );
   }
@@ -293,10 +311,45 @@ function FocusSoundIcon({ icon }: { icon: FocusSoundIcon }) {
       aria-hidden="true"
     >
       <circle cx="12" cy="12" r="6.5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.5v3.5l2.5 2" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 8.5v3.5l2.5 2"
+      />
       <path strokeLinecap="round" strokeLinejoin="round" d="M6.5 19.5h11" />
     </svg>
   );
+}
+
+function hexToRgb(hex: string) {
+  const normalized = hex.replace("#", "");
+  const value =
+    normalized.length === 3
+      ? normalized
+          .split("")
+          .map((segment) => `${segment}${segment}`)
+          .join("")
+      : normalized;
+
+  const parsed = Number.parseInt(value, 16);
+
+  return {
+    r: (parsed >> 16) & 255,
+    g: (parsed >> 8) & 255,
+    b: parsed & 255,
+  };
+}
+
+function withAlpha(hex: string, alpha: number) {
+  const { r, g, b } = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getContrastTextColor(hex: string) {
+  const { r, g, b } = hexToRgb(hex);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+  return brightness > 156 ? "rgb(15 23 42)" : "white";
 }
 
 export function FocusSoundStudio() {
@@ -321,10 +374,10 @@ export function FocusSoundStudio() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900"
+            className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary-200/80 bg-gradient-to-r from-primary-50 via-white to-cyan-50/70 p-4 shadow-[0_20px_45px_-36px_rgba(37,99,235,0.45)] dark:border-primary-900/70 dark:from-primary-950/70 dark:via-surface-900 dark:to-cyan-950/20 dark:shadow-none"
           >
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 dark:bg-primary-900/30">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary-200/70 bg-white/85 shadow-sm dark:border-primary-800/80 dark:bg-primary-950/40">
                 <svg
                   className="h-5 w-5 text-primary-600 dark:text-primary-400"
                   fill="currentColor"
@@ -355,14 +408,22 @@ export function FocusSoundStudio() {
               >
                 {isPaused ? (
                   <>
-                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="h-4 w-4"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path d="M8 5v14l11-7z" />
                     </svg>
                     <span className="hidden sm:inline">استئناف</span>
                   </>
                 ) : (
                   <>
-                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="h-4 w-4"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                     </svg>
                     <span className="hidden sm:inline">إيقاف</span>
@@ -372,9 +433,13 @@ export function FocusSoundStudio() {
               <button
                 type="button"
                 onClick={stopAll}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-surface-300 bg-white text-surface-700 transition-colors hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary-200/80 bg-white/90 text-primary-700 transition-colors hover:bg-primary-50 dark:border-primary-800/80 dark:bg-surface-800 dark:text-primary-300 dark:hover:bg-primary-950/40"
               >
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="h-4 w-4"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path d="M6 6h12v12H6z" />
                 </svg>
               </button>
@@ -384,125 +449,186 @@ export function FocusSoundStudio() {
 
         {/* Sound Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sounds.map((sound, index) => (
-            <motion.article
-              key={sound.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                duration: 0.2,
-                delay: index * 0.02,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className={`group relative overflow-hidden rounded-2xl border transition-all ${
-                sound.enabled
-                  ? "border-surface-300 bg-white shadow-sm dark:border-surface-700 dark:bg-surface-900"
-                  : "border-surface-200 bg-surface-50 dark:border-surface-800 dark:bg-surface-950"
-              }`}
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between gap-3 p-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 transition-all"
+          {sounds.map((sound, index) => {
+            const accent = sound.accentColor;
+            const actionTextColor = getContrastTextColor(accent);
+
+            return (
+              <motion.article
+                key={sound.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.2,
+                  delay: index * 0.02,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className={`group relative overflow-hidden rounded-2xl border transition-all ${
+                  sound.enabled
+                    ? "bg-white dark:bg-surface-900"
+                    : "bg-surface-50 dark:bg-surface-950"
+                }`}
+                style={{
+                  borderColor: sound.enabled
+                    ? withAlpha(accent, 0.34)
+                    : withAlpha(accent, 0.14),
+                  boxShadow: sound.enabled
+                    ? `0 26px 48px -36px ${withAlpha(accent, 0.42)}`
+                    : undefined,
+                }}
+              >
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-24"
+                  style={{
+                    background: `linear-gradient(180deg, ${withAlpha(
+                      accent,
+                      sound.enabled ? 0.18 : 0.08,
+                    )} 0%, transparent 100%)`,
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-6 top-0 h-px"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${withAlpha(
+                      accent,
+                      0.72,
+                    )}, transparent)`,
+                  }}
+                />
+
+                {/* Header */}
+                <div className="relative flex items-start justify-between gap-3 p-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all"
+                      style={{
+                        borderColor: withAlpha(
+                          accent,
+                          sound.enabled ? 0.34 : 0.18,
+                        ),
+                        backgroundColor: withAlpha(
+                          accent,
+                          sound.enabled ? 0.14 : 0.08,
+                        ),
+                        color: accent,
+                        boxShadow: sound.enabled
+                          ? `0 16px 30px -24px ${withAlpha(accent, 0.85)}`
+                          : undefined,
+                      }}
+                    >
+                      <FocusSoundIcon icon={sound.icon} />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base font-semibold text-surface-900 dark:text-surface-50">
+                        {sound.label}
+                      </h3>
+                      <p
+                        className="mt-1 inline-flex rounded-full border px-2 py-1 text-[11px] font-medium"
+                        style={{
+                          borderColor: withAlpha(
+                            accent,
+                            sound.enabled ? 0.24 : 0.18,
+                          ),
+                          backgroundColor: withAlpha(
+                            accent,
+                            sound.enabled ? 0.12 : 0.06,
+                          ),
+                          color: accent,
+                        }}
+                      >
+                        {sound.categoryLabel}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => toggleSound(sound.id)}
+                    className="shrink-0 rounded-xl border px-4 py-2 text-sm font-medium transition-all"
+                    style={
+                      sound.enabled
+                        ? {
+                            borderColor: "transparent",
+                            backgroundColor: accent,
+                            color: actionTextColor,
+                            boxShadow: `0 16px 28px -22px ${withAlpha(accent, 0.9)}`,
+                          }
+                        : {
+                            borderColor: withAlpha(accent, 0.2),
+                            backgroundColor: withAlpha(accent, 0.08),
+                            color: accent,
+                          }
+                    }
+                    aria-label={
+                      sound.enabled
+                        ? `إيقاف ${sound.label}`
+                        : `تشغيل ${sound.label}`
+                    }
+                  >
+                    {sound.enabled ? "إيقاف" : "تشغيل"}
+                  </button>
+                </div>
+
+                {/* Description */}
+                <p className="relative px-4 pb-4 text-sm leading-relaxed text-surface-600 dark:text-surface-400">
+                  {sound.description}
+                </p>
+
+                {/* Volume Control - Only show when enabled */}
+                {sound.enabled && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="relative border-t p-4"
                     style={{
-                      borderColor: sound.enabled
-                        ? sound.accentColor
-                        : "rgb(226 232 240)",
-                      backgroundColor: sound.enabled
-                        ? `${sound.accentColor}12`
-                        : "transparent",
-                      color: sound.enabled ? sound.accentColor : "rgb(148 163 184)",
+                      borderColor: withAlpha(accent, 0.18),
+                      background: `linear-gradient(180deg, ${withAlpha(
+                        accent,
+                        0.1,
+                      )} 0%, transparent 100%)`,
                     }}
                   >
-                    <FocusSoundIcon icon={sound.icon} />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="truncate text-base font-semibold text-surface-900 dark:text-surface-50">
-                      {sound.label}
-                    </h3>
-                    <p className="text-xs text-surface-500 dark:text-surface-400">
-                      {sound.categoryLabel}
+                    <div className="flex items-center gap-3">
+                      <input
+                        aria-label={`مستوى صوت ${sound.label}`}
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={Math.round(sound.volume * 100)}
+                        onChange={(event) =>
+                          setVolume(sound.id, Number(event.target.value) / 100)
+                        }
+                        className="h-2 flex-1 cursor-pointer rounded-full"
+                        style={{ accentColor: accent }}
+                      />
+                      <span
+                        className="min-w-[3ch] rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums"
+                        style={{
+                          backgroundColor: withAlpha(accent, 0.12),
+                          color: accent,
+                        }}
+                      >
+                        {Math.round(sound.volume * 100)}
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Error Message */}
+                {sound.errorMessage && (
+                  <div className="border-t border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30">
+                    <p className="text-xs text-red-700 dark:text-red-300">
+                      {sound.errorMessage}
                     </p>
                   </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => toggleSound(sound.id)}
-                  className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
-                    sound.enabled
-                      ? "bg-surface-100 text-surface-700 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
-                      : "bg-surface-900 text-white hover:bg-surface-800 dark:bg-surface-50 dark:text-surface-950 dark:hover:bg-surface-200"
-                  }`}
-                  aria-label={sound.enabled ? `إيقاف ${sound.label}` : `تشغيل ${sound.label}`}
-                >
-                  {sound.enabled ? "إيقاف" : "تشغيل"}
-                </button>
-              </div>
-
-              {/* Description */}
-              <p className="px-4 pb-4 text-sm leading-relaxed text-surface-600 dark:text-surface-400">
-                {sound.description}
-              </p>
-
-              {/* Volume Control - Only show when enabled */}
-              {sound.enabled && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="border-t border-surface-200 bg-surface-50/50 p-4 dark:border-surface-800 dark:bg-surface-950/50"
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      aria-label={`مستوى صوت ${sound.label}`}
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="1"
-                      value={Math.round(sound.volume * 100)}
-                      onChange={(event) =>
-                        setVolume(sound.id, Number(event.target.value) / 100)
-                      }
-                      className="h-2 flex-1 cursor-pointer rounded-full"
-                      style={{ accentColor: sound.accentColor }}
-                    />
-                    <span
-                      className="min-w-[3ch] text-sm font-semibold tabular-nums"
-                      style={{ color: sound.accentColor }}
-                    >
-                      {Math.round(sound.volume * 100)}
-                    </span>
-                  </div>
-
-                  {/* Status Indicator */}
-                  <div className="mt-3 flex items-center gap-2">
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        sound.playbackStatus === "playing" ? "animate-pulse" : ""
-                      }`}
-                      style={{ backgroundColor: sound.accentColor }}
-                    />
-                    <span className="text-xs text-surface-500 dark:text-surface-400">
-                      {sound.playbackStatus === "playing"
-                        ? "يعمل الآن"
-                        : "متوقف مؤقتاً"}
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Error Message */}
-              {sound.errorMessage && (
-                <div className="border-t border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30">
-                  <p className="text-xs text-red-700 dark:text-red-300">
-                    {sound.errorMessage}
-                  </p>
-                </div>
-              )}
-            </motion.article>
-          ))}
+                )}
+              </motion.article>
+            );
+          })}
         </div>
 
         {/* Empty State */}

@@ -160,14 +160,19 @@ export function StudyTimerPanel() {
           )}
 
           {/* Timer Text */}
-          <div className="text-center">
+          <div className="text-center" aria-live="polite">
             <p className="text-4xl font-bold tracking-tight text-white tabular-nums sm:text-5xl md:text-6xl">
               {formatTimerClock(remainingMs)}
             </p>
             {runtime.status !== "idle" && (
-              <p className="mt-1 text-xs font-medium text-white/80 sm:text-sm">
-                {getPhaseLabel(runtime.phase)}
-              </p>
+              <>
+                <p className="mt-1 text-xs font-medium text-white/80 sm:text-sm">
+                  {getPhaseLabel(runtime.phase)}
+                </p>
+                <span className="sr-only">
+                  يصدر المؤقت تنبيهاً صوتياً عند انتهاء المرحلة الحالية.
+                </span>
+              </>
             )}
           </div>
         </motion.div>
