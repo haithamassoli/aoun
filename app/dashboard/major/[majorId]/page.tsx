@@ -23,10 +23,7 @@ import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
 import { normalizeAlias } from "@/lib/alias";
 import { formatCourseSemesterLabel } from "@/lib/course-semester";
-import {
-  REQUEST_KIND_LABELS,
-  type RequestKind,
-} from "@/lib/resource-requests";
+import { REQUEST_KIND_LABELS, type RequestKind } from "@/lib/resource-requests";
 
 type CourseListItem = {
   _id: Id<"courses">;
@@ -195,6 +192,8 @@ export default function MajorCoursesPage() {
   const [pendingRequestIds, setPendingRequestIds] = useState<Set<string>>(
     () => new Set(),
   );
+  const [showSlugInfo, setShowSlugInfo] = useState(false);
+  const [showAliasInfo, setShowAliasInfo] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -202,7 +201,7 @@ export default function MajorCoursesPage() {
       slug: "",
       credits: "3",
       courseCode: "",
-      semester: "",
+      semester: "1",
       order: "0",
       alias: "",
     },
@@ -361,11 +360,23 @@ export default function MajorCoursesPage() {
   const openMajorLinkForm = () => {
     if (major) {
       majorLinkForm.setFieldValue("treeDiagramUrl", major.treeDiagramUrl ?? "");
-      majorLinkForm.setFieldValue("instagram", major.socialLinks?.instagram ?? "");
-      majorLinkForm.setFieldValue("facebook", major.socialLinks?.facebook ?? "");
-      majorLinkForm.setFieldValue("facebookGroup", major.socialLinks?.facebookGroup ?? "");
+      majorLinkForm.setFieldValue(
+        "instagram",
+        major.socialLinks?.instagram ?? "",
+      );
+      majorLinkForm.setFieldValue(
+        "facebook",
+        major.socialLinks?.facebook ?? "",
+      );
+      majorLinkForm.setFieldValue(
+        "facebookGroup",
+        major.socialLinks?.facebookGroup ?? "",
+      );
       majorLinkForm.setFieldValue("faculty", major.socialLinks?.faculty ?? "");
-      majorLinkForm.setFieldValue("telegram", major.socialLinks?.telegram ?? "");
+      majorLinkForm.setFieldValue(
+        "telegram",
+        major.socialLinks?.telegram ?? "",
+      );
     }
     setShowMajorLinkForm(true);
   };
@@ -390,7 +401,9 @@ export default function MajorCoursesPage() {
   }
 
   const baseCourses = courses as CourseListItem[];
-  const courseLookup = new Map(baseCourses.map((course) => [course._id, course]));
+  const courseLookup = new Map(
+    baseCourses.map((course) => [course._id, course]),
+  );
   const activeCourses: CourseListItem[] = search.isEmpty
     ? baseCourses
     : (searchedCourses ?? []).map((course) => {
@@ -652,7 +665,7 @@ export default function MajorCoursesPage() {
               <FormInput
                 form={majorLinkForm}
                 name="faculty"
-                label="Faculty"
+                label="الهيئة التدريسية"
                 placeholder="https://..."
                 dir="ltr"
               />
@@ -823,18 +836,102 @@ export default function MajorCoursesPage() {
                       form.setFieldValue("slug", generateSlug(val));
                   }}
                 />
-                <FormInput
-                  form={form}
-                  name="slug"
-                  label="الرابط (slug) *"
-                  dir="ltr"
-                />
+                <div className="relative">
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <label className="text-xs font-medium text-surface-700 dark:text-surface-200">
+                      الرابط (slug) *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowSlugInfo(!showSlugInfo)}
+                      className="group relative inline-flex h-4 w-4 items-center justify-center rounded-full text-surface-400 transition-colors hover:text-primary-600 dark:hover:text-primary-400"
+                      aria-label="معلومات عن الرابط"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  {showSlugInfo && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 top-full z-10 mt-1 w-full rounded-xl border border-primary-200 bg-primary-50 p-3 shadow-lg dark:border-primary-800 dark:bg-primary-950/90"
+                    >
+                      <div className="flex items-start gap-2">
+                        <svg
+                          className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-primary-900 dark:text-primary-100">
+                            الرابط هو معرّف فريد للمادة في العنوان
+                          </p>
+                          <div className="mt-2 space-y-1.5">
+                            <p className="text-xs text-primary-700 dark:text-primary-300">
+                              <span className="font-semibold">مثال:</span> إذا
+                              كان اسم المادة "عربي"
+                            </p>
+                            <p className="text-xs font-mono text-primary-600 dark:text-primary-400">
+                              الرابط: aoun.assoli.site/just/[arabic]
+                            </p>
+                            <p className="mt-2 text-xs text-primary-700 dark:text-primary-300">
+                              يُستخدم في الرابط النهائي للمادة
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowSlugInfo(false)}
+                          className="shrink-0 rounded-lg p-1 text-primary-600 transition-colors hover:bg-primary-100 dark:text-primary-400 dark:hover:bg-primary-900/50"
+                          aria-label="إغلاق"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                  <FormInput form={form} name="slug" label="" dir="ltr" />
+                </div>
                 <FormInput
                   form={form}
                   name="courseCode"
                   label="رمز المادة"
                   dir="ltr"
-                  placeholder="CS101"
+                  placeholder="E112"
                 />
                 <FormInput
                   form={form}
@@ -848,14 +945,104 @@ export default function MajorCoursesPage() {
                   form={form}
                   name="semester"
                   label="المستوى أو المسار"
-                  placeholder="مثال: 1 أو القدرة أو الاتصالات"
+                  placeholder="مثال: 1"
                 />
-                <FormInput
-                  form={form}
-                  name="alias"
-                  label="الاسم البديل (alias)"
-                  placeholder="اسم بديل للبحث"
-                />
+                <div className="relative">
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <label className="text-xs font-medium text-surface-700 dark:text-surface-200">
+                      الأسماء البديلة (alias)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowAliasInfo(!showAliasInfo)}
+                      className="group relative inline-flex h-4 w-4 items-center justify-center rounded-full text-surface-400 transition-colors hover:text-primary-600 dark:hover:text-primary-400"
+                      aria-label="معلومات عن الاسم البديل"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  {showAliasInfo && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 top-full z-10 mt-1 w-full rounded-xl border border-primary-200 bg-primary-50 p-3 shadow-lg dark:border-primary-800 dark:bg-primary-950/90"
+                    >
+                      <div className="flex items-start gap-2">
+                        <svg
+                          className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-primary-900 dark:text-primary-100">
+                            أسماء بديلة تساعد في البحث عن المادة
+                          </p>
+                          <div className="mt-2 space-y-1.5">
+                            <p className="text-xs text-primary-700 dark:text-primary-300">
+                              <span className="font-semibold">مثال:</span> إذا
+                              كان اسم المادة "calculus 101"
+                            </p>
+                            <p className="text-xs text-primary-600 dark:text-primary-400">
+                              الاسم البديل: كالكولس كالك تفاضل وتكامل رياضيات
+                            </p>
+                            <p className="mt-2 text-xs text-primary-700 dark:text-primary-300">
+                              يمكن للطلاب البحث بالاسم البديل للوصول للمادة
+                              بسهولة
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowAliasInfo(false)}
+                          className="shrink-0 rounded-lg p-1 text-primary-600 transition-colors hover:bg-primary-100 dark:text-primary-400 dark:hover:bg-primary-900/50"
+                          aria-label="إغلاق"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                  <FormInput
+                    form={form}
+                    name="alias"
+                    label=""
+                    placeholder="اسم بديل للبحث"
+                  />
+                </div>
                 <FormInput
                   form={form}
                   name="order"
@@ -902,7 +1089,7 @@ export default function MajorCoursesPage() {
                 <div className="max-w-2xl flex-1">
                   <PublicSearchInput
                     label="ابحث داخل مواد التخصص"
-                    placeholder="مثال: برمجة كائنية أو CS101"
+                    placeholder="مثال: برمجة كائنية أو E112"
                     value={search.input}
                     onChange={search.setInput}
                   />
@@ -983,7 +1170,9 @@ export default function MajorCoursesPage() {
           ) : (
             <div className="space-y-3">
               {activeCourses.map((course, index: number) => {
-                const semesterLabel = formatCourseSemesterLabel(course.semester);
+                const semesterLabel = formatCourseSemesterLabel(
+                  course.semester,
+                );
                 return (
                   <motion.div
                     key={course._id}
@@ -1171,7 +1360,9 @@ export default function MajorCoursesPage() {
                                 rel="noopener noreferrer"
                                 className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                               >
-                                <span className="truncate">{request.suggestedUrl}</span>
+                                <span className="truncate">
+                                  {request.suggestedUrl}
+                                </span>
                                 <svg
                                   className="h-4 w-4 shrink-0"
                                   fill="none"
@@ -1198,7 +1389,9 @@ export default function MajorCoursesPage() {
                             </Link>
                             <button
                               type="button"
-                              onClick={() => handleMarkRequestFulfilled(request._id)}
+                              onClick={() =>
+                                handleMarkRequestFulfilled(request._id)
+                              }
                               disabled={pendingRequestIds.has(request._id)}
                               className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
                             >
