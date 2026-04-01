@@ -372,7 +372,7 @@ export const getPublicVisitorsTotal = query({
   args: {},
   returns: publicVisitorsTotal,
   handler: async (ctx) => {
-    const visitorsTotal = await ctx.db.query("visitors").count();
+    const visitorsTotal = await ctx.db.query("visitorDailyVisits").count();
 
     return {
       visitorsTotal,
