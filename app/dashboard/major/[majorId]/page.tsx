@@ -194,6 +194,7 @@ export default function MajorCoursesPage() {
   );
   const [showSlugInfo, setShowSlugInfo] = useState(false);
   const [showAliasInfo, setShowAliasInfo] = useState(false);
+  const [showOrderInfo, setShowOrderInfo] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -929,7 +930,7 @@ export default function MajorCoursesPage() {
                 <FormInput
                   form={form}
                   name="courseCode"
-                  label="رمز المادة"
+                  label="رمز المادة (اختياري)"
                   dir="ltr"
                   placeholder="E112"
                 />
@@ -944,13 +945,13 @@ export default function MajorCoursesPage() {
                 <FormInput
                   form={form}
                   name="semester"
-                  label="المستوى أو المسار"
+                  label="المستوى أو المسار (اختياري)"
                   placeholder="مثال: 1"
                 />
                 <div className="relative">
                   <div className="mb-1.5 flex items-center gap-1.5">
                     <label className="text-xs font-medium text-surface-700 dark:text-surface-200">
-                      الأسماء البديلة (alias)
+                      الأسماء البديلة (اختياري)
                     </label>
                     <button
                       type="button"
@@ -1040,16 +1041,105 @@ export default function MajorCoursesPage() {
                     form={form}
                     name="alias"
                     label=""
-                    placeholder="اسم بديل للبحث"
+                    placeholder="اسماء بديلة للبحث"
                   />
                 </div>
-                <FormInput
-                  form={form}
-                  name="order"
-                  label="الترتيب"
-                  type="number"
-                  min="0"
-                />
+                <div className="relative">
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <label className="text-xs font-medium text-surface-700 dark:text-surface-200">
+                      الترتيب (اختياري)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowOrderInfo(!showOrderInfo)}
+                      className="group relative inline-flex h-4 w-4 items-center justify-center rounded-full text-surface-400 transition-colors hover:text-primary-600 dark:hover:text-primary-400"
+                      aria-label="معلومات عن الترتيب"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  {showOrderInfo && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 top-full z-10 mt-1 w-full rounded-xl border border-primary-200 bg-primary-50 p-3 shadow-lg dark:border-primary-800 dark:bg-primary-950/90"
+                    >
+                      <div className="flex items-start gap-2">
+                        <svg
+                          className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-primary-900 dark:text-primary-100">
+                            رقم الترتيب يحدد موضع المادة في القائمة
+                          </p>
+                          <div className="mt-2 space-y-1.5">
+                            <p className="text-xs text-primary-700 dark:text-primary-300">
+                              <span className="font-semibold">مثال:</span>{" "}
+                              المواد ذات الترتيب الأقل تظهر أولاً
+                            </p>
+                            <p className="text-xs text-primary-600 dark:text-primary-400">
+                              ترتيب 0 → أول مادة، ترتيب 1 → ثاني مادة
+                            </p>
+                            <p className="mt-2 text-xs text-primary-700 dark:text-primary-300">
+                              يمكنك استخدامه لترتيب المواد حسب المستوى الدراسي
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowOrderInfo(false)}
+                          className="shrink-0 rounded-lg p-1 text-primary-600 transition-colors hover:bg-primary-100 dark:text-primary-400 dark:hover:bg-primary-900/50"
+                          aria-label="إغلاق"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                  <FormInput
+                    form={form}
+                    name="order"
+                    label=""
+                    type="number"
+                    min="0"
+                  />
+                </div>
               </div>
               <div className="mt-4 flex items-center justify-end gap-3">
                 <button
