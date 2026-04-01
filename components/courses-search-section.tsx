@@ -244,7 +244,7 @@ function CourseCard({
   const statusOption = getCourseStatusOption(status);
 
   return (
-    <article className="public-elevated-surface public-interactive-card group flex h-full flex-col rounded-2xl p-3 sm:p-4">
+    <article className="group flex h-full flex-col rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(14,165,233,0.45)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none dark:hover:border-primary-600 sm:p-4">
       <div className="flex items-center justify-between sm:gap-3">
         <Link href={href} className="min-w-0 flex-1 space-y-2">
           {badge ? (
@@ -305,7 +305,11 @@ function CourseProgressStats({
 }: {
   courseStatuses: Record<string, CourseProgressStatus>;
   courses: CourseListItem[];
-  customCourses?: Array<{ id: string; status: CourseProgressStatus; credits?: number }>;
+  customCourses?: Array<{
+    id: string;
+    status: CourseProgressStatus;
+    credits?: number;
+  }>;
 }) {
   let totalCredits = 0;
   let hiddenCredits = 0;
@@ -334,7 +338,7 @@ function CourseProgressStats({
   // Include custom courses in the stats
   for (const customCourse of customCourses) {
     const credits = customCourse.credits ?? 3;
-    
+
     if (customCourse.status === "completed") {
       completedCredits += credits;
       totalCredits += credits;
@@ -715,7 +719,11 @@ export function CoursesSearchSection({
             majorId={majorId}
             onCoursesChange={(courses) =>
               setCustomCourses(
-                courses.map((c) => ({ id: c.id, status: c.status, credits: c.credits })),
+                courses.map((c) => ({
+                  id: c.id,
+                  status: c.status,
+                  credits: c.credits,
+                })),
               )
             }
           />
