@@ -546,7 +546,7 @@ export default function CourseResourcesPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         dir="ltr"
-                        className="text-xs text-primary-600 hover:underline dark:text-primary-400"
+                        className="text-xs text-primary-600 hover:underline dark:text-primary-400 break-all"
                       >
                         {resource.url}
                       </a>
