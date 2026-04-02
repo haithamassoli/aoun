@@ -22,7 +22,7 @@ export const STUDENT_TOOL_NAV_ITEMS: readonly StudentToolNavItem[] = [
   },
   {
     href: "/focus",
-    label: "أصوات التركيز",
+    label: "مؤقت الدراسة وأصوات التركيز",
     description:
       "استخدم مؤقت بومودورو وامزج المطر والطبيعة والضوضاء الهادئة خلال المذاكرة والتنقل.",
   },

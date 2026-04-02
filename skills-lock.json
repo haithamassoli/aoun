@@ -135,6 +135,11 @@
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
       "computedHash": "c858d2d9023e73edb4e5504868cb0e36313e58fd56af12ef888b43c5634a3c17"
+    },
+    "vercel-react-view-transitions": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "60ea14314de303bc3149e8cafe77ddb12e0ff6eb9408b6551061c456aed1d6d6"
     }
   }
 }
