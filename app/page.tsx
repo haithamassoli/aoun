@@ -57,6 +57,7 @@ export default async function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-[linear-gradient(180deg,#407bf3_0%,#356eea_34%,#2d61df_62%,#2957d3_82%,#274fc7_100%)] px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24)_0%,transparent_72%)]" />
         <div className="relative mx-auto max-w-4xl text-center">
           <motion.h1
             initial={{ opacity: 0, y: 24, scale: 0.98 }}

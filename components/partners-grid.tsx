@@ -10,8 +10,8 @@ export function PartnersGrid() {
   return (
     <div>
       {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-16 text-center sm:px-6 lg:px-8">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24)_0%,transparent_72%)]" />
+      <div className="relative overflow-hidden bg-[linear-gradient(180deg,#407bf3_0%,#356eea_34%,#2d61df_62%,#2957d3_82%,#274fc7_100%)] px-4 py-16 text-center sm:px-6 lg:px-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-60 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24)_0%,transparent_72%)]" />
         <h1 className="public-section-title relative text-3xl font-bold text-white sm:text-4xl">
           شركاؤنا وداعمونا
         </h1>
