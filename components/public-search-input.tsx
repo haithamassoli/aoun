@@ -14,7 +14,7 @@ export function PublicSearchInput({
   onChange,
 }: PublicSearchInputProps) {
   return (
-    <div className="public-search-shell public-elevated-surface rounded-[1.6rem] p-4 backdrop-blur-sm">
+    <div className="rounded-2xl border border-surface-200 bg-white/85 p-4 shadow-sm backdrop-blur-sm dark:border-surface-700 dark:bg-surface-900/85">
       <label className="mb-2 block text-sm font-semibold text-surface-700 dark:text-surface-200">
         {label}
       </label>
