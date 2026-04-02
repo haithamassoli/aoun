@@ -14,6 +14,7 @@ import { PublicRouteFrame } from "@/components/public-route-frame";
 import { PublicShellChrome } from "@/components/public-shell-chrome";
 import { DeveloperSupportButton } from "@/components/developer-support-button";
 import { FocusAudioProvider } from "@/components/focus-audio-provider";
+import { PostHogProvider } from "@/components/posthog-provider";
 import { StudyTimerProvider } from "@/components/study-timer-provider";
 import { SITE_URL } from "@/lib/site-url";
 import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
@@ -89,72 +90,74 @@ export default async function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${ibmPlexArabic.className} font-sans antialiased`}>
-        <PWARegister />
-        <PWAInstallBanner />
-        <ThemeProvider>
-          <ConvexClientProvider sessionToken={sessionToken}>
-            <VisitorTracker />
-            <PublicShellChrome />
-            <div className="flex min-h-screen flex-col">
-              <header className="hidden border-b border-surface-200/80 bg-white/72 backdrop-blur-xl md:sticky md:top-0 md:z-50 md:block dark:border-surface-700/80 dark:bg-surface-950/72">
-                <nav
-                  aria-label="التنقل الرئيسي"
-                  className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
-                >
-                  <Link href="/" className="flex items-center gap-2">
-                    <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                      عـون
-                    </span>
-                  </Link>
-                  {/* <
-                    className="flex items-center gap-1 text-sm font-medium text-surface-600 dark:text-surface-300"
-                  ></nav> */}
+        <PostHogProvider>
+          <PWARegister />
+          <PWAInstallBanner />
+          <ThemeProvider>
+            <ConvexClientProvider sessionToken={sessionToken}>
+              <VisitorTracker />
+              <PublicShellChrome />
+              <div className="flex min-h-screen flex-col">
+                <header className="hidden border-b border-surface-200/80 bg-white/72 backdrop-blur-xl md:sticky md:top-0 md:z-50 md:block dark:border-surface-700/80 dark:bg-surface-950/72">
+                  <nav
+                    aria-label="التنقل الرئيسي"
+                    className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+                  >
+                    <Link href="/" className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                        عـون
+                      </span>
+                    </Link>
+                    {/* <
+                      className="flex items-center gap-1 text-sm font-medium text-surface-600 dark:text-surface-300"
+                    ></nav> */}
 
-                  <div className="flex items-center gap-1 text-sm font-medium text-surface-600 dark:text-surface-300">
-                    {STUDENT_TOOL_NAV_ITEMS.map((item) => (
+                    <div className="flex items-center gap-1 text-sm font-medium text-surface-600 dark:text-surface-300">
+                      {STUDENT_TOOL_NAV_ITEMS.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="rounded-lg px-3 py-1.5 transition-colors hover:bg-surface-100 hover:text-primary-600 dark:hover:bg-surface-800 dark:hover:text-primary-400 sm:block"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
                       <Link
-                        key={item.href}
-                        href={item.href}
+                        href="/settings"
                         className="rounded-lg px-3 py-1.5 transition-colors hover:bg-surface-100 hover:text-primary-600 dark:hover:bg-surface-800 dark:hover:text-primary-400 sm:block"
                       >
-                        {item.label}
+                        الإعدادات
                       </Link>
-                    ))}
-                    <Link
-                      href="/settings"
-                      className="rounded-lg px-3 py-1.5 transition-colors hover:bg-surface-100 hover:text-primary-600 dark:hover:bg-surface-800 dark:hover:text-primary-400 sm:block"
-                    >
-                      الإعدادات
-                    </Link>
-                    <HeaderAuth />
-                    <ThemeToggle />
+                      <HeaderAuth />
+                      <ThemeToggle />
+                    </div>
+                  </nav>
+                </header>
+
+                <main className="flex-1 pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
+                  <FocusAudioProvider>
+                    <StudyTimerProvider>
+                      <PublicRouteFrame>{children}</PublicRouteFrame>
+                    </StudyTimerProvider>
+                  </FocusAudioProvider>
+                </main>
+
+                <MobileBottomNav />
+
+                <footer className="hidden border-t border-surface-200 bg-surface-50 md:block dark:border-surface-700 dark:bg-surface-950">
+                  <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                    <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+                      <p className="text-sm text-surface-500 dark:text-surface-400">
+                        عون — مصادر أكاديمية مجانية لطلاب الجامعات الأردنية
+                      </p>
+                      <DeveloperSupportButton />
+                    </div>
                   </div>
-                </nav>
-              </header>
-
-              <main className="flex-1 pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
-                <FocusAudioProvider>
-                  <StudyTimerProvider>
-                    <PublicRouteFrame>{children}</PublicRouteFrame>
-                  </StudyTimerProvider>
-                </FocusAudioProvider>
-              </main>
-
-              <MobileBottomNav />
-
-              <footer className="hidden border-t border-surface-200 bg-surface-50 md:block dark:border-surface-700 dark:bg-surface-950">
-                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                  <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-                    <p className="text-sm text-surface-500 dark:text-surface-400">
-                      عون — مصادر أكاديمية مجانية لطلاب الجامعات الأردنية
-                    </p>
-                    <DeveloperSupportButton />
-                  </div>
-                </div>
-              </footer>
-            </div>
-          </ConvexClientProvider>
-        </ThemeProvider>
+                </footer>
+              </div>
+            </ConvexClientProvider>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );
