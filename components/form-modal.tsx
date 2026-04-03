@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
 
 type FormModalProps = {
@@ -57,7 +58,11 @@ export function FormModal({ open, title, onClose, children }: FormModalProps) {
 
   if (!open) return null;
 
-  return (
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  return createPortal(
     <div
       ref={overlayRef}
       className="fixed inset-0 z-50 overflow-y-auto bg-surface-950/45 backdrop-blur-sm"
@@ -106,6 +111,7 @@ export function FormModal({ open, title, onClose, children }: FormModalProps) {
           <div className="px-6 pb-6 pt-5">{children}</div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
