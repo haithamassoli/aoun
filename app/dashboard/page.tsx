@@ -5,7 +5,6 @@ import { motion } from "motion/react";
 import { useQuery } from "convex/react";
 import { useAuth } from "@/components/auth-provider";
 import { Toast, useToast } from "@/components/toast";
-import { SendNotificationForm } from "@/components/dashboard/send-notification-form";
 import { AdminDashboardOverview } from "@/components/dashboard/admin-dashboard-overview";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
@@ -47,45 +46,7 @@ export default function DashboardPage() {
           </p>
         </motion.div>
 
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.08 }}
-          className="mb-6 rounded-[28px] border border-primary-200/70 bg-gradient-to-l from-white via-primary-50/60 to-primary-100/70 p-5 dark:border-primary-900/50 dark:from-surface-900 dark:via-primary-950/20 dark:to-surface-900 sm:p-6"
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary-700/80 dark:text-primary-200/80">
-            Visitor intelligence
-          </p>
-          <h2 className="mt-3 text-xl font-bold text-surface-900 dark:text-surface-50 sm:text-2xl">
-            أين يذهب الزوار داخل المنصة؟
-          </h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-surface-600 dark:text-surface-300">
-            هذا الإصدار من اللوحة يركز على سلوك الزيارة الفعلي: الصفحات
-            الأكثر مشاهدة، أنواع الصفحات التي تستقطب الحركة، ومسارات التنقل
-            الأكثر شيوعًا بين الجامعات والتخصصات والمواد.
-          </p>
-        </motion.section>
-
         <AdminDashboardOverview analytics={analytics} />
-
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="mt-6 overflow-hidden rounded-[28px] border border-primary-200/70 bg-gradient-to-br from-white via-primary-50/40 to-white p-5 dark:border-primary-900/50 dark:from-surface-900 dark:via-primary-950/20 dark:to-surface-900 sm:p-6"
-        >
-          <div className="mb-5">
-            <h2 className="text-lg font-bold text-surface-900 dark:text-surface-50">
-              إرسال إشعار مخصص
-            </h2>
-            <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-              أرسل إشعارا مباشرا لجميع المشتركين أو لمشتركي تخصص محدد.
-            </p>
-          </div>
-          <SendNotificationForm
-            showToast={(message, type) => toast.show(message, type)}
-          />
-        </motion.section>
       </div>
     );
   }
