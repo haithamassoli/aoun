@@ -88,6 +88,37 @@ const visitorSeriesEntry = v.object({
   uniqueVisitors: v.number(),
 });
 
+const pageViewSeriesEntry = v.object({
+  dateKey: v.string(),
+  label: v.string(),
+  pageViews: v.number(),
+  uniqueVisitors: v.number(),
+});
+
+const topPageEntry = v.object({
+  pathname: v.string(),
+  label: v.string(),
+  pageType: v.string(),
+  pageTypeLabel: v.string(),
+  pageViews: v.number(),
+  uniqueVisitors: v.number(),
+});
+
+const topTransitionEntry = v.object({
+  fromPathname: v.string(),
+  fromLabel: v.string(),
+  toPathname: v.string(),
+  toLabel: v.string(),
+  count: v.number(),
+});
+
+const pageTypeTrafficEntry = v.object({
+  pageType: v.string(),
+  label: v.string(),
+  pageViews: v.number(),
+  uniqueVisitors: v.number(),
+});
+
 const entitySeriesEntry = v.object({
   dateKey: v.string(),
   label: v.string(),
@@ -101,12 +132,57 @@ const adminDashboardAnalytics = v.object({
   majorsTotal: v.number(),
   coursesTotal: v.number(),
   visitorsTotal: v.number(),
+  pageViewsTotal: v.number(),
   entitySeries: v.array(entitySeriesEntry),
   visitorSeries: v.array(visitorSeriesEntry),
+  pageViewSeries: v.array(pageViewSeriesEntry),
+  topPages: v.array(topPageEntry),
+  topTransitions: v.array(topTransitionEntry),
+  trafficByPageType: v.array(pageTypeTrafficEntry),
 });
 
 const AMMAN_TIME_ZONE = "Asia/Amman";
 const PUBLIC_VISITOR_STATIC_PATHS = new Set(["/", "/gpa-calculator"]);
+const STATIC_TRACKABLE_PAGE_LABELS: Record<
+  string,
+  { pageType: string; pageTypeLabel: string; label: string }
+> = {
+  "/": {
+    pageType: "home",
+    pageTypeLabel: "الرئيسية",
+    label: "الصفحة الرئيسية",
+  },
+  "/gpa-calculator": {
+    pageType: "tool",
+    pageTypeLabel: "أدوات",
+    label: "حاسبة المعدل",
+  },
+  "/academic-planner": {
+    pageType: "tool",
+    pageTypeLabel: "أدوات",
+    label: "المخطط الأكاديمي",
+  },
+  "/courses": {
+    pageType: "catalog",
+    pageTypeLabel: "الدليل",
+    label: "دليل المواد",
+  },
+  "/focus": {
+    pageType: "tool",
+    pageTypeLabel: "أدوات",
+    label: "وضع التركيز",
+  },
+  "/partners": {
+    pageType: "info",
+    pageTypeLabel: "تعريفية",
+    label: "الشركاء",
+  },
+  "/settings": {
+    pageType: "info",
+    pageTypeLabel: "تعريفية",
+    label: "الإعدادات",
+  },
+};
 const ammanDateKeyFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: AMMAN_TIME_ZONE,
   year: "numeric",
@@ -203,6 +279,122 @@ function shouldTrackVisitorPath(pathname: string) {
   }
 
   return true;
+}
+
+type PathLookup = {
+  universityNamesBySlug: Map<string, string>;
+  majorNamesByPath: Map<string, string>;
+  courseNamesByPath: Map<string, string>;
+  newsLabelsByPath: Map<string, string>;
+};
+
+function buildPathLookup(
+  universities: Array<{ _id: string; slug: string; name: string }>,
+  majors: Array<{
+    _id: string;
+    universityId: string;
+    slug: string;
+    name: string;
+  }>,
+  courses: Array<{ majorId: string; slug: string; name: string }>
+): PathLookup {
+  const universityNamesBySlug = new Map(
+    universities.map((university) => [university.slug, university.name])
+  );
+  const universitiesById = new Map(
+    universities.map((university) => [university._id, university])
+  );
+  const majorsById = new Map(majors.map((major) => [major._id, major]));
+  const majorNamesByPath = new Map<string, string>();
+  const courseNamesByPath = new Map<string, string>();
+  const newsLabelsByPath = new Map<string, string>();
+
+  for (const major of majors) {
+    const university = universitiesById.get(major.universityId);
+    if (!university) {
+      continue;
+    }
+
+    const majorPath = `/${university.slug}/${major.slug}`;
+    majorNamesByPath.set(majorPath, major.name);
+    newsLabelsByPath.set(`${majorPath}/news`, `أخبار ${major.name}`);
+  }
+
+  for (const course of courses) {
+    const major = majorsById.get(course.majorId);
+    if (!major) {
+      continue;
+    }
+
+    const university = universitiesById.get(major.universityId);
+    if (!university) {
+      continue;
+    }
+
+    courseNamesByPath.set(
+      `/${university.slug}/${major.slug}/${course.slug}`,
+      course.name
+    );
+  }
+
+  return {
+    universityNamesBySlug,
+    majorNamesByPath,
+    courseNamesByPath,
+    newsLabelsByPath,
+  };
+}
+
+function describePublicPath(pathname: string, pathLookup: PathLookup) {
+  const staticPage = STATIC_TRACKABLE_PAGE_LABELS[pathname];
+  if (staticPage) {
+    return staticPage;
+  }
+
+  const courseName = pathLookup.courseNamesByPath.get(pathname);
+  if (courseName) {
+    return {
+      pageType: "course",
+      pageTypeLabel: "المواد",
+      label: `مادة: ${courseName}`,
+    };
+  }
+
+  const newsLabel = pathLookup.newsLabelsByPath.get(pathname);
+  if (newsLabel) {
+    return {
+      pageType: "news",
+      pageTypeLabel: "الأخبار",
+      label: newsLabel,
+    };
+  }
+
+  const majorName = pathLookup.majorNamesByPath.get(pathname);
+  if (majorName) {
+    return {
+      pageType: "major",
+      pageTypeLabel: "التخصصات",
+      label: `تخصص: ${majorName}`,
+    };
+  }
+
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 1) {
+    const universityName = pathLookup.universityNamesBySlug.get(segments[0] ?? "");
+    if (universityName) {
+      return {
+        pageType: "university",
+        pageTypeLabel: "الجامعات",
+        label: `جامعة: ${universityName}`,
+      };
+    }
+  }
+
+  return {
+    pageType: "other",
+    pageTypeLabel: "أخرى",
+    label: pathname,
+  };
 }
 
 export const getMyMajors = query({
@@ -372,7 +564,8 @@ export const getPublicVisitorsTotal = query({
   args: {},
   returns: publicVisitorsTotal,
   handler: async (ctx) => {
-    const visitorsTotal = await ctx.db.query("visitorDailyVisits").count();
+    const visitorsTotal = (await ctx.db.query("visitorDailyVisits").collect())
+      .length;
 
     return {
       visitorsTotal,
@@ -384,9 +577,10 @@ export const trackVisitorVisit = mutation({
   args: {
     visitorKey: v.string(),
     pathname: v.string(),
+    referrerPath: v.optional(v.string()),
   },
   returns: v.null(),
-  handler: async (ctx, { visitorKey, pathname }) => {
+  handler: async (ctx, { visitorKey, pathname, referrerPath }) => {
     const normalizedPathname = pathname.trim();
     if (!visitorKey || !normalizedPathname) {
       return null;
@@ -398,6 +592,7 @@ export const trackVisitorVisit = mutation({
 
     const now = Date.now();
     const dateKey = formatDateKey(now);
+    const normalizedReferrerPath = referrerPath?.trim();
     const visitor = await ctx.db
       .query("visitors")
       .withIndex("by_visitorKey", (q) => q.eq("visitorKey", visitorKey))
@@ -416,6 +611,19 @@ export const trackVisitorVisit = mutation({
         lastPath: normalizedPathname,
       });
     }
+
+    await ctx.db.insert("visitorPageViews", {
+      visitorKey,
+      dateKey,
+      pathname: normalizedPathname,
+      referrerPath:
+        normalizedReferrerPath &&
+        normalizedReferrerPath !== normalizedPathname &&
+        shouldTrackVisitorPath(normalizedReferrerPath)
+          ? normalizedReferrerPath
+          : undefined,
+      trackedAt: now,
+    });
 
     const existingDailyVisit = await ctx.db
       .query("visitorDailyVisits")
@@ -469,33 +677,121 @@ export const getAdminDashboardAnalytics = query({
 
     const resolvedDays = Math.max(7, Math.min(days ?? 30, 90));
     const dateKeys = buildRecentDateKeys(resolvedDays);
-    const [universities, majors, courses, visitors, visitorDailyStats] =
-      await Promise.all([
-        ctx.db.query("universities").collect(),
-        ctx.db.query("majors").collect(),
-        ctx.db.query("courses").collect(),
-        ctx.db.query("visitors").count(),
-        ctx.db.query("visitorDailyStats").collect(),
-      ]);
+    const [
+      universities,
+      majors,
+      courses,
+      visitors,
+      visitorDailyStats,
+      visitorPageViewBatches,
+    ] = await Promise.all([
+      ctx.db.query("universities").collect(),
+      ctx.db.query("majors").collect(),
+      ctx.db.query("courses").collect(),
+      ctx.db.query("visitors").collect(),
+      ctx.db.query("visitorDailyStats").collect(),
+      Promise.all(
+        dateKeys.map((dateKey) =>
+          ctx.db
+            .query("visitorPageViews")
+            .withIndex("by_dateKey", (q) => q.eq("dateKey", dateKey))
+            .collect()
+        )
+      ),
+    ]);
 
-    const visitorDailyStatsByDate = new Map(
+    const visitorDailyStatsByDate = new Map<string, number>(
       visitorDailyStats.map((entry) => [entry.dateKey, entry.uniqueVisitors])
     );
+    const visitorPageViews = visitorPageViewBatches.flat();
     const activeUniversities = universities.filter(isNotDeleted);
     const activeMajors = majors.filter(isNotDeleted);
     const activeCourses = courses.filter(isNotDeleted);
+    const pathLookup = buildPathLookup(
+      activeUniversities,
+      activeMajors,
+      activeCourses
+    );
     const universityTotalsByDay = buildCumulativeTotals(
       activeUniversities,
       dateKeys
     );
     const majorTotalsByDay = buildCumulativeTotals(activeMajors, dateKeys);
     const courseTotalsByDay = buildCumulativeTotals(activeCourses, dateKeys);
+    const pageViewsByDate = new Map<string, number>();
+    const pageStatsByPath = new Map<
+      string,
+      {
+        label: string;
+        pageType: string;
+        pageTypeLabel: string;
+        pageViews: number;
+        uniqueVisitors: Set<string>;
+      }
+    >();
+    const transitionStats = new Map<
+      string,
+      {
+        fromPathname: string;
+        fromLabel: string;
+        toPathname: string;
+        toLabel: string;
+        count: number;
+      }
+    >();
+    const pageTypeStats = new Map<
+      string,
+      { label: string; pageViews: number; uniqueVisitors: Set<string> }
+    >();
+
+    for (const pageView of visitorPageViews) {
+      const pageMeta = describePublicPath(pageView.pathname, pathLookup);
+      pageViewsByDate.set(
+        pageView.dateKey,
+        (pageViewsByDate.get(pageView.dateKey) ?? 0) + 1
+      );
+
+      const pageStats = pageStatsByPath.get(pageView.pathname) ?? {
+        label: pageMeta.label,
+        pageType: pageMeta.pageType,
+        pageTypeLabel: pageMeta.pageTypeLabel,
+        pageViews: 0,
+        uniqueVisitors: new Set<string>(),
+      };
+      pageStats.pageViews += 1;
+      pageStats.uniqueVisitors.add(pageView.visitorKey);
+      pageStatsByPath.set(pageView.pathname, pageStats);
+
+      const pageTypeEntry = pageTypeStats.get(pageMeta.pageType) ?? {
+        label: pageMeta.pageTypeLabel,
+        pageViews: 0,
+        uniqueVisitors: new Set<string>(),
+      };
+      pageTypeEntry.pageViews += 1;
+      pageTypeEntry.uniqueVisitors.add(pageView.visitorKey);
+      pageTypeStats.set(pageMeta.pageType, pageTypeEntry);
+
+      if (pageView.referrerPath && pageView.referrerPath !== pageView.pathname) {
+        const referrerMeta = describePublicPath(pageView.referrerPath, pathLookup);
+        const transitionKey = `${pageView.referrerPath}->${pageView.pathname}`;
+        const transition = transitionStats.get(transitionKey) ?? {
+          fromPathname: pageView.referrerPath,
+          fromLabel: referrerMeta.label,
+          toPathname: pageView.pathname,
+          toLabel: pageMeta.label,
+          count: 0,
+        };
+        transition.count += 1;
+        transitionStats.set(transitionKey, transition);
+      }
+    }
 
     return {
       universitiesTotal: activeUniversities.length,
       majorsTotal: activeMajors.length,
       coursesTotal: activeCourses.length,
-      visitorsTotal: visitors,
+      visitorsTotal: visitors.length,
+      pageViewsTotal: visitorPageViews.length,
       entitySeries: dateKeys.map((dateKey, index) => ({
         dateKey,
         label: formatSeriesLabel(dateKey),
@@ -508,6 +804,34 @@ export const getAdminDashboardAnalytics = query({
         label: formatSeriesLabel(dateKey),
         uniqueVisitors: visitorDailyStatsByDate.get(dateKey) ?? 0,
       })),
+      pageViewSeries: dateKeys.map((dateKey) => ({
+        dateKey,
+        label: formatSeriesLabel(dateKey),
+        pageViews: pageViewsByDate.get(dateKey) ?? 0,
+        uniqueVisitors: visitorDailyStatsByDate.get(dateKey) ?? 0,
+      })),
+      topPages: Array.from(pageStatsByPath.entries())
+        .map(([pathname, stats]) => ({
+          pathname,
+          label: stats.label,
+          pageType: stats.pageType,
+          pageTypeLabel: stats.pageTypeLabel,
+          pageViews: stats.pageViews,
+          uniqueVisitors: stats.uniqueVisitors.size,
+        }))
+        .toSorted((left, right) => right.pageViews - left.pageViews)
+        .slice(0, 6),
+      topTransitions: Array.from(transitionStats.values())
+        .toSorted((left, right) => right.count - left.count)
+        .slice(0, 6),
+      trafficByPageType: Array.from(pageTypeStats.entries())
+        .map(([pageType, stats]) => ({
+          pageType,
+          label: stats.label,
+          pageViews: stats.pageViews,
+          uniqueVisitors: stats.uniqueVisitors.size,
+        }))
+        .toSorted((left, right) => right.pageViews - left.pageViews),
     };
   },
 });

@@ -1,36 +1,30 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMutation } from "convex/react";
 import { usePathname } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import {
   getOrCreateVisitorKey,
-  getVisitorDateKey,
-  hasTrackedVisitorForDate,
   isTrackableVisitorPath,
-  markVisitorTrackedForDate,
 } from "@/lib/visitor-analytics";
 
 export function VisitorTracker() {
   const pathname = usePathname();
   const trackVisitorVisit = useMutation(api.dashboard.trackVisitorVisit);
+  const previousTrackablePathnameRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isTrackableVisitorPath(pathname)) {
-      return;
-    }
-
-    const dateKey = getVisitorDateKey();
-    if (hasTrackedVisitorForDate(dateKey)) {
+      previousTrackablePathnameRef.current = null;
       return;
     }
 
     const visitorKey = getOrCreateVisitorKey();
-    void trackVisitorVisit({ visitorKey, pathname })
-      .then(() => {
-        markVisitorTrackedForDate(dateKey);
-      })
+    const referrerPath = previousTrackablePathnameRef.current ?? undefined;
+    previousTrackablePathnameRef.current = pathname;
+
+    void trackVisitorVisit({ visitorKey, pathname, referrerPath })
       .catch(() => {
         // Visitor analytics should never block navigation.
       });

@@ -5,8 +5,6 @@ const RESERVED_SEGMENTS = new Set(["dashboard", "login", "offline"]);
 
 export const VISITOR_ID_STORAGE_KEY =
   `${STORAGE_NAMESPACE}:visitor-id:${STORAGE_VERSION}`;
-export const VISITOR_TRACKED_DATE_KEY =
-  `${STORAGE_NAMESPACE}:visitor-date:${STORAGE_VERSION}`;
 
 const ammanDateKeyFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: AMMAN_TIME_ZONE,
@@ -58,30 +56,6 @@ export function getOrCreateVisitorKey() {
     return nextVisitorKey;
   } catch {
     return createVisitorKey();
-  }
-}
-
-export function hasTrackedVisitorForDate(dateKey: string) {
-  if (!canUseStorage()) {
-    return false;
-  }
-
-  try {
-    return window.sessionStorage.getItem(VISITOR_TRACKED_DATE_KEY) === dateKey;
-  } catch {
-    return false;
-  }
-}
-
-export function markVisitorTrackedForDate(dateKey: string) {
-  if (!canUseStorage()) {
-    return;
-  }
-
-  try {
-    window.sessionStorage.setItem(VISITOR_TRACKED_DATE_KEY, dateKey);
-  } catch {
-    // Session storage may be blocked.
   }
 }
 

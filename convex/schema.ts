@@ -189,6 +189,16 @@ export default defineSchema({
     lastPath: v.string(),
   }).index("by_visitorKey", ["visitorKey"]),
 
+  visitorPageViews: defineTable({
+    visitorKey: v.string(),
+    dateKey: v.string(),
+    pathname: v.string(),
+    referrerPath: v.optional(v.string()),
+    trackedAt: v.number(),
+  })
+    .index("by_dateKey", ["dateKey"])
+    .index("by_visitorKey_dateKey", ["visitorKey", "dateKey"]),
+
   visitorDailyVisits: defineTable({
     visitorKey: v.string(),
     dateKey: v.string(),
