@@ -5,7 +5,7 @@ export default function FocusLoading() {
   return (
     <>
       <MobilePageHeaderMenu
-        title="مؤقت الدراسة وأصوات التركيز"
+        title="التركيز"
         subtitle="عدّاد بومودورو وصوتيات هادئة في جلسة واحدة"
       >
         <div className="public-elevated-surface rounded-[28px] p-4">
