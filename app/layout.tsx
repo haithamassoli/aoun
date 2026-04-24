@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import Link from "next/link";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -16,16 +15,10 @@ import { DeveloperSupportButton } from "@/components/developer-support-button";
 import { FocusAudioProvider } from "@/components/focus-audio-provider";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { StudyTimerProvider } from "@/components/study-timer-provider";
+import { thmanyahSans } from "@/fonts";
 import { SITE_URL } from "@/lib/site-url";
 import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
 import "./globals.css";
-
-const ibmPlexArabic = IBM_Plex_Sans_Arabic({
-  variable: "--font-ibm-plex-arabic",
-  subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -88,8 +81,13 @@ export default async function RootLayout({
   const sessionToken = await getSessionToken();
 
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body className={`${ibmPlexArabic.className} font-sans antialiased`}>
+    <html
+      lang="ar"
+      dir="rtl"
+      className={thmanyahSans.variable}
+      suppressHydrationWarning
+    >
+      <body className="font-sans antialiased">
         <PostHogProvider>
           <PWARegister />
           <PWAInstallBanner />
