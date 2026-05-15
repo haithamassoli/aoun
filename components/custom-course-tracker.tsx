@@ -25,7 +25,6 @@ import {
   normalizePublicSearchQuery,
 } from "@/lib/public-search";
 import type { CourseProgressStatus } from "@/lib/student-progress";
-import { url } from "inspector/promises";
 
 type GlobalCourseSearchResult = {
   _id: Id<"courses">;
@@ -525,20 +524,45 @@ export function CustomCourseTracker({
       {isReady ? (
         courses.length > 0 ? (
           <div className="grid gap-2 sm:gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course, index) => (
-              <Link
-                key={course.id}
-                href={course.linkedCourse?.href ?? "#"}
-                style={{
-                  cursor: `url("/assets/cursor.svg"), ${course.linkedCourse ? "" : "pointer"}`,
-                }}
-                aria-label={
-                  course.linkedCourse
-                    ? `افتح صفحة المادة ${course.linkedCourse.name}`
-                    : `المسار الخاص ${course.name} غير مرتبط بأي مادة`
-                }
-              >
+            {courses.map((course, index) => {
+              const courseSummary = (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`h-2.5 w-2.5 shrink-0 rounded-full ${getStatusDotClassName(course.status)}`}
+                      aria-hidden="true"
+                    />
+                    <span className="inline-flex rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
+                      مسار خاص
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300">
+                        <svg
+                          className="size-3"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        {course.credits ?? 3} ساعة
+                      </span>
+                    </div>
+                  </div>
+                  <h4 className="line-clamp-2 text-sm font-semibold leading-6 text-surface-900 transition-colors group-hover:text-primary-700 dark:text-surface-50 dark:group-hover:text-primary-300 sm:text-base">
+                    {course.name}
+                  </h4>
+                </>
+              );
+
+              return (
                 <motion.article
+                  key={course.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -549,38 +573,22 @@ export function CustomCourseTracker({
                   className="group flex h-full flex-col rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(14,165,233,0.45)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none dark:hover:border-primary-600 sm:p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`h-2.5 w-2.5 shrink-0 rounded-full ${getStatusDotClassName(course.status)}`}
-                          aria-hidden="true"
-                        />
-                        <span className="inline-flex rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
-                          مسار خاص
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300">
-                            <svg
-                              className="size-3"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            {course.credits ?? 3} ساعة
-                          </span>
-                        </div>
+                    {course.linkedCourse ? (
+                      <Link
+                        href={course.linkedCourse.href}
+                        aria-label={`افتح صفحة المادة ${course.linkedCourse.name}`}
+                        className="min-w-0 flex-1 space-y-2"
+                      >
+                        {courseSummary}
+                      </Link>
+                    ) : (
+                      <div
+                        className="min-w-0 flex-1 space-y-2"
+                        aria-label={`المسار الخاص ${course.name} غير مرتبط بأي مادة`}
+                      >
+                        {courseSummary}
                       </div>
-                      <h4 className="line-clamp-2 text-sm font-semibold leading-6 text-surface-900 transition-colors group-hover:text-primary-700 dark:text-surface-50 dark:group-hover:text-primary-300 sm:text-base">
-                        {course.name}
-                      </h4>
-                    </div>
+                    )}
 
                     <div className="flex shrink-0 items-center gap-1">
                       <button
@@ -633,8 +641,8 @@ export function CustomCourseTracker({
                     </div>
                   </div>
                 </motion.article>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         ) : null
       ) : (
