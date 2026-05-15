@@ -71,10 +71,22 @@
       "sourceType": "github",
       "computedHash": "9ebe6c652743fcde8d2ae773f34b6f548dcc8b2e75a3a30936adcd8b95dd2d16"
     },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "computedHash": "784f0dbb7403b0f00324bce9a112f715342777a0daee7bbb7385f9c6f0a170ea"
+    },
     "harden": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "computedHash": "f8ce420b3c78b90707704122264da76514c793ac0e12fb9540ace68d257c231c"
+    },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": "skill/SKILL.md",
+      "computedHash": "ada9c434d56c794352ccd5c7a6901e5ebb4b7f3b7fe42e8c17c2c4b96c3735c8"
     },
     "next-best-practices": {
       "source": "vercel-labs/next-skills",
