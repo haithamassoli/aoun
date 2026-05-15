@@ -1,12 +1,22 @@
 import type { CourseProgressStatus } from "@/lib/student-progress";
 import { CUSTOM_COURSES_STORAGE_KEY } from "@/lib/local-storage-keys";
 
+export type CustomCourseLink = {
+  courseId: string;
+  href: string;
+  name: string;
+  courseCode?: string;
+  majorName: string;
+  universityName: string;
+};
+
 export type CustomCourse = {
   id: string;
   name: string;
   note?: string;
-  credits: number;
+  credits?: number;
   status: CourseProgressStatus;
+  linkedCourse?: CustomCourseLink;
   createdAt: number;
   updatedAt: number;
 };
@@ -40,6 +50,49 @@ function normalizeStatus(value: unknown): CourseProgressStatus | null {
   return null;
 }
 
+function normalizeCustomCourseLink(value: unknown): CustomCourseLink | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  const courseId =
+    typeof candidate.courseId === "string" ? candidate.courseId.trim() : "";
+  const href = typeof candidate.href === "string" ? candidate.href.trim() : "";
+  const name = typeof candidate.name === "string" ? candidate.name.trim() : "";
+  const majorName =
+    typeof candidate.majorName === "string" ? candidate.majorName.trim() : "";
+  const universityName =
+    typeof candidate.universityName === "string"
+      ? candidate.universityName.trim()
+      : "";
+
+  if (
+    !courseId ||
+    !href ||
+    !href.startsWith("/") ||
+    !name ||
+    !majorName ||
+    !universityName
+  ) {
+    return undefined;
+  }
+
+  const courseCode =
+    typeof candidate.courseCode === "string" && candidate.courseCode.trim()
+      ? candidate.courseCode.trim()
+      : undefined;
+
+  return {
+    courseId,
+    href,
+    name,
+    courseCode,
+    majorName,
+    universityName,
+  };
+}
+
 function normalizeCustomCourse(value: unknown): CustomCourse | null {
   if (!value || typeof value !== "object") {
     return null;
@@ -68,6 +121,7 @@ function normalizeCustomCourse(value: unknown): CustomCourse | null {
     typeof candidate.note === "string" && candidate.note.trim()
       ? candidate.note.trim()
       : undefined;
+  const linkedCourse = normalizeCustomCourseLink(candidate.linkedCourse);
 
   const credits =
     typeof candidate.credits === "number" &&
@@ -82,6 +136,7 @@ function normalizeCustomCourse(value: unknown): CustomCourse | null {
     note,
     credits,
     status,
+    linkedCourse,
     createdAt,
     updatedAt,
   };
@@ -216,6 +271,7 @@ export function createCustomCourse(
     name: string;
     credits?: number;
     status?: CourseProgressStatus;
+    linkedCourse?: CustomCourseLink;
   },
 ) {
   const now = Date.now();
@@ -224,6 +280,7 @@ export function createCustomCourse(
     name: input.name.trim(),
     credits: input.credits,
     status: input.status ?? "none",
+    linkedCourse: input.linkedCourse,
     createdAt: now,
     updatedAt: now,
   };
@@ -234,7 +291,9 @@ export function createCustomCourse(
 export function updateCustomCourse(
   majorId: string,
   courseId: string,
-  patch: Partial<Pick<CustomCourse, "name" | "credits" | "status">>,
+  patch: Partial<Pick<CustomCourse, "name" | "credits" | "status">> & {
+    linkedCourse?: CustomCourseLink | null;
+  },
 ) {
   const courses = loadCustomCourses(majorId);
   const nextCourses = courses.map((course) =>
@@ -245,6 +304,10 @@ export function updateCustomCourse(
           name: patch.name !== undefined ? patch.name.trim() : course.name,
           credits: patch.credits !== undefined ? patch.credits : course.credits,
           status: patch.status ?? course.status,
+          linkedCourse:
+            patch.linkedCourse !== undefined
+              ? patch.linkedCourse ?? undefined
+              : course.linkedCourse,
           updatedAt: Date.now(),
         },
   );
