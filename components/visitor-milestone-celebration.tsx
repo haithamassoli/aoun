@@ -8,7 +8,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { useQuery } from "convex/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { VISITOR_MILESTONE_CELEBRATION_STORAGE_KEY } from "@/lib/local-storage-keys";
 
@@ -22,6 +22,7 @@ const CONFETTI_COLORS = [
   "#fb7185",
   "#f97316",
 ];
+const MILESTONE_NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
 
 const CONFETTI_PIECES = Array.from({ length: 34 }, (_, index) => ({
   id: index,
@@ -56,13 +57,8 @@ export function VisitorMilestoneCelebration() {
   const visitorsTotal = publicVisitors?.visitorsTotal;
   const prefersReducedMotion = useReducedMotion();
   const [milestone, setMilestone] = useState<number | null>(null);
-  const formattedMilestone = useMemo(
-    () =>
-      milestone === null
-        ? ""
-        : new Intl.NumberFormat("en-US").format(milestone),
-    [milestone],
-  );
+  const formattedMilestone =
+    milestone === null ? "" : MILESTONE_NUMBER_FORMATTER.format(milestone);
 
   useEffect(() => {
     if (visitorsTotal === undefined) {
@@ -74,8 +70,6 @@ export function VisitorMilestoneCelebration() {
     if (currentMilestone === null) {
       return;
     }
-
-    let hideTimeoutId: number | undefined;
 
     try {
       const storedMilestone = getStoredMilestone();
@@ -98,20 +92,27 @@ export function VisitorMilestoneCelebration() {
       }
 
       setMilestone(currentMilestone);
-      hideTimeoutId = window.setTimeout(
-        () => setMilestone(null),
-        CELEBRATION_DURATION_MS,
-      );
     }, 0);
 
     return () => {
       window.clearTimeout(showTimeoutId);
-
-      if (hideTimeoutId !== undefined) {
-        window.clearTimeout(hideTimeoutId);
-      }
     };
   }, [visitorsTotal]);
+
+  useEffect(() => {
+    if (milestone === null) {
+      return;
+    }
+
+    const hideTimeoutId = window.setTimeout(
+      () => setMilestone(null),
+      CELEBRATION_DURATION_MS,
+    );
+
+    return () => {
+      window.clearTimeout(hideTimeoutId);
+    };
+  }, [milestone]);
 
   return (
     <LazyMotion features={domAnimation}>
