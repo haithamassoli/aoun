@@ -13,7 +13,7 @@ import { api } from "@/convex/_generated/api";
 import { VISITOR_MILESTONE_CELEBRATION_STORAGE_KEY } from "@/lib/local-storage-keys";
 
 const MILESTONE_STEP = 1000;
-const CELEBRATION_DURATION_MS = 12000;
+const CELEBRATION_DURATION_MS = 6400;
 const CONFETTI_COLORS = [
   "#facc15",
   "#38bdf8",
@@ -170,7 +170,7 @@ export function VisitorMilestoneCelebration() {
               className="relative flex max-w-[min(92vw,28rem)] items-center gap-3 rounded-2xl border border-white/45 bg-white/92 px-4 py-3 text-start text-sm font-medium text-surface-900 shadow-[0_18px_55px_rgba(15,23,42,0.2)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:text-surface-50"
             >
               <span className="leading-relaxed">
-                وصل عون إلى{" "}
+                وصل عون إلى أكثر من{" "}
                 <span className="font-bold tabular-nums">
                   {formattedMilestone}
                 </span>{" "}
