@@ -169,15 +169,15 @@ export function VisitorMilestoneCelebration() {
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               className="relative flex max-w-[min(92vw,28rem)] items-center gap-3 rounded-2xl border border-white/45 bg-white/92 px-4 py-3 text-start text-sm font-medium text-surface-900 shadow-[0_18px_55px_rgba(15,23,42,0.2)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:text-surface-50"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-lg text-primary-700 dark:bg-primary-500/15 dark:text-primary-200">
-                🎉
-              </span>
               <span className="leading-relaxed">
                 وصل عون إلى{" "}
                 <span className="font-bold tabular-nums">
                   {formattedMilestone}
                 </span>{" "}
                 زائر. شكراً لكل طالب شاركنا الرحلة.
+              </span>
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-lg text-primary-700 dark:bg-primary-500/15 dark:text-primary-200">
+                🎉
               </span>
             </m.div>
           </div>
