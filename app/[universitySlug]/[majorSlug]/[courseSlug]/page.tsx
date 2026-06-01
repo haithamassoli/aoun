@@ -12,11 +12,27 @@ import { decodeSlugParam } from "@/lib/slug";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
 import { socialPlatforms } from "@/lib/social-platforms";
+import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
+import type { CategoryValue } from "@/constant/resource-categories";
 
 type Params = {
   universitySlug: string;
   majorSlug: string;
   courseSlug: string;
+};
+
+type CourseResourceRecord = {
+  _id: string;
+  category: CategoryValue;
+  content?: string;
+  helpfulnessScore: number;
+  notUsefulCount: number;
+  order: number;
+  title: string;
+  totalFeedback: number;
+  type: "link" | "richtext";
+  usefulCount: number;
+  url?: string;
 };
 
 export async function generateMetadata({
@@ -91,21 +107,23 @@ export default async function CoursePage({
       majorId: major._id,
     }),
   ]);
-  const resourceCards = resources.map((resource) => ({
-    _id: resource._id,
-    category: resource.category,
-    contentHtml: resource.content
-      ? sanitizeRichText(resource.content)
-      : undefined,
-    helpfulnessScore: resource.helpfulnessScore,
-    notUsefulCount: resource.notUsefulCount,
-    order: resource.order,
-    totalFeedback: resource.totalFeedback,
-    title: resource.title,
-    type: resource.type,
-    usefulCount: resource.usefulCount,
-    url: resource.url,
-  }));
+  const resourceCards = (resources as CourseResourceRecord[]).map(
+    (resource) => ({
+      _id: resource._id,
+      category: resource.category,
+      contentHtml: resource.content
+        ? sanitizeRichText(resource.content)
+        : undefined,
+      helpfulnessScore: resource.helpfulnessScore,
+      notUsefulCount: resource.notUsefulCount,
+      order: resource.order,
+      totalFeedback: resource.totalFeedback,
+      title: resource.title,
+      type: resource.type,
+      usefulCount: resource.usefulCount,
+      url: resource.url,
+    }),
+  );
   const courseBreadcrumbItems = [
     { label: "الرئيسية", href: "/" },
     { label: university.name, href: `/${canonicalUniversitySlug}` },
@@ -118,6 +136,15 @@ export default async function CoursePage({
   const courseSummary = course.courseCode
     ? `${course.courseCode} · ${major.name} · ${university.name}`
     : `${major.name} · ${university.name}`;
+  const courseHref = `/${canonicalUniversitySlug}/${canonicalMajorSlug}/${course.slug}`;
+  const courseBookmarkItem = {
+    id: course._id,
+    type: "course" as const,
+    title: course.name,
+    href: courseHref,
+    subtitle: `${major.name} · ${university.name}`,
+    badge: course.courseCode,
+  };
   const majorSocialLinks = socialPlatforms.flatMap((platform) => {
     const url = major.socialLinks?.[platform.key];
     if (!url) {
@@ -145,10 +172,15 @@ export default async function CoursePage({
             </div>
 
             {course.courseCode ? (
-              <div className="shrink-0 rounded-full bg-surface-100 px-3 py-1 text-sm font-medium text-surface-700 dark:bg-surface-800 dark:text-surface-200">
-                {course.courseCode}
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <div className="rounded-full bg-surface-100 px-3 py-1 text-sm font-medium text-surface-700 dark:bg-surface-800 dark:text-surface-200">
+                  {course.courseCode}
+                </div>
+                <BookmarkToggleButton item={courseBookmarkItem} showLabel />
               </div>
-            ) : null}
+            ) : (
+              <BookmarkToggleButton item={courseBookmarkItem} showLabel />
+            )}
           </div>
         </div>
 
@@ -283,6 +315,7 @@ export default async function CoursePage({
             className="mt-4 flex flex-wrap items-center justify-between gap-2"
           >
             <div className="flex flex-wrap items-center gap-2">
+              <BookmarkToggleButton item={courseBookmarkItem} showLabel />
               {major.treeDiagramUrl && (
                 <a
                   href={major.treeDiagramUrl}
@@ -389,6 +422,8 @@ export default async function CoursePage({
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <CourseResourcesSection
           courseId={course._id}
+          courseHref={courseHref}
+          courseName={course.name}
           resources={resourceCards}
         />
       </section>

@@ -30,6 +30,7 @@ import {
   normalizePublicSearchQuery,
 } from "@/lib/public-search";
 import { normalizeSlugLookup } from "@/lib/slug";
+import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
 
 // Simple SVG Icons
 const SearchIcon = ({ className }: { className?: string }) => (
@@ -407,19 +408,20 @@ function GlobalCoursesSearchPageInner({
     [selectedUniversitySlug, universityBySlug],
   );
 
-  const majors = useQuery(
+  const queriedMajors = useQuery(
     api.majors.listByUniversity,
     selectedUniversity ? { universityId: selectedUniversity._id } : "skip",
   );
+  const majors = queriedMajors as MajorOption[] | undefined;
 
-  const sortedMajors = (majors ?? EMPTY_MAJORS).toSorted(
+  const sortedMajors: MajorOption[] = (majors ?? EMPTY_MAJORS).toSorted(
     (a, b) => a.order - b.order,
   );
-  const majorBySlug = new Map(
+  const majorBySlug = new Map<string, MajorOption>(
     sortedMajors.map((major) => [normalizeSlugLookup(major.slug), major]),
   );
 
-  const selectedMajor =
+  const selectedMajor: MajorOption | null =
     selectedMajorSlug && majors !== undefined
       ? (majorBySlug.get(normalizeSlugLookup(selectedMajorSlug)) ?? null)
       : null;
@@ -457,7 +459,7 @@ function GlobalCoursesSearchPageInner({
     Boolean(selectedMajorSlug) &&
     majors === undefined;
 
-  const searchedCourses = useQuery(
+  const queriedSearchedCourses = useQuery(
     api.courses.searchGlobalPublic,
     hasQuery && !isMajorPending
       ? {
@@ -467,6 +469,9 @@ function GlobalCoursesSearchPageInner({
         }
       : "skip",
   );
+  const searchedCourses = queriedSearchedCourses as
+    | GlobalCourseSearchResult[]
+    | undefined;
 
   const deferredSearchedCourses = useDeferredValue(searchedCourses);
   const activeResults = deferredSearchedCourses ?? EMPTY_RESULTS;
@@ -682,31 +687,45 @@ function GlobalCoursesSearchPageInner({
 
             <div className="space-y-3">
               {activeResults.map((course) => (
-                <Link
+                <article
                   key={course._id}
-                  href={course.href}
-                  className="group block rounded-xl border border-surface-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-sm dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
+                  className="group rounded-xl border border-surface-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-sm dark:border-surface-700 dark:bg-surface-900 dark:hover:border-primary-600"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="line-clamp-1 text-base font-semibold text-surface-900 group-hover:text-primary-600 dark:text-surface-50 dark:group-hover:text-primary-400">
-                        {course.name}
-                      </h3>
-                      <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-surface-600 dark:text-surface-400">
-                        <span>{course.majorName}</span>
-                        <span className="text-surface-300 dark:text-surface-600">
-                          •
-                        </span>
-                        <span>{course.universityName}</span>
+                    <Link href={course.href} className="min-w-0 flex-1">
+                      <div className="min-w-0">
+                        <h3 className="line-clamp-1 text-base font-semibold text-surface-900 group-hover:text-primary-600 dark:text-surface-50 dark:group-hover:text-primary-400">
+                          {course.name}
+                        </h3>
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-surface-600 dark:text-surface-400">
+                          <span>{course.majorName}</span>
+                          <span className="text-surface-300 dark:text-surface-600">
+                            •
+                          </span>
+                          <span>{course.universityName}</span>
+                        </div>
                       </div>
+                    </Link>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <BookmarkToggleButton
+                        item={{
+                          id: course._id,
+                          type: "course",
+                          title: course.name,
+                          href: course.href,
+                          subtitle: `${course.majorName} · ${course.universityName}`,
+                          badge: course.courseCode,
+                        }}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-surface-200 bg-white text-surface-500 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-400 dark:hover:border-primary-700 dark:hover:bg-primary-950/50 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950 [&_svg]:h-4 [&_svg]:w-4"
+                      />
+                      {course.courseCode ? (
+                        <span className="rounded-md bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300">
+                          {course.courseCode}
+                        </span>
+                      ) : null}
                     </div>
-                    {course.courseCode && (
-                      <span className="shrink-0 rounded-md bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300">
-                        {course.courseCode}
-                      </span>
-                    )}
                   </div>
-                </Link>
+                </article>
               ))}
             </div>
           </div>

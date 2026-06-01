@@ -1,5 +1,6 @@
 import {
   ACADEMIC_CALENDAR_STORAGE_KEY,
+  BOOKMARKS_STORAGE_KEY,
   COURSE_STATUS_FILTER_STORAGE_KEY,
   COURSE_STATUS_STORAGE_KEY,
   CUSTOM_COURSES_STORAGE_KEY,
@@ -55,13 +56,14 @@ export const USER_DATA_BACKUP_SECTIONS: readonly BackupSection[] = [
     id: "progress",
     title: "الخطة والتقدم",
     description:
-      "حالات المواد، المواد الإضافية، فلاتر العرض، وعمليات البحث.",
+      "حالات المواد، المواد الإضافية، فلاتر العرض، عمليات البحث، والمحفوظات.",
     keys: [
       COURSE_STATUS_STORAGE_KEY,
       LAST_MAJOR_STORAGE_KEY,
       CUSTOM_COURSES_STORAGE_KEY,
       COURSE_STATUS_FILTER_STORAGE_KEY,
       RECENT_GLOBAL_COURSE_SEARCHES_STORAGE_KEY,
+      BOOKMARKS_STORAGE_KEY,
     ],
   },
   {

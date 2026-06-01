@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BookmarksNavLink } from "@/components/bookmarks/bookmarks-nav-link";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -191,6 +192,7 @@ export function MobileBottomNav() {
         <div className="fixed bottom-[calc(5.42rem+env(safe-area-inset-bottom))] left-4 z-40 md:hidden">
           <div className="flex items-center gap-1 rounded-full border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
             <ThemeToggle />
+            <BookmarksNavLink />
             <Link
               href="/dashboard"
               aria-label="لوحة التحكم"

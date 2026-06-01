@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { DeveloperSupportButton } from "@/components/developer-support-button";
+import { BookmarksNavLink } from "@/components/bookmarks/bookmarks-nav-link";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
 import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
 
@@ -270,7 +271,10 @@ export function MobilePageHeaderMenu({
                               </svg>
                             </Link>
 
-                            <div className="shrink-0 rounded-2xl border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
+                            <div className="flex shrink-0 items-center gap-1 rounded-2xl border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
+                              <BookmarksNavLink
+                                onClick={() => setIsOpen(false)}
+                              />
                               <ThemeToggle />
                             </div>
                           </div>

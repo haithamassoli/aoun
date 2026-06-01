@@ -15,6 +15,7 @@ import {
 } from "@/lib/resource-requests";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { getOrCreateVisitorKey } from "@/lib/visitor-analytics";
+import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
 
 const categoryConfig = {
   course_intro: { label: "التعريف بالمادة", icon: "🧭" },
@@ -282,6 +283,8 @@ function VoteButton({
 }
 
 function ResourceCard({
+  courseHref,
+  courseName,
   isPending,
   onVote,
   resource,
@@ -289,6 +292,8 @@ function ResourceCard({
   viewerVote,
   visitorReady,
 }: {
+  courseHref: string;
+  courseName: string;
   isPending: boolean;
   onVote: (resourceId: string, vote: ResourceVote) => void;
   resource: CourseResource;
@@ -297,11 +302,26 @@ function ResourceCard({
   visitorReady: boolean;
 }) {
   const interactionDisabled = isPending || !visitorReady;
+  const categoryLabel = categoryConfig[resource.category].label;
+  const bookmarkItem = {
+    id: resource._id,
+    type: "resource" as const,
+    title: resource.title,
+    href: resource.type === "link" && resource.url ? resource.url : courseHref,
+    subtitle: `${categoryLabel} · ${courseName}`,
+    badge: categoryLabel,
+    external: resource.type === "link" && Boolean(resource.url),
+  };
 
   return (
     <article className="group relative overflow-hidden rounded-xl border border-surface-200/80 bg-white transition-all hover:border-surface-300 hover:shadow-sm dark:border-surface-700/50 dark:bg-surface-900 dark:hover:border-surface-600">
       {/* Voting buttons - top left for RTL */}
       <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5">
+        <BookmarkToggleButton
+          item={bookmarkItem}
+          stopPropagation
+          className="rounded-lg bg-white/90 p-1.5 text-surface-400 backdrop-blur-sm transition-all hover:bg-primary-50 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-surface-800/90 dark:text-surface-500 dark:hover:bg-primary-950/50 dark:hover:text-primary-400 [&_svg]:h-4 [&_svg]:w-4"
+        />
         <button
           type="button"
           onClick={(e) => {
@@ -369,14 +389,14 @@ function ResourceCard({
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="block p-4 pl-20 transition-colors hover:bg-surface-50/50 dark:hover:bg-surface-800/50"
+          className="block p-4 pl-28 transition-colors hover:bg-surface-50/50 dark:hover:bg-surface-800/50"
         >
           <div className="flex items-start gap-3">
             <div className="min-w-0 flex-1 space-y-1.5">
               {showCategory && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-surface-500 dark:text-surface-400">
                   {categoryConfig[resource.category].icon}
-                  <span>{categoryConfig[resource.category].label}</span>
+                  <span>{categoryLabel}</span>
                 </span>
               )}
               <h3 className="break-words text-sm font-semibold leading-snug text-surface-900 [overflow-wrap:anywhere] dark:text-surface-50">
@@ -399,11 +419,11 @@ function ResourceCard({
           </div>
         </a>
       ) : (
-        <div className="p-4 pl-20 space-y-2">
+        <div className="space-y-2 p-4 pl-28">
           {showCategory && (
             <span className="inline-flex items-center gap-1 text-[11px] font-medium text-surface-500 dark:text-surface-400">
               {categoryConfig[resource.category].icon}
-              <span>{categoryConfig[resource.category].label}</span>
+              <span>{categoryLabel}</span>
             </span>
           )}
           <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
@@ -462,9 +482,13 @@ function ResourceRequestCtaCard({
 
 export function CourseResourcesSection({
   courseId,
+  courseHref,
+  courseName,
   resources,
 }: {
   courseId: Id<"courses">;
+  courseHref: string;
+  courseName: string;
   resources: CourseResource[];
 }) {
   const toast = useToast();
@@ -676,6 +700,8 @@ export function CourseResourcesSection({
               <div className="space-y-3">
                 {allResourcesByVotes.map((resource) => (
                   <ResourceCard
+                    courseHref={courseHref}
+                    courseName={courseName}
                     key={resource._id}
                     isPending={pendingResourceIds.has(resource._id)}
                     onVote={handleVote}
@@ -707,6 +733,8 @@ export function CourseResourcesSection({
               <div className="space-y-3">
                 {group.resources.map((resource) => (
                   <ResourceCard
+                    courseHref={courseHref}
+                    courseName={courseName}
                     key={resource._id}
                     isPending={pendingResourceIds.has(resource._id)}
                     onVote={handleVote}

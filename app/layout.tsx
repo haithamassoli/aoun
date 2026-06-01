@@ -15,6 +15,7 @@ import { DeveloperSupportButton } from "@/components/developer-support-button";
 import { FocusAudioProvider } from "@/components/focus-audio-provider";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { StudyTimerProvider } from "@/components/study-timer-provider";
+import { BookmarksNavLink } from "@/components/bookmarks/bookmarks-nav-link";
 import { thmanyahSans } from "@/fonts";
 import { SITE_URL } from "@/lib/site-url";
 import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
@@ -127,6 +128,7 @@ export default async function RootLayout({
                         الإعدادات
                       </Link>
                       <HeaderAuth />
+                      <BookmarksNavLink />
                       <ThemeToggle />
                     </div>
                   </nav>

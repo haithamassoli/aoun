@@ -19,6 +19,7 @@ import {
 } from "@/lib/student-progress";
 import { COURSE_STATUS_FILTER_STORAGE_KEY } from "@/lib/local-storage-keys";
 import { CustomCourseTracker } from "@/components/custom-course-tracker";
+import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
 import {
   formatCourseSemesterLabel,
   getCourseSemesterGroupKey,
@@ -242,6 +243,14 @@ function CourseCard({
   onStatusChange: (status: CourseProgressStatus) => void;
 }) {
   const statusOption = getCourseStatusOption(status);
+  const bookmarkItem = {
+    id: course._id,
+    type: "course" as const,
+    title: course.name,
+    href,
+    subtitle: badge ?? "مادة ضمن الخطة الدراسية",
+    badge: course.courseCode,
+  };
 
   return (
     <article className="group flex h-full flex-col rounded-2xl border border-surface-200/80 bg-white/95 p-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-[0_20px_40px_-28px_rgba(14,165,233,0.45)] dark:border-surface-700/80 dark:bg-surface-900/95 dark:shadow-none dark:hover:border-primary-600 sm:p-4">
@@ -287,6 +296,10 @@ function CourseCard({
         </Link>
 
         <div className="flex shrink-0 items-center gap-2">
+          <BookmarkToggleButton
+            item={bookmarkItem}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-surface-200 bg-white text-surface-500 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-400 dark:hover:border-primary-700 dark:hover:bg-primary-950/50 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950 [&_svg]:h-4 [&_svg]:w-4"
+          />
           <CourseStatusMenu
             ariaLabel={`تغيير حالة المادة ${course.name}`}
             value={status}
