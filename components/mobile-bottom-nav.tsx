@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/components/auth-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -16,7 +15,7 @@ type NavItem = {
 function HomeIcon() {
   return (
     <svg
-      className="h-5 w-5"
+      className="size-5"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -35,7 +34,7 @@ function HomeIcon() {
 function CalendarIcon() {
   return (
     <svg
-      className="h-5 w-5"
+      className="size-5"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -59,7 +58,7 @@ function CalendarIcon() {
 function CalculatorIcon() {
   return (
     <svg
-      className="h-5 w-5"
+      className="size-5"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -87,7 +86,7 @@ function CalculatorIcon() {
 function SearchIcon() {
   return (
     <svg
-      className="h-5 w-5"
+      className="size-5"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -106,7 +105,7 @@ function SearchIcon() {
 function FocusIcon() {
   return (
     <svg
-      className="h-5 w-5"
+      className="size-5"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -123,14 +122,31 @@ function FocusIcon() {
   );
 }
 
+function DashboardIcon() {
+  return (
+    <svg
+      className="size-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4.75 5.75A1.75 1.75 0 0 1 6.5 4h4A1.75 1.75 0 0 1 12.25 5.75v4A1.75 1.75 0 0 1 10.5 11.5h-4a1.75 1.75 0 0 1-1.75-1.75Zm7 0A1.75 1.75 0 0 1 13.5 4h4A1.75 1.75 0 0 1 19.25 5.75v4A1.75 1.75 0 0 1 17.5 11.5h-4a1.75 1.75 0 0 1-1.75-1.75Zm-7 8.5A1.75 1.75 0 0 1 6.5 12.5h4a1.75 1.75 0 0 1 1.75 1.75v4A1.75 1.75 0 0 1 10.5 20h-4a1.75 1.75 0 0 1-1.75-1.75Zm7 0a1.75 1.75 0 0 1 1.75-1.75h4a1.75 1.75 0 0 1 1.75 1.75v4A1.75 1.75 0 0 1 17.5 20h-4a1.75 1.75 0 0 1-1.75-1.75Z"
+      />
+    </svg>
+  );
+}
+
 function isFocusPath(pathname: string) {
   return pathname === "/focus" || pathname.startsWith("/focus/");
 }
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { sessionToken } = useAuth();
-  const isAuthenticated = Boolean(sessionToken);
   const isHomePage = pathname === "/";
 
   const items: NavItem[] = [
@@ -173,8 +189,15 @@ export function MobileBottomNav() {
     >
       {isHomePage ? (
         <div className="fixed bottom-[calc(5.42rem+env(safe-area-inset-bottom))] left-4 z-40 md:hidden">
-          <div className="rounded-full border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
+          <div className="flex items-center gap-1 rounded-full border border-surface-200/80 bg-white/92 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-surface-700/80 dark:bg-surface-950/92 dark:shadow-[0_12px_30px_rgba(2,6,23,0.42)]">
             <ThemeToggle />
+            <Link
+              href="/dashboard"
+              aria-label="لوحة التحكم"
+              className="rounded-lg p-2 text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:text-surface-400 dark:hover:bg-surface-800 dark:hover:text-surface-200 dark:focus-visible:ring-offset-surface-950"
+            >
+              <DashboardIcon />
+            </Link>
           </div>
         </div>
       ) : null}
