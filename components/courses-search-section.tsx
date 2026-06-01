@@ -298,13 +298,22 @@ function CourseCard({
         <div className="flex shrink-0 items-center gap-2">
           <BookmarkToggleButton
             item={bookmarkItem}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-surface-200 bg-white text-surface-500 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-400 dark:hover:border-primary-700 dark:hover:bg-primary-950/50 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950 [&_svg]:h-4 [&_svg]:w-4"
+            className="hidden size-9 items-center justify-center rounded-xl border border-surface-200 bg-white text-surface-500 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-400 dark:hover:border-primary-700 dark:hover:bg-primary-950/50 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950 sm:inline-flex [&_svg]:size-4"
           />
           <CourseStatusMenu
             ariaLabel={`تغيير حالة المادة ${course.name}`}
             value={status}
             onChange={onStatusChange}
-          />
+          >
+            <div className="mt-1 border-t border-surface-200/80 pt-1 sm:hidden dark:border-surface-700">
+              <BookmarkToggleButton
+                item={bookmarkItem}
+                menuCheckbox
+                showLabel
+                className="flex w-full items-center gap-2 rounded-xl border border-transparent bg-transparent px-3 py-2 text-right text-xs font-semibold text-surface-600 transition-all duration-150 hover:border-surface-200 hover:bg-surface-50 hover:text-surface-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:text-surface-300 dark:hover:border-surface-700 dark:hover:bg-surface-900 dark:hover:text-surface-100 dark:focus-visible:ring-offset-surface-950 [&_svg]:size-4"
+              />
+            </div>
+          </CourseStatusMenu>
         </div>
       </div>
     </article>
@@ -755,7 +764,7 @@ export function CoursesSearchSection({
                   className="flex w-full items-center justify-between gap-3 rounded-2xl border border-surface-200/80 bg-white/90 px-4 py-3 text-right shadow-[0_12px_30px_-28px_rgba(15,23,42,0.55)] transition-all duration-200 hover:border-primary-300 hover:bg-primary-50/60 dark:border-surface-700/80 dark:bg-surface-900/90 dark:shadow-none dark:hover:border-primary-600 dark:hover:bg-surface-900"
                 >
                   <span className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
                       {semester.key && /^\d+$/.test(semester.key)
                         ? String(Number.parseInt(semester.key, 10))
                         : semester.key

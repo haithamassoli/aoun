@@ -15,6 +15,7 @@ import {
 type BookmarkToggleButtonProps = {
   item: BookmarkItemInput;
   className?: string;
+  menuCheckbox?: boolean;
   showLabel?: boolean;
   stopPropagation?: boolean;
 };
@@ -28,6 +29,7 @@ const activeClassName =
 export function BookmarkToggleButton({
   item,
   className,
+  menuCheckbox = false,
   showLabel = false,
   stopPropagation = false,
 }: BookmarkToggleButtonProps) {
@@ -39,7 +41,7 @@ export function BookmarkToggleButton({
   const itemKey = getBookmarkItemKey(item.type, item.id);
   const isSaved = bookmarks.items.some((bookmark) => bookmark.key === itemKey);
 
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const toggleBookmark = (event: MouseEvent<HTMLButtonElement>) => {
     if (stopPropagation) {
       event.preventDefault();
       event.stopPropagation();
@@ -56,10 +58,12 @@ export function BookmarkToggleButton({
   return (
     <button
       type="button"
-      aria-pressed={isSaved}
+      role={menuCheckbox ? "menuitemcheckbox" : undefined}
+      aria-checked={menuCheckbox ? isSaved : undefined}
+      aria-pressed={menuCheckbox ? undefined : isSaved}
       aria-label={isSaved ? "إزالة من المحفوظات" : "حفظ في المحفوظات"}
       title={isSaved ? "إزالة من المحفوظات" : "حفظ في المحفوظات"}
-      onClick={handleClick}
+      onClick={toggleBookmark}
       className={className ?? (isSaved ? activeClassName : defaultClassName)}
     >
       <BookmarkIcon filled={isSaved} />

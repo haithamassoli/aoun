@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { CourseProgressStatus } from "@/lib/student-progress";
 
 type CourseStatusSelectorProps = {
@@ -21,6 +21,7 @@ type CourseStatusMenuProps = {
   value: CourseProgressStatus;
   onChange: (status: CourseProgressStatus) => void;
   ariaLabel: string;
+  children?: ReactNode;
 };
 
 export const courseStatusOptions: CourseStatusOption[] = [
@@ -146,6 +147,7 @@ export function CourseStatusMenu({
   value,
   onChange,
   ariaLabel,
+  children,
 }: CourseStatusMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -186,11 +188,11 @@ export function CourseStatusMenu({
         aria-expanded={isOpen}
         aria-controls={isOpen ? menuId : undefined}
         onClick={() => setIsOpen((open) => !open)}
-        className="inline-flex h-4 w-4 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:border border-surface-200/80 sm:bg-surface-50 text-surface-500 transition-all duration-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:border-surface-700 dark:sm:bg-surface-800/80 dark:text-surface-400 dark:hover:border-primary-600 dark:hover:bg-primary-950/60 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950"
+        className="inline-flex size-9 items-center justify-center rounded-xl border border-surface-200/80 bg-surface-50 text-surface-500 transition-all duration-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-400 dark:hover:border-primary-600 dark:hover:bg-primary-950/60 dark:hover:text-primary-300 dark:focus-visible:ring-offset-surface-950"
       >
         <span className="sr-only">تغيير الحالة</span>
         <svg
-          className="h-4 w-4"
+          className="size-4"
           viewBox="0 0 20 20"
           fill="currentColor"
           aria-hidden="true"
@@ -233,7 +235,7 @@ export function CourseStatusMenu({
 
                 {isActive ? (
                   <svg
-                    className="h-4 w-4 shrink-0"
+                    className="size-4 shrink-0"
                     viewBox="0 0 20 20"
                     fill="none"
                     stroke="currentColor"
@@ -250,6 +252,7 @@ export function CourseStatusMenu({
               </button>
             );
           })}
+          {children}
         </div>
       ) : null}
     </div>
