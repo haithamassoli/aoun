@@ -95,9 +95,9 @@ export default async function Home() {
               }}
               className="mx-auto mt-8 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[0_16px_40px_rgba(15,23,42,0.16)] backdrop-blur-md"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15">
+              <span className="flex size-8 items-center justify-center rounded-full bg-white/15">
                 <svg
-                  className="h-4 w-4"
+                  className="size-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -112,9 +112,7 @@ export default async function Home() {
                 </svg>
               </span>
               <span>إجمالي الزوار</span>
-              <span className="tabular-nums font-semibold">
-                {visitorsTotal}
-              </span>
+              <span className="tabular-nums font-semibold">{visitorsTotal}</span>
             </motion.div>
           )}
         </div>

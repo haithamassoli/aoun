@@ -8,6 +8,7 @@ import { getSessionToken } from "@/app/actions/auth";
 import { PWARegister } from "@/components/pwa-register";
 import { PWAInstallBanner } from "@/components/pwa-install-banner";
 import { VisitorTracker } from "@/components/visitor-tracker";
+import { VisitorMilestoneCelebration } from "@/components/visitor-milestone-celebration";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { PublicRouteFrame } from "@/components/public-route-frame";
 import { PublicShellChrome } from "@/components/public-shell-chrome";
@@ -95,6 +96,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <ConvexClientProvider sessionToken={sessionToken}>
               <VisitorTracker />
+              <VisitorMilestoneCelebration />
               <PublicShellChrome />
               <div className="flex min-h-screen flex-col">
                 <header className="hidden border-b border-surface-200/80 bg-white/72 backdrop-blur-xl md:sticky md:top-0 md:z-50 md:block dark:border-surface-700/80 dark:bg-surface-950/72">

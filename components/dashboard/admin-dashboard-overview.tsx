@@ -157,7 +157,7 @@ const PAGE_TYPE_COLORS = [
 ];
 
 function formatNumber(value: number) {
-  return new Intl.NumberFormat("ar-JO").format(value);
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 function formatAverage(value: number, days: number) {
@@ -165,7 +165,7 @@ function formatAverage(value: number, days: number) {
     return "0";
   }
 
-  return new Intl.NumberFormat("ar-JO", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: value < days ? 1 : 0,
   }).format(value / days);
 }
@@ -364,8 +364,15 @@ export function AdminDashboardOverview({
 
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="4 4" stroke="rgba(148, 163, 184, 0.22)" vertical={false} />
+              <ComposedChart
+                data={series}
+                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="4 4"
+                  stroke="rgba(148, 163, 184, 0.22)"
+                  vertical={false}
+                />
                 <XAxis
                   dataKey="label"
                   tick={{ fill: "currentColor", fontSize: 11 }}
@@ -411,7 +418,8 @@ export function AdminDashboardOverview({
             </ResponsiveContainer>
           </div>
           <p className="mt-4 text-xs text-surface-500 dark:text-surface-400">
-            إذا كانت أعمدة المشاهدات أعلى بكثير من خط الزوار، فهذا يعني أن الزائر الواحد يتنقل بين أكثر من صفحة في الجلسة نفسها.
+            إذا كانت أعمدة المشاهدات أعلى بكثير من خط الزوار، فهذا يعني أن
+            الزائر الواحد يتنقل بين أكثر من صفحة في الجلسة نفسها.
           </p>
         </SectionFrame>
       </motion.div>
@@ -498,7 +506,9 @@ export function AdminDashboardOverview({
                         </p>
                       </div>
                       <div className="text-left">
-                        <p className={`${firaCode.className} text-sm font-semibold text-surface-900 dark:text-surface-50`}>
+                        <p
+                          className={`${firaCode.className} text-sm font-semibold text-surface-900 dark:text-surface-50`}
+                        >
                           {formatNumber(page.pageViews)}
                         </p>
                         <p className="text-xs text-surface-500 dark:text-surface-400">
@@ -559,16 +569,20 @@ export function AdminDashboardOverview({
                         }}
                         formatter={(value, name) => [
                           formatNumber(Number(value ?? 0)),
-                          name === "uniqueVisitors"
-                            ? "زوار فريدون"
-                            : "مشاهدات",
+                          name === "uniqueVisitors" ? "زوار فريدون" : "مشاهدات",
                         ]}
                       />
-                      <Bar dataKey="pageViews" radius={[0, 12, 12, 0]} barSize={18}>
+                      <Bar
+                        dataKey="pageViews"
+                        radius={[0, 12, 12, 0]}
+                        barSize={18}
+                      >
                         {analytics.trafficByPageType.map((entry, index) => (
                           <Cell
                             key={entry.pageType}
-                            fill={PAGE_TYPE_COLORS[index % PAGE_TYPE_COLORS.length]}
+                            fill={
+                              PAGE_TYPE_COLORS[index % PAGE_TYPE_COLORS.length]
+                            }
                           />
                         ))}
                       </Bar>
@@ -593,7 +607,9 @@ export function AdminDashboardOverview({
                           {entry.label}
                         </p>
                       </div>
-                      <p className={`${firaCode.className} mt-3 text-xl font-bold text-surface-900 dark:text-surface-50`}>
+                      <p
+                        className={`${firaCode.className} mt-3 text-xl font-bold text-surface-900 dark:text-surface-50`}
+                      >
                         {formatNumber(entry.pageViews)}
                       </p>
                       <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
@@ -648,7 +664,9 @@ export function AdminDashboardOverview({
                         </p>
                       </div>
                       <div className="text-left">
-                        <p className={`${firaCode.className} text-sm font-semibold text-surface-900 dark:text-surface-50`}>
+                        <p
+                          className={`${firaCode.className} text-sm font-semibold text-surface-900 dark:text-surface-50`}
+                        >
                           {formatNumber(transition.count)}
                         </p>
                         <p className="text-xs text-surface-500 dark:text-surface-400">
@@ -663,7 +681,8 @@ export function AdminDashboardOverview({
                       />
                     </div>
                     <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
-                      الترتيب #{formatNumber(index + 1)} ضمن أكثر المسارات استخدامًا
+                      الترتيب #{formatNumber(index + 1)} ضمن أكثر المسارات
+                      استخدامًا
                     </p>
                   </div>
                 );
@@ -671,16 +690,23 @@ export function AdminDashboardOverview({
             </div>
           ) : (
             <EmptyState
-              title={hasPageLevelData ? "لا توجد انتقالات كافية بعد" : "بانتظار أول مسارات تنقل"}
+              title={
+                hasPageLevelData
+                  ? "لا توجد انتقالات كافية بعد"
+                  : "بانتظار أول مسارات تنقل"
+              }
               description="عند بدء التنقل بين الصفحات العامة سيظهر هنا أكثر المسارات شيوعًا، مثل الانتقال من صفحة الجامعة إلى التخصص أو من التخصص إلى المادة."
             />
           )}
         </SectionFrame>
       </motion.div>
 
-      {!hasPageLevelData && analytics.visitorSeries.some((point) => point.uniqueVisitors > 0) ? (
+      {!hasPageLevelData &&
+      analytics.visitorSeries.some((point) => point.uniqueVisitors > 0) ? (
         <div className="rounded-3xl border border-primary-200 bg-primary-50/70 px-4 py-3 text-sm text-primary-800 dark:border-primary-900/60 dark:bg-primary-950/30 dark:text-primary-200">
-          بيانات الزوار اليومية القديمة ما زالت ظاهرة، أما تفاصيل الصفحات الأكثر مشاهدة ومسارات التنقل فستبدأ بالظهور مع الزيارات الجديدة بعد تفعيل التتبع الأدق.
+          بيانات الزوار اليومية القديمة ما زالت ظاهرة، أما تفاصيل الصفحات الأكثر
+          مشاهدة ومسارات التنقل فستبدأ بالظهور مع الزيارات الجديدة بعد تفعيل
+          التتبع الأدق.
         </div>
       ) : null}
     </div>
