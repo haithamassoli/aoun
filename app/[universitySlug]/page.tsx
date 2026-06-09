@@ -27,13 +27,17 @@ export async function generateMetadata({
   if (!university) return {};
   const title = university.name;
   const description = `تصفح التخصصات والمواد الأكاديمية في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
+  const canonicalPath = `/${university.slug}`;
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalPath,
+    },
     openGraph: {
       title: `${title} — عون`,
       description,
-      url: `/${university.slug}`,
+      url: canonicalPath,
       type: "website",
     },
   };

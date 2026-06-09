@@ -14,21 +14,40 @@ function getSingleParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-export const metadata: Metadata = {
-  title: "البحث عن المواد",
-  description:
-    "ابحث عن المواد الأكاديمية عبر جميع الجامعات الأردنية من صفحة واحدة، ثم انتقل مباشرة إلى صفحة المادة.",
-  openGraph: {
-    title: "البحث عن المواد — عون",
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<CoursesPageSearchParams>;
+}): Promise<Metadata> {
+  const resolvedSearchParams = await searchParams;
+  const hasFilters = Boolean(
+    getSingleParam(resolvedSearchParams.q) ||
+      getSingleParam(resolvedSearchParams.university) ||
+      getSingleParam(resolvedSearchParams.major),
+  );
+
+  return {
+    title: "البحث عن المواد",
     description:
       "ابحث عن المواد الأكاديمية عبر جميع الجامعات الأردنية من صفحة واحدة، ثم انتقل مباشرة إلى صفحة المادة.",
-    url: "/courses",
-    type: "website",
-  },
-  alternates: {
-    canonical: "/courses",
-  },
-};
+    openGraph: {
+      title: "البحث عن المواد — عون",
+      description:
+        "ابحث عن المواد الأكاديمية عبر جميع الجامعات الأردنية من صفحة واحدة، ثم انتقل مباشرة إلى صفحة المادة.",
+      url: "/courses",
+      type: "website",
+    },
+    alternates: {
+      canonical: "/courses",
+    },
+    robots: hasFilters
+      ? {
+          index: false,
+          follow: true,
+        }
+      : undefined,
+  };
+}
 
 export default async function CoursesPage({
   searchParams,

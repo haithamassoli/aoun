@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "المحفوظات والمجموعات",
   description:
     "احفظ المواد والمصادر المهمة محلياً ونظمها في مجموعات على هذا الجهاز.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function Page() {

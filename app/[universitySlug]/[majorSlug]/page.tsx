@@ -65,13 +65,17 @@ export async function generateMetadata({
   if (!major || major.universityId !== university._id) return {};
   const title = `${major.name} — ${university.name}`;
   const description = `الخطة الدراسية والمواد الأكاديمية لتخصص ${major.name} في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
+  const canonicalPath = `/${university.slug}/${major.slug}`;
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalPath,
+    },
     openGraph: {
       title: `${title} — عون`,
       description,
-      url: `/${university.slug}/${major.slug}`,
+      url: canonicalPath,
       type: "website",
     },
   };

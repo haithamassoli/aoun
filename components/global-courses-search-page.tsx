@@ -31,6 +31,7 @@ import {
 } from "@/lib/public-search";
 import { normalizeSlugLookup } from "@/lib/slug";
 import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
+import { captureAnalyticsEvent } from "@/lib/analytics-events";
 
 // Simple SVG Icons
 const SearchIcon = ({ className }: { className?: string }) => (
@@ -314,6 +315,14 @@ function GlobalCoursesSearchPageInner({
       }
 
       setDebouncedQueryInput(trimmedQuery);
+      captureAnalyticsEvent("course_search_submitted", {
+        query: trimmedQuery,
+        universitySlug: effectiveUniversitySlug || null,
+        majorSlug:
+          majors === undefined
+            ? selectedMajorSlug || null
+            : (selectedMajor?.slug ?? null),
+      });
       saveSearch({
         query: trimmedQuery,
         universitySlug: effectiveUniversitySlug || undefined,

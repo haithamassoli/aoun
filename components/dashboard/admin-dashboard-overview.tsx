@@ -6,9 +6,7 @@ import type { ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Bar,
-  BarChart,
   CartesianGrid,
-  Cell,
   ComposedChart,
   Line,
   ResponsiveContainer,
@@ -83,81 +81,17 @@ export type DashboardAnalytics = Record<MetricKey, number> & {
   trafficByPageType: PageTypeTraffic[];
 };
 
-export const DEFAULT_DASHBOARD_ANALYTICS: DashboardAnalytics = {
-  universitiesTotal: 0,
-  majorsTotal: 0,
-  coursesTotal: 0,
-  visitorsTotal: 0,
-  pageViewsTotal: 0,
-  entitySeries: [],
-  visitorSeries: [],
-  pageViewSeries: [],
-  topPages: [],
-  topTransitions: [],
-  trafficByPageType: [],
-};
-
-const KPI_CARDS: Array<{
-  key: keyof Pick<
-    DashboardAnalytics,
-    | "universitiesTotal"
-    | "majorsTotal"
-    | "coursesTotal"
-    | "visitorsTotal"
-    | "pageViewsTotal"
-  >;
-  label: string;
-  hint: string;
-  accentClass: string;
-}> = [
-  {
-    key: "universitiesTotal",
-    label: "الجامعات",
-    hint: "المعروضة حاليًا",
-    accentClass:
-      "bg-sky-500/10 text-sky-700 ring-sky-500/15 dark:bg-sky-400/10 dark:text-sky-200",
-  },
-  {
-    key: "majorsTotal",
-    label: "التخصصات",
-    hint: "ضمن المنصة",
-    accentClass:
-      "bg-violet-500/10 text-violet-700 ring-violet-500/15 dark:bg-violet-400/10 dark:text-violet-200",
-  },
-  {
-    key: "coursesTotal",
-    label: "المواد",
-    hint: "ذات صفحات عامة",
-    accentClass:
-      "bg-amber-500/10 text-amber-700 ring-amber-500/15 dark:bg-amber-400/10 dark:text-amber-200",
-  },
-  {
-    key: "visitorsTotal",
-    label: "الزوار الفريدون",
-    hint: "منذ بدء التتبع",
-    accentClass:
-      "bg-emerald-500/10 text-emerald-700 ring-emerald-500/15 dark:bg-emerald-400/10 dark:text-emerald-200",
-  },
-  {
-    key: "pageViewsTotal",
-    label: "مشاهدات الصفحات",
-    hint: "آخر 30 يومًا",
-    accentClass:
-      "bg-primary-500/10 text-primary-700 ring-primary-500/15 dark:bg-primary-400/10 dark:text-primary-200",
-  },
-];
-
-const PAGE_TYPE_COLORS = [
-  "#2563eb",
-  "#7c3aed",
-  "#f59e0b",
-  "#059669",
-  "#db2777",
-  "#0891b2",
-];
+const SUMMARY_SKELETONS = ["content", "reach", "signal"];
+const numberFormatter = new Intl.NumberFormat("en-US");
+const decimalFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 1,
+});
+const percentFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
 
 function formatNumber(value: number) {
-  return new Intl.NumberFormat("en-US").format(value);
+  return numberFormatter.format(value);
 }
 
 function formatAverage(value: number, days: number) {
@@ -165,9 +99,25 @@ function formatAverage(value: number, days: number) {
     return "0";
   }
 
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: value < days ? 1 : 0,
-  }).format(value / days);
+  const formatter = value < days ? decimalFormatter : numberFormatter;
+
+  return formatter.format(value / days);
+}
+
+function formatDecimal(value: number) {
+  return decimalFormatter.format(value);
+}
+
+function formatPercent(value: number) {
+  return `${percentFormatter.format(value)}%`;
+}
+
+function getPercent(value: number, total: number) {
+  if (total <= 0) {
+    return 0;
+  }
+
+  return Math.round((value / total) * 100);
 }
 
 function formatTooltipLabel(name: string) {
@@ -189,10 +139,6 @@ function shortenLabel(label: string, maxLength = 26) {
   return `${label.slice(0, maxLength - 1)}…`;
 }
 
-function buildTransitionLabel(transition: TopTransition) {
-  return `${transition.fromLabel} -> ${transition.toLabel}`;
-}
-
 function EmptyState({
   title,
   description,
@@ -201,7 +147,7 @@ function EmptyState({
   description: string;
 }) {
   return (
-    <div className="flex min-h-56 items-center justify-center rounded-3xl border border-dashed border-surface-200 bg-surface-50/70 px-6 text-center dark:border-surface-700 dark:bg-surface-900/50">
+    <div className="flex min-h-52 items-center justify-center rounded-3xl border border-dashed border-surface-200 bg-surface-50/70 px-6 text-center dark:border-surface-700 dark:bg-surface-950/50">
       <div>
         <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
           {title}
@@ -215,11 +161,13 @@ function EmptyState({
 }
 
 function SectionFrame({
+  eyebrow,
   title,
   description,
   children,
   className = "",
 }: {
+  eyebrow?: string;
   title: string;
   description: string;
   children: ReactNode;
@@ -227,20 +175,424 @@ function SectionFrame({
 }) {
   return (
     <section
-      className={`overflow-hidden rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900 sm:p-6 ${className}`}
+      className={`overflow-hidden rounded-[30px] border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-700 dark:bg-surface-900 sm:p-6 ${className}`}
     >
-      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-surface-900 dark:text-surface-50 sm:text-xl">
-            {title}
-          </h2>
-          <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-            {description}
+      <div className="mb-5 max-w-3xl">
+        {eyebrow ? (
+          <p className="mb-2 text-xs font-semibold text-primary-700 dark:text-primary-300">
+            {eyebrow}
           </p>
-        </div>
+        ) : null}
+        <h2 className="text-lg font-bold text-surface-900 dark:text-surface-50 sm:text-xl">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-surface-500 dark:text-surface-400">
+          {description}
+        </p>
       </div>
       {children}
     </section>
+  );
+}
+
+function SmallMetric({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+}) {
+  return (
+    <div>
+      <p className="text-xs text-surface-500 dark:text-surface-400">{label}</p>
+      <p
+        className={`${firaCode.className} mt-1 text-2xl font-bold text-surface-900 dark:text-surface-50`}
+      >
+        {value}
+      </p>
+      {hint ? (
+        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function MeterBar({
+  percent,
+  className = "bg-primary-600 dark:bg-primary-400",
+}: {
+  percent: number;
+  className?: string;
+}) {
+  return (
+    <div className="h-2 overflow-hidden rounded-full bg-surface-200 dark:bg-surface-800">
+      <div
+        className={`h-full rounded-full ${className}`}
+        style={{ width: `${Math.max(4, Math.min(percent, 100))}%` }}
+      />
+    </div>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  description,
+  children,
+  featured = false,
+}: {
+  label: string;
+  value: string;
+  description: string;
+  children?: ReactNode;
+  featured?: boolean;
+}) {
+  return (
+    <article
+      className={`h-full rounded-[28px] border p-5 shadow-sm ${
+        featured
+          ? "border-primary-200 bg-primary-50/70 dark:border-primary-900/60 dark:bg-primary-950/30"
+          : "border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+      }`}
+    >
+      <p
+        className={`text-xs font-semibold ${
+          featured
+            ? "text-primary-800 dark:text-primary-200"
+            : "text-surface-500 dark:text-surface-400"
+        }`}
+      >
+        {label}
+      </p>
+      <p
+        className={`${firaCode.className} mt-3 text-3xl font-bold text-surface-950 dark:text-surface-50`}
+      >
+        {value}
+      </p>
+      <p className="mt-2 text-sm leading-6 text-surface-600 dark:text-surface-300">
+        {description}
+      </p>
+      {children ? <div className="mt-4">{children}</div> : null}
+    </article>
+  );
+}
+
+function ContentInventory({ analytics }: { analytics: DashboardAnalytics }) {
+  const items = [
+    { label: "جامعات", value: analytics.universitiesTotal },
+    { label: "تخصصات", value: analytics.majorsTotal },
+    { label: "مواد", value: analytics.coursesTotal },
+  ];
+
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="rounded-2xl bg-surface-50 px-3 py-2 dark:bg-surface-950/70"
+        >
+          <p
+            className={`${firaCode.className} text-lg font-bold text-surface-900 dark:text-surface-50`}
+          >
+            {formatNumber(item.value)}
+          </p>
+          <p className="mt-0.5 text-[11px] text-surface-500 dark:text-surface-400">
+            {item.label}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TopPageList({
+  pages,
+  totalViews,
+}: {
+  pages: TopPage[];
+  totalViews: number;
+}) {
+  if (pages.length === 0) {
+    return (
+      <EmptyState
+        title="لا توجد صفحات متصدرة بعد"
+        description="عند وصول أول الزيارات التفصيلية سيظهر هنا المحتوى الذي يحتاج تحسينًا أو إبرازًا أكثر."
+      />
+    );
+  }
+
+  const maxViews = pages[0]?.pageViews ?? 1;
+
+  return (
+    <div className="space-y-3">
+      {pages.map((page, index) => {
+        const share = getPercent(page.pageViews, totalViews);
+        const widthPercent = getPercent(page.pageViews, maxViews);
+
+        return (
+          <div
+            key={page.pathname}
+            className="rounded-3xl border border-surface-200 bg-surface-50/70 p-4 dark:border-surface-700 dark:bg-surface-950/60"
+          >
+            <div className="mb-3 flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold text-primary-700 dark:text-primary-300">
+                    #{formatNumber(index + 1)}
+                  </span>
+                  <p className="truncate text-sm font-bold text-surface-900 dark:text-surface-50">
+                    {page.label}
+                  </p>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] text-surface-600 ring-1 ring-surface-200 dark:bg-surface-900 dark:text-surface-300 dark:ring-surface-700">
+                    {page.pageTypeLabel}
+                  </span>
+                </div>
+                <p className="mt-1 truncate text-xs text-surface-500 dark:text-surface-400">
+                  {page.pathname}
+                </p>
+              </div>
+              <div className="shrink-0 text-left">
+                <p
+                  className={`${firaCode.className} text-sm font-bold text-surface-900 dark:text-surface-50`}
+                >
+                  {formatNumber(page.pageViews)}
+                </p>
+                <p className="text-xs text-surface-500 dark:text-surface-400">
+                  {formatPercent(share)} من الزيارات
+                </p>
+              </div>
+            </div>
+            <MeterBar percent={widthPercent} />
+            <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
+              {formatNumber(page.uniqueVisitors)} زائر فريد
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PageTypeList({
+  traffic,
+  totalViews,
+}: {
+  traffic: PageTypeTraffic[];
+  totalViews: number;
+}) {
+  if (traffic.length === 0) {
+    return (
+      <EmptyState
+        title="لا يوجد توزيع صفحات بعد"
+        description="سيظهر هذا القسم بعد وصول زيارات فعلية، لتعرف هل الحركة تتركز في المواد أم الجامعات أم الأدوات."
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {traffic.map((entry, index) => {
+        const share = getPercent(entry.pageViews, totalViews);
+
+        return (
+          <div
+            key={entry.pageType}
+            className="rounded-3xl border border-surface-200 bg-surface-50/70 p-4 dark:border-surface-700 dark:bg-surface-950/60"
+          >
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold text-surface-900 dark:text-surface-50">
+                  {entry.label}
+                </p>
+                <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                  {formatNumber(entry.uniqueVisitors)} زائر فريد
+                </p>
+              </div>
+              <div className="text-left">
+                <p
+                  className={`${firaCode.className} text-sm font-bold text-surface-900 dark:text-surface-50`}
+                >
+                  {formatPercent(share)}
+                </p>
+                <p className="text-xs text-surface-500 dark:text-surface-400">
+                  {formatNumber(entry.pageViews)} مشاهدة
+                </p>
+              </div>
+            </div>
+            <MeterBar
+              percent={share}
+              className={
+                index === 0
+                  ? "bg-primary-600 dark:bg-primary-400"
+                  : "bg-surface-500 dark:bg-surface-500"
+              }
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TransitionList({
+  transitions,
+  hasPageLevelData,
+}: {
+  transitions: TopTransition[];
+  hasPageLevelData: boolean;
+}) {
+  if (transitions.length === 0) {
+    return (
+      <EmptyState
+        title={
+          hasPageLevelData ? "لا توجد انتقالات كافية بعد" : "بانتظار أول مسارات تنقل"
+        }
+        description="عند تنقل الطلاب بين الصفحات العامة سيظهر هنا المسار الأكثر تكرارًا بوضوح."
+      />
+    );
+  }
+
+  const maxCount = transitions[0]?.count ?? 1;
+
+  return (
+    <div className="space-y-3">
+      {transitions.map((transition, index) => {
+        const widthPercent = getPercent(transition.count, maxCount);
+
+        return (
+          <div
+            key={`${transition.fromPathname}-${transition.toPathname}`}
+            className="rounded-3xl border border-surface-200 bg-surface-50/70 p-4 dark:border-surface-700 dark:bg-surface-950/60"
+          >
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+                  <div className="min-w-0 rounded-2xl bg-white px-3 py-2 dark:bg-surface-900">
+                    <p className="text-[11px] text-surface-500 dark:text-surface-400">
+                      من
+                    </p>
+                    <p className="mt-0.5 truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
+                      {transition.fromLabel}
+                    </p>
+                  </div>
+                  <span className="hidden text-xs font-semibold text-surface-400 sm:block">
+                    إلى
+                  </span>
+                  <div className="min-w-0 rounded-2xl bg-white px-3 py-2 dark:bg-surface-900">
+                    <p className="text-[11px] text-surface-500 dark:text-surface-400">
+                      إلى
+                    </p>
+                    <p className="mt-0.5 truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
+                      {transition.toLabel}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-2 truncate text-xs text-surface-500 dark:text-surface-400">
+                  {transition.fromPathname} / {transition.toPathname}
+                </p>
+              </div>
+              <div className="shrink-0 text-left">
+                <p
+                  className={`${firaCode.className} text-sm font-bold text-surface-900 dark:text-surface-50`}
+                >
+                  {formatNumber(transition.count)}
+                </p>
+                <p className="text-xs text-surface-500 dark:text-surface-400">
+                  انتقال
+                </p>
+              </div>
+            </div>
+            <MeterBar
+              percent={widthPercent}
+              className={
+                index === 0
+                  ? "bg-emerald-600 dark:bg-emerald-400"
+                  : "bg-surface-500 dark:bg-surface-500"
+              }
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TrafficChart({ series }: { series: PageViewSeriesPoint[] }) {
+  return (
+    <div className="h-[300px] w-full lg:h-[340px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart
+          data={series}
+          margin={{ top: 10, right: 6, left: 0, bottom: 0 }}
+        >
+          <CartesianGrid
+            strokeDasharray="4 4"
+            stroke="rgba(148, 163, 184, 0.22)"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="label"
+            tick={{ fill: "currentColor", fontSize: 11 }}
+            tickLine={false}
+            axisLine={false}
+            minTickGap={18}
+          />
+          <YAxis
+            tick={{ fill: "currentColor", fontSize: 11 }}
+            tickLine={false}
+            axisLine={false}
+            width={36}
+          />
+          <Tooltip
+            cursor={{ fill: "rgba(15, 23, 42, 0.04)" }}
+            contentStyle={{
+              borderRadius: 18,
+              border: "1px solid rgba(148,163,184,0.25)",
+              boxShadow: "0 18px 40px -28px rgba(15,23,42,0.45)",
+            }}
+            formatter={(value, name) => [
+              formatNumber(Number(value ?? 0)),
+              formatTooltipLabel(String(name)),
+            ]}
+          />
+          <Bar
+            dataKey="pageViews"
+            fill="#2563eb"
+            radius={[10, 10, 0, 0]}
+            barSize={16}
+            name="pageViews"
+          />
+          <Line
+            type="monotone"
+            dataKey="uniqueVisitors"
+            stroke="#059669"
+            strokeWidth={3}
+            dot={false}
+            activeDot={{ r: 5 }}
+            name="uniqueVisitors"
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function TrafficLegend() {
+  return (
+    <div className="flex flex-wrap gap-3 text-xs text-surface-500 dark:text-surface-400">
+      <span className="inline-flex items-center gap-2">
+        <span className="size-2.5 rounded-full bg-primary-600" />
+        مشاهدات الصفحات
+      </span>
+      <span className="inline-flex items-center gap-2">
+        <span className="size-2.5 rounded-full bg-emerald-600" />
+        الزوار الفريدون
+      </span>
+    </div>
   );
 }
 
@@ -252,20 +604,20 @@ export function AdminDashboardOverview({
   if (analytics === undefined) {
     return (
       <div className="space-y-6">
-        <div className="grid gap-4 xl:grid-cols-5">
-          {KPI_CARDS.map((card) => (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {SUMMARY_SKELETONS.map((item) => (
             <Skeleton
-              key={card.key}
-              className="h-28 rounded-3xl border border-surface-200 dark:border-surface-700"
+              key={item}
+              className="h-40 rounded-[28px] border border-surface-200 dark:border-surface-700"
             />
           ))}
         </div>
-        <Skeleton className="h-[440px] rounded-[28px] border border-surface-200 dark:border-surface-700" />
-        <div className="grid gap-6 xl:grid-cols-2">
-          <Skeleton className="h-[360px] rounded-[28px] border border-surface-200 dark:border-surface-700" />
-          <Skeleton className="h-[360px] rounded-[28px] border border-surface-200 dark:border-surface-700" />
+        <Skeleton className="h-[460px] rounded-[30px] border border-surface-200 dark:border-surface-700" />
+        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <Skeleton className="h-[520px] rounded-[30px] border border-surface-200 dark:border-surface-700" />
+          <Skeleton className="h-[520px] rounded-[30px] border border-surface-200 dark:border-surface-700" />
         </div>
-        <Skeleton className="h-[320px] rounded-[28px] border border-surface-200 dark:border-surface-700" />
+        <Skeleton className="h-[360px] rounded-[30px] border border-surface-200 dark:border-surface-700" />
       </div>
     );
   }
@@ -285,346 +637,158 @@ export function AdminDashboardOverview({
     { dateKey: "", label: "", pageViews: 0, uniqueVisitors: 0 },
   );
   const topPage = analytics.topPages[0];
+  const topPageType = analytics.trafficByPageType[0];
+  const dailyVisitorTotal = series.reduce(
+    (total, point) => total + point.uniqueVisitors,
+    0,
+  );
+  const viewsPerVisitor =
+    dailyVisitorTotal > 0
+      ? analytics.pageViewsTotal / dailyVisitorTotal
+      : 0;
+  const topPageShare = topPage
+    ? getPercent(topPage.pageViews, analytics.pageViewsTotal)
+    : 0;
+  const topPageTypeShare = topPageType
+    ? getPercent(topPageType.pageViews, analytics.pageViewsTotal)
+    : 0;
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 xl:grid-cols-5">
-        {KPI_CARDS.map((card, index) => (
-          <motion.article
-            key={card.key}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28, delay: 0.05 + index * 0.04 }}
-            className="overflow-hidden rounded-[26px] border border-surface-200 bg-white p-4 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+      <div className="grid gap-4 lg:grid-cols-3">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, delay: 0.05 }}
+        >
+          <SummaryCard
+            label="حجم المحتوى"
+            value={formatNumber(analytics.coursesTotal)}
+            description="عدد المواد هو المؤشر الأسرع لحجم الدليل الأكاديمي المتاح للطلاب."
           >
-            <span
-              className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${card.accentClass}`}
-            >
-              {card.label}
-            </span>
-            <p
-              className={`${firaCode.className} mt-4 text-3xl font-bold text-surface-900 dark:text-surface-50`}
-            >
-              {formatNumber(analytics[card.key])}
-            </p>
-            <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
-              {card.hint}
-            </p>
-          </motion.article>
-        ))}
+            <ContentInventory analytics={analytics} />
+          </SummaryCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, delay: 0.1 }}
+        >
+          <SummaryCard
+            label="نشاط آخر 30 يومًا"
+            value={formatNumber(analytics.pageViewsTotal)}
+            description={`${formatNumber(
+              dailyVisitorTotal,
+            )} زيارة فريدة يومية، بمتوسط ${formatDecimal(
+              viewsPerVisitor,
+            )} مشاهدة لكل زيارة.`}
+            featured
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, delay: 0.15 }}
+        >
+          <SummaryCard
+            label="أوضح إشارة الآن"
+            value={topPage ? formatPercent(topPageShare) : "0%"}
+            description={
+              topPage
+                ? `${shortenLabel(topPage.label, 38)} تستحوذ على هذه النسبة من المشاهدات.`
+                : "بانتظار بيانات صفحات كافية لتحديد المحتوى الأبرز."
+            }
+          />
+        </motion.div>
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.32, delay: 0.18 }}
+        transition={{ duration: 0.32, delay: 0.2 }}
       >
         <SectionFrame
-          title="حركة الزوار ومشاهدات الصفحات"
-          description="المخطط يجمع بين مشاهدات الصفحات والزوار الفريدين يوميًا، حتى تعرف إن كانت الزيادة ناتجة عن اتساع الوصول أو عن عمق التصفح."
+          eyebrow="حركة الزيارات"
+          title="هل الحركة تنمو أم تتذبذب؟"
+          description="اقرأ الأعمدة كحجم مشاهدة، والخط كعدد طلاب مختلفين. الفرق بينهما يوضح عمق التصفح."
         >
-          <div className="mb-5 grid gap-3 lg:grid-cols-3">
-            <div className="rounded-2xl border border-surface-200 bg-surface-50/80 p-4 dark:border-surface-700 dark:bg-surface-950/60">
-              <p className="text-xs text-surface-500 dark:text-surface-400">
-                متوسط المشاهدات اليومي
-              </p>
-              <p
-                className={`${firaCode.className} mt-2 text-2xl font-bold text-surface-900 dark:text-surface-50`}
-              >
-                {averageDailyViews}
-              </p>
+          <div className="grid gap-6 lg:grid-cols-[0.85fr_1.35fr] lg:items-center">
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+              <div className="rounded-3xl bg-surface-50 p-4 dark:bg-surface-950/60">
+                <SmallMetric
+                  label="متوسط المشاهدات اليومي"
+                  value={averageDailyViews}
+                  hint={`${formatNumber(totalTrackedDays)} يومًا متتبعًا`}
+                />
+              </div>
+              <div className="rounded-3xl bg-surface-50 p-4 dark:bg-surface-950/60">
+                <SmallMetric
+                  label="أعلى يوم مشاهدة"
+                  value={formatNumber(peakTrafficDay.pageViews)}
+                  hint={peakTrafficDay.label || "لا توجد بيانات بعد"}
+                />
+              </div>
+              <div className="rounded-3xl bg-surface-50 p-4 dark:bg-surface-950/60">
+                <SmallMetric
+                  label="المشاهدات لكل زيارة فريدة"
+                  value={formatDecimal(viewsPerVisitor)}
+                  hint="كلما ارتفع الرقم زاد تنقل الطالب داخل الموقع"
+                />
+              </div>
             </div>
-            <div className="rounded-2xl border border-surface-200 bg-surface-50/80 p-4 dark:border-surface-700 dark:bg-surface-950/60">
-              <p className="text-xs text-surface-500 dark:text-surface-400">
-                أعلى يوم مشاهدة
-              </p>
-              <p
-                className={`${firaCode.className} mt-2 text-2xl font-bold text-surface-900 dark:text-surface-50`}
-              >
-                {formatNumber(peakTrafficDay.pageViews)}
-              </p>
-              <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                {peakTrafficDay.label || "لا توجد بيانات بعد"}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-surface-200 bg-surface-50/80 p-4 dark:border-surface-700 dark:bg-surface-950/60">
-              <p className="text-xs text-surface-500 dark:text-surface-400">
-                الصفحة الأبرز
-              </p>
-              <p className="mt-2 text-base font-semibold text-surface-900 dark:text-surface-50">
-                {topPage?.label ?? "بانتظار أول بيانات تفصيلية"}
-              </p>
-              <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                {topPage
-                  ? `${formatNumber(topPage.pageViews)} مشاهدة`
-                  : "سيظهر هنا أكثر محتوى تتم زيارته"}
-              </p>
+            <div>
+              <TrafficChart series={series} />
+              <div className="mt-4 flex items-center justify-between gap-4">
+                <TrafficLegend />
+                <p className="hidden text-xs text-surface-500 dark:text-surface-400 sm:block">
+                  آخر {formatNumber(totalTrackedDays)} يومًا
+                </p>
+              </div>
             </div>
           </div>
-
-          <div className="h-[320px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart
-                data={series}
-                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="4 4"
-                  stroke="rgba(148, 163, 184, 0.22)"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="label"
-                  tick={{ fill: "currentColor", fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                  minTickGap={18}
-                />
-                <YAxis
-                  tick={{ fill: "currentColor", fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                  width={36}
-                />
-                <Tooltip
-                  cursor={{ fill: "rgba(15, 23, 42, 0.04)" }}
-                  contentStyle={{
-                    borderRadius: 18,
-                    border: "1px solid rgba(148,163,184,0.25)",
-                    boxShadow: "0 18px 40px -28px rgba(15,23,42,0.45)",
-                  }}
-                  formatter={(value, name) => [
-                    formatNumber(Number(value ?? 0)),
-                    formatTooltipLabel(String(name)),
-                  ]}
-                />
-                <Bar
-                  dataKey="pageViews"
-                  fill="#93c5fd"
-                  radius={[10, 10, 0, 0]}
-                  barSize={18}
-                  name="pageViews"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="uniqueVisitors"
-                  stroke="#0f766e"
-                  strokeWidth={3}
-                  dot={false}
-                  activeDot={{ r: 5 }}
-                  name="uniqueVisitors"
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="mt-4 text-xs text-surface-500 dark:text-surface-400">
-            إذا كانت أعمدة المشاهدات أعلى بكثير من خط الزوار، فهذا يعني أن
-            الزائر الواحد يتنقل بين أكثر من صفحة في الجلسة نفسها.
-          </p>
         </SectionFrame>
       </motion.div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.32, delay: 0.24 }}
+          transition={{ duration: 0.32, delay: 0.26 }}
         >
           <SectionFrame
-            title="الصفحات الأكثر مشاهدة"
-            description="ترتيب مباشر للصفحات العامة التي تستحوذ على الاهتمام الآن، مع عدد الزوار الفريدين لكل صفحة."
+            eyebrow="اهتمام الطلاب"
+            title="أكثر الصفحات فائدة للمراقبة"
+            description="هذه القائمة تكشف أين يذهب الطلاب فعليًا، مع حصة كل صفحة من إجمالي المشاهدات."
           >
-            {analytics.topPages.length > 0 ? (
-              <>
-                <div className="h-[320px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={analytics.topPages.map((item) => ({
-                        ...item,
-                        shortLabel: shortenLabel(item.label),
-                      }))}
-                      layout="vertical"
-                      margin={{ top: 8, right: 8, left: 24, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="4 4"
-                        stroke="rgba(148, 163, 184, 0.18)"
-                        horizontal={false}
-                      />
-                      <XAxis type="number" tickLine={false} axisLine={false} />
-                      <YAxis
-                        type="category"
-                        dataKey="shortLabel"
-                        tickLine={false}
-                        axisLine={false}
-                        width={122}
-                        tick={{ fill: "currentColor", fontSize: 12 }}
-                      />
-                      <Tooltip
-                        cursor={{ fill: "rgba(15, 23, 42, 0.04)" }}
-                        contentStyle={{
-                          borderRadius: 18,
-                          border: "1px solid rgba(148,163,184,0.25)",
-                          boxShadow: "0 18px 40px -28px rgba(15,23,42,0.45)",
-                        }}
-                        labelFormatter={(_, payload) =>
-                          payload?.[0]?.payload?.label ?? ""
-                        }
-                        formatter={(value, name) => [
-                          formatNumber(Number(value ?? 0)),
-                          name === "uniqueVisitors"
-                            ? "الزوار الفريدون"
-                            : "المشاهدات",
-                        ]}
-                      />
-                      <Bar
-                        dataKey="pageViews"
-                        fill="#2563eb"
-                        radius={[0, 12, 12, 0]}
-                        barSize={18}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-4 space-y-3">
-                  {analytics.topPages.map((page) => (
-                    <div
-                      key={page.pathname}
-                      className="flex items-center justify-between gap-4 rounded-2xl border border-surface-200 bg-surface-50/80 px-4 py-3 dark:border-surface-700 dark:bg-surface-950/60"
-                    >
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
-                            {page.label}
-                          </p>
-                          <span className="rounded-full bg-surface-200 px-2 py-0.5 text-[11px] text-surface-600 dark:bg-surface-800 dark:text-surface-300">
-                            {page.pageTypeLabel}
-                          </span>
-                        </div>
-                        <p className="mt-1 truncate text-xs text-surface-500 dark:text-surface-400">
-                          {page.pathname}
-                        </p>
-                      </div>
-                      <div className="text-left">
-                        <p
-                          className={`${firaCode.className} text-sm font-semibold text-surface-900 dark:text-surface-50`}
-                        >
-                          {formatNumber(page.pageViews)}
-                        </p>
-                        <p className="text-xs text-surface-500 dark:text-surface-400">
-                          {formatNumber(page.uniqueVisitors)} زائر
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <EmptyState
-                title="لا توجد صفحات متصدرة بعد"
-                description="سيظهر هذا القسم بعد وصول أول مشاهدات مسجلة بنظام التتبع الجديد، وسيساعدك على معرفة أي صفحات يجب تحسينها أو إبرازها أكثر."
-              />
-            )}
+            <TopPageList
+              pages={analytics.topPages}
+              totalViews={analytics.pageViewsTotal}
+            />
           </SectionFrame>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.32, delay: 0.3 }}
+          transition={{ duration: 0.32, delay: 0.32 }}
         >
           <SectionFrame
-            title="توزيع الحركة حسب نوع الصفحة"
-            description="هذا الرسم يوضح أين تتركز الحركة: على صفحات المواد، التخصصات، الجامعات، أو الأدوات العامة."
+            eyebrow="توزيع الحركة"
+            title="أي نوع صفحات يجذب الزيارات؟"
+            description={
+              topPageType
+                ? `${topPageType.label} يستحوذ على ${formatPercent(
+                    topPageTypeShare,
+                  )} من الحركة الحالية.`
+                : "سيظهر توزيع الأنواع بعد وصول بيانات صفحات كافية."
+            }
           >
-            {analytics.trafficByPageType.length > 0 ? (
-              <>
-                <div className="h-[320px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={analytics.trafficByPageType}
-                      layout="vertical"
-                      margin={{ top: 8, right: 8, left: 12, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="4 4"
-                        stroke="rgba(148, 163, 184, 0.18)"
-                        horizontal={false}
-                      />
-                      <XAxis type="number" tickLine={false} axisLine={false} />
-                      <YAxis
-                        type="category"
-                        dataKey="label"
-                        tickLine={false}
-                        axisLine={false}
-                        width={78}
-                        tick={{ fill: "currentColor", fontSize: 12 }}
-                      />
-                      <Tooltip
-                        cursor={{ fill: "rgba(15, 23, 42, 0.04)" }}
-                        contentStyle={{
-                          borderRadius: 18,
-                          border: "1px solid rgba(148,163,184,0.25)",
-                          boxShadow: "0 18px 40px -28px rgba(15,23,42,0.45)",
-                        }}
-                        formatter={(value, name) => [
-                          formatNumber(Number(value ?? 0)),
-                          name === "uniqueVisitors" ? "زوار فريدون" : "مشاهدات",
-                        ]}
-                      />
-                      <Bar
-                        dataKey="pageViews"
-                        radius={[0, 12, 12, 0]}
-                        barSize={18}
-                      >
-                        {analytics.trafficByPageType.map((entry, index) => (
-                          <Cell
-                            key={entry.pageType}
-                            fill={
-                              PAGE_TYPE_COLORS[index % PAGE_TYPE_COLORS.length]
-                            }
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {analytics.trafficByPageType.map((entry, index) => (
-                    <div
-                      key={entry.pageType}
-                      className="rounded-2xl border border-surface-200 bg-surface-50/80 p-4 dark:border-surface-700 dark:bg-surface-950/60"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="h-3 w-3 rounded-full"
-                          style={{
-                            backgroundColor:
-                              PAGE_TYPE_COLORS[index % PAGE_TYPE_COLORS.length],
-                          }}
-                        />
-                        <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                          {entry.label}
-                        </p>
-                      </div>
-                      <p
-                        className={`${firaCode.className} mt-3 text-xl font-bold text-surface-900 dark:text-surface-50`}
-                      >
-                        {formatNumber(entry.pageViews)}
-                      </p>
-                      <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                        {formatNumber(entry.uniqueVisitors)} زائرًا فريدًا
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <EmptyState
-                title="لا يوجد توزيع صفحات بعد"
-                description="سيظهر هذا الرسم بعد وصول زيارات فعلية للصفحات العامة، وبعدها ستعرف فورًا إن كانت الحركة مركزة على المواد أم على صفحات التخصصات والجامعات."
-              />
-            )}
+            <PageTypeList
+              traffic={analytics.trafficByPageType}
+              totalViews={analytics.pageViewsTotal}
+            />
           </SectionFrame>
         </motion.div>
       </div>
@@ -632,81 +796,25 @@ export function AdminDashboardOverview({
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.32, delay: 0.36 }}
+        transition={{ duration: 0.32, delay: 0.38 }}
       >
         <SectionFrame
-          title="أكثر مسارات التنقل شيوعًا"
-          description="هذا القسم يبين الصفحة التي يأتي منها الزائر والصفحة التالية بعدها، حتى تفهم المسارات الطبيعية داخل الموقع وتعرف أين تضع الروابط أو الدعوات التالية."
+          eyebrow="مسارات التنقل"
+          title="كيف ينتقل الطلاب بين الصفحات؟"
+          description="استخدم هذه المسارات لمعرفة أين تحتاج روابط أو دعوات أو ترتيبًا أوضح داخل الصفحات العامة."
         >
-          {analytics.topTransitions.length > 0 ? (
-            <div className="space-y-4">
-              {analytics.topTransitions.map((transition, index) => {
-                const maxCount = analytics.topTransitions[0]?.count ?? 1;
-                const widthPercent = Math.max(
-                  12,
-                  Math.round((transition.count / maxCount) * 100),
-                );
-
-                return (
-                  <div
-                    key={`${transition.fromPathname}-${transition.toPathname}`}
-                    className="rounded-3xl border border-surface-200 bg-surface-50/80 p-4 dark:border-surface-700 dark:bg-surface-950/60"
-                  >
-                    <div className="mb-3 flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                          {buildTransitionLabel(transition)}
-                        </p>
-                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                          {transition.fromPathname}
-                          {" -> "}
-                          {transition.toPathname}
-                        </p>
-                      </div>
-                      <div className="text-left">
-                        <p
-                          className={`${firaCode.className} text-sm font-semibold text-surface-900 dark:text-surface-50`}
-                        >
-                          {formatNumber(transition.count)}
-                        </p>
-                        <p className="text-xs text-surface-500 dark:text-surface-400">
-                          انتقالات
-                        </p>
-                      </div>
-                    </div>
-                    <div className="h-2.5 overflow-hidden rounded-full bg-surface-200 dark:bg-surface-800">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-primary-600 to-emerald-500"
-                        style={{ width: `${widthPercent}%` }}
-                      />
-                    </div>
-                    <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
-                      الترتيب #{formatNumber(index + 1)} ضمن أكثر المسارات
-                      استخدامًا
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <EmptyState
-              title={
-                hasPageLevelData
-                  ? "لا توجد انتقالات كافية بعد"
-                  : "بانتظار أول مسارات تنقل"
-              }
-              description="عند بدء التنقل بين الصفحات العامة سيظهر هنا أكثر المسارات شيوعًا، مثل الانتقال من صفحة الجامعة إلى التخصص أو من التخصص إلى المادة."
-            />
-          )}
+          <TransitionList
+            transitions={analytics.topTransitions}
+            hasPageLevelData={hasPageLevelData}
+          />
         </SectionFrame>
       </motion.div>
 
       {!hasPageLevelData &&
       analytics.visitorSeries.some((point) => point.uniqueVisitors > 0) ? (
-        <div className="rounded-3xl border border-primary-200 bg-primary-50/70 px-4 py-3 text-sm text-primary-800 dark:border-primary-900/60 dark:bg-primary-950/30 dark:text-primary-200">
-          بيانات الزوار اليومية القديمة ما زالت ظاهرة، أما تفاصيل الصفحات الأكثر
-          مشاهدة ومسارات التنقل فستبدأ بالظهور مع الزيارات الجديدة بعد تفعيل
-          التتبع الأدق.
+        <div className="rounded-3xl border border-primary-200 bg-primary-50/70 px-4 py-3 text-sm leading-6 text-primary-800 dark:border-primary-900/60 dark:bg-primary-950/30 dark:text-primary-200">
+          بيانات الزوار اليومية القديمة ما زالت ظاهرة. تفاصيل الصفحات والمسارات
+          ستبدأ بالظهور مع الزيارات الجديدة بعد تفعيل التتبع الأدق.
         </div>
       ) : null}
     </div>

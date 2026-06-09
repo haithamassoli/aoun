@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "التقويم",
   description:
     "نظّم الامتحانات والمشاريع ومواعيد التسجيل في تقويم أكاديمي عربي محفوظ محلياً على جهازك.",
+  alternates: {
+    canonical: "/academic-planner",
+  },
 };
 
 export default function AcademicPlannerPage() {

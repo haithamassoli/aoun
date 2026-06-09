@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "الإعدادات",
   description:
     "صدّر واستورد بياناتك المحلية المحفوظة على هذا الجهاز، بما في ذلك السمة، سجل المعدل، والخطة الدراسية.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function SettingsPage() {

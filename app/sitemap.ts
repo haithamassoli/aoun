@@ -3,6 +3,15 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { SITE_URL } from "@/lib/site-url";
 
+const STATIC_PUBLIC_PATHS = [
+  "/",
+  "/courses",
+  "/gpa-calculator",
+  "/academic-planner",
+  "/focus",
+  "/partners",
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let urls: { path: string }[] = [];
   try {
@@ -12,20 +21,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     urls = [{ path: "/" }];
   }
 
-  return urls.map((entry) => {
-    const isHome = entry.path === "/";
-    const isNewsPage = entry.path.endsWith("/news");
-    const segmentCount = entry.path.split("/").filter(Boolean).length;
+  const entries = [...STATIC_PUBLIC_PATHS, ...urls.map((entry) => entry.path)];
+  const uniqueEntries = Array.from(new Set(entries));
+
+  return uniqueEntries.map((path) => {
+    const isHome = path === "/";
+    const isNewsPage = path.endsWith("/news");
+    const isToolPage = STATIC_PUBLIC_PATHS.includes(path);
+    const segmentCount = path.split("/").filter(Boolean).length;
 
     return {
-      url: `${SITE_URL}${entry.path}`,
-      lastModified: new Date(),
+      url: `${SITE_URL}${path}`,
       changeFrequency: isHome
         ? "daily"
         : isNewsPage
           ? "daily"
+          : isToolPage
+            ? "monthly"
           : "weekly",
-      priority: isHome ? 1 : segmentCount <= 2 ? 0.8 : 0.6,
+      priority: isHome ? 1 : path === "/courses" ? 0.9 : segmentCount <= 2 ? 0.8 : 0.6,
     };
   });
 }

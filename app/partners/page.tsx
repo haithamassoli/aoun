@@ -5,6 +5,9 @@ import * as motion from "motion/react-client";
 export const metadata: Metadata = {
   title: "الشركاء والداعمون",
   description: "الجهات الداعمة والشريكة لمنصة عون",
+  alternates: {
+    canonical: "/partners",
+  },
 };
 
 export default function PartnersPage() {

@@ -8,12 +8,14 @@ import * as motion from "motion/react-client";
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { UniversityQuickLinks } from "@/components/university-quick-links";
 import { CourseResourcesSection } from "@/components/course-resources-section";
+import { JsonLd } from "@/components/json-ld";
 import { decodeSlugParam } from "@/lib/slug";
+import { SITE_URL } from "@/lib/site-url";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
 import { socialPlatforms } from "@/lib/social-platforms";
 import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
-import type { CategoryValue } from "@/constant/resource-categories";
+import { CATEGORIES, type CategoryValue } from "@/constant/resource-categories";
 
 type Params = {
   universitySlug: string;
@@ -58,15 +60,19 @@ export async function generateMetadata({
     slug: normalizedCourseSlug,
   });
   if (!course || course.majorId !== major._id) return {};
-  const title = `${course.name} — ${major.name} — ${university.name}`;
+  const title = `${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} — ${major.name} — ${university.name}`;
   const description = `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}. ملخصات، امتحانات، وفيديوهات.`;
+  const canonicalPath = `/${university.slug}/${major.slug}/${course.slug}`;
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalPath,
+    },
     openGraph: {
       title: `${title} — عون`,
       description,
-      url: `/${university.slug}/${major.slug}/${course.slug}`,
+      url: canonicalPath,
       type: "article",
     },
   };
@@ -137,6 +143,9 @@ export default async function CoursePage({
     ? `${course.courseCode} · ${major.name} · ${university.name}`
     : `${major.name} · ${university.name}`;
   const courseHref = `/${canonicalUniversitySlug}/${canonicalMajorSlug}/${course.slug}`;
+  const categoryLabels = new Map(
+    CATEGORIES.map((category) => [category.value, category.label]),
+  );
   const courseBookmarkItem = {
     id: course._id,
     type: "course" as const,
@@ -156,6 +165,49 @@ export default async function CoursePage({
 
   return (
     <div>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Course",
+              "@id": `${SITE_URL}${courseHref}#course`,
+              name: course.name,
+              description: `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}.`,
+              url: `${SITE_URL}${courseHref}`,
+              inLanguage: "ar-JO",
+              ...(course.courseCode ? { courseCode: course.courseCode } : {}),
+              provider: {
+                "@type": "CollegeOrUniversity",
+                name: university.name,
+                url: `${SITE_URL}/${canonicalUniversitySlug}`,
+              },
+              about: {
+                "@type": "Thing",
+                name: major.name,
+              },
+            },
+            {
+              "@type": "ItemList",
+              "@id": `${SITE_URL}${courseHref}#resources`,
+              name: `مصادر مادة ${course.name}`,
+              numberOfItems: resourceCards.length,
+              itemListElement: resourceCards.map((resource, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                item: {
+                  "@type": "LearningResource",
+                  name: resource.title,
+                  learningResourceType:
+                    categoryLabels.get(resource.category) ?? "مصدر أكاديمي",
+                  url: `${SITE_URL}${courseHref}#resource-${resource._id}`,
+                  inLanguage: "ar-JO",
+                },
+              })),
+            },
+          ],
+        }}
+      />
       <MobilePageHeaderMenu title={course.name} subtitle={courseSummary}>
         <div className="public-elevated-surface rounded-[28px] p-4">
           <div className="flex items-start justify-between gap-4">

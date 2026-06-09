@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import * as motion from "motion/react-client";
 import { api } from "@/convex/_generated/api";
@@ -16,6 +16,7 @@ import {
 import { sanitizeRichText } from "@/lib/sanitize-rich-text";
 import { getOrCreateVisitorKey } from "@/lib/visitor-analytics";
 import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
+import { captureAnalyticsEvent } from "@/lib/analytics-events";
 
 const categoryConfig = {
   course_intro: { label: "التعريف بالمادة", icon: "🧭" },
@@ -157,18 +158,6 @@ function buildCategoryGroups(resources: CourseResource[]): CategoryGroup[] {
   });
 }
 
-function formatScore(score: number) {
-  return score > 0 ? `+${score}` : `${score}`;
-}
-
-function formatFeedbackCount(totalFeedback: number) {
-  if (totalFeedback === 0) {
-    return "بدون تقييمات";
-  }
-
-  return `${totalFeedback} تقييم`;
-}
-
 function buildRequestFieldErrors(
   issues: Array<{
     path: (string | number)[];
@@ -218,70 +207,6 @@ function getResourceRequestErrorMessage(error: unknown) {
   return "تعذر إرسال الطلب. حاول مرة أخرى.";
 }
 
-function VoteButton({
-  active,
-  disabled,
-  label,
-  onClick,
-  tone,
-}: {
-  active: boolean;
-  disabled: boolean;
-  label: string;
-  onClick: () => void;
-  tone: "positive" | "negative";
-}) {
-  const activeClassName =
-    tone === "positive"
-      ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-500/70 dark:bg-emerald-950/40 dark:text-emerald-300"
-      : "border-rose-500 bg-rose-50 text-rose-700 dark:border-rose-500/70 dark:bg-rose-950/40 dark:text-rose-300";
-
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      disabled={disabled}
-      onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-        active
-          ? activeClassName
-          : "border-surface-200 bg-white text-surface-600 hover:border-surface-300 hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300 dark:hover:border-surface-600 dark:hover:bg-surface-800"
-      }`}
-    >
-      {tone === "positive" ? (
-        <svg
-          className="h-3.5 w-3.5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M14 9V5a3 3 0 00-3-3l-1 4-3 4v10h10.76a2 2 0 001.95-1.55l1.2-6A2 2 0 0018.95 10H14zM7 22H4a2 2 0 01-2-2v-8a2 2 0 012-2h3"
-          />
-        </svg>
-      ) : (
-        <svg
-          className="h-3.5 w-3.5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M10 15v4a3 3 0 003 3l1-4 3-4V4H6.24a2 2 0 00-1.95 1.55l-1.2 6A2 2 0 005.05 14H10zM17 2h3a2 2 0 012 2v8a2 2 0 01-2 2h-3"
-          />
-        </svg>
-      )}
-      {label}
-    </button>
-  );
-}
-
 function ResourceCard({
   courseHref,
   courseName,
@@ -314,7 +239,10 @@ function ResourceCard({
   };
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-surface-200/80 bg-white transition-all hover:border-surface-300 hover:shadow-sm dark:border-surface-700/50 dark:bg-surface-900 dark:hover:border-surface-600">
+    <article
+      id={`resource-${resource._id}`}
+      className="group relative overflow-hidden rounded-xl border border-surface-200/80 bg-white transition-all hover:border-surface-300 hover:shadow-sm dark:border-surface-700/50 dark:bg-surface-900 dark:hover:border-surface-600"
+    >
       {/* Voting buttons - top left for RTL */}
       <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5">
         <BookmarkToggleButton
@@ -389,6 +317,15 @@ function ResourceCard({
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            captureAnalyticsEvent("resource_opened", {
+              courseHref,
+              courseName,
+              resourceId: resource._id,
+              resourceCategory: resource.category,
+              resourceType: resource.type,
+            });
+          }}
           className="block p-4 pl-28 transition-colors hover:bg-surface-50/50 dark:hover:bg-surface-800/50"
         >
           <div className="flex items-start gap-3">
@@ -495,7 +432,9 @@ export function CourseResourcesSection({
   const [activeCategory, setActiveCategory] = useState<
     "all" | ResourceCategory
   >("all");
-  const [visitorKey, setVisitorKey] = useState<string | null>(null);
+  const [visitorKey] = useState<string | null>(() =>
+    typeof window === "undefined" ? null : getOrCreateVisitorKey(),
+  );
   const [pendingResourceIds, setPendingResourceIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -516,10 +455,6 @@ export function CourseResourcesSection({
   );
   const setVote = useMutation(api.resources.setVote);
   const submitResourceRequest = useMutation(api.resourceRequests.submitPublic);
-
-  useEffect(() => {
-    setVisitorKey(getOrCreateVisitorKey());
-  }, []);
 
   const resolvedResources = liveResources
     ? liveResources.map(mapLiveResourceToCourseResource)
@@ -579,6 +514,12 @@ export function CourseResourcesSection({
         visitorKey,
         vote,
       });
+      captureAnalyticsEvent("resource_vote_submitted", {
+        courseHref,
+        courseName,
+        resourceId,
+        vote,
+      });
     } catch {
       toast.show("تعذر تحديث التقييم. حاول مرة أخرى.", "error");
     } finally {
@@ -628,6 +569,13 @@ export function CourseResourcesSection({
           result.data.kind === "resource_suggestion"
             ? result.data.suggestedUrl.trim() || undefined
             : undefined,
+      });
+      captureAnalyticsEvent("resource_request_submitted", {
+        courseHref,
+        courseName,
+        kind: result.data.kind,
+        category: result.data.category || null,
+        hasSuggestedUrl: Boolean(result.data.suggestedUrl.trim()),
       });
       toast.show("تم إرسال الطلب بنجاح", "success");
       resetRequestForm();

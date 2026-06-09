@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     url: "/",
     type: "website",
   },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default async function Home() {
@@ -112,7 +115,9 @@ export default async function Home() {
                 </svg>
               </span>
               <span>إجمالي الزوار</span>
-              <span className="tabular-nums font-semibold">{visitorsTotal}</span>
+              <span className="tabular-nums font-semibold">
+                {visitorsTotal}
+              </span>
             </motion.div>
           )}
         </div>

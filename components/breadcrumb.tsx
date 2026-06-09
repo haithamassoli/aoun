@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site-url";
+import { JsonLd } from "@/components/json-ld";
 
 interface BreadcrumbItem {
   label: string;
@@ -26,14 +27,7 @@ export function Breadcrumb({
 
   return (
     <>
-      {includeStructuredData ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-          }}
-        />
-      ) : null}
+      {includeStructuredData ? <JsonLd data={jsonLd} /> : null}
       <nav aria-label="مسار التنقل" className="mb-6">
         <ol className="flex flex-wrap items-center gap-1.5 text-sm text-surface-500 dark:text-surface-400">
           {items.map((item, index) => (

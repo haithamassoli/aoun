@@ -17,6 +17,7 @@ import { FocusAudioProvider } from "@/components/focus-audio-provider";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { StudyTimerProvider } from "@/components/study-timer-provider";
 import { BookmarksNavLink } from "@/components/bookmarks/bookmarks-nav-link";
+import { JsonLd } from "@/components/json-ld";
 import { thmanyahSans } from "@/fonts";
 import { SITE_URL } from "@/lib/site-url";
 import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
@@ -66,6 +67,34 @@ export const metadata: Metadata = {
   },
 };
 
+const siteStructuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "عون",
+      url: SITE_URL,
+      description:
+        "منصة مجانية تجمع الملخصات والامتحانات والمصادر الأكاديمية لطلاب الجامعات الأردنية",
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "عون",
+      alternateName: "Aoun Jo Study",
+      url: SITE_URL,
+      inLanguage: "ar-JO",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${SITE_URL}/courses?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -90,6 +119,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
+        <JsonLd data={siteStructuredData} />
         <PostHogProvider>
           <PWARegister />
           <PWAInstallBanner />

@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "حاسبة المعدل",
   description:
     "احسب معدلك الفصلي والتراكمي وخطط للفصل القادم باستخدام نماذج 4.0 الشائعة أو نظام JUST الرسمي على 4.2",
+  alternates: {
+    canonical: "/gpa-calculator",
+  },
 };
 
 export default function GpaCalculatorPage() {
