@@ -136,7 +136,7 @@ export default async function RootLayout({
                   >
                     <Link href="/" className="flex items-center gap-2">
                       <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                        عـون
+                        عــون
                       </span>
                     </Link>
                     {/* <
@@ -157,7 +157,7 @@ export default async function RootLayout({
                         href="/settings"
                         className="rounded-lg px-3 py-1.5 transition-colors hover:bg-surface-100 hover:text-primary-600 dark:hover:bg-surface-800 dark:hover:text-primary-400 sm:block"
                       >
-                        الإعدادات
+                        الإعــدادات
                       </Link>
                       <HeaderAuth />
                       <BookmarksNavLink />

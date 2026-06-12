@@ -214,15 +214,15 @@ export default async function MajorPage({
           <div className="space-y-3">
             <div className="grid gap-2 grid-cols-4">
               {majorSocialLinks.map((platform) => (
-                  <a
-                    key={platform.key}
-                    href={platform.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={platform.label}
-                    title={platform.label}
-                    className={`flex justify-center items-center grid-cols-4 gap-3 rounded-2xl border px-4 py-3 text-sm font-medium shadow-sm transition-all hover:-translate-y-0.5 ${platform.className}`}
-                  >
+                <a
+                  key={platform.key}
+                  href={platform.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={platform.label}
+                  title={platform.label}
+                  className={`flex justify-center items-center grid-cols-4 gap-3 rounded-2xl border px-4 py-3 text-sm font-medium shadow-sm transition-all hover:-translate-y-0.5 ${platform.className}`}
+                >
                   <svg
                     className="h-4 w-4 shrink-0"
                     fill="none"
@@ -318,7 +318,7 @@ export default async function MajorPage({
                     <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
                     <path d="M12 12V8" />
                   </svg>
-                  شجرة مسار التخصص
+                  شجرة مســار التخصص
                 </a>
               )}
               <Link
@@ -339,7 +339,7 @@ export default async function MajorPage({
                     d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
                   />
                 </svg>
-                الأخبار والمستجدات
+                الأخبــار والمستجدات
               </Link>
             </div>
             {majorSocialLinks.length > 0 && (

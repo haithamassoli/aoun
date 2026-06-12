@@ -66,9 +66,9 @@ export default async function Home() {
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl font-bold leading-tight tracking-[-0.04em] sm:text-5xl lg:text-6xl"
+            className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
           >
-            عـــون
+            عـــــون
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -76,8 +76,8 @@ export default async function Home() {
             transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
             className="mt-4 text-lg leading-relaxed text-primary-100 sm:text-xl"
           >
-            منصة مجانية تجمع الملخصات، الامتحانات، والمصادر الأكاديمية لطلاب
-            الجامعات الأردنية. كل شي بمكان واحد.
+            منصة مجانيـة تجمع الملخصـات، الامتحانـات، والمصـادر الأكاديمية لطلاب
+            الجامعـات الأردنية. كل شي بمكان واحـد.
           </motion.p>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -85,7 +85,7 @@ export default async function Home() {
             transition={{ duration: 0.6, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
             className="mt-2 text-base text-primary-200"
           >
-            اختر جامعتك وابدأ بتصفح المواد
+            اختر جامعتك وابدأ بتصفح المــواد
           </motion.p>
           {visitorsTotal !== null && (
             <motion.div
@@ -114,7 +114,7 @@ export default async function Home() {
                   />
                 </svg>
               </span>
-              <span>إجمالي الزوار</span>
+              <span>إجمالي الـزوار</span>
               <span className="tabular-nums font-semibold">
                 {visitorsTotal}
               </span>
@@ -130,13 +130,13 @@ export default async function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-8 flex items-center justify-between">
               <h2 className="public-section-title text-sm font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500">
-                شركاؤنا وداعمونا
+                شركاؤنــا وداعمــونا
               </h2>
               <Link
                 href="/partners"
                 className="text-sm text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
               >
-                عرض الكل
+                عرض الكــل
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
@@ -145,7 +145,7 @@ export default async function Home() {
                   <div className="public-elevated-surface public-interactive-card flex flex-col items-center gap-3 rounded-[1.6rem] p-2">
                     <div className="relative h-40 w-32">
                       <Image
-                        src={partner.logoUrl}
+                        src={partner.logoUrl || ""}
                         alt={partner.name}
                         fill
                         className="object-contain rounded-lg"
