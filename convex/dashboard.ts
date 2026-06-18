@@ -38,7 +38,10 @@ const courseWithResourceCount = v.object({
   slug: v.string(),
   credits: v.number(),
   courseCode: v.optional(v.string()),
+  semesterId: v.optional(v.id("semesters")),
   semester: v.optional(v.string()),
+  semesterName: v.optional(v.string()),
+  semesterOrder: v.optional(v.number()),
   order: v.number(),
   alias: v.optional(v.string()),
   resourceCount: v.number(),
@@ -448,10 +451,14 @@ export const getCoursesForMajor = query({
 
     return await Promise.all(
       courses.filter(isNotDeleted).map(async (course) => {
-        const resources = await ctx.db
-          .query("resources")
-          .withIndex("by_courseId", (q) => q.eq("courseId", course._id))
-          .collect();
+        const [resources, semester] = await Promise.all([
+          ctx.db
+            .query("resources")
+            .withIndex("by_courseId", (q) => q.eq("courseId", course._id))
+            .collect(),
+          course.semesterId ? ctx.db.get(course.semesterId) : null,
+        ]);
+        const activeSemester = semester && isNotDeleted(semester) ? semester : null;
         return {
           _id: course._id,
           _creationTime: course._creationTime,
@@ -460,7 +467,10 @@ export const getCoursesForMajor = query({
           slug: course.slug,
           credits: course.credits,
           courseCode: course.courseCode,
+          semesterId: activeSemester?._id,
           semester: course.semester,
+          semesterName: activeSemester?.name,
+          semesterOrder: activeSemester?.order,
           order: course.order,
           alias: course.alias,
           resourceCount: resources.filter(isNotDeleted).length,
@@ -889,7 +899,10 @@ export const adminListCourses = query({
       slug: v.string(),
       credits: v.number(),
       courseCode: v.optional(v.string()),
+      semesterId: v.optional(v.id("semesters")),
       semester: v.optional(v.string()),
+      semesterName: v.optional(v.string()),
+      semesterOrder: v.optional(v.number()),
       order: v.number(),
       alias: v.optional(v.string()),
       majorName: v.string(),
@@ -903,10 +916,14 @@ export const adminListCourses = query({
     const courses = (await ctx.db.query("courses").collect()).filter(isNotDeleted);
     const enriched = await Promise.all(
       courses.map(async (course) => {
-        const major = await ctx.db.get("majors", course.majorId);
+        const [major, semester] = await Promise.all([
+          ctx.db.get("majors", course.majorId),
+          course.semesterId ? ctx.db.get(course.semesterId) : null,
+        ]);
         const university = major
           ? await ctx.db.get("universities", major.universityId)
           : null;
+        const activeSemester = semester && isNotDeleted(semester) ? semester : null;
         return {
           _id: course._id,
           _creationTime: course._creationTime,
@@ -915,7 +932,10 @@ export const adminListCourses = query({
           slug: course.slug,
           credits: course.credits,
           courseCode: course.courseCode,
+          semesterId: activeSemester?._id,
           semester: course.semester,
+          semesterName: activeSemester?.name,
+          semesterOrder: activeSemester?.order,
           order: course.order,
           alias: course.alias,
           majorName: major?.name ?? "",
@@ -1003,7 +1023,10 @@ export const getCourseWithMajor = query({
       slug: v.string(),
       credits: v.number(),
       courseCode: v.optional(v.string()),
+      semesterId: v.optional(v.id("semesters")),
       semester: v.optional(v.string()),
+      semesterName: v.optional(v.string()),
+      semesterOrder: v.optional(v.number()),
       order: v.number(),
       alias: v.optional(v.string()),
       majorName: v.string(),
@@ -1016,7 +1039,11 @@ export const getCourseWithMajor = query({
     const course = await ctx.db.get("courses", courseId);
     if (!course || course.deletedAt !== undefined) return null;
 
-    const major = await ctx.db.get("majors", course.majorId);
+    const [major, semester] = await Promise.all([
+      ctx.db.get("majors", course.majorId),
+      course.semesterId ? ctx.db.get(course.semesterId) : null,
+    ]);
+    const activeSemester = semester && isNotDeleted(semester) ? semester : null;
     return {
       _id: course._id,
       _creationTime: course._creationTime,
@@ -1025,7 +1052,10 @@ export const getCourseWithMajor = query({
       slug: course.slug,
       credits: course.credits,
       courseCode: course.courseCode,
+      semesterId: activeSemester?._id,
       semester: course.semester,
+      semesterName: activeSemester?.name,
+      semesterOrder: activeSemester?.order,
       order: course.order,
       alias: course.alias,
       majorName: major?.name ?? "",

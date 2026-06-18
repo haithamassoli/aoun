@@ -91,12 +91,24 @@ export default defineSchema({
       filterFields: ["universityId", "deletedAt"],
     }),
 
+  semesters: defineTable({
+    majorId: v.id("majors"),
+    name: v.string(),
+    order: v.number(),
+    ...softDeleteFields,
+  })
+    .index("by_majorId", ["majorId"])
+    .index("by_majorId_order", ["majorId", "order"])
+    .index("by_majorId_name", ["majorId", "name"]),
+
   courses: defineTable({
     majorId: v.id("majors"),
     name: v.string(),
     slug: v.string(),
     credits: v.number(),
     courseCode: v.optional(v.string()),
+    semesterId: v.optional(v.id("semesters")),
+    // Legacy migration field. New code writes semesterId; remove after all deployments run the migration.
     semester: v.optional(v.string()),
     order: v.number(),
     alias: v.optional(v.string()),
@@ -106,6 +118,7 @@ export default defineSchema({
     .index("by_majorId", ["majorId"])
     .index("by_majorId_order", ["majorId", "order"])
     .index("by_majorId_slug", ["majorId", "slug"])
+    .index("by_semesterId", ["semesterId"])
     .index("by_slug", ["slug"])
     .searchIndex("search_token", {
       searchField: "searchToken",

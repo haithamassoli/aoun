@@ -209,6 +209,7 @@ export default function AdminMajorsPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => {
             resetForm();
             setShowForm(true);
@@ -560,7 +561,15 @@ export default function AdminMajorsPage() {
                 )}
 
                 <div className="flex items-center gap-2 border-t border-surface-100 pt-3 dark:border-surface-800">
+                  <Link
+                    href={`/dashboard/major/${major._id}`}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary-50 px-3 py-2 text-xs font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:bg-primary-950"
+                    aria-label={`إدارة فصول ومواد ${major.name}`}
+                  >
+                    الفصول والمواد
+                  </Link>
                   <button
+                    type="button"
                     onClick={() => handleEdit(major)}
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-surface-100 px-3 py-2 text-xs font-medium text-surface-700 transition-colors hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
                   >
@@ -580,9 +589,11 @@ export default function AdminMajorsPage() {
                     تعديل
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(major._id)}
                     disabled={deleting === major._id}
                     className="flex items-center justify-center rounded-lg bg-red-50 p-2 text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50 dark:bg-red-950/50 dark:text-red-400 dark:hover:bg-red-950"
+                    aria-label={`حذف ${major.name}`}
                   >
                     {deleting === major._id ? (
                       <svg
@@ -672,10 +683,32 @@ export default function AdminMajorsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
+                  <Link
+                    href={`/dashboard/major/${major._id}`}
+                    className="rounded-lg p-1.5 text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-primary-950 dark:hover:text-primary-300"
+                    title="الفصول والمواد"
+                    aria-label={`إدارة فصول ومواد ${major.name}`}
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </Link>
                   <button
+                    type="button"
                     onClick={() => handleEdit(major)}
                     className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
                     title="تعديل"
+                    aria-label={`تعديل ${major.name}`}
                   >
                     <svg
                       className="h-4 w-4"
@@ -692,10 +725,12 @@ export default function AdminMajorsPage() {
                     </svg>
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(major._id)}
                     disabled={deleting === major._id}
                     className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"
                     title="حذف"
+                    aria-label={`حذف ${major.name}`}
                   >
                     <svg
                       className="h-4 w-4"

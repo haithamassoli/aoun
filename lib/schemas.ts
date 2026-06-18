@@ -83,9 +83,14 @@ export const courseSchema = z.object({
   slug: z.string().min(1, "الرابط مطلوب"),
   credits: creditsStringField,
   courseCode: z.string(),
-  semester: z.string(),
+  semesterId: z.string(),
   order: z.string(),
   alias: z.string(),
+});
+
+export const semesterSchema = z.object({
+  name: z.string().min(1, "اسم الفصل مطلوب"),
+  order: z.string(),
 });
 
 export const resourceSchema = z
@@ -112,7 +117,7 @@ export const contributorCourseSchema = z.object({
   slug: z.string().min(1, "الرابط مطلوب"),
   credits: creditsStringField,
   courseCode: z.string(),
-  semester: z.string(),
+  semesterId: z.string(),
   order: z.string(),
   alias: z.string(),
 });

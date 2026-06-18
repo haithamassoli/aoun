@@ -1,11 +1,14 @@
 import { ConvexError, v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { isSameSlug, normalizeSlugLookup } from "../lib/slug";
 import { normalizeAlias } from "../lib/alias";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { assertCanEditCourse, assertCanEditMajor, authenticateUser, isNotDeleted, softDeleteFields } from "./helpers";
 import { buildCourseSearchToken, normalize } from "./searchUtils";
 import { normalizeCourseSemesterInput } from "../lib/course-semester";
+
+const semesterIdInput = v.optional(v.union(v.id("semesters"), v.null()));
 
 const courseDoc = v.object({
   _id: v.id("courses"),
@@ -15,7 +18,10 @@ const courseDoc = v.object({
   slug: v.string(),
   credits: v.number(),
   courseCode: v.optional(v.string()),
+  semesterId: v.optional(v.id("semesters")),
   semester: v.optional(v.string()),
+  semesterName: v.optional(v.string()),
+  semesterOrder: v.optional(v.number()),
   order: v.number(),
   alias: v.optional(v.string()),
   searchToken: v.optional(v.string()),
@@ -28,7 +34,10 @@ const globalCourseSearchResultDoc = v.object({
   name: v.string(),
   credits: v.number(),
   courseCode: v.optional(v.string()),
+  semesterId: v.optional(v.id("semesters")),
   semester: v.optional(v.string()),
+  semesterName: v.optional(v.string()),
+  semesterOrder: v.optional(v.number()),
   order: v.number(),
   majorName: v.string(),
   majorSlug: v.string(),
@@ -42,10 +51,70 @@ const courseInput = v.object({
   slug: v.string(),
   credits: v.number(),
   courseCode: v.optional(v.string()),
-  semester: v.optional(v.string()),
+  semesterId: semesterIdInput,
   order: v.number(),
   alias: v.optional(v.string()),
 });
+
+async function assertSemesterBelongsToMajor(
+  ctx: QueryCtx | MutationCtx,
+  majorId: Id<"majors">,
+  semesterId: Id<"semesters"> | null | undefined,
+) {
+  if (!semesterId) {
+    return;
+  }
+
+  const semester = await ctx.db.get(semesterId);
+  if (
+    !semester ||
+    semester.deletedAt !== undefined ||
+    semester.majorId !== majorId
+  ) {
+    throw new ConvexError({ code: "SEMESTER_NOT_FOUND" });
+  }
+}
+
+async function getSemesterDetails(
+  ctx: QueryCtx,
+  semesterId: Id<"semesters"> | undefined,
+) {
+  if (!semesterId) {
+    return {};
+  }
+
+  const semester = await ctx.db.get(semesterId);
+  if (!semester || semester.deletedAt !== undefined) {
+    return {};
+  }
+
+  return {
+    semesterId: semester._id,
+    semesterName: semester.name,
+    semesterOrder: semester.order,
+  };
+}
+
+async function enrichCourse(ctx: QueryCtx, course: Doc<"courses">) {
+  const semesterDetails = await getSemesterDetails(ctx, course.semesterId);
+
+  return {
+    _id: course._id,
+    _creationTime: course._creationTime,
+    majorId: course.majorId,
+    name: course.name,
+    slug: course.slug,
+    credits: course.credits,
+    courseCode: course.courseCode,
+    semester: normalizeCourseSemesterInput(
+      (course as { semester?: string }).semester,
+    ),
+    ...semesterDetails,
+    order: course.order,
+    alias: course.alias,
+    searchToken: course.searchToken,
+  };
+}
 
 function makeCourseInsert(args: {
   majorId: Id<"majors">;
@@ -53,7 +122,7 @@ function makeCourseInsert(args: {
   slug: string;
   credits: number;
   courseCode?: string;
-  semester?: string;
+  semesterId?: Id<"semesters"> | null;
   order: number;
   alias?: string;
 }) {
@@ -71,7 +140,7 @@ function makeCourseInsert(args: {
     slug: args.slug,
     credits: args.credits,
     courseCode: args.courseCode,
-    semester: normalizeCourseSemesterInput(args.semester),
+    semesterId: args.semesterId ?? undefined,
     order: args.order,
     alias,
     searchToken,
@@ -86,7 +155,7 @@ export const listByMajor = query({
       .query("courses")
       .withIndex("by_majorId_order", (q) => q.eq("majorId", args.majorId))
       .collect();
-    return all.filter(isNotDeleted);
+    return await Promise.all(all.filter(isNotDeleted).map((course) => enrichCourse(ctx, course)));
   },
 });
 
@@ -111,7 +180,9 @@ export const searchByMajor = query({
       )
       .collect();
 
-    return matches.filter(isNotDeleted);
+    return await Promise.all(
+      matches.filter(isNotDeleted).map((course) => enrichCourse(ctx, course)),
+    );
   },
 });
 
@@ -172,6 +243,19 @@ export const searchGlobalPublic = query({
           : [],
       ),
     );
+    const semesterIds = [
+      ...new Set(matches.flatMap((course) => (course.semesterId ? [course.semesterId] : []))),
+    ];
+    const semesterEntries = await Promise.all(
+      semesterIds.map(async (semesterId) => [semesterId, await ctx.db.get(semesterId)] as const),
+    );
+    const semesterMap = new Map(
+      semesterEntries.flatMap(([semesterId, semester]) =>
+        semester && isNotDeleted(semester)
+          ? [[semesterId, semester] as const]
+          : [],
+      ),
+    );
 
     return matches.flatMap((course) => {
       const major = majorMap.get(course.majorId);
@@ -195,6 +279,10 @@ export const searchGlobalPublic = query({
         return [];
       }
 
+      const semester = course.semesterId
+        ? semesterMap.get(course.semesterId)
+        : undefined;
+
       return [
         {
           _id: course._id,
@@ -203,7 +291,10 @@ export const searchGlobalPublic = query({
           name: course.name,
           credits: course.credits,
           courseCode: course.courseCode,
+          semesterId: semester?._id,
           semester: course.semester,
+          semesterName: semester?.name,
+          semesterOrder: semester?.order,
           order: course.order,
           majorName: major.name,
           majorSlug: major.slug,
@@ -226,14 +317,14 @@ export const getBySlug = query({
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .first();
     if (course && course.deletedAt === undefined) {
-      return course;
+      return await enrichCourse(ctx, course);
     }
 
     const courses = await ctx.db.query("courses").collect();
     const normalizedMatch = courses.find(
       (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
     );
-    return normalizedMatch ?? null;
+    return normalizedMatch ? await enrichCourse(ctx, normalizedMatch) : null;
   },
 });
 
@@ -253,7 +344,7 @@ export const getByMajorAndSlug = query({
       .collect();
     const course = results.find(isNotDeleted);
     if (course) {
-      return course;
+      return await enrichCourse(ctx, course);
     }
 
     const courses = await ctx.db
@@ -263,7 +354,7 @@ export const getByMajorAndSlug = query({
     const normalizedMatch = courses.find(
       (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
     );
-    return normalizedMatch ?? null;
+    return normalizedMatch ? await enrichCourse(ctx, normalizedMatch) : null;
   },
 });
 
@@ -275,7 +366,7 @@ export const add = mutation({
     slug: v.string(),
     credits: v.number(),
     courseCode: v.optional(v.string()),
-    semester: v.optional(v.string()),
+    semesterId: semesterIdInput,
     order: v.number(),
     alias: v.optional(v.string()),
   },
@@ -283,6 +374,7 @@ export const add = mutation({
   handler: async (ctx, args) => {
     const user = await authenticateUser(ctx, args.token);
     await assertCanEditMajor(ctx, user._id, args.majorId);
+    await assertSemesterBelongsToMajor(ctx, args.majorId, args.semesterId);
 
     // Uniqueness check ignoring soft-deleted rows
     const existing = await ctx.db
@@ -303,7 +395,7 @@ export const add = mutation({
         slug: args.slug,
         credits: args.credits,
         courseCode: args.courseCode,
-        semester: args.semester,
+        semesterId: args.semesterId,
         order: args.order,
         alias: args.alias,
       }),
@@ -346,6 +438,7 @@ export const bulkAddForMajor = internalMutation({
 
     const ids: Id<"courses">[] = [];
     for (const course of args.courses) {
+      await assertSemesterBelongsToMajor(ctx, args.majorId, course.semesterId);
       ids.push(
         await ctx.db.insert(
           "courses",
@@ -355,7 +448,7 @@ export const bulkAddForMajor = internalMutation({
             slug: course.slug,
             credits: course.credits,
             courseCode: course.courseCode,
-            semester: course.semester,
+            semesterId: course.semesterId,
             order: course.order,
             alias: course.alias,
           }),
@@ -375,7 +468,7 @@ export const update = mutation({
     slug: v.optional(v.string()),
     credits: v.optional(v.number()),
     courseCode: v.optional(v.string()),
-    semester: v.optional(v.string()),
+    semesterId: semesterIdInput,
     order: v.optional(v.number()),
     alias: v.optional(v.string()),
   },
@@ -422,8 +515,11 @@ export const update = mutation({
       courseCode: newCourseCode,
     });
 
+    if (args.semesterId !== undefined) {
+      await assertSemesterBelongsToMajor(ctx, current.majorId, args.semesterId);
+    }
+
     const courseId = args.courseId;
-    const semester = args.semester;
     const rawUpdates = {
       name: args.name,
       slug: args.slug,
@@ -435,13 +531,15 @@ export const update = mutation({
     const filtered: Record<string, unknown> = Object.fromEntries(
       Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
     );
-    if (semester !== undefined) {
-      filtered.semester = normalizeCourseSemesterInput(semester);
+    if (args.semesterId !== undefined) {
+      filtered.semesterId = args.semesterId ?? undefined;
+    }
+    if (typeof filtered.alias === "string") {
+      filtered.alias = normalizeAlias(filtered.alias) || undefined;
     }
 
     await ctx.db.patch("courses", courseId, {
       ...filtered,
-      alias: filtered.alias ? normalizeAlias(String(filtered.alias)) : filtered.alias,
       searchToken,
     });
 

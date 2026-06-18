@@ -119,7 +119,10 @@ type GlobalCourseSearchResult = {
   name: string;
   credits: number;
   courseCode?: string;
+  semesterId?: Id<"semesters">;
   semester?: string;
+  semesterName?: string;
+  semesterOrder?: number;
   order: number;
   majorName: string;
   majorSlug: string;
@@ -585,12 +588,16 @@ function GlobalCoursesSearchPageInner({
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
               {/* University Select */}
               <div className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900">
-                <label className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-400">
+                <label
+                  htmlFor="global-course-search-university"
+                  className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-400"
+                >
                   الجامعة
                 </label>
                 <form.Field name="universitySlug">
                   {(field) => (
                     <select
+                      id="global-course-search-university"
                       value={field.state.value}
                       onChange={(event) => {
                         field.handleChange(event.target.value);
@@ -611,12 +618,16 @@ function GlobalCoursesSearchPageInner({
 
               {/* Major Select */}
               <div className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900">
-                <label className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-400">
+                <label
+                  htmlFor="global-course-search-major"
+                  className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-400"
+                >
                   التخصص
                 </label>
                 <form.Field name="majorSlug">
                   {(field) => (
                     <select
+                      id="global-course-search-major"
                       value={
                         majors === undefined
                           ? field.state.value

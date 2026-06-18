@@ -1,10 +1,16 @@
-import { internalMutation } from "./_generated/server";
+import { internalMutation, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 import {
   buildUniversitySearchToken,
   buildMajorSearchToken,
   buildCourseSearchToken,
 } from "./searchUtils";
+import { assertAdmin, authenticateUser, isNotDeleted } from "./helpers";
+import {
+  formatCourseSemesterLabel,
+  normalizeCourseSemesterInput,
+} from "../lib/course-semester";
 
 /**
  * M1-T7: Migration/backfill script.
@@ -20,7 +26,34 @@ import {
  * 7. Run backfillResources
  * 8. Run backfillUsers
  * 9. Run backfillPermissions
+ * 10. Run migrateCourseSemesters after deploying the semesters table
  */
+
+const numericSemesterPattern = /^\d+$/;
+
+function normalizeLegacyCourseSemester(value: unknown) {
+  if (typeof value === "number") {
+    return String(value);
+  }
+
+  if (typeof value === "string") {
+    return normalizeCourseSemesterInput(value);
+  }
+
+  return undefined;
+}
+
+function migrationSemesterOrder(value: string, fallbackOrder: number) {
+  if (!numericSemesterPattern.test(value)) {
+    return fallbackOrder;
+  }
+
+  return Number.parseInt(value, 10);
+}
+
+function migrationSemesterKey(majorId: Id<"majors">, name: string) {
+  return `${majorId}:${name}`;
+}
 
 export const backfillUniversities = internalMutation({
   args: {},
@@ -161,6 +194,149 @@ export const backfillCourseSemesterStrings = internalMutation({
     }
 
     return count;
+  },
+});
+
+export const migrateCourseSemesters = mutation({
+  args: { token: v.string() },
+  returns: v.object({
+    createdSemesters: v.number(),
+    updatedCourses: v.number(),
+    clearedLegacySemesters: v.number(),
+    skippedCourses: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    const user = await authenticateUser(ctx, args.token);
+    await assertAdmin(ctx, user._id);
+
+    const [courses, semesters] = await Promise.all([
+      ctx.db.query("courses").collect(),
+      ctx.db.query("semesters").collect(),
+    ]);
+    const semesterIdsByKey = new Map<string, Id<"semesters">>();
+    for (const semester of semesters) {
+      if (!isNotDeleted(semester)) {
+        continue;
+      }
+      semesterIdsByKey.set(
+        migrationSemesterKey(semester.majorId, semester.name),
+        semester._id,
+      );
+    }
+
+    const semesterSpecsByKey = new Map<
+      string,
+      {
+        majorId: Id<"majors">;
+        legacyValue: string;
+        name: string;
+        order: number;
+        firstCreatedAt: number;
+      }
+    >();
+
+    for (const course of courses) {
+      const legacyValue = normalizeLegacyCourseSemester(
+        (course as { semester?: unknown }).semester,
+      );
+      if (!legacyValue) {
+        continue;
+      }
+
+      const name = formatCourseSemesterLabel(legacyValue) ?? legacyValue;
+      const key = migrationSemesterKey(course.majorId, name);
+      const order = migrationSemesterOrder(legacyValue, course.order);
+      const existing = semesterSpecsByKey.get(key);
+      if (!existing) {
+        semesterSpecsByKey.set(key, {
+          majorId: course.majorId,
+          legacyValue,
+          name,
+          order,
+          firstCreatedAt: course._creationTime,
+        });
+        continue;
+      }
+
+      existing.order = Math.min(existing.order, order);
+      existing.firstCreatedAt = Math.min(existing.firstCreatedAt, course._creationTime);
+    }
+
+    let createdSemesters = 0;
+    const semesterSpecs = Array.from(semesterSpecsByKey.entries()).toSorted(
+      ([, left], [, right]) => {
+        if (left.majorId !== right.majorId) {
+          return String(left.majorId).localeCompare(String(right.majorId));
+        }
+        if (left.order !== right.order) {
+          return left.order - right.order;
+        }
+        if (left.firstCreatedAt !== right.firstCreatedAt) {
+          return left.firstCreatedAt - right.firstCreatedAt;
+        }
+        return left.name.localeCompare(right.name, "ar");
+      },
+    );
+
+    for (const [key, spec] of semesterSpecs) {
+      if (semesterIdsByKey.has(key)) {
+        continue;
+      }
+
+      const semesterId = await ctx.db.insert("semesters", {
+        majorId: spec.majorId,
+        name: spec.name,
+        order: spec.order,
+      });
+      semesterIdsByKey.set(key, semesterId);
+      createdSemesters += 1;
+    }
+
+    let updatedCourses = 0;
+    let clearedLegacySemesters = 0;
+    let skippedCourses = 0;
+
+    for (const course of courses) {
+      const rawLegacySemester = (course as { semester?: unknown }).semester;
+      const legacyValue = normalizeLegacyCourseSemester(rawLegacySemester);
+      const currentSemesterId = (course as { semesterId?: Id<"semesters"> })
+        .semesterId;
+      const updates: {
+        semesterId?: Id<"semesters"> | undefined;
+        semester?: undefined;
+      } = {};
+
+      if (legacyValue) {
+        const name = formatCourseSemesterLabel(legacyValue) ?? legacyValue;
+        const semesterId = semesterIdsByKey.get(
+          migrationSemesterKey(course.majorId, name),
+        );
+        if (!semesterId) {
+          skippedCourses += 1;
+          continue;
+        }
+        if (currentSemesterId !== semesterId) {
+          updates.semesterId = semesterId;
+        }
+      }
+
+      if (rawLegacySemester !== undefined) {
+        updates.semester = undefined;
+        clearedLegacySemesters += 1;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await ctx.db.patch("courses", course._id, updates);
+        updatedCourses += 1;
+      }
+    }
+
+    return {
+      createdSemesters,
+      updatedCourses,
+      clearedLegacySemesters,
+      skippedCourses,
+    };
   },
 });
 

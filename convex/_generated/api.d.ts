@@ -26,6 +26,7 @@ import type * as resources from "../resources.js";
 import type * as searchUtils from "../searchUtils.js";
 import type * as seed from "../seed.js";
 import type * as seedJustEe from "../seedJustEe.js";
+import type * as semesters from "../semesters.js";
 import type * as sitemap from "../sitemap.js";
 import type * as universities from "../universities.js";
 
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   searchUtils: typeof searchUtils;
   seed: typeof seed;
   seedJustEe: typeof seedJustEe;
+  semesters: typeof semesters;
   sitemap: typeof sitemap;
   universities: typeof universities;
 }>;

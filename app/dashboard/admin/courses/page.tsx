@@ -19,6 +19,7 @@ import { formatCourseSemesterLabel } from "@/lib/course-semester";
 export default function AdminCoursesPage() {
   const { user, sessionToken } = useAuth();
   const toast = useToast();
+  const [selectedMajorId, setSelectedMajorId] = useState("");
 
   const courses = useQuery(
     api.dashboard.adminListCourses,
@@ -27,6 +28,10 @@ export default function AdminCoursesPage() {
   const majors = useQuery(
     api.dashboard.adminListMajors,
     user && sessionToken ? { token: sessionToken } : "skip",
+  );
+  const semesters = useQuery(
+    api.semesters.listByMajor,
+    selectedMajorId ? { majorId: selectedMajorId as Id<"majors"> } : "skip",
   );
 
   const addCourse = useMutation(api.courses.add);
@@ -44,7 +49,7 @@ export default function AdminCoursesPage() {
       slug: "",
       credits: "3",
       courseCode: "",
-      semester: "",
+      semesterId: "",
       order: "0",
       alias: "",
     },
@@ -60,7 +65,9 @@ export default function AdminCoursesPage() {
             slug: normalizeSlug(value.slug),
             credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester,
+            semesterId: value.semesterId
+              ? (value.semesterId as Id<"semesters">)
+              : null,
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
@@ -73,13 +80,16 @@ export default function AdminCoursesPage() {
             slug: normalizeSlug(value.slug),
             credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester,
+            semesterId: value.semesterId
+              ? (value.semesterId as Id<"semesters">)
+              : null,
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
           toast.show("تم إضافة المادة بنجاح", "success");
         }
         formApi.reset();
+        setSelectedMajorId("");
         setEditingId(null);
         setShowForm(false);
       } catch (error) {
@@ -96,6 +106,7 @@ export default function AdminCoursesPage() {
 
   const resetForm = () => {
     form.reset();
+    setSelectedMajorId("");
     setEditingId(null);
     setShowForm(false);
   };
@@ -107,10 +118,12 @@ export default function AdminCoursesPage() {
     slug: string;
     credits: number;
     courseCode?: string;
+    semesterId?: string;
     semester?: string;
     order: number;
     alias?: string;
   }) => {
+    setSelectedMajorId(course.majorId);
     form.reset(
       {
         majorId: course.majorId,
@@ -118,7 +131,7 @@ export default function AdminCoursesPage() {
         slug: course.slug,
         credits: course.credits.toString(),
         courseCode: course.courseCode ?? "",
-        semester: course.semester ?? "",
+        semesterId: course.semesterId ?? "",
         order: course.order.toString(),
         alias: normalizeAlias(course.alias ?? ""),
       },
@@ -148,6 +161,11 @@ export default function AdminCoursesPage() {
     majors?.map((m: { _id: Id<"majors">; name: string; universityName: string }) => ({
       value: m._id,
       label: `${m.name} — ${m.universityName}`,
+    })) ?? [];
+  const semesterOptions =
+    semesters?.map((semester) => ({
+      value: semester._id,
+      label: `${semester.name} — ترتيب ${semester.order}`,
     })) ?? [];
 
   return (
@@ -192,6 +210,7 @@ export default function AdminCoursesPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => {
             resetForm();
             setShowForm(true);
@@ -235,6 +254,10 @@ export default function AdminCoursesPage() {
               options={majorOptions}
               placeholder="اختر التخصص"
               disabled={!!editingId}
+              onChangeCallback={(value) => {
+                setSelectedMajorId(value);
+                form.setFieldValue("semesterId", "");
+              }}
             />
             <FormInput
               form={form}
@@ -271,11 +294,17 @@ export default function AdminCoursesPage() {
               min="1"
               step="1"
             />
-            <FormInput
+            <FormSelect
               form={form}
-              name="semester"
-              label="المستوى أو المسار"
-              placeholder="مثال: 1 أو القدرة أو الاتصالات"
+              name="semesterId"
+              label="الفصل أو المستوى"
+              options={semesterOptions}
+              placeholder={
+                selectedMajorId
+                  ? "بدون فصل"
+                  : "اختر التخصص أولاً"
+              }
+              disabled={!selectedMajorId}
             />
             <FormInput
               form={form}
@@ -341,12 +370,16 @@ export default function AdminCoursesPage() {
             credits: number;
             courseCode?: string;
             semester?: string;
+            semesterId?: string;
+            semesterName?: string;
+            semesterOrder?: number;
             order: number;
             alias?: string;
             majorName: string;
             universityName: string;
           }, index: number) => {
-            const semesterLabel = formatCourseSemesterLabel(course.semester);
+            const semesterLabel =
+              course.semesterName ?? formatCourseSemesterLabel(course.semester);
             return (
               <motion.div
                 key={course._id}
@@ -383,9 +416,11 @@ export default function AdminCoursesPage() {
                 </div>
                 <div className="flex items-center gap-1 ">
                   <button
+                    type="button"
                     onClick={() => handleEdit(course)}
                     className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
                     title="تعديل"
+                    aria-label={`تعديل ${course.name}`}
                   >
                     <svg
                       className="h-4 w-4"
@@ -402,10 +437,12 @@ export default function AdminCoursesPage() {
                     </svg>
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(course._id)}
                     disabled={deleting === course._id}
                     className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"
                     title="حذف"
+                    aria-label={`حذف ${course.name}`}
                   >
                     <svg
                     className="h-4 w-4"

@@ -3,7 +3,10 @@ import justEeCourses from "../seed-date/just-ee.json";
 import type { Id } from "./_generated/dataModel";
 import { internalMutation } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
-import { normalizeCourseSemesterInput } from "../lib/course-semester";
+import {
+  formatCourseSemesterLabel,
+  normalizeCourseSemesterInput,
+} from "../lib/course-semester";
 import {
   buildCourseSearchToken,
   buildMajorSearchToken,
@@ -67,6 +70,7 @@ type ActiveCourse = {
   alias?: string;
   order: number;
   courseCode?: string;
+  semesterId?: Id<"semesters">;
   semester?: string;
   searchToken?: string;
 };
@@ -146,6 +150,21 @@ function getSeedCourseSemester(item: SeedItem) {
   }
 
   return undefined;
+}
+
+function getSeedCourseSemesterName(semester: string | undefined) {
+  return semester ? formatCourseSemesterLabel(semester) ?? semester : undefined;
+}
+
+function getSeedCourseSemesterOrder(
+  semester: string | undefined,
+  fallbackOrder: number,
+) {
+  if (!semester || !/^\d+$/.test(semester)) {
+    return fallbackOrder;
+  }
+
+  return Number.parseInt(semester, 10);
 }
 
 function getSeedCourseSearchToken(
@@ -460,6 +479,35 @@ async function getOrCreateJustEeMajor(
   });
 }
 
+async function getOrCreateCourseSemester(
+  ctx: MutationCtx,
+  majorId: Id<"majors">,
+  semester: string | undefined,
+  fallbackOrder: number,
+) {
+  const name = getSeedCourseSemesterName(semester);
+  if (!name) {
+    return undefined;
+  }
+
+  const existing = await ctx.db
+    .query("semesters")
+    .withIndex("by_majorId_name", (q) =>
+      q.eq("majorId", majorId).eq("name", name),
+    )
+    .collect();
+  const active = existing.find(isActive);
+  if (active) {
+    return active._id;
+  }
+
+  return await ctx.db.insert("semesters", {
+    majorId,
+    name,
+    order: getSeedCourseSemesterOrder(semester, fallbackOrder),
+  });
+}
+
 export const seedFromJson = internalMutation({
   args: {},
   returns: v.object({
@@ -490,6 +538,7 @@ export const seedFromJson = internalMutation({
         alias: course.alias,
         order: course.order,
         courseCode: course.courseCode,
+        semesterId: course.semesterId,
         semester: course.semester,
         searchToken: course.searchToken,
       }));
@@ -504,6 +553,12 @@ export const seedFromJson = internalMutation({
       const order = getSeedCourseOrder(item, index + 1);
       const courseCode = getSeedCourseCode(item);
       const semester = getSeedCourseSemester(item);
+      const semesterId = await getOrCreateCourseSemester(
+        ctx,
+        majorId,
+        semester,
+        index + 1,
+      );
       const searchToken = getSeedCourseSearchToken(item, slug, courseCode);
 
       const matchingCourse = findMatchingCourse(existingCourses, item, slug);
@@ -517,7 +572,8 @@ export const seedFromJson = internalMutation({
           matchingCourse.slug !== slug ||
           matchingCourse.alias !== item.alias ||
           matchingCourse.courseCode !== courseCode ||
-          matchingCourse.semester !== semester ||
+          matchingCourse.semesterId !== semesterId ||
+          matchingCourse.semester !== undefined ||
           matchingCourse.order !== order ||
           matchingCourse.searchToken !== searchToken;
 
@@ -527,7 +583,8 @@ export const seedFromJson = internalMutation({
             slug,
             alias: item.alias,
             courseCode,
-            semester,
+            semesterId,
+            semester: undefined,
             order,
             searchToken,
           });
@@ -536,7 +593,8 @@ export const seedFromJson = internalMutation({
           matchingCourse.slug = slug;
           matchingCourse.alias = item.alias;
           matchingCourse.courseCode = courseCode;
-          matchingCourse.semester = semester;
+          matchingCourse.semesterId = semesterId;
+          matchingCourse.semester = undefined;
           matchingCourse.order = order;
           matchingCourse.searchToken = searchToken;
           updatedCourses += 1;
@@ -548,7 +606,8 @@ export const seedFromJson = internalMutation({
           slug,
           alias: item.alias,
           courseCode,
-          semester,
+          semesterId,
+          credits: 3,
           order,
           searchToken,
         });
@@ -560,7 +619,8 @@ export const seedFromJson = internalMutation({
           alias: item.alias,
           order,
           courseCode,
-          semester,
+          semesterId,
+          semester: undefined,
           searchToken,
         });
         createdCourses += 1;

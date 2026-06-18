@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyForm = any;
 
@@ -33,6 +35,8 @@ export function FormInput({
   step,
   onChangeCallback,
 }: FormInputProps) {
+  const inputId = useId();
+
   return (
     <form.Field name={name}>
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -41,10 +45,14 @@ export function FormInput({
           field.state.meta.isTouched && field.state.meta.errors.length > 0;
         return (
           <div>
-            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+            <label
+              htmlFor={inputId}
+              className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+            >
               {label}
             </label>
             <input
+              id={inputId}
               type={type}
               value={field.state.value}
               onChange={(e) => {
@@ -84,6 +92,7 @@ interface FormSelectProps {
   options: { value: string; label: string }[];
   placeholder?: string;
   disabled?: boolean;
+  onChangeCallback?: (value: string) => void;
 }
 
 export function FormSelect({
@@ -93,7 +102,10 @@ export function FormSelect({
   options,
   placeholder,
   disabled,
+  onChangeCallback,
 }: FormSelectProps) {
+  const selectId = useId();
+
   return (
     <form.Field name={name}>
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -102,12 +114,19 @@ export function FormSelect({
           field.state.meta.isTouched && field.state.meta.errors.length > 0;
         return (
           <div>
-            <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+            <label
+              htmlFor={selectId}
+              className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+            >
               {label}
             </label>
             <select
+              id={selectId}
               value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
+              onChange={(e) => {
+                field.handleChange(e.target.value);
+                onChangeCallback?.(e.target.value);
+              }}
               onBlur={field.handleBlur}
               disabled={disabled}
               className={`${inputCls}${hasError ? inputErrorCls : ""}`}

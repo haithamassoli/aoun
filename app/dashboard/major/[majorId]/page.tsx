@@ -10,10 +10,14 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Toast, useToast } from "@/components/toast";
-import { FormInput } from "@/components/form-field";
+import { FormInput, FormSelect } from "@/components/form-field";
 import { PublicSearchInput } from "@/components/public-search-input";
 import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
-import { contributorCourseSchema, contributorMajorSchema } from "@/lib/schemas";
+import {
+  contributorCourseSchema,
+  contributorMajorSchema,
+  semesterSchema,
+} from "@/lib/schemas";
 import { motion } from "motion/react";
 import { NewsList } from "@/components/dashboard/news-list";
 import { NewsForm } from "@/components/dashboard/news-form";
@@ -31,7 +35,10 @@ type CourseListItem = {
   slug: string;
   credits: number;
   courseCode?: string;
+  semesterId?: Id<"semesters">;
   semester?: string;
+  semesterName?: string;
+  semesterOrder?: number;
   order: number;
   resourceCount: number;
   alias?: string;
@@ -49,7 +56,12 @@ type OpenResourceRequest = {
   courseName: string;
 };
 
-type ActiveTab = "courses" | "news" | "requests" | "notifications";
+type ActiveTab =
+  | "courses"
+  | "semesters"
+  | "news"
+  | "requests"
+  | "notifications";
 
 const CATEGORY_LABELS: Record<CategoryValue, string> = Object.fromEntries(
   CATEGORIES.map((category) => [category.value, category.label]),
@@ -147,6 +159,9 @@ export default function MajorCoursesPage() {
       ? { token: sessionToken, majorId: majorIdValue }
       : "skip",
   );
+  const semesters = useQuery(api.semesters.listByMajor, {
+    majorId: majorIdValue,
+  });
   const searchedCourses = useQuery(
     api.courses.searchByMajor,
     search.isEmpty ? "skip" : { majorId: majorIdValue, query: search.query },
@@ -161,6 +176,9 @@ export default function MajorCoursesPage() {
 
   const addCourse = useMutation(api.courses.add);
   const updateCourse = useMutation(api.courses.update);
+  const addSemester = useMutation(api.semesters.add);
+  const updateSemester = useMutation(api.semesters.update);
+  const removeSemester = useMutation(api.semesters.remove);
   const removeNews = useMutation(api.news.remove);
   const markResourceRequestFulfilled = useMutation(
     api.resourceRequests.markFulfilled,
@@ -173,6 +191,15 @@ export default function MajorCoursesPage() {
   const [showForm, setShowForm] = useState(false);
   const [showMajorLinkForm, setShowMajorLinkForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showSemesterForm, setShowSemesterForm] = useState(false);
+  const [editingSemesterId, setEditingSemesterId] = useState<string | null>(
+    null,
+  );
+  const [deletingSemester, setDeletingSemester] = useState<string | null>(null);
+  const [pendingDeleteSemester, setPendingDeleteSemester] = useState<{
+    _id: Id<"semesters">;
+    name: string;
+  } | null>(null);
 
   // News state
   const [showNewsForm, setShowNewsForm] = useState(false);
@@ -202,7 +229,7 @@ export default function MajorCoursesPage() {
       slug: "",
       credits: "3",
       courseCode: "",
-      semester: "1",
+      semesterId: "",
       order: "0",
       alias: "",
     },
@@ -218,7 +245,9 @@ export default function MajorCoursesPage() {
             slug: normalizeSlug(value.slug),
             credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester,
+            semesterId: value.semesterId
+              ? (value.semesterId as Id<"semesters">)
+              : null,
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
@@ -231,7 +260,9 @@ export default function MajorCoursesPage() {
             slug: normalizeSlug(value.slug),
             credits: Number(value.credits),
             courseCode: value.courseCode.trim() || undefined,
-            semester: value.semester,
+            semesterId: value.semesterId
+              ? (value.semesterId as Id<"semesters">)
+              : null,
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
@@ -242,6 +273,47 @@ export default function MajorCoursesPage() {
         setShowForm(false);
       } catch {
         toast.show("حدث خطأ أثناء الحفظ", "error");
+      }
+    },
+  });
+
+  const semesterForm = useForm({
+    defaultValues: {
+      name: "",
+      order: "0",
+    },
+    validators: { onChange: semesterSchema },
+    onSubmit: async ({ value, formApi }) => {
+      if (!sessionToken) return;
+      try {
+        if (editingSemesterId) {
+          await updateSemester({
+            token: sessionToken,
+            semesterId: editingSemesterId as Id<"semesters">,
+            name: value.name.trim(),
+            order: Number(value.order) || 0,
+          });
+          toast.show("تم تحديث المستوى بنجاح", "success");
+        } else {
+          await addSemester({
+            token: sessionToken,
+            majorId: majorIdValue,
+            name: value.name.trim(),
+            order: Number(value.order) || 0,
+          });
+          toast.show("تم إضافة المستوى بنجاح", "success");
+        }
+
+        formApi.reset();
+        setEditingSemesterId(null);
+        setShowSemesterForm(false);
+      } catch (error) {
+        const msg =
+          error instanceof Error &&
+          error.message.includes("SEMESTER_NAME_EXISTS")
+            ? "اسم المستوى مستخدم بالفعل في هذا التخصص"
+            : "حدث خطأ أثناء حفظ المستوى";
+        toast.show(msg, "error");
       }
     },
   });
@@ -279,6 +351,12 @@ export default function MajorCoursesPage() {
     setShowForm(false);
   };
 
+  const resetSemesterForm = () => {
+    semesterForm.reset();
+    setEditingSemesterId(null);
+    setShowSemesterForm(false);
+  };
+
   const handleEdit = (course: CourseListItem) => {
     form.reset(
       {
@@ -286,7 +364,7 @@ export default function MajorCoursesPage() {
         slug: course.slug,
         credits: course.credits.toString(),
         courseCode: course.courseCode ?? "",
-        semester: course.semester ?? "",
+        semesterId: course.semesterId ?? "",
         order: course.order.toString(),
         alias: normalizeAlias(course.alias ?? ""),
       },
@@ -294,6 +372,22 @@ export default function MajorCoursesPage() {
     );
     setEditingId(course._id);
     setShowForm(true);
+  };
+
+  const handleSemesterEdit = (semester: {
+    _id: Id<"semesters">;
+    name: string;
+    order: number;
+  }) => {
+    semesterForm.reset(
+      {
+        name: semester.name,
+        order: semester.order.toString(),
+      },
+      { keepDefaultValues: true },
+    );
+    setEditingSemesterId(semester._id);
+    setShowSemesterForm(true);
   };
 
   const handleNewsEdit = (news: {
@@ -319,6 +413,24 @@ export default function MajorCoursesPage() {
     } finally {
       setDeletingNews(null);
       setPendingDeleteNews(null);
+    }
+  };
+
+  const handleSemesterDelete = async () => {
+    if (!sessionToken || !pendingDeleteSemester) return;
+
+    setDeletingSemester(pendingDeleteSemester._id);
+    try {
+      await removeSemester({
+        token: sessionToken,
+        semesterId: pendingDeleteSemester._id,
+      });
+      toast.show("تم حذف المستوى وإزالة ربطه من المواد", "success");
+    } catch {
+      toast.show("حدث خطأ أثناء حذف المستوى", "error");
+    } finally {
+      setDeletingSemester(null);
+      setPendingDeleteSemester(null);
     }
   };
 
@@ -402,6 +514,22 @@ export default function MajorCoursesPage() {
   }
 
   const baseCourses = courses as CourseListItem[];
+  const activeSemesters = semesters ?? [];
+  const semesterOptions = activeSemesters.map((semester) => ({
+    value: semester._id,
+    label: `${semester.name} — ترتيب ${semester.order}`,
+  }));
+  const semesterCourseCounts = new Map<Id<"semesters">, number>();
+  for (const course of baseCourses) {
+    if (!course.semesterId) {
+      continue;
+    }
+
+    semesterCourseCounts.set(
+      course.semesterId,
+      (semesterCourseCounts.get(course.semesterId) ?? 0) + 1,
+    );
+  }
   const courseLookup = new Map(
     baseCourses.map((course) => [course._id, course]),
   );
@@ -469,6 +597,7 @@ export default function MajorCoursesPage() {
         {activeTab === "courses" ? (
           <div className="flex flex-wrap items-center gap-2">
             <button
+              type="button"
               onClick={openMajorLinkForm}
               className="inline-flex items-center gap-2 rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm font-medium text-surface-700 shadow-sm transition-colors hover:border-surface-300 hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300 dark:hover:border-surface-600 dark:hover:bg-surface-800"
             >
@@ -493,6 +622,7 @@ export default function MajorCoursesPage() {
               إعدادات التخصص
             </button>
             <button
+              type="button"
               onClick={() => {
                 resetForm();
                 setShowForm(true);
@@ -515,8 +645,33 @@ export default function MajorCoursesPage() {
               إضافة مادة
             </button>
           </div>
+        ) : activeTab === "semesters" ? (
+          <button
+            type="button"
+            onClick={() => {
+              resetSemesterForm();
+              setShowSemesterForm(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
+          >
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            إضافة فصل
+          </button>
         ) : activeTab === "news" ? (
           <button
+            type="button"
             onClick={() => {
               resetNewsForm();
               setShowNewsForm(true);
@@ -749,6 +904,7 @@ export default function MajorCoursesPage() {
       {/* Tab bar */}
       <div className="mb-4 flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
+          type="button"
           onClick={() => setActiveTab("courses")}
           className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "courses"
@@ -759,6 +915,18 @@ export default function MajorCoursesPage() {
           المواد ({courses.length})
         </button>
         <button
+          type="button"
+          onClick={() => setActiveTab("semesters")}
+          className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeTab === "semesters"
+              ? "bg-primary-600 text-white"
+              : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+          }`}
+        >
+          المستويات ({activeSemesters.length})
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab("news")}
           className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "news"
@@ -780,6 +948,7 @@ export default function MajorCoursesPage() {
           )}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("requests")}
           className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "requests"
@@ -801,6 +970,7 @@ export default function MajorCoursesPage() {
           ) : null}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("notifications")}
           className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             activeTab === "notifications"
@@ -839,9 +1009,9 @@ export default function MajorCoursesPage() {
                 />
                 <div className="relative">
                   <div className="mb-1.5 flex items-center gap-1.5">
-                    <label className="text-xs font-medium text-surface-700 dark:text-surface-200">
+                    <span className="text-xs font-medium text-surface-700 dark:text-surface-200">
                       الرابط (slug) *
-                    </label>
+                    </span>
                     <button
                       type="button"
                       onClick={() => setShowSlugInfo(!showSlugInfo)}
@@ -892,7 +1062,7 @@ export default function MajorCoursesPage() {
                           <div className="mt-2 space-y-1.5">
                             <p className="text-xs text-primary-700 dark:text-primary-300">
                               <span className="font-semibold">مثال:</span> إذا
-                              كان اسم المادة "عربي"
+                              كان اسم المادة «عربي»
                             </p>
                             <p className="text-xs font-mono text-primary-600 dark:text-primary-400">
                               الرابط: aoun.assoli.site/just/[arabic]
@@ -942,17 +1112,18 @@ export default function MajorCoursesPage() {
                   min="1"
                   step="1"
                 />
-                <FormInput
+                <FormSelect
                   form={form}
-                  name="semester"
-                  label="المستوى أو المسار (اختياري)"
-                  placeholder="مثال: 1"
+                  name="semesterId"
+                  label="الفصل أو المستوى (اختياري)"
+                  options={semesterOptions}
+                  placeholder="بدون فصل"
                 />
                 <div className="relative">
                   <div className="mb-1.5 flex items-center gap-1.5">
-                    <label className="text-xs font-medium text-surface-700 dark:text-surface-200">
+                    <span className="text-xs font-medium text-surface-700 dark:text-surface-200">
                       الأسماء البديلة (اختياري)
-                    </label>
+                    </span>
                     <button
                       type="button"
                       onClick={() => setShowAliasInfo(!showAliasInfo)}
@@ -1003,7 +1174,7 @@ export default function MajorCoursesPage() {
                           <div className="mt-2 space-y-1.5">
                             <p className="text-xs text-primary-700 dark:text-primary-300">
                               <span className="font-semibold">مثال:</span> إذا
-                              كان اسم المادة "calculus 101"
+                              كان اسم المادة «calculus 101»
                             </p>
                             <p className="text-xs text-primary-600 dark:text-primary-400">
                               الاسم البديل: كالكولس كالك تفاضل وتكامل رياضيات
@@ -1046,9 +1217,9 @@ export default function MajorCoursesPage() {
                 </div>
                 <div className="relative">
                   <div className="mb-1.5 flex items-center gap-1.5">
-                    <label className="text-xs font-medium text-surface-700 dark:text-surface-200">
+                    <span className="text-xs font-medium text-surface-700 dark:text-surface-200">
                       الترتيب (اختياري)
-                    </label>
+                    </span>
                     <button
                       type="button"
                       onClick={() => setShowOrderInfo(!showOrderInfo)}
@@ -1260,9 +1431,9 @@ export default function MajorCoursesPage() {
           ) : (
             <div className="space-y-3">
               {activeCourses.map((course, index: number) => {
-                const semesterLabel = formatCourseSemesterLabel(
-                  course.semester,
-                );
+                const semesterLabel =
+                  course.semesterName ??
+                  formatCourseSemesterLabel(course.semester);
                 return (
                   <motion.div
                     key={course._id}
@@ -1293,9 +1464,11 @@ export default function MajorCoursesPage() {
                     </Link>
                     <div className="flex items-center gap-2">
                       <button
+                        type="button"
                         onClick={() => handleEdit(course)}
                         className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
                         title="تعديل"
+                        aria-label={`تعديل ${course.name}`}
                       >
                         <svg
                           className="h-4 w-4"
@@ -1308,6 +1481,192 @@ export default function MajorCoursesPage() {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Semesters tab content */}
+      {activeTab === "semesters" && (
+        <>
+          <FormModal
+            open={showSemesterForm}
+            title={editingSemesterId ? "تعديل المستوى" : "إضافة مستوى جديد"}
+            onClose={resetSemesterForm}
+          >
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                semesterForm.handleSubmit();
+              }}
+              className="space-y-4"
+            >
+              <div className="rounded-2xl border border-primary-100 bg-primary-50/70 p-4 dark:border-primary-900 dark:bg-primary-950/30">
+                <h3 className="text-sm font-semibold text-primary-900 dark:text-primary-100">
+                  ترتيب المستويات يظهر في الخطة العامة
+                </h3>
+                <p className="mt-1 text-xs leading-5 text-primary-700 dark:text-primary-300">
+                  استخدم رقماً أقل لإظهار المستوى مبكراً، ثم اربط المواد
+                  بالمستوى من نموذج المادة.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormInput
+                  form={semesterForm}
+                  name="name"
+                  label="اسم المستوى *"
+                  placeholder="مثال: المستوى الأول"
+                />
+                <FormInput
+                  form={semesterForm}
+                  name="order"
+                  label="الترتيب"
+                  type="number"
+                  min="0"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={resetSemesterForm}
+                  className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
+                >
+                  إلغاء
+                </button>
+                <semesterForm.Subscribe
+                  selector={(s) => [s.canSubmit, s.isSubmitting]}
+                >
+                  {([canSubmit, isSubmitting]) => (
+                    <button
+                      type="submit"
+                      disabled={!canSubmit || isSubmitting}
+                      className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
+                    >
+                      {isSubmitting
+                        ? "جاري الحفظ..."
+                        : editingSemesterId
+                          ? "تحديث"
+                          : "إضافة"}
+                    </button>
+                  )}
+                </semesterForm.Subscribe>
+              </div>
+            </form>
+          </FormModal>
+
+          {semesters === undefined ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="h-20 animate-pulse rounded-2xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
+                />
+              ))}
+            </div>
+          ) : activeSemesters.length === 0 ? (
+            <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800">
+                <svg
+                  className="h-6 w-6 text-surface-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
+                لا توجد مستويات بعد
+              </p>
+              <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
+                أضف مستويات لترتيب المواد في الصفحة العامة.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activeSemesters.map((semester, index) => {
+                const courseCount = semesterCourseCounts.get(semester._id) ?? 0;
+
+                return (
+                  <motion.div
+                    key={semester._id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: Math.min(index * 0.04, 0.2),
+                    }}
+                    className="group flex items-center justify-between gap-4 rounded-2xl border border-surface-200 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-surface-700 dark:bg-surface-900 dark:hover:border-surface-600"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
+                        {semester.order}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
+                          {semester.name}
+                        </h3>
+                        <p className="text-xs text-surface-500 dark:text-surface-400">
+                          {courseCount} مادة مرتبطة
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleSemesterEdit(semester)}
+                        className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
+                        title="تعديل"
+                        aria-label={`تعديل ${semester.name}`}
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPendingDeleteSemester(semester)}
+                        disabled={deletingSemester === semester._id}
+                        className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"
+                        title="حذف"
+                        aria-label={`حذف ${semester.name}`}
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                           />
                         </svg>
                       </button>
@@ -1534,6 +1893,24 @@ export default function MajorCoursesPage() {
         onCancel={() => {
           if (!deletingNews) {
             setPendingDeleteNews(null);
+          }
+        }}
+      />
+      <ConfirmDialog
+        open={pendingDeleteSemester !== null}
+        title="تأكيد حذف المستوى"
+        description={
+          pendingDeleteSemester
+            ? `سيتم حذف فصل «${pendingDeleteSemester.name}» وإزالة ربطه من المواد المرتبطة به.`
+            : ""
+        }
+        confirmLabel="تأكيد الحذف"
+        cancelLabel="إلغاء"
+        isLoading={deletingSemester !== null}
+        onConfirm={handleSemesterDelete}
+        onCancel={() => {
+          if (!deletingSemester) {
+            setPendingDeleteSemester(null);
           }
         }}
       />

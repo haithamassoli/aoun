@@ -1,6 +1,10 @@
 import { internalMutation } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
+import {
+  formatCourseSemesterLabel,
+  normalizeCourseSemesterInput,
+} from "../lib/course-semester";
 
 // ── Seed all data: universities, majors, courses ─────────────────────
 export const seedAll = internalMutation({
@@ -337,17 +341,44 @@ export const seedAll = internalMutation({
           universityId,
           order: major.order,
         });
+        const semesterIdsByValue = new Map<string, Id<"semesters">>();
+
+        const getSemesterId = async (semester: number | string | undefined) => {
+          if (semester === undefined) {
+            return undefined;
+          }
+
+          const value = normalizeCourseSemesterInput(String(semester));
+          if (!value) {
+            return undefined;
+          }
+
+          const existingSemesterId = semesterIdsByValue.get(value);
+          if (existingSemesterId) {
+            return existingSemesterId;
+          }
+
+          const order = /^\d+$/.test(value)
+            ? Number.parseInt(value, 10)
+            : semesterIdsByValue.size + 1;
+          const semesterId = await ctx.db.insert("semesters", {
+            majorId,
+            name: formatCourseSemesterLabel(value) ?? value,
+            order,
+          });
+          semesterIdsByValue.set(value, semesterId);
+          return semesterId;
+        };
 
         for (const course of major.courses) {
+          const semesterId = await getSemesterId(course.semester);
           await ctx.db.insert("courses", {
             name: course.name,
             slug: course.slug,
             courseCode: course.courseCode,
-            semester:
-              course.semester === undefined
-                ? undefined
-                : String(course.semester),
+            semesterId,
             majorId,
+            credits: 3,
             order: course.order,
           });
         }
@@ -399,6 +430,7 @@ export const clearAll = internalMutation({
       "permissions",
       "sessions",
       "courses",
+      "semesters",
       "majors",
       "universities",
       "users",
