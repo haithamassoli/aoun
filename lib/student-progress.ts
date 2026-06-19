@@ -14,6 +14,11 @@ export type LastVisitedMajor = {
   majorSlug: string;
 };
 
+export const LAST_MAJOR_COOKIE = "aoun_student_last_major_v1";
+export const HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE =
+  "aoun_student_home_last_major_redirect_v1";
+export const LAST_MAJOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
 const VALID_STATUSES = new Set<CourseProgressStatus>([
   "completed",
   "in_progress",
@@ -87,6 +92,56 @@ function parseLastVisitedMajor(raw: string | null): LastVisitedMajor | null {
     };
   } catch {
     return null;
+  }
+}
+
+export function parseLastVisitedMajorCookie(
+  value: string | null | undefined,
+): LastVisitedMajor | null {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return parseLastVisitedMajor(decodeURIComponent(value));
+  } catch {
+    return parseLastVisitedMajor(value);
+  }
+}
+
+export function encodeLastVisitedMajorCookie(target: LastVisitedMajor) {
+  return encodeURIComponent(JSON.stringify(target));
+}
+
+function secureCookieSuffix() {
+  return typeof window !== "undefined" && window.location.protocol === "https:"
+    ? "; Secure"
+    : "";
+}
+
+function persistLastVisitedMajorCookie(target: LastVisitedMajor) {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  try {
+    document.cookie = `${LAST_MAJOR_COOKIE}=${encodeLastVisitedMajorCookie(
+      target,
+    )}; Max-Age=${LAST_MAJOR_COOKIE_MAX_AGE}; Path=/; SameSite=Lax${secureCookieSuffix()}`;
+  } catch {
+    // Cookies may be blocked by the browser.
+  }
+}
+
+function removeLastVisitedMajorCookie() {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  try {
+    document.cookie = `${LAST_MAJOR_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax${secureCookieSuffix()}`;
+  } catch {
+    // Cookies may be blocked by the browser.
   }
 }
 
@@ -173,6 +228,8 @@ export function saveLastVisitedMajor(target: LastVisitedMajor) {
   } catch {
     // Local storage may be blocked by the browser.
   }
+
+  persistLastVisitedMajorCookie(target);
 }
 
 export function clearLastVisitedMajor() {
@@ -187,4 +244,6 @@ export function clearLastVisitedMajor() {
   } catch {
     // Local storage may be blocked by the browser.
   }
+
+  removeLastVisitedMajorCookie();
 }

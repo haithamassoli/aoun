@@ -1,10 +1,25 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import {
+  HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE,
+  LAST_MAJOR_COOKIE,
+} from "@/lib/student-progress";
 
 const SESSION_COOKIE = "aoun_session";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname === "/") {
+    const lastMajor = request.cookies.get(LAST_MAJOR_COOKIE)?.value;
+    const hasRedirectedThisSession = request.cookies.has(
+      HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE,
+    );
+
+    if (lastMajor && !hasRedirectedThisSession) {
+      return NextResponse.redirect(new URL("/resume-last-major", request.url));
+    }
+  }
 
   // Protect dashboard routes
   if (pathname.startsWith("/dashboard")) {
@@ -29,5 +44,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/", "/dashboard/:path*", "/login"],
 };
