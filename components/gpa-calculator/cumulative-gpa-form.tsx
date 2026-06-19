@@ -283,6 +283,7 @@ function CumulativeGpaFormContent({
                       onBlur={field.handleBlur}
                       placeholder="0"
                       min={0}
+                      step={0.25}
                       className={`${inputCls}${error ? " border-red-400 dark:border-red-600" : ""}`}
                     />
                     {error && (

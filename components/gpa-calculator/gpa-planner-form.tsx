@@ -172,7 +172,7 @@ export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
             "الساعات المعتمدة الحالية",
             "مثال: 60",
             undefined,
-            1,
+            0.25,
           )}
           {renderField(
             "targetGpa",
@@ -186,7 +186,7 @@ export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
             "ساعات الفصل القادم",
             "مثال: 18",
             undefined,
-            1,
+            0.25,
           )}
         </div>
 

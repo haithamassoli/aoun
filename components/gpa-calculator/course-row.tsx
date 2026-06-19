@@ -13,6 +13,10 @@ import type { CourseRowValues } from "@/lib/gpa-schemas";
 const inputCls =
   "w-full rounded-lg border border-surface-300 bg-white px-2 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100";
 
+const CREDIT_HOUR_OPTIONS = [
+  1, 1.5, 2, 2.25, 2.5, 3, 3.5, 4, 4.5, 5, 6,
+];
+
 interface CourseRowProps {
   course: CourseRowValues;
   index: number;
@@ -88,7 +92,7 @@ export function CourseRow({
                 }
                 className={inputCls}
               >
-                {[1, 2, 3, 4, 5, 6].map((h) => (
+                {CREDIT_HOUR_OPTIONS.map((h) => (
                   <option key={h} value={h}>
                     {h}
                   </option>
