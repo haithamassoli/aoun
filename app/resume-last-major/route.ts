@@ -4,7 +4,6 @@ import type { NextRequest } from "next/server";
 import { api } from "@/convex/_generated/api";
 import {
   type LastVisitedMajor,
-  HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE,
   LAST_MAJOR_COOKIE,
   LAST_MAJOR_COOKIE_MAX_AGE,
   encodeLastVisitedMajorCookie,
@@ -26,14 +25,6 @@ function majorUrl(requestUrl: URL, target: LastVisitedMajor) {
   );
 }
 
-function setRedirectedThisSession(response: NextResponse, requestUrl: URL) {
-  response.cookies.set(HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE, "1", {
-    path: "/",
-    sameSite: "lax",
-    secure: isSecureRequest(requestUrl),
-  });
-}
-
 function clearLastMajorCookie(response: NextResponse, requestUrl: URL) {
   response.cookies.set(LAST_MAJOR_COOKIE, "", {
     path: "/",
@@ -43,8 +34,14 @@ function clearLastMajorCookie(response: NextResponse, requestUrl: URL) {
   });
 }
 
-function redirectHome(requestUrl: URL) {
-  return NextResponse.redirect(new URL("/", requestUrl));
+function redirectHome(requestUrl: URL, searchParams?: Record<string, string>) {
+  const homeUrl = new URL("/", requestUrl);
+
+  for (const [key, value] of Object.entries(searchParams ?? {})) {
+    homeUrl.searchParams.set(key, value);
+  }
+
+  return NextResponse.redirect(homeUrl);
 }
 
 export async function GET(request: NextRequest) {
@@ -67,9 +64,7 @@ export async function GET(request: NextRequest) {
       majorSlug: storedTarget.majorSlug,
     });
   } catch {
-    const response = redirectHome(requestUrl);
-    setRedirectedThisSession(response, requestUrl);
-    return response;
+    return redirectHome(requestUrl, { lastMajorResumeFailed: "1" });
   }
 
   if (!validatedTarget) {
@@ -79,7 +74,6 @@ export async function GET(request: NextRequest) {
   }
 
   const response = NextResponse.redirect(majorUrl(requestUrl, validatedTarget));
-  setRedirectedThisSession(response, requestUrl);
   response.cookies.set(
     LAST_MAJOR_COOKIE,
     encodeLastVisitedMajorCookie(validatedTarget),

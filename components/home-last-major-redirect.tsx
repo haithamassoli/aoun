@@ -7,14 +7,10 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
   type LastVisitedMajor,
-  HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE,
   clearLastVisitedMajor,
   loadLastVisitedMajor,
   saveLastVisitedMajor,
 } from "@/lib/student-progress";
-
-const HOME_LAST_MAJOR_REDIRECT_SESSION_KEY =
-  "aoun:student:home-last-major-redirect:v1";
 
 function subscribeToClientHydration() {
   return () => {};
@@ -28,54 +24,6 @@ function useHasHydrated() {
   );
 }
 
-function hasRedirectedThisSession() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  try {
-    const sessionCookie = document.cookie
-      .split(";")
-      .map((part) => part.trim())
-      .some((part) => part === `${HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE}=1`);
-
-    if (sessionCookie) {
-      return true;
-    }
-  } catch {
-    // Cookies may be blocked by the browser.
-  }
-
-  try {
-    return (
-      window.sessionStorage.getItem(HOME_LAST_MAJOR_REDIRECT_SESSION_KEY) === "1"
-    );
-  } catch {
-    return false;
-  }
-}
-
-function markRedirectedThisSession() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.sessionStorage.setItem(HOME_LAST_MAJOR_REDIRECT_SESSION_KEY, "1");
-  } catch {
-    // Session storage may be blocked by the browser.
-  }
-
-  try {
-    const secureSuffix =
-      window.location.protocol === "https:" ? "; Secure" : "";
-    document.cookie =
-      `${HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE}=1; Path=/; SameSite=Lax${secureSuffix}`;
-  } catch {
-    // Cookies may be blocked by the browser.
-  }
-}
-
 export function HomeLastMajorRedirect() {
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
@@ -83,26 +31,22 @@ export function HomeLastMajorRedirect() {
   const [storedTarget] = useState<LastVisitedMajor | null>(() =>
     loadLastVisitedMajor(),
   );
-  const [shouldRedirect] = useState(() => !hasRedirectedThisSession());
   const hasHandledRedirect = useRef(false);
   const hasClearedInvalidTarget = useRef(false);
 
   const validatedTarget = useQuery(
     api.majors.validateLastVisitedMajor,
-    storedTarget && shouldRedirect
+    storedTarget
       ? {
           universitySlug: storedTarget.universitySlug,
           majorSlug: storedTarget.majorSlug,
         }
       : "skip",
   );
-  const isRedirecting = Boolean(
-    storedTarget && shouldRedirect && validatedTarget !== null,
-  );
+  const isRedirecting = Boolean(storedTarget && validatedTarget !== null);
 
   useEffect(() => {
     if (
-      !shouldRedirect ||
       hasHandledRedirect.current ||
       !storedTarget ||
       validatedTarget === undefined
@@ -111,7 +55,6 @@ export function HomeLastMajorRedirect() {
     }
 
     hasHandledRedirect.current = true;
-    markRedirectedThisSession();
 
     if (validatedTarget) {
       saveLastVisitedMajor(validatedTarget);
@@ -135,7 +78,6 @@ export function HomeLastMajorRedirect() {
   }, [
     prefersReducedMotion,
     router,
-    shouldRedirect,
     storedTarget,
     validatedTarget,
   ]);

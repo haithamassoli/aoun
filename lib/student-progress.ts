@@ -15,8 +15,6 @@ export type LastVisitedMajor = {
 };
 
 export const LAST_MAJOR_COOKIE = "aoun_student_last_major_v1";
-export const HOME_LAST_MAJOR_REDIRECT_SESSION_COOKIE =
-  "aoun_student_home_last_major_redirect_v1";
 export const LAST_MAJOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 const VALID_STATUSES = new Set<CourseProgressStatus>([
