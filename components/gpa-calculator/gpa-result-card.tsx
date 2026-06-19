@@ -4,6 +4,7 @@ import {
   getGpaColors,
   getGpaLabel,
   getGpaLetter,
+  getResultPercentage,
   getScaleMaxGpa,
   type GpaResult,
   type GradeScale,
@@ -24,7 +25,9 @@ export function GpaResultCard({
   const label = getGpaLabel(result.gpa);
   const letter = getGpaLetter(result.gpa, scale);
   const maxGpa = getScaleMaxGpa(scale);
-  const percentage = maxGpa > 0 ? (result.gpa / maxGpa) * 100 : 0;
+  const percentage = getResultPercentage(result, scale);
+  const percentageLabel =
+    result.percentage !== undefined ? "النسبة الموزونة" : "النسبة المكافئة";
 
   return (
     <div
@@ -51,7 +54,7 @@ export function GpaResultCard({
           {letter}
         </span>
         <p className="text-xs text-surface-500 dark:text-surface-400">
-          النسبة المكافئة والمعدل بالنقاط مع الدرجة الحرفية
+          {percentageLabel} والمعدل بالنقاط مع الدرجة الحرفية
         </p>
       </div>
       <div className="mt-4 flex justify-center gap-6 border-t border-current/10 pt-4 text-sm text-surface-500 dark:text-surface-400">

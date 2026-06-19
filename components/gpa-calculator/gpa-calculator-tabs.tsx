@@ -5,6 +5,7 @@ import {
   DEFAULT_GRADE_SCALE,
   GRADE_SCALES,
   getGpaLetter,
+  getResultPercentage,
   getScaleMaxGpa,
   type GradeScale,
   type GpaResult,
@@ -92,7 +93,7 @@ function formatHistoryDate(timestamp: number) {
 
 function formatResultSummary(result: GpaResult, scale: GradeScale) {
   const maxGpa = getScaleMaxGpa(scale);
-  const percentage = maxGpa > 0 ? (result.gpa / maxGpa) * 100 : 0;
+  const percentage = getResultPercentage(result, scale);
   const letter = getGpaLetter(result.gpa, scale);
 
   return `${letter} • ${percentage.toFixed(1)}% • ${result.gpa.toFixed(2)}/${maxGpa.toFixed(2)}`;

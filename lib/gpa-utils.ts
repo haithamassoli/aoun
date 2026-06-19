@@ -160,7 +160,41 @@ export type GpaResult = {
   gpa: number;
   totalCredits: number;
   totalPoints: number;
+  percentage?: number;
 };
+
+function roundToTwo(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function getWeightedPercentage(
+  courses: CourseInput[],
+  totalCredits: number,
+): number | undefined {
+  let totalPercentage = 0;
+  let percentageCredits = 0;
+
+  for (const course of courses) {
+    if (course.gradeType !== "percentage") {
+      continue;
+    }
+
+    const percentage = parseFloat(course.grade);
+    if (isNaN(percentage)) {
+      continue;
+    }
+
+    const credits = Number(course.creditHours) || 0;
+    totalPercentage += Math.min(100, Math.max(0, percentage)) * credits;
+    percentageCredits += credits;
+  }
+
+  if (totalCredits === 0 || percentageCredits !== totalCredits) {
+    return undefined;
+  }
+
+  return roundToTwo(totalPercentage / totalCredits);
+}
 
 export function calculateSemesterGpa(
   courses: CourseInput[],
@@ -178,10 +212,13 @@ export function calculateSemesterGpa(
   }
 
   const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+  const percentage = getWeightedPercentage(courses, totalCredits);
+
   return {
-    gpa: Math.min(maxGpa, Math.round(gpa * 100) / 100),
+    gpa: Math.min(maxGpa, roundToTwo(gpa)),
     totalCredits,
-    totalPoints: Math.round(totalPoints * 100) / 100,
+    totalPoints: roundToTwo(totalPoints),
+    ...(percentage !== undefined ? { percentage } : {}),
   };
 }
 
@@ -198,12 +235,34 @@ export function calculateCumulativeGpa(
   const totalCredits = semResult.totalCredits + prevCredits;
   const totalPoints = semResult.totalPoints + prevGpa * prevCredits;
   const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+  const previousPercentage = maxGpa > 0 ? (prevGpa / maxGpa) * 100 : 0;
+  const percentage =
+    totalCredits > 0 && semResult.percentage !== undefined
+      ? roundToTwo(
+          (semResult.percentage * semResult.totalCredits +
+            previousPercentage * prevCredits) /
+            totalCredits,
+        )
+      : undefined;
 
   return {
-    gpa: Math.min(maxGpa, Math.round(gpa * 100) / 100),
+    gpa: Math.min(maxGpa, roundToTwo(gpa)),
     totalCredits,
-    totalPoints: Math.round(totalPoints * 100) / 100,
+    totalPoints: roundToTwo(totalPoints),
+    ...(percentage !== undefined ? { percentage } : {}),
   };
+}
+
+export function getResultPercentage(
+  result: GpaResult,
+  scale: GradeScale,
+): number {
+  if (result.percentage !== undefined) {
+    return result.percentage;
+  }
+
+  const maxGpa = getScaleMaxGpa(scale);
+  return maxGpa > 0 ? (result.gpa / maxGpa) * 100 : 0;
 }
 
 export function calculateRequiredGpa(
