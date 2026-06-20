@@ -57,7 +57,7 @@ export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
           duration: 4,
           repeat: Infinity,
           repeatType: "reverse" as const,
-          ease: "easeInOut",
+          ease: "easeInOut" as const,
         },
       };
   const floatAnimation2 = prefersReducedMotion
@@ -69,7 +69,7 @@ export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
           duration: 5,
           repeat: Infinity,
           repeatType: "reverse" as const,
-          ease: "easeInOut",
+          ease: "easeInOut" as const,
         },
       };
   const floatAnimation3 = prefersReducedMotion
@@ -81,7 +81,7 @@ export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
           duration: 6,
           repeat: Infinity,
           repeatType: "reverse" as const,
-          ease: "easeInOut",
+          ease: "easeInOut" as const,
         },
       };
   return (
