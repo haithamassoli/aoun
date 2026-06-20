@@ -299,8 +299,6 @@ export const FOCUS_SOUND_IDS = FOCUS_SOUND_DEFINITIONS.map(
   (sound) => sound.id,
 ) as readonly FocusSoundId[];
 
-const FOCUS_SOUND_ID_SET = new Set<FocusSoundId>(FOCUS_SOUND_IDS);
-
 const DEFAULT_FOCUS_SOUND_VOLUMES = Object.fromEntries(
   FOCUS_SOUND_DEFINITIONS.map(({ defaultVolume, id }) => [id, defaultVolume]),
 ) as Record<FocusSoundId, number>;
@@ -402,8 +400,4 @@ export function saveFocusSoundPreferences(preferences: FocusSoundPreferences) {
   } catch {
     // Local storage may be blocked by the browser.
   }
-}
-
-export function isFocusSoundId(value: string): value is FocusSoundId {
-  return FOCUS_SOUND_ID_SET.has(value as FocusSoundId);
 }

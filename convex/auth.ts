@@ -177,9 +177,9 @@ export const updateUser = mutation({
       }
     }
 
-    const { userId, token: _token, ...rawUpdates } = args;
+    const { userId, name, email, role } = args;
     const filtered = Object.fromEntries(
-      Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
+      Object.entries({ name, email, role }).filter(([, value]) => value !== undefined)
     );
 
     if (Object.keys(filtered).length > 0) {

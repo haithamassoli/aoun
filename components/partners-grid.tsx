@@ -4,8 +4,15 @@ import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
+type PartnerCard = {
+  _id: string;
+  name: string;
+  logoUrl: string;
+  websiteUrl?: string;
+};
+
 export function PartnersGrid() {
-  const partners = useQuery(api.partners.list);
+  const partners = useQuery(api.partners.list) as PartnerCard[] | undefined;
 
   return (
     <div>
@@ -46,6 +53,7 @@ export function PartnersGrid() {
                       src={partner.logoUrl}
                       alt={partner.name}
                       fill
+                      sizes="(min-width: 1024px) 8rem, (min-width: 640px) 33vw, 50vw"
                       className="object-contain rounded-lg"
                       unoptimized
                     />

@@ -17,6 +17,19 @@ import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 import { CATEGORIES, CategoryValue } from "@/constant/resource-categories";
 
+type ResourceListItem = {
+  _id: string;
+  courseId: string;
+  title: string;
+  category: CategoryValue;
+  type: "link" | "richtext";
+  url?: string;
+  content?: string;
+  order: number;
+  courseName: string;
+  majorName: string;
+};
+
 const CATEGORY_LABELS: Record<CategoryValue, string> = Object.fromEntries(
   CATEGORIES.map((c) => [c.value, c.label]),
 ) as Record<CategoryValue, string>;
@@ -110,16 +123,7 @@ export default function AdminResourcesPage() {
     setShowForm(false);
   };
 
-  const handleEdit = (resource: {
-    _id: string;
-    courseId: string;
-    title: string;
-    category: CategoryValue;
-    type: "link" | "richtext";
-    url?: string;
-    content?: string;
-    order: number;
-  }) => {
+  const handleEdit = (resource: ResourceListItem) => {
     form.reset(
       {
         courseId: resource.courseId,
@@ -153,7 +157,7 @@ export default function AdminResourcesPage() {
   };
 
   const courseOptions =
-    courses?.map((c) => ({
+    courses?.map((c: { _id: Id<"courses">; name: string; majorName: string }) => ({
       value: c._id,
       label: `${c.name} — ${c.majorName}`,
     })) ?? [];
@@ -200,6 +204,7 @@ export default function AdminResourcesPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => {
             resetForm();
             setShowForm(true);
@@ -264,10 +269,10 @@ export default function AdminResourcesPage() {
             </div>
 
             {/* Type toggle */}
-            <div>
-              <label className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-300">
+            <fieldset>
+              <legend className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-300">
                 نوع المصدر
-              </label>
+              </legend>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -292,7 +297,7 @@ export default function AdminResourcesPage() {
                   نص منسق
                 </button>
               </div>
-            </div>
+            </fieldset>
 
             {resourceType === "link" ? (
               <FormInput
@@ -307,10 +312,11 @@ export default function AdminResourcesPage() {
               <form.Field name="content">
                 {(field) => (
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+                    <p className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
                       المحتوى *
-                    </label>
+                    </p>
                     <TiptapEditor
+                      ariaLabel="المحتوى"
                       content={field.state.value}
                       onChange={(html) => field.handleChange(html)}
                     />
@@ -381,7 +387,7 @@ export default function AdminResourcesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {resources.map((resource, index) => (
+          {(resources as ResourceListItem[]).map((resource, index) => (
             <motion.div
               key={resource._id}
               initial={{ opacity: 0, y: 10 }}
@@ -425,6 +431,8 @@ export default function AdminResourcesPage() {
                 </div>
                 <div className="flex shrink-0 items-center gap-1 ">
                   <button
+                    type="button"
+                    aria-label={`تعديل ${resource.title}`}
                     onClick={() =>
                       handleEdit(resource as Parameters<typeof handleEdit>[0])
                     }
@@ -446,6 +454,8 @@ export default function AdminResourcesPage() {
                     </svg>
                   </button>
                   <button
+                    type="button"
+                    aria-label={`حذف ${resource.title}`}
                     onClick={() => handleDelete(resource._id)}
                     disabled={deleting === resource._id}
                     className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"

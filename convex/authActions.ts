@@ -9,6 +9,17 @@ import { action } from "./_generated/server";
 
 const userRole = v.union(v.literal("admin"), v.literal("contributor"));
 
+type AuthUser = {
+  _id: Id<"users">;
+  name: string;
+  email: string;
+  role: "admin" | "contributor";
+};
+
+type AuthUserWithPassword = AuthUser & {
+  passwordHash: string;
+};
+
 export const login = action({
   args: {
     email: v.string(),
@@ -23,8 +34,10 @@ export const login = action({
       role: userRole,
     }),
   }),
-  handler: async (ctx, { email, password }) => {
-    const user = await ctx.runQuery(internal.auth.getUserByEmail, { email });
+  handler: async (ctx, { email, password }): Promise<{ token: string; user: AuthUser }> => {
+    const user = (await ctx.runQuery(internal.auth.getUserByEmail, {
+      email,
+    })) as AuthUserWithPassword | null;
 
     if (!user) {
       throw new ConvexError({ code: "INVALID_CREDENTIALS" });

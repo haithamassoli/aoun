@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DEFAULT_GRADE_SCALE,
   GRADE_SCALES,
@@ -45,6 +45,10 @@ const HISTORY_TONE_STYLES: Record<HistoryTone, string> = {
     "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30",
   danger: "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30",
 };
+const historyDateFormatter = new Intl.DateTimeFormat("ar-JO", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
 
 function formatPercentRange(
   grades: (typeof GRADE_SCALES)[GradeScale]["grades"],
@@ -85,10 +89,7 @@ function isHistoryEntry(value: unknown): value is HistoryEntry {
 }
 
 function formatHistoryDate(timestamp: number) {
-  return new Intl.DateTimeFormat("ar-JO", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(timestamp);
+  return historyDateFormatter.format(timestamp);
 }
 
 function formatResultSummary(result: GpaResult, scale: GradeScale) {
@@ -102,9 +103,8 @@ function formatResultSummary(result: GpaResult, scale: GradeScale) {
 export function GpaCalculatorTabs() {
   const [activeTab, setActiveTab] = useState<Tab>("semester");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
-  const [hasLoadedScalePreference, setHasLoadedScalePreference] =
-    useState(false);
+  const hasLoadedHistoryRef = useRef(false);
+  const hasLoadedScalePreferenceRef = useRef(false);
   const [supports42Scale, setSupports42Scale] = useState(
     DEFAULT_GRADE_SCALE === "just",
   );
@@ -117,43 +117,55 @@ export function GpaCalculatorTabs() {
   const activeScaleInfo = GRADE_SCALES[activeScale];
 
   useEffect(() => {
-    setSupports42Scale(loadSupports42ScalePreference());
-    setHasLoadedScalePreference(true);
+    const frameId = window.requestAnimationFrame(() => {
+      hasLoadedScalePreferenceRef.current = true;
+      setSupports42Scale(loadSupports42ScalePreference());
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
   useEffect(() => {
-    try {
-      const rawHistory = window.localStorage.getItem(
-        GPA_CALCULATOR_HISTORY_STORAGE_KEY,
-      );
+    const frameId = window.requestAnimationFrame(() => {
+      try {
+        const rawHistory = window.localStorage.getItem(
+          GPA_CALCULATOR_HISTORY_STORAGE_KEY,
+        );
 
-      if (!rawHistory) {
-        return;
+        if (!rawHistory) {
+          return;
+        }
+
+        const parsed = JSON.parse(rawHistory);
+        if (!Array.isArray(parsed)) {
+          return;
+        }
+
+        setHistory(parsed.filter(isHistoryEntry).slice(0, MAX_HISTORY_ITEMS));
+      } catch {
+        window.localStorage.removeItem(GPA_CALCULATOR_HISTORY_STORAGE_KEY);
+      } finally {
+        hasLoadedHistoryRef.current = true;
       }
+    });
 
-      const parsed = JSON.parse(rawHistory);
-      if (!Array.isArray(parsed)) {
-        return;
-      }
-
-      setHistory(parsed.filter(isHistoryEntry).slice(0, MAX_HISTORY_ITEMS));
-    } catch {
-      window.localStorage.removeItem(GPA_CALCULATOR_HISTORY_STORAGE_KEY);
-    } finally {
-      setHasLoadedHistory(true);
-    }
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
   useEffect(() => {
-    if (!hasLoadedScalePreference) {
+    if (!hasLoadedScalePreferenceRef.current) {
       return;
     }
 
     saveSupports42ScalePreference(supports42Scale);
-  }, [hasLoadedScalePreference, supports42Scale]);
+  }, [supports42Scale]);
 
   useEffect(() => {
-    if (!hasLoadedHistory) {
+    if (!hasLoadedHistoryRef.current) {
       return;
     }
 
@@ -166,7 +178,7 @@ export function GpaCalculatorTabs() {
       GPA_CALCULATOR_HISTORY_STORAGE_KEY,
       JSON.stringify(history),
     );
-  }, [hasLoadedHistory, history]);
+  }, [history]);
 
   const addHistoryEntry = ({
     tab,
@@ -270,6 +282,7 @@ export function GpaCalculatorTabs() {
       <div className="mb-6 flex rounded-xl border border-surface-200 bg-surface-100 p-1 dark:border-surface-700 dark:bg-surface-800">
         {TABS.map((tab) => (
           <button
+            type="button"
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-semibold transition-all sm:text-sm ${
@@ -278,7 +291,7 @@ export function GpaCalculatorTabs() {
                 : "text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200"
             }`}
           >
-            <span role="img" aria-hidden="true">
+            <span aria-hidden="true">
               {tab.icon}
             </span>
             {tab.label}

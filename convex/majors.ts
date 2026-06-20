@@ -270,14 +270,14 @@ export const update = mutation({
       alias: newAlias,
     });
 
-    const { majorId, ...rawUpdates } = args;
+    const { name, slug, order, treeDiagramUrl, socialLinks: nextSocialLinks } = args;
     const filtered = Object.fromEntries(
-      Object.entries(rawUpdates).filter(([, value]) => value !== undefined)
+      Object.entries({ name, slug, order, treeDiagramUrl, socialLinks: nextSocialLinks }).filter(([, value]) => value !== undefined)
     );
 
-    await ctx.db.patch("majors", majorId, {
+    await ctx.db.patch("majors", args.majorId, {
       ...filtered,
-      alias: filtered.alias ? normalizeAlias(String(filtered.alias)) : filtered.alias,
+      ...(args.alias !== undefined ? { alias: normalizeAlias(args.alias) } : {}),
       searchToken,
     });
 

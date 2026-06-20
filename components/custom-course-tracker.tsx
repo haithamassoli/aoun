@@ -166,7 +166,8 @@ export function CustomCourseTracker({
       : "skip",
   );
   const deferredLinkedCourseResults = useDeferredValue(linkedCourseResults);
-  const visibleLinkedCourseResults = deferredLinkedCourseResults ?? [];
+  const visibleLinkedCourseResults =
+    (deferredLinkedCourseResults ?? []) as GlobalCourseSearchResult[];
   const isSearchingLinkedCourses =
     normalizedLinkedCourseQuery.length > 0 &&
     (normalizedLinkedCourseQuery !== normalizedDebouncedLinkedCourseQuery ||
@@ -448,7 +449,8 @@ export function CustomCourseTracker({
                       <div className="max-h-72 space-y-2 overflow-y-auto">
                         {visibleLinkedCourseResults.map((course) => {
                           const isSelected =
-                            linkedCourse?.courseId === course._id &&
+                            linkedCourse !== null &&
+                            linkedCourse.courseId === course._id &&
                             linkedCourse.href === course.href;
 
                           return (

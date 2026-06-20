@@ -7,9 +7,10 @@ import Link from "@tiptap/extension-link";
 type Props = {
   content: string;
   onChange: (html: string) => void;
+  ariaLabel?: string;
 };
 
-export function TiptapEditor({ content, onChange }: Props) {
+export function TiptapEditor({ content, onChange, ariaLabel }: Props) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -27,6 +28,7 @@ export function TiptapEditor({ content, onChange }: Props) {
       attributes: {
         class: "prose prose-sm max-w-none min-h-[200px] p-3 outline-none focus:outline-none",
         dir: "rtl",
+        ...(ariaLabel ? { "aria-label": ariaLabel } : {}),
       },
     },
     onUpdate: ({ editor }) => {

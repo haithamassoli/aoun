@@ -288,6 +288,7 @@ export default function AdminUniversitiesPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => {
             resetForm();
             setShowForm(true);
@@ -398,6 +399,8 @@ export default function AdminUniversitiesPage() {
               <div className="mt-4 space-y-3">
                 {quickLinks.map((quickLink, index) => {
                   const rowErrors = quickLinkErrors.get(index);
+                  const titleInputId = `quick-link-${index}-title`;
+                  const urlInputId = `quick-link-${index}-url`;
 
                   return (
                     <div
@@ -476,10 +479,14 @@ export default function AdminUniversitiesPage() {
 
                       <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)]">
                         <div>
-                          <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+                          <label
+                            htmlFor={titleInputId}
+                            className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+                          >
                             العنوان
                           </label>
                           <input
+                            id={titleInputId}
                             type="text"
                             value={quickLink.title}
                             onChange={(event) =>
@@ -504,10 +511,14 @@ export default function AdminUniversitiesPage() {
                         </div>
 
                         <div>
-                          <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+                          <label
+                            htmlFor={urlInputId}
+                            className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+                          >
                             الرابط
                           </label>
                           <input
+                            id={urlInputId}
                             type="url"
                             dir="ltr"
                             value={quickLink.url}
@@ -593,7 +604,7 @@ export default function AdminUniversitiesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {universities.map((uni, index) => (
+          {(universities as UniversityListItem[]).map((uni, index) => (
             <motion.div
               key={uni._id}
               initial={{ opacity: 0, y: 10 }}
@@ -628,6 +639,8 @@ export default function AdminUniversitiesPage() {
               </div>
               <div className="flex items-center gap-1 ">
                 <button
+                  type="button"
+                  aria-label={`تعديل ${uni.name}`}
                   onClick={() => handleEdit(uni as UniversityListItem)}
                   className="rounded-lg p-1.5 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-surface-300"
                   title="تعديل"
@@ -647,6 +660,8 @@ export default function AdminUniversitiesPage() {
                   </svg>
                 </button>
                 <button
+                  type="button"
+                  aria-label={`حذف ${uni.name}`}
                   onClick={() => handleDelete(uni._id)}
                   disabled={deleting === uni._id}
                   className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"

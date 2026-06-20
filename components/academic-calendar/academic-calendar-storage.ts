@@ -104,7 +104,7 @@ function sanitizeAcademicCalendarEvent(
           title,
           category: event.category,
           start,
-          end,
+          end: end ?? undefined,
           allDay: true,
         }
       : null;

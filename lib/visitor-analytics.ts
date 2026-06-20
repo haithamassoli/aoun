@@ -1,35 +1,11 @@
 const STORAGE_NAMESPACE = "aoun:analytics";
 const STORAGE_VERSION = "v1";
-const AMMAN_TIME_ZONE = "Asia/Amman";
 const RESERVED_SEGMENTS = new Set(["dashboard", "login", "offline"]);
 
-export const VISITOR_ID_STORAGE_KEY =
-  `${STORAGE_NAMESPACE}:visitor-id:${STORAGE_VERSION}`;
-
-const ammanDateKeyFormatter = new Intl.DateTimeFormat("en-US", {
-  timeZone: AMMAN_TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
+const VISITOR_ID_STORAGE_KEY = `${STORAGE_NAMESPACE}:visitor-id:${STORAGE_VERSION}`;
 
 function canUseStorage() {
   return typeof window !== "undefined";
-}
-
-function getDatePart(
-  parts: Intl.DateTimeFormatPart[],
-  type: "year" | "month" | "day",
-) {
-  return parts.find((part) => part.type === type)?.value ?? "";
-}
-
-export function getVisitorDateKey(timestamp = Date.now()) {
-  const parts = ammanDateKeyFormatter.formatToParts(new Date(timestamp));
-  const year = getDatePart(parts, "year");
-  const month = getDatePart(parts, "month");
-  const day = getDatePart(parts, "day");
-  return `${year}-${month}-${day}`;
 }
 
 function createVisitorKey() {

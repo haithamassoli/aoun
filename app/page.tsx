@@ -7,6 +7,13 @@ import Image from "next/image";
 import { UniversitiesSearchSection } from "@/components/universities-search-section";
 import { HomeLastMajorRedirect } from "@/components/home-last-major-redirect";
 
+type PartnerCard = {
+  _id: string;
+  name: string;
+  logoUrl?: string | null;
+  websiteUrl?: string;
+};
+
 export const metadata: Metadata = {
   title: "عون — مصادر أكاديمية للجامعات الأردنية",
   description:
@@ -33,9 +40,7 @@ export default async function Home() {
     // Convex may not have data yet
   }
 
-  let partners: Awaited<
-    ReturnType<typeof fetchQuery<typeof api.partners.list>>
-  > = [];
+  let partners: PartnerCard[] = [];
   try {
     partners = await fetchQuery(api.partners.list);
   } catch {
@@ -148,6 +153,7 @@ export default async function Home() {
                         src={partner.logoUrl || ""}
                         alt={partner.name}
                         fill
+                        sizes="(min-width: 1024px) 8rem, (min-width: 640px) 33vw, 50vw"
                         className="object-contain rounded-lg"
                         unoptimized
                       />

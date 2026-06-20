@@ -163,7 +163,7 @@ export default function AdminCoursesPage() {
       label: `${m.name} — ${m.universityName}`,
     })) ?? [];
   const semesterOptions =
-    semesters?.map((semester) => ({
+    semesters?.map((semester: { _id: Id<"semesters">; name: string; order: number }) => ({
       value: semester._id,
       label: `${semester.name} — ترتيب ${semester.order}`,
     })) ?? [];

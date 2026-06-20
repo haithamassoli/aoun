@@ -15,6 +15,24 @@ import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
 import { normalizeAlias } from "@/lib/alias";
 
+type MajorListItem = {
+  _id: string;
+  universityId: string;
+  name: string;
+  slug: string;
+  order: number;
+  universityName: string;
+  alias?: string;
+  treeDiagramUrl?: string;
+  socialLinks?: {
+    instagram?: string;
+    facebook?: string;
+    facebookGroup?: string;
+    faculty?: string;
+    telegram?: string;
+  };
+};
+
 function buildSocialLinks(value: {
   instagram: string;
   facebook: string;
@@ -115,22 +133,7 @@ export default function AdminMajorsPage() {
     setShowForm(false);
   };
 
-  const handleEdit = (major: {
-    _id: string;
-    universityId: string;
-    name: string;
-    slug: string;
-    order: number;
-    alias?: string;
-    treeDiagramUrl?: string;
-    socialLinks?: {
-      instagram?: string;
-      facebook?: string;
-      facebookGroup?: string;
-      faculty?: string;
-      telegram?: string;
-    };
-  }) => {
+  const handleEdit = (major: MajorListItem) => {
     form.reset(
       {
         universityId: major.universityId,
@@ -165,7 +168,10 @@ export default function AdminMajorsPage() {
   };
 
   const universityOptions =
-    universities?.map((u) => ({ value: u._id, label: u.name })) ?? [];
+    universities?.map((u: { _id: Id<"universities">; name: string }) => ({
+      value: u._id,
+      label: u.name,
+    })) ?? [];
 
   return (
     <div>
@@ -498,7 +504,7 @@ export default function AdminMajorsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {majors.map((major, index) => (
+          {(majors as MajorListItem[]).map((major, index) => (
             <motion.div
               key={major._id}
               initial={{ opacity: 0, y: 10 }}

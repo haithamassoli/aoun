@@ -24,19 +24,24 @@ export function usePushSubscription() {
   const unsubscribeMutation = useMutation(api.pushSubscriptions.unsubscribe);
 
   useEffect(() => {
-    const supported =
-      typeof window !== "undefined" &&
-      "serviceWorker" in navigator &&
-      "PushManager" in window &&
-      "Notification" in window;
+    const frameId = window.requestAnimationFrame(() => {
+      const supported =
+        "serviceWorker" in navigator &&
+        "PushManager" in window &&
+        "Notification" in window;
 
-    setIsSupported(supported);
+      setIsSupported(supported);
 
-    if (supported) {
-      getExistingSubscription().then((sub) => {
-        if (sub) setEndpoint(sub.endpoint);
-      });
-    }
+      if (supported) {
+        getExistingSubscription().then((sub) => {
+          if (sub) setEndpoint(sub.endpoint);
+        });
+      }
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
   const subscribe = useCallback(

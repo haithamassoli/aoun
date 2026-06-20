@@ -44,6 +44,10 @@ type CourseListItem = {
   alias?: string;
 };
 
+type CourseSearchResult = Omit<CourseListItem, "resourceCount"> & {
+  resourceCount?: number;
+};
+
 type OpenResourceRequest = {
   _id: Id<"resourceRequests">;
   courseId: Id<"courses">;
@@ -54,6 +58,12 @@ type OpenResourceRequest = {
   suggestedUrl?: string;
   createdAt: number;
   courseName: string;
+};
+
+type SemesterListItem = {
+  _id: Id<"semesters">;
+  name: string;
+  order: number;
 };
 
 type ActiveTab =
@@ -514,7 +524,7 @@ export default function MajorCoursesPage() {
   }
 
   const baseCourses = courses as CourseListItem[];
-  const activeSemesters = semesters ?? [];
+  const activeSemesters = (semesters ?? []) as SemesterListItem[];
   const semesterOptions = activeSemesters.map((semester) => ({
     value: semester._id,
     label: `${semester.name} — ترتيب ${semester.order}`,
@@ -535,7 +545,7 @@ export default function MajorCoursesPage() {
   );
   const activeCourses: CourseListItem[] = search.isEmpty
     ? baseCourses
-    : (searchedCourses ?? []).map((course) => {
+    : ((searchedCourses ?? []) as CourseSearchResult[]).map((course) => {
         const existingCourse = courseLookup.get(course._id);
 
         if (existingCourse) {

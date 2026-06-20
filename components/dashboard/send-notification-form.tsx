@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -11,12 +11,23 @@ type SendNotificationFormProps = {
   showToast: (message: string, type: "success" | "error") => void;
 };
 
+type NotificationMajorOption = {
+  _id: Id<"majors">;
+  name: string;
+  universityName: string;
+};
+
 export function SendNotificationForm({
   majorId,
   showToast,
 }: SendNotificationFormProps) {
   const { sessionToken } = useAuth();
   const sendCustom = useAction(api.notifications.sendCustom);
+  const fieldId = useId();
+  const targetMajorFieldId = `${fieldId}-target-major`;
+  const titleId = `${fieldId}-title`;
+  const bodyId = `${fieldId}-body`;
+  const urlId = `${fieldId}-url`;
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -35,7 +46,7 @@ export function SendNotificationForm({
 
     setIsSubmitting(true);
     try {
-      const targetMajorId = (majorId ?? selectedMajorId) || undefined;
+      const targetMajorId = majorId ?? (selectedMajorId as Id<"majors"> | "");
       const result = await sendCustom({
         token: sessionToken,
         title: title.trim(),
@@ -59,16 +70,20 @@ export function SendNotificationForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {!majorId && (
         <div>
-          <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+          <label
+            htmlFor={targetMajorFieldId}
+            className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+          >
             الجهة المستهدفة
           </label>
           <select
+            id={targetMajorFieldId}
             value={selectedMajorId}
             onChange={(e) => setSelectedMajorId(e.target.value)}
             className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2.5 text-sm text-surface-900 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-50"
           >
             <option value="">جميع المشتركين</option>
-            {adminMajors?.map((major) => (
+            {(adminMajors as NotificationMajorOption[] | undefined)?.map((major) => (
               <option key={major._id} value={major._id}>
                 {major.name} — {major.universityName}
               </option>
@@ -78,10 +93,14 @@ export function SendNotificationForm({
       )}
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+        <label
+          htmlFor={titleId}
+          className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+        >
           عنوان الإشعار *
         </label>
         <input
+          id={titleId}
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -92,10 +111,14 @@ export function SendNotificationForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+        <label
+          htmlFor={bodyId}
+          className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+        >
           نص الإشعار *
         </label>
         <textarea
+          id={bodyId}
           value={body}
           onChange={(e) => setBody(e.target.value)}
           required
@@ -106,10 +129,14 @@ export function SendNotificationForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
+        <label
+          htmlFor={urlId}
+          className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
+        >
           الرابط (اختياري)
         </label>
         <input
+          id={urlId}
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}

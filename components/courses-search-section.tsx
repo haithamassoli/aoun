@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -39,6 +39,36 @@ type CourseListItem = {
   order: number;
 };
 type CourseStatusFilter = "all" | CourseProgressStatus;
+type CustomCourseSummary = {
+  id: string;
+  status: CourseProgressStatus;
+  credits?: number;
+};
+type CourseStatusState = {
+  courseStatuses: Record<string, CourseProgressStatus>;
+  statusFilter: CourseStatusFilter;
+  isStatusFilterReady: boolean;
+};
+
+const EMPTY_CUSTOM_COURSES: CustomCourseSummary[] = [];
+const COURSE_PROGRESS_STAT_ITEMS = [
+  {
+    key: "completed",
+    label: "مكتمل",
+    dotClassName: "bg-emerald-500",
+  },
+  {
+    key: "in_progress",
+    label: "قيد الدراسة",
+    dotClassName: "bg-amber-500",
+  },
+  {
+    key: "none",
+    label: "لم يُبدأ",
+    dotClassName: "bg-surface-300 dark:bg-surface-600",
+  },
+] as const;
+
 type StatusFilterOption = {
   value: CourseStatusFilter;
   label: string;
@@ -342,15 +372,11 @@ function CourseCard({
 function CourseProgressStats({
   courseStatuses,
   courses,
-  customCourses = [],
+  customCourses = EMPTY_CUSTOM_COURSES,
 }: {
   courseStatuses: Record<string, CourseProgressStatus>;
   courses: CourseListItem[];
-  customCourses?: Array<{
-    id: string;
-    status: CourseProgressStatus;
-    credits?: number;
-  }>;
+  customCourses?: CustomCourseSummary[];
 }) {
   let totalCredits = 0;
   let hiddenCredits = 0;
@@ -395,7 +421,6 @@ function CourseProgressStats({
   }
 
   const visibleCredits = totalCredits - hiddenCredits;
-  // const noneCredits = visibleCredits - completedCredits - inProgressCredits;
   const completedPct =
     visibleCredits > 0
       ? Math.round((completedCredits / visibleCredits) * 100)
@@ -405,43 +430,6 @@ function CourseProgressStats({
       ? Math.round((inProgressCredits / visibleCredits) * 100)
       : 0;
   const nonePct = Math.max(0, 100 - completedPct - inProgressPct);
-  // const hiddenPct =
-  //   totalCredits > 0 ? Math.round((hiddenCredits / totalCredits) * 100) : 0;
-
-  const stats = [
-    // {
-    //   key: "hidden",
-    //   label: "مخفي",
-    //   count: hiddenCredits,
-    //   percentage: hiddenPct,
-    //   dotClassName: "bg-slate-500",
-    //   textClassName: "text-slate-600 dark:text-slate-300",
-    // },
-    {
-      key: "completed",
-      label: "مكتمل",
-      // count: completedCredits,
-      // percentage: completedPct,
-      dotClassName: "bg-emerald-500",
-      textClassName: "text-emerald-600 dark:text-emerald-400",
-    },
-    {
-      key: "in_progress",
-      label: "قيد الدراسة",
-      // count: inProgressCredits,
-      // percentage: inProgressPct,
-      dotClassName: "bg-amber-500",
-      textClassName: "text-amber-600 dark:text-amber-400",
-    },
-    {
-      key: "none",
-      label: "لم يُبدأ",
-      // count: noneCredits,
-      // percentage: nonePct,
-      dotClassName: "bg-surface-300 dark:bg-surface-600",
-      textClassName: "text-surface-600 dark:text-surface-300",
-    },
-  ] as const;
 
   return (
     <div className="rounded-xl border border-surface-200 bg-white p-4 dark:border-surface-700 dark:bg-surface-900">
@@ -450,11 +438,6 @@ function CourseProgressStats({
           <p className="text-sm font-semibold text-surface-800 dark:text-surface-100">
             تقدم الدراسة
           </p>
-          {/* <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            {hiddenCredits > 0
-              ? `توزيع ${visibleCredits} ساعة ضمن الخطة بعد إخفاء ${hiddenCredits} ساعة من أصل ${totalCredits}.`
-              : `توزيع ${visibleCredits} ساعة ضمن الخطة.`}
-          </p> */}
         </div>
 
         <div className="sm:text-left">
@@ -469,10 +452,16 @@ function CourseProgressStats({
         </div>
       </div>
 
+      <progress
+        className="sr-only"
+        max={Math.max(visibleCredits, 1)}
+        value={completedCredits}
+      >
+        {completedCredits} من {visibleCredits} ساعة مكتملة
+      </progress>
       <div
         className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800"
-        aria-label="مخطط تقدم الدراسة"
-        role="img"
+        aria-hidden="true"
       >
         <motion.div
           className="h-full bg-emerald-500"
@@ -495,7 +484,7 @@ function CourseProgressStats({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {stats.map((stat) => (
+        {COURSE_PROGRESS_STAT_ITEMS.map((stat) => (
           <div
             key={stat.key}
             className="inline-flex items-center gap-2 rounded-full border border-surface-200 px-3 py-1.5 text-sm dark:border-surface-700"
@@ -507,12 +496,6 @@ function CourseProgressStats({
             <span className="text-surface-700 dark:text-surface-200">
               {stat.label}
             </span>
-            {/* <span className={`font-semibold ${stat.textClassName}`}>
-              {stat.count} ساعة
-            </span>
-            <span className="text-surface-500 dark:text-surface-400">
-              ({stat.percentage}%)
-            </span> */}
           </div>
         ))}
       </div>
@@ -534,34 +517,27 @@ export function CoursesSearchSection({
   initialStatusFilter?: CourseStatusFilter;
 }) {
   const search = useDebouncedPublicSearch();
-  const [courseStatuses, setCourseStatuses] = useState<
-    Record<string, CourseProgressStatus>
-  >({});
-  const [statusFilter, setStatusFilter] = useState<CourseStatusFilter>(
-    initialStatusFilter ?? "all",
-  );
-  const [isStatusFilterReady, setIsStatusFilterReady] = useState(false);
+  const [statusState, setStatusState] = useState<CourseStatusState>({
+    courseStatuses: {},
+    statusFilter: initialStatusFilter ?? "all",
+    isStatusFilterReady: false,
+  });
   const [collapsedSemesterGroups, setCollapsedSemesterGroups] = useState<
     Record<string, boolean>
   >({});
-  const [customCourses, setCustomCourses] = useState<
-    Array<{ id: string; status: CourseProgressStatus; credits?: number }>
-  >([]);
+  const [customCourses, setCustomCourses] = useState<CustomCourseSummary[]>([]);
+  const { courseStatuses, isStatusFilterReady, statusFilter } = statusState;
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
-      setCourseStatuses(loadCourseStatuses());
+      const storedFilter =
+        initialStatusFilter === undefined ? loadCourseStatusFilter() : null;
 
-      if (initialStatusFilter === undefined) {
-        const storedFilter = loadCourseStatusFilter();
-        if (storedFilter) {
-          setStatusFilter(storedFilter);
-        }
-      } else {
-        setStatusFilter(initialStatusFilter);
-      }
-
-      setIsStatusFilterReady(true);
+      setStatusState({
+        courseStatuses: loadCourseStatuses(),
+        statusFilter: initialStatusFilter ?? storedFilter ?? "all",
+        isStatusFilterReady: true,
+      });
     });
 
     return () => {
@@ -635,6 +611,19 @@ export function CoursesSearchSection({
     defaultCourses.length > 0 &&
     filteredDefaultCourses.length === 0;
 
+  const handleCustomCoursesChange = useCallback(
+    (courses: CustomCourseSummary[]) => {
+      setCustomCourses(
+        courses.map((course) => ({
+          id: course.id,
+          status: course.status,
+          credits: course.credits,
+        })),
+      );
+    },
+    [],
+  );
+
   const getStatus = (courseId: Id<"courses">) => {
     return courseStatuses[courseId] ?? "none";
   };
@@ -643,7 +632,17 @@ export function CoursesSearchSection({
     courseId: Id<"courses">,
     nextStatus: CourseProgressStatus,
   ) => {
-    setCourseStatuses(setCourseStatus(courseId, nextStatus));
+    setStatusState((current) => ({
+      ...current,
+      courseStatuses: setCourseStatus(courseId, nextStatus),
+    }));
+  };
+
+  const handleStatusFilterChange = (nextFilter: CourseStatusFilter) => {
+    setStatusState((current) => ({
+      ...current,
+      statusFilter: nextFilter,
+    }));
   };
 
   const toggleSemesterGroup = (groupKey: string) => {
@@ -696,7 +695,7 @@ export function CoursesSearchSection({
                     type="button"
                     role="radio"
                     aria-checked={isActive}
-                    onClick={() => setStatusFilter(option.value)}
+                    onClick={() => handleStatusFilterChange(option.value)}
                     className={getFilterButtonClassName(isActive)}
                   >
                     <span
@@ -758,15 +757,7 @@ export function CoursesSearchSection({
         <div className="space-y-10">
           <CustomCourseTracker
             majorId={majorId}
-            onCoursesChange={(courses) =>
-              setCustomCourses(
-                courses.map((c) => ({
-                  id: c.id,
-                  status: c.status,
-                  credits: c.credits,
-                })),
-              )
-            }
+            onCoursesChange={handleCustomCoursesChange}
           />
           {groupedDefaultCourses.map((semester) => {
             const groupKey = getSemesterGroupKey(semester.key);

@@ -18,6 +18,24 @@ const ROLE_OPTIONS = [
   { value: "contributor", label: "مساهم" },
 ];
 
+type UserListItem = {
+  _id: string;
+  name: string;
+  email: string;
+  role: "admin" | "contributor";
+};
+
+type MajorPermissionOption = {
+  _id: Id<"majors">;
+  name: string;
+  universityName: string;
+};
+
+type UserPermissionItem = {
+  _id: Id<"permissions">;
+  majorId: Id<"majors">;
+};
+
 export default function AdminUsersPage() {
   const { user, sessionToken } = useAuth();
   const toast = useToast();
@@ -189,15 +207,22 @@ export default function AdminUsersPage() {
   };
 
   const getMajorName = (majorId: string) => {
-    const major = majors?.find((m) => m._id === majorId);
+    const major = (majors as MajorPermissionOption[] | undefined)?.find(
+      (m) => m._id === majorId,
+    );
     return major ? `${major.name} — ${major.universityName}` : majorId;
   };
 
   const assignedMajorIds = new Set(
-    userPermissions?.map((p) => p.majorId) ?? [],
+    (userPermissions as UserPermissionItem[] | undefined)?.map(
+      (p) => p.majorId,
+    ) ?? [],
   );
   const availableMajors =
-    majors?.filter((m) => !assignedMajorIds.has(m._id)) ?? [];
+    (majors as MajorPermissionOption[] | undefined)?.filter(
+      (m) => !assignedMajorIds.has(m._id),
+    ) ?? [];
+  const permissionSelectId = "permission-major-select";
 
   return (
     <div>
@@ -241,6 +266,7 @@ export default function AdminUsersPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => setShowCreateForm(true)}
           className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
         >
@@ -356,7 +382,7 @@ export default function AdminUsersPage() {
             >
               إلغاء
             </button>
-               <editForm.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
+            <editForm.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
                 <button
                   type="submit"
@@ -373,17 +399,25 @@ export default function AdminUsersPage() {
 
       <FormModal
         open={managingPermsFor !== null}
-        title={`صلاحيات: ${users?.find((u) => u._id === managingPermsFor)?.name ?? ""}`}
+        title={`صلاحيات: ${
+          (users as UserListItem[] | undefined)?.find(
+            (u) => u._id === managingPermsFor,
+          )?.name ?? ""
+        }`}
         onClose={() => setManagingPermsFor(null)}
       >
         <div className="space-y-4">
           {/* Add Permission Section */}
           <div className="rounded-xl border border-surface-200 bg-surface-50 p-4 dark:border-surface-700 dark:bg-surface-800/50">
-            <label className="mb-2 block text-xs font-medium text-surface-700 dark:text-surface-300">
+            <label
+              htmlFor={permissionSelectId}
+              className="mb-2 block text-xs font-medium text-surface-700 dark:text-surface-300"
+            >
               إضافة صلاحية جديدة
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <select
+                id={permissionSelectId}
                 value={selectedMajorId}
                 onChange={(e) => setSelectedMajorId(e.target.value)}
                 className="flex-1 rounded-lg border border-surface-300 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-100"
@@ -396,6 +430,7 @@ export default function AdminUsersPage() {
                 ))}
               </select>
               <button
+                type="button"
                 onClick={handleAddPermission}
                 disabled={!selectedMajorId}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
@@ -480,7 +515,7 @@ export default function AdminUsersPage() {
               </div>
             ) : (
               <div className="max-h-[300px] space-y-2 overflow-y-auto rounded-xl border border-surface-200 bg-white p-3 dark:border-surface-700 dark:bg-surface-900">
-                {userPermissions.map((perm) => (
+                {(userPermissions as UserPermissionItem[]).map((perm) => (
                   <div
                     key={perm._id}
                     className="group flex items-start justify-between gap-3 rounded-lg border border-surface-100 bg-surface-50 p-3 transition-all hover:border-surface-200 hover:shadow-sm dark:border-surface-700 dark:bg-surface-800 dark:hover:border-surface-600"
@@ -506,6 +541,8 @@ export default function AdminUsersPage() {
                       </span>
                     </div>
                     <button
+                      type="button"
+                      aria-label={`إزالة صلاحية ${getMajorName(perm.majorId)}`}
                       onClick={() => handleRemovePermission(perm._id)}
                       className="shrink-0 rounded-md p-1.5 text-surface-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-950 dark:hover:text-red-400"
                       title="إزالة الصلاحية"
@@ -550,7 +587,7 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {users.map((u, index) => (
+          {(users as UserListItem[]).map((u, index) => (
             <motion.div
               key={u._id}
               initial={{ opacity: 0, y: 10 }}
@@ -587,6 +624,8 @@ export default function AdminUsersPage() {
               <div className="flex items-center gap-1 ">
                 {u.role === "contributor" && (
                   <button
+                    type="button"
+                    aria-label={`إدارة صلاحيات ${u.name}`}
                     onClick={() => {
                       setManagingPermsFor(u._id);
                       setEditingId(null);
@@ -611,6 +650,8 @@ export default function AdminUsersPage() {
                   </button>
                 )}
                 <button
+                  type="button"
+                  aria-label={`تعديل ${u.name}`}
                   onClick={() => {
                     handleEdit(u);
                     setManagingPermsFor(null);
@@ -633,6 +674,8 @@ export default function AdminUsersPage() {
                   </svg>
                 </button>
                 <button
+                  type="button"
+                  aria-label={`حذف ${u.name}`}
                   onClick={() => handleDelete(u._id)}
                   disabled={deleting === u._id || u._id === user._id}
                   className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-400"

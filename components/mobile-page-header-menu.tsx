@@ -6,11 +6,9 @@ import type { ReactNode } from "react";
 import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
-import { usePathname } from "next/navigation";
 import { DeveloperSupportButton } from "@/components/developer-support-button";
 import { BookmarksNavLink } from "@/components/bookmarks/bookmarks-nav-link";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
-import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
 
 const ThemeToggle = dynamic(
   () => import("@/components/theme-toggle").then((mod) => mod.ThemeToggle),
@@ -44,7 +42,6 @@ export function MobilePageHeaderMenu({
   subtitle,
   children,
 }: MobilePageHeaderMenuProps) {
-  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [menuViewportTop, setMenuViewportTop] = useState(0);
   const panelId = useId();
@@ -74,9 +71,6 @@ export function MobilePageHeaderMenu({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
-
-  const isToolActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <>
