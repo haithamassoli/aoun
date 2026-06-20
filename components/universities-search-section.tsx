@@ -8,6 +8,8 @@ import { Id } from "@/convex/_generated/dataModel";
 import { PublicSearchInput } from "@/components/public-search-input";
 import { useDebouncedPublicSearch } from "@/components/use-debounced-public-search";
 import { decodeSlugParam } from "@/lib/slug";
+import { ScrollReveal, ScrollRevealGroup } from "@/components/landing/scroll-reveal";
+import { TiltCard } from "@/components/landing/tilt-card";
 
 type UniversityListItem = {
   _id: Id<"universities">;
@@ -44,21 +46,38 @@ export function UniversitiesSearchSection({
   const isEmptyList = search.isEmpty && defaultUniversities.length === 0;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-      <div className="mb-8 space-y-4">
-        <h2 className="public-section-title text-center text-2xl font-bold text-surface-800 dark:text-surface-100 sm:text-3xl">
-          الجامعات
-        </h2>
-
-        <div className="mx-auto max-w-2xl">
-          <PublicSearchInput
-            label="ابحث عن الجامعة"
-            placeholder="مثال: الجامعة الأردنية"
-            value={search.input}
-            onChange={search.setInput}
-          />
-        </div>
+    <section
+      id="universities"
+      className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8"
+    >
+      {/* Decorative accent glow behind section */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -translate-y-1/2"
+      >
+        <div className="mx-auto h-48 w-3/4 rounded-full bg-primary-500/8 blur-3xl dark:bg-primary-500/5" />
       </div>
+
+      <ScrollReveal variant="fade-up">
+        <div className="mb-12 space-y-5">
+          {/* Section header with accent line */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-1 w-12 rounded-full bg-gradient-to-l from-primary-500 to-accent-500" />
+            <h2 className="public-section-title text-center text-2xl font-bold text-surface-800 dark:text-surface-100 sm:text-3xl">
+              الجامعات
+            </h2>
+          </div>
+
+          <div className="mx-auto max-w-2xl">
+            <PublicSearchInput
+              label="ابحث عن الجامعة"
+              placeholder="مثال: الجامعة الأردنية"
+              value={search.input}
+              onChange={search.setInput}
+            />
+          </div>
+        </div>
+      </ScrollReveal>
 
       {isLoading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -70,14 +89,16 @@ export function UniversitiesSearchSection({
           ))}
         </div>
       ) : isNoResults ? (
-        <div className="mx-auto max-w-xl rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
-          <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
-            لا توجد نتائج مطابقة
-          </p>
-          <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            لم نعثر على جامعة تطابق «{search.query}».
-          </p>
-        </div>
+        <ScrollReveal variant="fade-in">
+          <div className="mx-auto max-w-xl rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
+            <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
+              لا توجد نتائج مطابقة
+            </p>
+            <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
+              لم نعثر على جامعة تطابق «{search.query}».
+            </p>
+          </div>
+        </ScrollReveal>
       ) : isEmptyList ? (
         <div className="mx-auto max-w-xl rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
@@ -88,34 +109,38 @@ export function UniversitiesSearchSection({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ScrollRevealGroup
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          staggerDelay={0.06}
+        >
           {activeUniversities.map((uni: UniversityListItem) => (
-            <Link
-              key={uni._id}
-              href={`/${decodeSlugParam(uni.slug)}`}
-              className="public-elevated-surface public-interactive-card group flex flex-col items-center gap-4 rounded-[1.7rem] p-8"
-            >
-              {uni.logoUrl ? (
-                <Image
-                  src={uni.logoUrl}
-                  alt={uni.name}
-                  width={80}
-                  height={80}
-                  unoptimized
-                  sizes="80px"
-                  className="h-20 w-20 rounded-xl object-contain"
-                />
-              ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-primary-100 text-3xl font-bold text-primary-600 dark:bg-primary-950 dark:text-primary-400">
-                  {decodeSlugParam(uni.slug).toUpperCase().slice(0, 4)}
-                </div>
-              )}
-              <h3 className="text-center text-lg font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">
-                {uni.name}
-              </h3>
-            </Link>
+            <TiltCard key={uni._id} tiltAmount={6} glare>
+              <Link
+                href={`/${decodeSlugParam(uni.slug)}`}
+                className="public-elevated-surface public-interactive-card glow-border group flex flex-col items-center gap-4 rounded-[1.7rem] p-8"
+              >
+                {uni.logoUrl ? (
+                  <Image
+                    src={uni.logoUrl}
+                    alt={uni.name}
+                    width={80}
+                    height={80}
+                    unoptimized
+                    sizes="80px"
+                    className="h-20 w-20 rounded-xl object-contain"
+                  />
+                ) : (
+                  <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-primary-100 text-3xl font-bold text-primary-600 dark:bg-primary-950 dark:text-primary-400">
+                    {decodeSlugParam(uni.slug).toUpperCase().slice(0, 4)}
+                  </div>
+                )}
+                <h3 className="text-center text-lg font-semibold text-surface-800 group-hover:text-primary-600 dark:text-surface-100 dark:group-hover:text-primary-400">
+                  {uni.name}
+                </h3>
+              </Link>
+            </TiltCard>
           ))}
-        </div>
+        </ScrollRevealGroup>
       )}
     </section>
   );
