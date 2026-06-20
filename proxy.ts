@@ -4,6 +4,24 @@ import { LAST_MAJOR_COOKIE } from "@/lib/student-progress";
 
 const SESSION_COOKIE = "aoun_session";
 
+function isDocumentNavigation(request: NextRequest) {
+  const isRscRequest =
+    request.headers.has("rsc") || request.nextUrl.searchParams.has("_rsc");
+
+  if (isRscRequest) {
+    return false;
+  }
+
+  const fetchMode = request.headers.get("sec-fetch-mode");
+  const fetchDestination = request.headers.get("sec-fetch-dest");
+
+  return (
+    fetchMode === "navigate" ||
+    fetchDestination === "document" ||
+    (!fetchMode && !fetchDestination)
+  );
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -13,7 +31,7 @@ export function proxy(request: NextRequest) {
       "lastMajorResumeFailed",
     );
 
-    if (lastMajor && !shouldSkipResume) {
+    if (lastMajor && !shouldSkipResume && isDocumentNavigation(request)) {
       return NextResponse.redirect(new URL("/resume-last-major", request.url));
     }
   }

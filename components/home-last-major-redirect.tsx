@@ -24,6 +24,35 @@ function useHasHydrated() {
   );
 }
 
+let hasRedirectedFromHomeDocument = false;
+
+function isHomeDocumentLoad() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  if (hasRedirectedFromHomeDocument) {
+    return false;
+  }
+
+  try {
+    const navigationEntry = performance.getEntriesByType(
+      "navigation",
+    )[0] as PerformanceNavigationTiming | undefined;
+
+    if (!navigationEntry) {
+      return window.location.pathname === "/";
+    }
+
+    return (
+      new URL(navigationEntry.name).pathname === "/" &&
+      window.location.pathname === "/"
+    );
+  } catch {
+    return window.location.pathname === "/";
+  }
+}
+
 export function HomeLastMajorRedirect() {
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
@@ -31,22 +60,28 @@ export function HomeLastMajorRedirect() {
   const [storedTarget] = useState<LastVisitedMajor | null>(() =>
     loadLastVisitedMajor(),
   );
+  const [shouldRedirect] = useState(
+    () => Boolean(storedTarget) && isHomeDocumentLoad(),
+  );
   const hasHandledRedirect = useRef(false);
   const hasClearedInvalidTarget = useRef(false);
 
   const validatedTarget = useQuery(
     api.majors.validateLastVisitedMajor,
-    storedTarget
+    storedTarget && shouldRedirect
       ? {
           universitySlug: storedTarget.universitySlug,
           majorSlug: storedTarget.majorSlug,
         }
       : "skip",
   );
-  const isRedirecting = Boolean(storedTarget && validatedTarget !== null);
+  const isRedirecting = Boolean(
+    storedTarget && shouldRedirect && validatedTarget !== null,
+  );
 
   useEffect(() => {
     if (
+      !shouldRedirect ||
       hasHandledRedirect.current ||
       !storedTarget ||
       validatedTarget === undefined
@@ -58,6 +93,7 @@ export function HomeLastMajorRedirect() {
 
     if (validatedTarget) {
       saveLastVisitedMajor(validatedTarget);
+      hasRedirectedFromHomeDocument = true;
       const targetHref = `/${encodeURIComponent(
         validatedTarget.universitySlug,
       )}/${encodeURIComponent(validatedTarget.majorSlug)}`;
@@ -78,6 +114,7 @@ export function HomeLastMajorRedirect() {
   }, [
     prefersReducedMotion,
     router,
+    shouldRedirect,
     storedTarget,
     validatedTarget,
   ]);
