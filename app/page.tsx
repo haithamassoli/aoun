@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { UniversitiesSearchSection } from "@/components/universities-search-section";
 import { HomeLastMajorRedirect } from "@/components/home-last-major-redirect";
+import { HomeHero } from "@/components/home-hero";
 
 type PartnerCard = {
   _id: string;
@@ -62,103 +63,76 @@ export default async function Home() {
   return (
     <div>
       <HomeLastMajorRedirect />
+      <HomeHero visitorsTotal={visitorsTotal} />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-[linear-gradient(180deg,#407bf3_0%,#356eea_34%,#2d61df_62%,#2957d3_82%,#274fc7_100%)] px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24)_0%,transparent_72%)]" />
-        <div className="relative mx-auto max-w-4xl text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 24, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
-          >
-            عـــــون
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-4 text-lg leading-relaxed text-primary-100 sm:text-xl"
-          >
-            منصة مجانيـة تجمع الملخصـات، الامتحانـات، والمصـادر الأكاديمية لطلاب
-            الجامعـات الأردنية. كل شي بمكان واحـد.
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-2 text-base text-primary-200"
-          >
-            اختر جامعتك وابدأ بتصفح المــواد
-          </motion.p>
-          {visitorsTotal !== null && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.65,
-                delay: 0.24,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="mx-auto mt-8 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[0_16px_40px_rgba(15,23,42,0.16)] backdrop-blur-md"
-            >
-              <span className="flex size-8 items-center justify-center rounded-full bg-white/15">
-                <svg
-                  className="size-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17 20h5V18a4 4 0 00-5-3.874M17 20H7m10 0v-2c0-.653-.157-1.269-.436-1.813M7 20H2V18a4 4 0 015-3.874M7 20v-2c0-.653.157-1.269.436-1.813m0 0a5.002 5.002 0 019.128 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </span>
-              <span>إجمالي الـزوار</span>
-              <span className="tabular-nums font-semibold">
-                {visitorsTotal}
-              </span>
-            </motion.div>
-          )}
-        </div>
-      </section>
-
-      <UniversitiesSearchSection universities={sortedUniversities} />
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-20 bg-surface-50 dark:bg-surface-950"
+      >
+        <UniversitiesSearchSection universities={sortedUniversities} />
+      </motion.div>
 
       {partners.length > 0 && (
-        <section className="border-t border-surface-200/80 bg-surface-50/70 px-4 py-12 dark:border-surface-700/80 dark:bg-surface-950/60">
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.8 }}
+          className="relative z-20 border-t border-surface-200/80 bg-surface-50/70 px-4 py-16 dark:border-surface-700/80 dark:bg-surface-950/60"
+        >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-8 flex items-center justify-between">
+            <div className="mb-10 flex items-center justify-between">
               <h2 className="public-section-title text-sm font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500">
                 شركاؤنــا وداعمــونا
               </h2>
               <Link
                 href="/partners"
-                className="text-sm text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                className="group flex items-center gap-2 text-sm text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
               >
                 عرض الكــل
+                <svg
+                  className="size-4 transition-transform group-hover:-translate-x-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-              {partners.map((partner) => {
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 sm:gap-6">
+              {partners.map((partner, index) => {
                 const card = (
-                  <div className="public-elevated-surface public-interactive-card flex flex-col items-center gap-3 rounded-[1.6rem] p-2">
-                    <div className="relative h-40 w-32">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.5,
+                      delay: index * 0.1,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="public-elevated-surface public-interactive-card flex flex-col items-center justify-center gap-3 rounded-3xl p-6 sm:p-8"
+                  >
+                    <div className="relative h-16 w-32 sm:h-20 sm:w-40">
                       <Image
                         src={partner.logoUrl || ""}
                         alt={partner.name}
                         fill
                         sizes="(min-width: 1024px) 8rem, (min-width: 640px) 33vw, 50vw"
-                        className="object-contain rounded-lg"
+                        className="object-contain rounded-xl"
                         unoptimized
                       />
                     </div>
-                  </div>
+                  </motion.div>
                 );
                 return partner.websiteUrl ? (
                   <a
@@ -175,7 +149,7 @@ export default async function Home() {
               })}
             </div>
           </div>
-        </section>
+        </motion.section>
       )}
     </div>
   );
