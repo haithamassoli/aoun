@@ -85,48 +85,101 @@ function MobilePillGridSkeleton({
 export function HomePageSkeleton() {
   return (
     <div>
-      <section className="bg-gradient-to-bl from-primary-600 via-primary-700 to-primary-900 px-4 py-20 text-white sm:px-6 sm:py-28 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <Skeleton className="mx-auto h-16 w-48 rounded-2xl bg-white/18 dark:bg-white/12" />
-          <Skeleton className="mx-auto mt-6 h-6 w-full max-w-3xl rounded-full bg-white/16 dark:bg-white/10" />
-          <Skeleton className="mx-auto mt-3 h-6 w-4/5 max-w-2xl rounded-full bg-white/14 dark:bg-white/10" />
-          <Skeleton className="mx-auto mt-5 h-4 w-44 rounded-full bg-white/14 dark:bg-white/8" />
-        </div>
-      </section>
+      <section className="relative overflow-hidden border-b border-surface-200/50 bg-surface-50 px-4 py-24 text-surface-900 dark:border-surface-800/50 dark:bg-[#020617] dark:text-white sm:px-6 sm:py-32 lg:px-8">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.1)_0%,transparent_70%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.15)_0%,transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[url('/assets/grid.svg')] bg-center opacity-5 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] dark:opacity-10" />
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-        <div className="mb-8 space-y-4">
-          <Skeleton className="mx-auto h-10 w-36" />
-          <div className="mx-auto max-w-2xl">
-            <Skeleton className="h-12 w-full rounded-xl" />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center gap-4 rounded-2xl border border-surface-200 bg-white p-8 shadow-sm dark:border-surface-700 dark:bg-surface-900"
-            >
-              <Skeleton className="h-20 w-20 rounded-xl" />
-              <Skeleton className="h-6 w-3/4" />
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute -left-12 top-20 hidden w-64 rounded-2xl border border-surface-200/40 bg-white/30 p-6 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-white/5 sm:block md:left-4 lg:left-[10%]">
+            <div className="mb-4 flex items-center gap-3">
+              <Skeleton className="size-10 rounded-xl bg-primary-100/50 dark:bg-primary-900/50" />
+              <Skeleton className="h-4 w-24 rounded-full bg-surface-200/50 dark:bg-surface-700/50" />
             </div>
-          ))}
+            <div className="space-y-2">
+              <Skeleton className="h-2.5 w-full rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
+              <Skeleton className="h-2.5 w-4/5 rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
+              <Skeleton className="h-2.5 w-full rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
+            </div>
+          </div>
+
+          <div className="absolute -right-8 bottom-32 hidden w-56 rounded-2xl border border-surface-200/40 bg-white/30 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-white/5 sm:block md:right-8 lg:right-[15%]">
+            <div className="mb-4 flex items-center gap-3">
+              <Skeleton className="size-8 rounded-lg bg-emerald-100/50 dark:bg-emerald-900/50" />
+              <Skeleton className="h-3 w-16 rounded-full bg-surface-200/50 dark:bg-surface-700/50" />
+            </div>
+            <div className="mt-6 flex items-center justify-between">
+              <Skeleton className="size-8 rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
+              <Skeleton className="h-2 w-20 rounded-full bg-primary-200/50 dark:bg-primary-800/50" />
+            </div>
+          </div>
+
+          <div className="absolute left-[60%] top-[10%] hidden size-32 rounded-full bg-primary-400/10 blur-3xl dark:bg-primary-600/20 md:block" />
+        </div>
+
+        <div className="relative z-20 mx-auto max-w-4xl text-center">
+          <div className="mb-8 inline-flex items-center justify-center gap-2 rounded-full border border-primary-500/20 bg-primary-50/50 px-4 py-1.5 backdrop-blur-md dark:border-primary-400/20 dark:bg-primary-950/30">
+            <Skeleton className="size-2 rounded-full bg-primary-500" variant="pulse" />
+            <Skeleton className="h-4 w-32 rounded-full bg-primary-200/70 dark:bg-primary-800/60" />
+          </div>
+
+          <Skeleton className="mx-auto h-16 w-40 rounded-2xl bg-surface-200/80 dark:bg-white/12 sm:h-20 sm:w-48 lg:h-24" />
+          <div className="mx-auto mt-6 max-w-2xl space-y-3">
+            <Skeleton className="mx-auto h-5 w-full rounded-full bg-surface-200/80 dark:bg-surface-700/60 sm:h-6" />
+            <Skeleton className="mx-auto h-5 w-4/5 rounded-full bg-surface-200/70 dark:bg-surface-700/50 sm:h-6" />
+          </div>
+
+          <div className="mx-auto mt-10 inline-flex items-center gap-3 rounded-2xl border border-surface-200/50 bg-white/40 px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+            <Skeleton className="size-10 rounded-xl bg-primary-100 dark:bg-primary-900/50" />
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-20 rounded-full bg-surface-200/80 dark:bg-surface-700/60" />
+              <Skeleton className="h-4 w-16 rounded-full bg-surface-300/80 dark:bg-surface-600/70" />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="border-t border-surface-200 bg-surface-50 px-4 py-12 dark:border-surface-700 dark:bg-surface-950">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 flex items-center justify-between">
-            <Skeleton className="h-5 w-36 rounded-full" />
-            <Skeleton className="h-5 w-16 rounded-full" />
+      <div className="relative z-20 bg-surface-50 dark:bg-surface-950">
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+          <div className="mb-8 space-y-4">
+            <Skeleton className="mx-auto h-9 w-32 rounded-full sm:h-10" />
+            <div className="mx-auto max-w-2xl">
+              <div className="public-search-shell rounded-2xl border border-surface-200 bg-white p-3 shadow-sm dark:border-surface-700 dark:bg-surface-900">
+                <Skeleton className="h-12 w-full rounded-xl" />
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="public-elevated-surface flex flex-col items-center gap-4 rounded-[1.7rem] p-8"
+              >
+                <Skeleton className="size-20 rounded-xl" />
+                <Skeleton className="h-6 w-3/4 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <section className="relative z-20 border-t border-surface-200/80 bg-surface-50/70 px-4 py-16 dark:border-surface-700/80 dark:bg-surface-950/60">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 flex items-center justify-between">
+            <Skeleton className="h-5 w-36 rounded-full" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-16 rounded-full" />
+              <Skeleton className="size-4 rounded-full" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
-                className="rounded-2xl border border-surface-200 bg-white p-6 shadow-sm dark:border-surface-700 dark:bg-surface-900"
+                className="public-elevated-surface flex flex-col items-center justify-center gap-3 rounded-3xl p-6 sm:p-8"
               >
-                <Skeleton className="mx-auto h-40 w-32 rounded-lg" />
+                <Skeleton className="h-16 w-32 rounded-xl sm:h-20 sm:w-40" />
               </div>
             ))}
           </div>
