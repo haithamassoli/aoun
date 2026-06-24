@@ -107,7 +107,7 @@ export default async function MajorNewsPage({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-                الأخبار
+                الأخبـار
               </p>
               <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
                 {major.name}
@@ -127,7 +127,7 @@ export default async function MajorNewsPage({
           href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}`}
           className="flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
         >
-          <span>العودة للتخصص</span>
+          <span>العودة للتخـصص</span>
           <svg
             className="h-4 w-4 shrink-0"
             fill="none"
@@ -152,13 +152,13 @@ export default async function MajorNewsPage({
         <div className="mx-auto max-w-3xl">
           <Breadcrumb
             items={[
-              { label: "الرئيسية", href: "/" },
+              { label: "الرئيسـية", href: "/" },
               { label: university.name, href: `/${canonicalUniversitySlug}` },
               {
                 label: major.name,
                 href: `/${canonicalUniversitySlug}/${canonicalMajorSlug}`,
               },
-              { label: "الأخبار" },
+              { label: "الأخبـار" },
             ]}
           />
 
@@ -185,7 +185,7 @@ export default async function MajorNewsPage({
                   />
                 </svg>
                 <span className="text-[11px] font-semibold text-primary-700 dark:text-primary-300">
-                  أخبار ومستجدات
+                  أخبار ومسـتجدات
                 </span>
               </motion.div>
 
@@ -225,8 +225,8 @@ export default async function MajorNewsPage({
           {initialNews.page.length > 0 && (
             <p className="mb-4 text-xs font-medium text-surface-400 dark:text-surface-500">
               {initialNews.isDone
-                ? `${initialNews.page.length} خبر`
-                : `أحدث ${initialNews.page.length} أخبار`}
+                ? `${initialNews.page.length} خـبر`
+                : `أحدث ${initialNews.page.length} أخبـار`}
             </p>
           )}
           <NewsPageContent majorId={major._id} initialNews={initialNews} />

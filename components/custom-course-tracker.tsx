@@ -277,10 +277,10 @@ export function CustomCourseTracker({
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
-            مواد إضافية
+            مواد إضافـية
           </h3>
           <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-            أضف المواد الإضافية، الحرة، أو المتطلبات الإجبارية غير المدرجة في
+            أضف المواد الإضافـية، الحرة، أو المتطلبات الإجبارية غير المدرجة في
             الخطة الافتراضية.
           </p>
         </div>
@@ -303,7 +303,7 @@ export function CustomCourseTracker({
               d="M12 5v14m-7-7h14"
             />
           </svg>
-          إضافة مسار
+          إضافة مسـار
         </button>
       </div>
 
@@ -311,15 +311,15 @@ export function CustomCourseTracker({
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
             <span className="size-2 rounded-full bg-primary-500" />
-            {stats.total} مسار
+            {stats.total} مسـار
           </span>
           <span className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
             <span className="size-2 rounded-full bg-emerald-500" />
-            {stats.completed} مكتمل
+            {stats.completed} مكتمـل
           </span>
           <span className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
             <span className="size-2 rounded-full bg-amber-500" />
-            {stats.inProgress} قيد الدراسة
+            {stats.inProgress} قيد الدراسـة
           </span>
         </div>
       ) : null}
@@ -338,13 +338,13 @@ export function CustomCourseTracker({
                 htmlFor={nameInputId}
                 className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
               >
-                اسم المسار
+                اسم المسـار
               </label>
               <input
                 id={nameInputId}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="مثال: عسكرية"
+                placeholder="مثـال: عسكرية"
                 className="h-11 w-full rounded-xl border border-surface-300 bg-white px-3 text-sm text-surface-800 outline-none transition-all placeholder:text-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-surface-600 dark:bg-surface-950 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:ring-primary-900"
               />
             </div>
@@ -354,7 +354,7 @@ export function CustomCourseTracker({
                 htmlFor={creditsInputId}
                 className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
               >
-                عدد الساعات
+                عدد الساعـات
               </label>
               <input
                 id={creditsInputId}
@@ -373,7 +373,7 @@ export function CustomCourseTracker({
                 htmlFor={linkedCourseInputId}
                 className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
               >
-                ربط مادة موجودة
+                ربط مـادة موجودة
               </label>
               <div className="space-y-3 rounded-2xl border border-surface-200/80 bg-surface-50/70 p-3 dark:border-surface-700 dark:bg-surface-950/40">
                 {linkedCourse ? (
@@ -381,7 +381,7 @@ export function CustomCourseTracker({
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-700 dark:text-primary-300">
-                          المادة المرتبطة
+                          المادة المرتبطـة
                         </p>
                         <p className="mt-1 text-sm font-semibold text-surface-900 dark:text-surface-50">
                           {linkedCourse.name}
@@ -396,7 +396,7 @@ export function CustomCourseTracker({
                         onClick={() => setLinkedCourse(null)}
                         className="inline-flex shrink-0 items-center justify-center rounded-xl border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-surface-700 transition-colors hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-950 dark:text-surface-200 dark:hover:bg-surface-900"
                       >
-                        إزالة الربط
+                        إزالة الربـط
                       </button>
                     </div>
 
@@ -404,7 +404,7 @@ export function CustomCourseTracker({
                       href={linkedCourse.href}
                       className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-primary-700 transition-colors hover:text-primary-800 dark:text-primary-300 dark:hover:text-primary-200"
                     >
-                      افتح صفحة المادة
+                      افتح صفحة المـادة
                       <svg
                         className="size-3.5"
                         fill="none"
@@ -430,11 +430,11 @@ export function CustomCourseTracker({
                     onChange={(event) =>
                       setLinkedCourseQuery(event.target.value)
                     }
-                    placeholder="ابحث باسم المادة أو رمزها في أي جامعة"
+                    placeholder="ابحث باسم المـادة أو رمزها في أي جامعة"
                     className="h-11 w-full rounded-xl border border-surface-300 bg-white px-3 text-sm text-surface-800 outline-none transition-all placeholder:text-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-surface-600 dark:bg-surface-950 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:ring-primary-900"
                   />
                   <p className="mt-1.5 text-xs text-surface-500 dark:text-surface-400">
-                    الربط اختياري. ابحث عن مادة من أي جامعة لفتح صفحتها مباشرة
+                    الربـط اختياري. ابحث عن مادة من أي جامعة لفتح صفحتها مباشرة
                     من هذا المسار.
                   </p>
                 </div>
@@ -443,7 +443,7 @@ export function CustomCourseTracker({
                   <div className="space-y-2">
                     {isSearchingLinkedCourses ? (
                       <div className="rounded-2xl border border-surface-200/80 bg-white p-3 text-sm text-surface-500 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-400">
-                        جاري البحث عن المواد...
+                        جاري البحث عن المـواد...
                       </div>
                     ) : visibleLinkedCourseResults.length > 0 ? (
                       <div className="max-h-72 space-y-2 overflow-y-auto">
@@ -471,7 +471,7 @@ export function CustomCourseTracker({
                                 </p>
                               </div>
                               <span className="inline-flex shrink-0 items-center rounded-full border border-primary-200 bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300">
-                                {isSelected ? "مربوطة" : "ربط"}
+                                {isSelected ? "مربوطـة" : "ربـط"}
                               </span>
                             </button>
                           );
@@ -479,7 +479,7 @@ export function CustomCourseTracker({
                       </div>
                     ) : (
                       <div className="rounded-2xl border border-dashed border-surface-200/80 bg-white p-3 text-sm text-surface-500 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-400">
-                        لا توجد مواد مطابقة. جرّب الاسم بالعربي أو الإنجليزي أو
+                        لا توجد مـواد مطابقة. جرّب الاسم بالعربي أو الإنجليزي أو
                         رمز المادة.
                       </div>
                     )}
@@ -493,7 +493,7 @@ export function CustomCourseTracker({
                 id={statusFieldId}
                 className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
               >
-                الحالة
+                الحـالة
               </p>
               <div aria-labelledby={statusFieldId}>
                 <CourseStatusSelector
@@ -509,14 +509,14 @@ export function CustomCourseTracker({
                 type="submit"
                 className="inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
               >
-                {editingCourseId ? "حفظ" : "إضافة"}
+                {editingCourseId ? "حفـظ" : "إضـافة"}
               </button>
               <button
                 type="button"
                 onClick={resetForm}
                 className="inline-flex items-center justify-center rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm font-semibold text-surface-700 transition-colors hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-950 dark:text-surface-200 dark:hover:bg-surface-900"
               >
-                إلغاء
+                إلغـاء
               </button>
             </div>
           </div>
@@ -535,7 +535,7 @@ export function CustomCourseTracker({
                       aria-hidden="true"
                     />
                     <span className="inline-flex rounded-full border border-surface-200 bg-surface-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300">
-                      مسار خاص
+                      مسـار خاص
                     </span>
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1 rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300">
@@ -552,7 +552,7 @@ export function CustomCourseTracker({
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        {course.credits ?? 3} ساعة
+                        {course.credits ?? 3} ساعـة
                       </span>
                     </div>
                   </div>

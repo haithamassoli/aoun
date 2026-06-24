@@ -184,7 +184,7 @@ export function MobilePageHeaderMenu({
                     <div className="relative flex items-center justify-between gap-3 px-5 pt-5">
                       <div className="pointer-events-none absolute inset-x-5 top-2 h-16 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.12)_0%,transparent_72%)] blur-2xl dark:bg-[radial-gradient(circle,rgba(96,165,250,0.16)_0%,transparent_72%)]" />
                       <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                        عـون
+                        عــون
                       </span>
                       <motion.button
                         type="button"
@@ -220,7 +220,7 @@ export function MobilePageHeaderMenu({
                             onClick={() => setIsOpen(false)}
                             className="flex items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm font-medium text-surface-700 shadow-sm transition-all hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-950/40 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-900"
                           >
-                            <span>لوحة التحكم</span>
+                            <span>لوحة التحـكم</span>
                             <svg
                               className="h-4 w-4 shrink-0"
                               fill="none"
@@ -243,7 +243,7 @@ export function MobilePageHeaderMenu({
                               onClick={() => setIsOpen(false)}
                               className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm font-medium text-surface-700 shadow-sm transition-all hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-950/40 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-900"
                             >
-                              <span>الإعدادات</span>
+                              <span>الإعـدادات</span>
                               <svg
                                 className="h-4 w-4 shrink-0"
                                 fill="none"

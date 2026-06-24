@@ -183,7 +183,7 @@ export default function AdminMajorsPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -195,7 +195,7 @@ export default function AdminMajorsPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         <span className="font-medium text-surface-900 dark:text-surface-50">
-          التخصصات
+          التخصصـات
         </span>
       </nav>
 
@@ -208,10 +208,10 @@ export default function AdminMajorsPage() {
       >
         <div>
           <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-            إدارة التخصصات
+            إدارة التخصصـات
           </h1>
           <p className="text-sm text-surface-500 dark:text-surface-400">
-            {majors ? `${majors.length} تخصص` : "جاري التحميل..."}
+            {majors ? `${majors.length} تخصـص` : "جاري التحميـل..."}
           </p>
         </div>
         <button
@@ -235,13 +235,13 @@ export default function AdminMajorsPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          إضافة تخصص
+          إضافة تخصـص
         </button>
       </motion.div>
 
       <FormModal
         open={showForm}
-        title={editingId ? "تعديل التخصص" : "إضافة تخصص جديد"}
+        title={editingId ? "تعديل التخصـص" : "إضافة تخصص جديـد"}
         onClose={resetForm}
       >
         <form
@@ -271,22 +271,22 @@ export default function AdminMajorsPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                المعلومات الأساسية
+                المعلومات الأساسيـة
               </h3>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormSelect
                 form={form}
                 name="universityId"
-                label="الجامعة *"
+                label="الجامعـة *"
                 options={universityOptions}
-                placeholder="اختر الجامعة"
+                placeholder="اختر الجامعـة"
                 disabled={!!editingId}
               />
               <FormInput
                 form={form}
                 name="name"
-                label="اسم التخصص *"
+                label="اسم التخصـص *"
                 onChangeCallback={(val) => {
                   if (!editingId) form.setFieldValue("slug", generateSlug(val));
                 }}
@@ -294,19 +294,19 @@ export default function AdminMajorsPage() {
               <FormInput
                 form={form}
                 name="slug"
-                label="الرابط (slug) *"
+                label="الرابـط (slug) *"
                 dir="ltr"
               />
               <FormInput
                 form={form}
                 name="alias"
-                label="الاسم البديل (alias)"
-                placeholder="اسم بديل للبحث"
+                label="الاسم البديـل (alias)"
+                placeholder="اسم بديل للبحـث"
               />
               <FormInput
                 form={form}
                 name="order"
-                label="الترتيب"
+                label="الترتـيب"
                 type="number"
                 min="0"
               />
@@ -337,16 +337,16 @@ export default function AdminMajorsPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                شجرة المسار الدراسي
+                شجرة المسـار الدراسي
               </h3>
             </div>
             <p className="text-xs text-surface-500 dark:text-surface-400">
-              رابط مخطط المواد والمتطلبات الدراسية للتخصص
+              رابط مخطط المواد والمتطلبات الدراسيـة للتخصص
             </p>
             <FormInput
               form={form}
               name="treeDiagramUrl"
-              label="رابط شجرة المسار"
+              label="رابط شجرة المسـار"
               placeholder="https://drive.google.com/..."
               dir="ltr"
             />
@@ -374,11 +374,11 @@ export default function AdminMajorsPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                حسابات التواصل الاجتماعي
+                حسابات التواصل الاجتماعـي
               </h3>
             </div>
             <p className="text-xs text-surface-500 dark:text-surface-400">
-              روابط حسابات التخصص على منصات التواصل الاجتماعي
+              روابط حسابات التخصص على منصـات التواصل الاجتماعي
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <FormInput
@@ -426,7 +426,7 @@ export default function AdminMajorsPage() {
               onClick={resetForm}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
@@ -456,7 +456,7 @@ export default function AdminMajorsPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         />
                       </svg>
-                      جاري الحفظ...
+                      جاري الحـفظ...
                     </>
                   ) : (
                     <>
@@ -473,7 +473,7 @@ export default function AdminMajorsPage() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      {editingId ? "تحديث التخصص" : "إضافة التخصص"}
+                      {editingId ? "تحديث التخصـص" : "إضافة التخصـص"}
                     </>
                   )}
                 </button>
@@ -496,10 +496,10 @@ export default function AdminMajorsPage() {
       ) : majors.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-            لا توجد تخصصات
+            لا توجد تخصصـات
           </p>
           <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-            أضف تخصص جديد للبدء
+            أضف تخصص جديد للبـدء
           </p>
         </div>
       ) : (
@@ -562,7 +562,7 @@ export default function AdminMajorsPage() {
                       <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
                       <path d="M12 12V8" />
                     </svg>
-                    شجرة المسار الدراسي
+                    شجرة المسـار الدراسي
                   </a>
                 )}
 
@@ -572,7 +572,7 @@ export default function AdminMajorsPage() {
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary-50 px-3 py-2 text-xs font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:bg-primary-950"
                     aria-label={`إدارة فصول ومواد ${major.name}`}
                   >
-                    الفصول والمواد
+                    الفصول والمـواد
                   </Link>
                   <button
                     type="button"
@@ -592,7 +592,7 @@ export default function AdminMajorsPage() {
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
-                    تعديل
+                    تعديـل
                   </button>
                   <button
                     type="button"
@@ -682,7 +682,7 @@ export default function AdminMajorsPage() {
                             <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
                             <path d="M12 12V8" />
                           </svg>
-                          شجرة المسار
+                          شجرة المسـار
                         </a>
                       )}
                     </div>

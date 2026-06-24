@@ -65,10 +65,10 @@ export function NewsList({
           </svg>
         </div>
         <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-          لا توجد أخبار
+          لا توجد أخبـار
         </p>
         <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-          أضف خبراً جديداً للبدء
+          أضف خبراً جديداً للبـدء
         </p>
       </div>
     );
@@ -166,7 +166,7 @@ export function NewsList({
             onClick={() => loadMore(10)}
             className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
           >
-            تحميل المزيد
+            تحميل المزيـد
           </button>
         </div>
       )}

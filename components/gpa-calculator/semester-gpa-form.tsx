@@ -135,7 +135,7 @@ function SemesterGpaFormContent({
             {(field: GradeTypeField) => (
               <div>
                 <label className="mb-1 block text-sm font-medium text-surface-700 dark:text-surface-200">
-                  نوع الدرجة
+                  نوع الدرجـة
                 </label>
                 <select
                   value={field.state.value}
@@ -153,7 +153,7 @@ function SemesterGpaFormContent({
                   ))}
                 </select>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  النوع المختار سيُطبّق على جميع المواد في هذا النموذج.
+                  النـوع المختار سيُطبّق على جميع المواد في هذا النموذج.
                 </p>
               </div>
             )}
@@ -164,10 +164,10 @@ function SemesterGpaFormContent({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-surface-700 dark:text-surface-200">
-              المواد الدراسية
+              المواد الدراسـية
             </h3>
             <span className="text-xs text-surface-500 dark:text-surface-400">
-              {courses.length} {courses.length === 1 ? "مادة" : "مواد"}
+              {courses.length} {courses.length === 1 ? "مـادة" : "مـواد"}
             </span>
           </div>
 
@@ -195,7 +195,7 @@ function SemesterGpaFormContent({
             <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
-            إضافة مادة
+            إضافة مـادة
           </button>
         </div>
 
@@ -209,7 +209,7 @@ function SemesterGpaFormContent({
           type="submit"
           className="w-full rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 active:bg-primary-800"
         >
-          احسب المعدل
+          احسب المعـدل
         </button>
       </form>
 
@@ -217,7 +217,7 @@ function SemesterGpaFormContent({
         <GpaResultCard
           result={result}
           scale={scale}
-          title="معدل الفصل الدراسي"
+          title="معدل الفصـل الدراسي"
         />
       )}
     </div>

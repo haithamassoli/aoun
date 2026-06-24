@@ -20,10 +20,10 @@ export function PartnersGrid() {
       <div className="relative overflow-hidden bg-[linear-gradient(180deg,#407bf3_0%,#356eea_34%,#2d61df_62%,#2957d3_82%,#274fc7_100%)] px-4 py-16 text-center sm:px-6 lg:px-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-60 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24)_0%,transparent_72%)]" />
         <h1 className="public-section-title relative text-3xl font-bold text-white sm:text-4xl">
-          شركاؤنا وداعمونا
+          شركاؤنا وداعمونــا
         </h1>
         <p className="relative mt-3 text-lg text-primary-100">
-          الجهات التي تساهم في دعم منصة عون وتطويرها
+          الجهات التي تسـاهم في دعم منصة عون وتطويرها
         </p>
       </div>
 
@@ -41,7 +41,7 @@ export function PartnersGrid() {
           </div>
         ) : partners.length === 0 ? (
           <p className="text-center text-surface-400 dark:text-surface-500">
-            لا يوجد شركاء حتى الآن
+            لا يوجد شركـاء حتى الآن
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">

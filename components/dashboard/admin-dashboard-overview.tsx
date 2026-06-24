@@ -123,9 +123,9 @@ function getPercent(value: number, total: number) {
 function formatTooltipLabel(name: string) {
   switch (name) {
     case "pageViews":
-      return "مشاهدات الصفحات";
+      return "مشاهدات الصفحـات";
     case "uniqueVisitors":
-      return "الزوار الفريدون";
+      return "الزوار الفريـدون";
     default:
       return name;
   }
@@ -283,9 +283,9 @@ function SummaryCard({
 
 function ContentInventory({ analytics }: { analytics: DashboardAnalytics }) {
   const items = [
-    { label: "جامعات", value: analytics.universitiesTotal },
-    { label: "تخصصات", value: analytics.majorsTotal },
-    { label: "مواد", value: analytics.coursesTotal },
+    { label: "جامعـات", value: analytics.universitiesTotal },
+    { label: "تخصصـات", value: analytics.majorsTotal },
+    { label: "مـواد", value: analytics.coursesTotal },
   ];
 
   return (
@@ -319,8 +319,8 @@ function TopPageList({
   if (pages.length === 0) {
     return (
       <EmptyState
-        title="لا توجد صفحات متصدرة بعد"
-        description="عند وصول أول الزيارات التفصيلية سيظهر هنا المحتوى الذي يحتاج تحسينًا أو إبرازًا أكثر."
+        title="لا توجد صفحات متصدرة بعـد"
+        description="عند وصول أول الزيارات التفصيلية سيظهر هنا المحتوى الذي يحتاج تحسينًا أو إبرازًا أكثـر."
       />
     );
   }
@@ -362,13 +362,13 @@ function TopPageList({
                   {formatNumber(page.pageViews)}
                 </p>
                 <p className="text-xs text-surface-500 dark:text-surface-400">
-                  {formatPercent(share)} من الزيارات
+                  {formatPercent(share)} من الزيـارات
                 </p>
               </div>
             </div>
             <MeterBar percent={widthPercent} />
             <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
-              {formatNumber(page.uniqueVisitors)} زائر فريد
+              {formatNumber(page.uniqueVisitors)} زائر فريـد
             </p>
           </div>
         );
@@ -387,8 +387,8 @@ function PageTypeList({
   if (traffic.length === 0) {
     return (
       <EmptyState
-        title="لا يوجد توزيع صفحات بعد"
-        description="سيظهر هذا القسم بعد وصول زيارات فعلية، لتعرف هل الحركة تتركز في المواد أم الجامعات أم الأدوات."
+        title="لا يوجد توزيع صفحات بعـد"
+        description="سيظهر هذا القسم بعد وصول زيارات فعلية، لتعرف هل الحركة تتركز في المواد أم الجامعات أم الأدوات بدقـة."
       />
     );
   }
@@ -409,7 +409,7 @@ function PageTypeList({
                   {entry.label}
                 </p>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  {formatNumber(entry.uniqueVisitors)} زائر فريد
+                  {formatNumber(entry.uniqueVisitors)} زائر فريـد
                 </p>
               </div>
               <div className="text-left">
@@ -419,7 +419,7 @@ function PageTypeList({
                   {formatPercent(share)}
                 </p>
                 <p className="text-xs text-surface-500 dark:text-surface-400">
-                  {formatNumber(entry.pageViews)} مشاهدة
+                  {formatNumber(entry.pageViews)} مشـاهدة
                 </p>
               </div>
             </div>
@@ -449,9 +449,9 @@ function TransitionList({
     return (
       <EmptyState
         title={
-          hasPageLevelData ? "لا توجد انتقالات كافية بعد" : "بانتظار أول مسارات تنقل"
+          hasPageLevelData ? "لا توجد انتقالات كافية بعـد" : "بانتظار أول مسارات تنقـل"
         }
-        description="عند تنقل الطلاب بين الصفحات العامة سيظهر هنا المسار الأكثر تكرارًا بوضوح."
+        description="عند تنقل الطلاب بين الصفحات العامة سيظهر هنا المسار الأكثر تكرارًا بوضـوح."
       />
     );
   }
@@ -502,7 +502,7 @@ function TransitionList({
                   {formatNumber(transition.count)}
                 </p>
                 <p className="text-xs text-surface-500 dark:text-surface-400">
-                  انتقال
+                  انتقـال
                 </p>
               </div>
             </div>
@@ -586,11 +586,11 @@ function TrafficLegend() {
     <div className="flex flex-wrap gap-3 text-xs text-surface-500 dark:text-surface-400">
       <span className="inline-flex items-center gap-2">
         <span className="size-2.5 rounded-full bg-primary-600" />
-        مشاهدات الصفحات
+        مشاهدات الصفحـات
       </span>
       <span className="inline-flex items-center gap-2">
         <span className="size-2.5 rounded-full bg-emerald-600" />
-        الزوار الفريدون
+        الزوار الفريـدون
       </span>
     </div>
   );
@@ -662,9 +662,9 @@ export function AdminDashboardOverview({
           transition={{ duration: 0.28, delay: 0.05 }}
         >
           <SummaryCard
-            label="حجم المحتوى"
+            label="حجم المحتـوى"
             value={formatNumber(analytics.coursesTotal)}
-            description="عدد المواد هو المؤشر الأسرع لحجم الدليل الأكاديمي المتاح للطلاب."
+            description="عدد المواد هو المؤشر الأسرع لحجم الدليل الأكاديمي المتاح للطـلاب."
           >
             <ContentInventory analytics={analytics} />
           </SummaryCard>
@@ -676,11 +676,11 @@ export function AdminDashboardOverview({
           transition={{ duration: 0.28, delay: 0.1 }}
         >
           <SummaryCard
-            label="نشاط آخر 30 يومًا"
+            label="نشاط آخـر 30 يومًا"
             value={formatNumber(analytics.pageViewsTotal)}
             description={`${formatNumber(
               dailyVisitorTotal,
-            )} زيارة فريدة يومية، بمتوسط ${formatDecimal(
+            )} زيارة فريدة يوميـة، بمتوسط ${formatDecimal(
               viewsPerVisitor,
             )} مشاهدة لكل زيارة.`}
             featured
@@ -693,12 +693,12 @@ export function AdminDashboardOverview({
           transition={{ duration: 0.28, delay: 0.15 }}
         >
           <SummaryCard
-            label="أوضح إشارة الآن"
+            label="أوضح إشـارة الآن"
             value={topPage ? formatPercent(topPageShare) : "0%"}
             description={
               topPage
-                ? `${shortenLabel(topPage.label, 38)} تستحوذ على هذه النسبة من المشاهدات.`
-                : "بانتظار بيانات صفحات كافية لتحديد المحتوى الأبرز."
+                ? `${shortenLabel(topPage.label, 38)} تستحوذ على هذه النسبة من المشاهـدات.`
+                : "بانتظار بيانات صفحات كافية لتحديد المحتوى الأبـرز."
             }
           />
         </motion.div>
@@ -710,31 +710,31 @@ export function AdminDashboardOverview({
         transition={{ duration: 0.32, delay: 0.2 }}
       >
         <SectionFrame
-          eyebrow="حركة الزيارات"
-          title="هل الحركة تنمو أم تتذبذب؟"
-          description="اقرأ الأعمدة كحجم مشاهدة، والخط كعدد طلاب مختلفين. الفرق بينهما يوضح عمق التصفح."
+          eyebrow="حركة الزيـارات"
+          title="هل الحركة تنمو أم تتذبـذب؟"
+          description="اقرأ الأعمدة كحجم مشاهدة، والخط كعدد طلاب مختلفين. الفرق بينهما يوضح عمق التصـفح."
         >
           <div className="grid gap-6 lg:grid-cols-[0.85fr_1.35fr] lg:items-center">
             <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
               <div className="rounded-3xl bg-surface-50 p-4 dark:bg-surface-950/60">
                 <SmallMetric
-                  label="متوسط المشاهدات اليومي"
+                  label="متوسط المشاهدات اليومـي"
                   value={averageDailyViews}
-                  hint={`${formatNumber(totalTrackedDays)} يومًا متتبعًا`}
+                  hint={`${formatNumber(totalTrackedDays)} يومًا متتبـعًا`}
                 />
               </div>
               <div className="rounded-3xl bg-surface-50 p-4 dark:bg-surface-950/60">
                 <SmallMetric
-                  label="أعلى يوم مشاهدة"
+                  label="أعلى يوم مشـاهدة"
                   value={formatNumber(peakTrafficDay.pageViews)}
-                  hint={peakTrafficDay.label || "لا توجد بيانات بعد"}
+                  hint={peakTrafficDay.label || "لا توجد بيانات بعـد"}
                 />
               </div>
               <div className="rounded-3xl bg-surface-50 p-4 dark:bg-surface-950/60">
                 <SmallMetric
-                  label="المشاهدات لكل زيارة فريدة"
+                  label="المشاهدات لكل زيارة فريـدة"
                   value={formatDecimal(viewsPerVisitor)}
-                  hint="كلما ارتفع الرقم زاد تنقل الطالب داخل الموقع"
+                  hint="كلما ارتفع الرقم زاد تنقل الطالب داخل الموقـع"
                 />
               </div>
             </div>
@@ -743,7 +743,7 @@ export function AdminDashboardOverview({
               <div className="mt-4 flex items-center justify-between gap-4">
                 <TrafficLegend />
                 <p className="hidden text-xs text-surface-500 dark:text-surface-400 sm:block">
-                  آخر {formatNumber(totalTrackedDays)} يومًا
+                  آخـر {formatNumber(totalTrackedDays)} يومًا
                 </p>
               </div>
             </div>
@@ -758,9 +758,9 @@ export function AdminDashboardOverview({
           transition={{ duration: 0.32, delay: 0.26 }}
         >
           <SectionFrame
-            eyebrow="اهتمام الطلاب"
-            title="أكثر الصفحات فائدة للمراقبة"
-            description="هذه القائمة تكشف أين يذهب الطلاب فعليًا، مع حصة كل صفحة من إجمالي المشاهدات."
+            eyebrow="اهتمام الطـلاب"
+            title="أكثر الصفحات فائدة للمراقبـة"
+            description="هذه القائمة تكشف أين يذهب الطلاب فعليًا، مع حصة كل صفحة من إجمالي المشاهـدات."
           >
             <TopPageList
               pages={analytics.topPages}
@@ -775,14 +775,14 @@ export function AdminDashboardOverview({
           transition={{ duration: 0.32, delay: 0.32 }}
         >
           <SectionFrame
-            eyebrow="توزيع الحركة"
-            title="أي نوع صفحات يجذب الزيارات؟"
+            eyebrow="توزيع الحركـة"
+            title="أي نوع صفحات يجذب الزيـارات؟"
             description={
               topPageType
                 ? `${topPageType.label} يستحوذ على ${formatPercent(
                     topPageTypeShare,
-                  )} من الحركة الحالية.`
-                : "سيظهر توزيع الأنواع بعد وصول بيانات صفحات كافية."
+                  )} من الحركة الحاليـة.`
+                : "سيظهر توزيع الأنواع بعد وصول بيانات صفحات كافيـة."
             }
           >
             <PageTypeList
@@ -799,9 +799,9 @@ export function AdminDashboardOverview({
         transition={{ duration: 0.32, delay: 0.38 }}
       >
         <SectionFrame
-          eyebrow="مسارات التنقل"
-          title="كيف ينتقل الطلاب بين الصفحات؟"
-          description="استخدم هذه المسارات لمعرفة أين تحتاج روابط أو دعوات أو ترتيبًا أوضح داخل الصفحات العامة."
+          eyebrow="مسارات التنقـل"
+          title="كيف ينتقل الطلاب بين الصفحـات؟"
+          description="استخدم هذه المسارات لمعرفة أين تحتاج روابط أو دعوات أو ترتيبًا أوضح داخل الصفحات العامـة."
         >
           <TransitionList
             transitions={analytics.topTransitions}
@@ -813,7 +813,7 @@ export function AdminDashboardOverview({
       {!hasPageLevelData &&
       analytics.visitorSeries.some((point) => point.uniqueVisitors > 0) ? (
         <div className="rounded-3xl border border-primary-200 bg-primary-50/70 px-4 py-3 text-sm leading-6 text-primary-800 dark:border-primary-900/60 dark:bg-primary-950/30 dark:text-primary-200">
-          بيانات الزوار اليومية القديمة ما زالت ظاهرة. تفاصيل الصفحات والمسارات
+          بيانات الزوار اليومية القديمة ما زالت ظاهـرة. تفاصيل الصفحات والمسارات
           ستبدأ بالظهور مع الزيارات الجديدة بعد تفعيل التتبع الأدق.
         </div>
       ) : null}

@@ -68,18 +68,18 @@ export default async function CoursesPage({
   return (
     <>
       <MobilePageHeaderMenu
-        title="البحث عن المواد"
-        subtitle="ابحث في جميع الجامعات الأردنية من صفحة واحدة"
+        title="البحث عن المـواد"
+        subtitle="ابحث في جميع الجـامعات الأردنية من صفحة واحدة"
       >
         <div className="public-elevated-surface rounded-[28px] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-            أداة سريعة
+            أداة سريـعة
           </p>
           <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
-            ابحث عن أي مادة
+            ابحث عن أي مـادة
           </h2>
           <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-            اكتب اسم المادة أو رمزها، ثم صفِّ النتائج حسب الجامعة والتخصص للوصول
+            اكتب اسم المـادة أو رمزها، ثم صفِّ النتائج حسب الجامعة والتخصص للوصول
             إلى الصفحة الصحيحة بسرعة.
           </p>
         </div>

@@ -389,13 +389,13 @@ export function FocusSoundStudio() {
               <div>
                 <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
                   {activeSoundCount === 1
-                    ? "صوت واحد نشط"
+                    ? "صوت واحـد نشط"
                     : activeSoundCount === 2
-                      ? "صوتان نشطان"
-                      : `${activeSoundCount} أصوات نشطة`}
+                       ? "صوتـان نشطان"
+                       : `${activeSoundCount} أصوات نشطـة`}
                 </p>
                 <p className="text-xs text-surface-500 dark:text-surface-400">
-                  {isPaused ? "متوقف مؤقتاً" : "يعمل الآن"}
+                  {isPaused ? "متوقف مؤقتـاً" : "يعمـل الآن"}
                 </p>
               </div>
             </div>
@@ -415,7 +415,7 @@ export function FocusSoundStudio() {
                     >
                       <path d="M8 5v14l11-7z" />
                     </svg>
-                    <span className="hidden sm:inline">استئناف</span>
+                    <span className="hidden sm:inline">استئـناف</span>
                   </>
                 ) : (
                   <>
@@ -426,7 +426,7 @@ export function FocusSoundStudio() {
                     >
                       <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                     </svg>
-                    <span className="hidden sm:inline">إيقاف</span>
+                    <span className="hidden sm:inline">إيقـاف</span>
                   </>
                 )}
               </button>
@@ -567,7 +567,7 @@ export function FocusSoundStudio() {
                         : `تشغيل ${sound.label}`
                     }
                   >
-                    {sound.enabled ? "إيقاف" : "تشغيل"}
+                    {sound.enabled ? "إيقـاف" : "تشغـيل"}
                   </button>
                 </div>
 
@@ -667,10 +667,10 @@ export function FocusSoundStudio() {
               </svg>
             </div>
             <h3 className="mt-4 text-lg font-semibold text-surface-900 dark:text-surface-50">
-              اختر صوتاً للبدء
+              اختر صوتـاً للبدء
             </h3>
             <p className="mt-2 text-sm text-surface-600 dark:text-surface-400">
-              اضغط على &quot;تشغيل&quot; في أي بطاقة لبدء جلسة التركيز
+              اضغط على &quot;تشغـيل&quot; في أي بطاقة لبدء جلسة التركيز
             </p>
           </motion.div>
         )}

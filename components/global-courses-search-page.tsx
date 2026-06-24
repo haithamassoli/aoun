@@ -221,12 +221,12 @@ function EmptyState({
           </div>
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-surface-900 dark:text-surface-50">
-              كيف تبحث؟
+              كيف تبـحث؟
             </h2>
             <ul className="mt-3 space-y-2 text-sm text-surface-600 dark:text-surface-400">
-              <li>• اكتب اسم المادة بالعربي أو الإنجليزي أو رمزها مثل CS101</li>
-              <li>• اختر الجامعة لتضييق النتائج (اختياري)</li>
-              <li>• اختر التخصص بعد اختيار الجامعة (اختياري)</li>
+              <li>• اكتب اسم المـادة بالعربي أو الإنجليزي أو رمزها مثل CS101</li>
+              <li>• اختر الجـامعة لتضييق النتائج (اختياري)</li>
+              <li>• اختر التخـصص بعد اختيار الجامعة (اختياري)</li>
             </ul>
           </div>
         </div>
@@ -238,7 +238,7 @@ function EmptyState({
           <div className="flex items-center gap-3">
             <ClockIcon className="h-5 w-5 text-surface-400 dark:text-surface-500" />
             <h3 className="text-base font-semibold text-surface-900 dark:text-surface-50">
-              عمليات البحث الأخيرة
+              عمليات البحث الأخيـرة
             </h3>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -554,10 +554,10 @@ function GlobalCoursesSearchPageInner({
         <div className="mx-auto max-w-5xl">
           <div className="mb-6 hidden md:block">
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl">
-              البحث عن المواد
+              البحث عن المـواد
             </h1>
             <p className="mt-2 text-sm text-surface-600 dark:text-surface-400 sm:text-base">
-              ابحث عن المواد في جميع الجامعات الأردنية من مكان واحد
+              ابحث عن المـواد في جميع الجامعات الأردنية من مكان واحد
             </p>
           </div>
 
@@ -575,8 +575,8 @@ function GlobalCoursesSearchPageInner({
               <form.Field name="query">
                 {(field) => (
                   <PublicSearchInput
-                    label="اسم المادة أو رمزها"
-                    placeholder="مثال: تراكيب البيانات أو CS201"
+                    label="اسم المـادة أو رمزها"
+                    placeholder="مثال: تراكيب البيانـات أو CS201"
                     value={field.state.value}
                     onChange={field.handleChange}
                   />
@@ -592,7 +592,7 @@ function GlobalCoursesSearchPageInner({
                   htmlFor="global-course-search-university"
                   className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-400"
                 >
-                  الجامعة
+                  الجـامعة
                 </label>
                 <form.Field name="universitySlug">
                   {(field) => (
@@ -605,7 +605,7 @@ function GlobalCoursesSearchPageInner({
                       }}
                       className={getSelectClassName(false)}
                     >
-                      <option value="">كل الجامعات</option>
+                      <option value="">كل الجـامعات</option>
                       {sortedUniversities.map((university) => (
                         <option key={university._id} value={university.slug}>
                           {university.name}
@@ -622,7 +622,7 @@ function GlobalCoursesSearchPageInner({
                   htmlFor="global-course-search-major"
                   className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-400"
                 >
-                  التخصص
+                  التخـصص
                 </label>
                 <form.Field name="majorSlug">
                   {(field) => (
@@ -641,8 +641,8 @@ function GlobalCoursesSearchPageInner({
                     >
                       <option value="">
                         {effectiveUniversitySlug
-                          ? "كل التخصصات"
-                          : "اختر الجامعة أولاً"}
+                          ? "كل التخـصصات"
+                          : "اختر الجـامعة أولاً"}
                       </option>
                       {sortedMajors.map((major) => (
                         <option key={major._id} value={major.slug}>
@@ -660,7 +660,7 @@ function GlobalCoursesSearchPageInner({
                 disabled={normalizedInput.length === 0}
                 className="h-full min-h-[56px] rounded-xl bg-primary-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-surface-300 dark:disabled:bg-surface-700 sm:col-span-2 lg:col-span-1"
               >
-                حفظ البحث
+                حفظ البـحث
               </button>
             </div>
           </form>
@@ -691,17 +691,17 @@ function GlobalCoursesSearchPageInner({
               <BookOpenIcon className="h-6 w-6 text-surface-400 dark:text-surface-500" />
             </div>
             <h2 className="mt-4 text-base font-semibold text-surface-900 dark:text-surface-50">
-              لا توجد نتائج
+              لا توجد نتائـج
             </h2>
             <p className="mt-2 text-sm text-surface-600 dark:text-surface-400">
-              جرّب تعديل البحث أو إزالة الفلاتر
+              جرّب تعديل البـحث أو إزالة الفلاتر
             </p>
           </div>
         ) : (
           <div>
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-surface-600 dark:text-surface-400">
-                {activeResults.length} نتيجة
+                {activeResults.length} نتيـجة
               </p>
             </div>
 

@@ -15,7 +15,7 @@ export function HeaderAuth() {
         href="/dashboard"
         className="rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:bg-primary-950 dark:text-primary-300 dark:hover:bg-primary-900"
       >
-        لوحة التحكــم
+        لوحة التحـكم
       </Link>
     );
   }
@@ -25,7 +25,7 @@ export function HeaderAuth() {
       href="/login"
       className="text-sm font-medium text-surface-500 transition-colors hover:text-primary-600 dark:text-surface-400 dark:hover:text-primary-400"
     >
-      تسجيل الدخول
+      تسجيل الدخـول
     </Link>
   );
 }

@@ -86,13 +86,13 @@ export default async function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-10 flex items-center justify-between">
               <h2 className="public-section-title text-sm font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500">
-                شركاؤنــا وداعمــونا
+                شركاؤنا وداعمونــا
               </h2>
               <Link
                 href="/partners"
                 className="group flex items-center gap-2 text-sm text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
               >
-                عرض الكــل
+                عرض الكـل
                 <svg
                   className="size-4 transition-transform group-hover:-translate-x-1"
                   fill="none"

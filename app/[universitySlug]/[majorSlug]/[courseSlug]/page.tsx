@@ -131,7 +131,7 @@ export default async function CoursePage({
     }),
   );
   const courseBreadcrumbItems = [
-    { label: "الرئيسية", href: "/" },
+    { label: "الرئيسـية", href: "/" },
     { label: university.name, href: `/${canonicalUniversitySlug}` },
     {
       label: major.name,
@@ -213,7 +213,7 @@ export default async function CoursePage({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-                المادة
+                المـادة
               </p>
               <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
                 {course.name}
@@ -244,7 +244,7 @@ export default async function CoursePage({
               rel="noopener noreferrer"
               className="flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
             >
-              <span>شجرة مسار التخصص</span>
+              <span>شجرة مسار التخـصص</span>
               <svg
                 className="h-4 w-4 shrink-0"
                 fill="none"
@@ -266,7 +266,7 @@ export default async function CoursePage({
             href={`/${canonicalUniversitySlug}/${canonicalMajorSlug}/news`}
             className="flex items-center justify-between gap-3 rounded-2xl border border-primary-200 bg-white px-4 py-3 text-sm font-medium text-primary-700 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:border-primary-700 dark:hover:bg-primary-950"
           >
-            <span>الأخبار والمستجدات</span>
+            <span>الأخبـار والمستجدات</span>
             <svg
               className="h-4 w-4 shrink-0"
               fill="none"
@@ -325,7 +325,7 @@ export default async function CoursePage({
               </p>
             </div>
             <div className="shrink-0 text-xs font-medium text-surface-500 transition-colors group-hover:text-primary-700 dark:text-surface-400 dark:group-hover:text-primary-300">
-              عرض
+              عـرض
             </div>
           </Link>
         ) : null}
@@ -390,7 +390,7 @@ export default async function CoursePage({
                     <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
                     <path d="M12 12V8" />
                   </svg>
-                  شجرة مسار التخصص
+                  شجرة مسار التخـصص
                 </a>
               )}
               <Link
@@ -411,7 +411,7 @@ export default async function CoursePage({
                     d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
                   />
                 </svg>
-                الأخبار والمستجدات
+                الأخبـار والمستجدات
               </Link>
             </div>
             {majorSocialLinks.length > 0 && (
@@ -461,7 +461,7 @@ export default async function CoursePage({
                   </p>
                 </div>
                 <div className="shrink-0 text-xs font-medium text-surface-500 transition-colors group-hover:text-primary-700 dark:text-surface-400 dark:group-hover:text-primary-300">
-                  عرض الخبر
+                  عرض الخـبر
                 </div>
               </Link>
             </motion.div>

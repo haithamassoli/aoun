@@ -33,9 +33,9 @@ type HistoryEntry = {
 };
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "semester", label: "معدل الفصل", icon: "📚" },
-  { id: "cumulative", label: "المعدل التراكمي", icon: "📊" },
-  { id: "planner", label: "مخطط المعدل", icon: "🎯" },
+  { id: "semester", label: "معدل الفصـل", icon: "📚" },
+  { id: "cumulative", label: "المعدل التراكمـي", icon: "📊" },
+  { id: "planner", label: "مخطـط المعدل", icon: "🎯" },
 ];
 const MAX_HISTORY_ITEMS = 12;
 const HISTORY_TONE_STYLES: Record<HistoryTone, string> = {
@@ -240,10 +240,10 @@ export function GpaCalculatorTabs() {
       {/* Header */}
       <div className="mb-8 text-center hidden md:block">
         <h1 className="text-3xl font-bold text-surface-900 dark:text-surface-50">
-          حاسبة المعدل
+          حاسبـة المعدل
         </h1>
         <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-          احسب معدلك الفصلي والتراكمي أو خطط للفصل القادم
+          احسب معدلك الفصلـي والتراكمي أو خطط للفصل القادم
         </p>
       </div>
 
@@ -252,10 +252,10 @@ export function GpaCalculatorTabs() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="font-medium text-surface-600 dark:text-surface-300">
-              آلية الحساب
+              آلية الحسـاب
             </p>
             <p className="mt-1 max-w-xl leading-5">
-              النتيجة تظهر كنسبة مئوية وبالنقاط معاً، ويمكنك التبديل بين سلم 4.2
+              النتيجـة تظهر كنسبة مئوية وبالنقاط معاً، ويمكنك التبديل بين سلم 4.2
               وسلّم 4.0 حسب نظام جامعتك قبل إدخال المواد.
             </p>
           </div>
@@ -268,7 +268,7 @@ export function GpaCalculatorTabs() {
               disabled={isPercentageGradeType}
               className="h-3.5 w-3.5 rounded border-surface-300 text-primary-600 focus:ring-primary-500 dark:border-surface-600"
             />
-            جامعتي تعتمد نظام 4.2
+            جامعتـي تعتمد نظام 4.2
           </label>
         </div>
         {isPercentageGradeType && (
@@ -325,10 +325,10 @@ export function GpaCalculatorTabs() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-base font-semibold text-surface-900 dark:text-surface-50">
-              السجل
+              السجـل
             </h2>
             <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-              آخر العمليات محفوظة محلياً على هذا الجهاز.
+              آخر العمليات محفوظة محليـاً على هذا الجهاز.
             </p>
           </div>
           {history.length > 0 && (
@@ -337,7 +337,7 @@ export function GpaCalculatorTabs() {
               onClick={() => setHistory([])}
               className="rounded-lg border border-surface-200 px-3 py-1.5 text-xs font-medium text-surface-500 transition-colors hover:border-red-300 hover:text-red-600 dark:border-surface-700 dark:text-surface-400 dark:hover:border-red-800 dark:hover:text-red-400"
             >
-              مسح السجل
+              مسح السجـل
             </button>
           )}
         </div>
@@ -371,7 +371,7 @@ export function GpaCalculatorTabs() {
             ))
           ) : (
             <p className="rounded-xl border border-dashed border-surface-200 px-4 py-5 text-center text-sm text-surface-500 dark:border-surface-700 dark:text-surface-400">
-              لا توجد عمليات محفوظة لهذا القسم بعد.
+              لا توجد عملـيات محفوظة لهذا القسم بعد.
             </p>
           )}
         </div>
@@ -380,7 +380,7 @@ export function GpaCalculatorTabs() {
       {/* Grade Scale Reference */}
       <details className="mt-6 rounded-xl border border-surface-200 bg-surface-50 dark:border-surface-700 dark:bg-surface-800/50">
         <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200">
-          جدول تحويل الدرجات
+          جدول تحويـل الدرجات
         </summary>
         <div className="px-4 pb-4 pt-2">
           <p className="mb-1 text-xs font-semibold text-surface-600 dark:text-surface-300">
@@ -392,9 +392,9 @@ export function GpaCalculatorTabs() {
           <table className="w-full text-xs">
             <thead>
               <tr className="text-surface-500 dark:text-surface-400">
-                <th className="pb-1 text-right font-medium">الحرف</th>
+                <th className="pb-1 text-right font-medium">الحـرف</th>
                 <th className="pb-1 text-center font-medium">%</th>
-                <th className="pb-1 text-left font-medium">نقطة</th>
+                <th className="pb-1 text-left font-medium">نقطـة</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-100 dark:divide-surface-700">
@@ -414,7 +414,7 @@ export function GpaCalculatorTabs() {
           </table>
         </div>
         <p className="px-4 pb-4 text-[11px] leading-5 text-surface-500 dark:text-surface-400">
-          تحويل النسبة المئوية هنا تقريبي للاستخدام العام. إذا كنت تعتمد حدوداً
+          تحويـل النسبة المئوية هنا تقريبي للاستخدام العام. إذا كنت تعتمد حدوداً
           مختلفة في جامعتك، فاستخدم الإدخال بالحروف أو بالنقاط لأنه أدق.
         </p>
       </details>

@@ -177,10 +177,10 @@ export function LocalDataSettings() {
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <header className="mb-6 sm:mb-8">
           <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50 sm:text-3xl">
-            النسخ الاحتياطي المحلي
+            النسخ الاحتياطـي المحلي
           </h1>
           <p className="mt-2 text-sm text-surface-600 dark:text-surface-400 sm:text-base">
-            احفظ واستعد بياناتك الدراسية المخزنة على جهازك
+            احفظ واستعد بياناتـك الدراسية المخزنة على جهازك
           </p>
         </header>
 
@@ -197,10 +197,10 @@ export function LocalDataSettings() {
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-base font-semibold text-surface-900 dark:text-surface-50 sm:text-lg">
-                  تصدير نسخة احتياطية
+                  تصدير نسخة احتياطـية
                 </h2>
                 <p className="mt-1 text-sm text-surface-600 dark:text-surface-400">
-                  نزّل ملفاً يحتوي على بياناتك المحلية، بما فيها عمليات البحث الأخيرة
+                  نزّل ملفـاً يحتوي على بياناتك المحلية، بما فيها عمليات البحث الأخيرة
                 </p>
               </div>
             </button>
@@ -216,10 +216,10 @@ export function LocalDataSettings() {
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-base font-semibold text-surface-900 dark:text-surface-50 sm:text-lg">
-                  استيراد نسخة محفوظة
+                  استيراد نسخة محفوظـة
                 </h2>
                 <p className="mt-1 text-sm text-surface-600 dark:text-surface-400">
-                  استعد بياناتك من ملف سابق مع آخر عمليات البحث المحفوظة
+                  استعد بياناتـك من ملف سابق مع آخر عمليات البحث المحفوظة
                 </p>
               </div>
             </button>
@@ -234,14 +234,14 @@ export function LocalDataSettings() {
 
           <section className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20 sm:p-5">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              الاستيراد يستبدل البيانات الحالية بالكامل. صدّر نسخة حديثة قبل
+              الاستـيراد يستبدل البيانات الحالية بالكامل. صدّر نسخة حديثة قبل
               الاستيراد إذا كنت تحتاج للعودة إليها.
             </p>
           </section>
 
           <section>
             <h2 className="mb-3 text-lg font-semibold text-surface-900 dark:text-surface-50 sm:mb-4">
-              البيانات المشمولة
+              البيانات المشمـولة
             </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {USER_DATA_BACKUP_SECTIONS.map((section, index) => (
@@ -271,7 +271,7 @@ export function LocalDataSettings() {
 
       <ConfirmDialog
         open={pendingImport !== null}
-        title="استبدال البيانات المحلية الحالية؟"
+        title="استبدال البيـانات المحلية الحالية؟"
         description={
           pendingImport
             ? `سيتم استيراد الملف ${pendingImport.fileName} واستبدال بيانات هذا الجهاز الحالية. تم إنشاء النسخة في ${formatBackupDate(
@@ -279,8 +279,8 @@ export function LocalDataSettings() {
               )} وتحتوي على ${countBackupEntries(pendingImport.backup)} عنصر تخزين.`
             : ""
         }
-        confirmLabel="استيراد الآن"
-        cancelLabel="إلغاء"
+        confirmLabel="استـيراد الآن"
+        cancelLabel="إلغـاء"
         isLoading={isImporting}
         onConfirm={handleImportConfirm}
         onCancel={() => {

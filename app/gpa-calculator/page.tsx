@@ -16,18 +16,18 @@ export default function GpaCalculatorPage() {
   return (
     <div>
       <MobilePageHeaderMenu
-        title="حاسبة المعدل"
-        subtitle="احسب المعدل الفصلي والتراكمي وخطط للفصل القادم"
+        title="حاسبـة المعدل"
+        subtitle="احسب المعـدل الفصلي والتراكمي وخطط للفصل القادم"
       >
         <div className="public-elevated-surface rounded-[28px] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-            أداة حساب
+            أداة حسـاب
           </p>
           <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
-            المعدل الفصلي والتراكمي
+            المعـدل الفصلي والتراكمي
           </h2>
           <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-            اختر طريقة الحساب المناسبة لجامعتك، ثم راقب النتائج بالنقاط والنسبة
+            اختر طريقة الحسـاب المناسبة لجامعتك، ثم راقب النتائج بالنقاط والنسبة
             المئوية مع سجل محفوظ محلياً.
           </p>
         </div>

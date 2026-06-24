@@ -22,7 +22,7 @@ export default function AdminNotificationsPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -34,7 +34,7 @@ export default function AdminNotificationsPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         <span className="font-medium text-surface-900 dark:text-surface-50">
-          الإشعارات
+          الإشـعارات
         </span>
       </nav>
 
@@ -46,10 +46,10 @@ export default function AdminNotificationsPage() {
         className="mb-6"
       >
         <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-          إرسال إشعار مخصص
+          إرسال إشعار مخصـص
         </h1>
         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-          أرسل إشعارا لجميع المشتركين أو لمشتركي تخصص محدد.
+          أرسل إشعارا لجميع المشتركـين أو لمشتركي تخصص محدد.
         </p>
       </motion.div>
 

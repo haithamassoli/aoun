@@ -184,14 +184,13 @@ export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75"></span>
             <span className="relative inline-flex size-2 rounded-full bg-primary-500"></span>
           </span>
-          المنصة الأكاديمية الأولى
+          المنصة الأكاديمية الأولــى
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl"
-          style={{ letterSpacing: "-0.02em" }}
         >
           <span className="bg-gradient-to-br from-surface-900 to-surface-500 bg-clip-text text-transparent dark:from-white dark:to-surface-400">
             عـــــون
@@ -203,8 +202,8 @@ export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-surface-600 dark:text-surface-300 sm:text-xl"
         >
-          منصة مجانيـة تجمع الملخصـات، الامتحانـات، والمصـادر الأكاديمية لطلاب
-          الجامعـات الأردنية
+          منصة مجانية تجمع الملخصات، الامتحانات، والمصـادر الأكاديمية لطلاب
+          الجامعات الأردنية
         </motion.p>
         {/* <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -212,7 +211,7 @@ export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
           transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="mt-4 text-base font-medium text-primary-600 dark:text-primary-400"
         >
-          اختر جامعتك وابدأ بتصفح المــواد
+          اختر جامعتك وابدأ بتصفح المواد
         </motion.p> */}
         {visitorsTotal !== null && (
           <motion.div
@@ -243,7 +242,7 @@ export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
             </span>
             <div className="ml-1 flex flex-col items-start text-left">
               <span className="text-xs text-surface-500 dark:text-surface-400">
-                إجمالي الـزوار
+                إجمـالي الزوار
               </span>
               <span className="mt-0.5 text-base font-bold leading-none tabular-nums">
                 {visitorsTotal.toLocaleString()}

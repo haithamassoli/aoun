@@ -23,10 +23,10 @@ type AcademicCalendarFormProps = {
 };
 
 const CATEGORY_OPTIONS: { value: AcademicCalendarCategory; label: string }[] = [
-  { value: "exam", label: "امتحان" },
-  { value: "registration", label: "تسجيل" },
-  { value: "add_drop", label: "سحب وإضافة" },
-  { value: "project", label: "مشروع" },
+  { value: "exam", label: "امتحـان" },
+  { value: "registration", label: "تسجـيل" },
+  { value: "add_drop", label: "سحب وإضـافة" },
+  { value: "project", label: "مشـروع" },
 ];
 
 const FIELD_CLASS_NAME =
@@ -99,7 +99,7 @@ export function AcademicCalendarForm({
   return (
     <FormModal
       open={open}
-      title={mode === "create" ? "إضافة موعد أكاديمي" : "تعديل الموعد"}
+      title={mode === "create" ? "إضافة موعـد أكاديمي" : "تعديل الموعـد"}
       onClose={onClose}
     >
       <form className="space-y-5" onSubmit={handleSubmit}>
@@ -109,13 +109,13 @@ export function AcademicCalendarForm({
               htmlFor={titleId}
               className="mb-2 block text-xs font-semibold tracking-[0.18em] text-surface-500 uppercase dark:text-surface-400"
             >
-              العنوان
+              العنـوان
             </label>
             <input
               id={titleId}
               value={values.title}
               onChange={(event) => updateValues({ title: event.target.value })}
-              placeholder="مثال: امتحان ميد 2 - تفاضل"
+              placeholder="مثال: امتحـان ميد 2 - تفاضل"
               className={FIELD_CLASS_NAME}
               maxLength={80}
             />
@@ -126,7 +126,7 @@ export function AcademicCalendarForm({
               htmlFor={categoryId}
               className="mb-2 block text-xs font-semibold tracking-[0.18em] text-surface-500 uppercase dark:text-surface-400"
             >
-              الفئة
+              الفئـة
             </label>
             <select
               id={categoryId}
@@ -153,7 +153,7 @@ export function AcademicCalendarForm({
               htmlFor={dateId}
               className="mb-2 block text-xs font-semibold tracking-[0.18em] text-surface-500 uppercase dark:text-surface-400"
             >
-              التاريخ
+              التـاريخ
             </label>
             <input
               id={dateId}
@@ -181,7 +181,7 @@ export function AcademicCalendarForm({
               }
               className="h-4 w-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500 dark:border-surface-600"
             />
-            موعد بوقت محدد
+            موعد بوقت محـدد
           </label>
         </div>
 
@@ -192,7 +192,7 @@ export function AcademicCalendarForm({
                 htmlFor={startTimeId}
                 className="mb-2 block text-xs font-semibold tracking-[0.18em] text-surface-500 uppercase dark:text-surface-400"
               >
-                وقت البداية
+                وقت البدايـة
               </label>
               <input
                 id={startTimeId}
@@ -210,7 +210,7 @@ export function AcademicCalendarForm({
                 htmlFor={endTimeId}
                 className="mb-2 block text-xs font-semibold tracking-[0.18em] text-surface-500 uppercase dark:text-surface-400"
               >
-                وقت النهاية
+                وقت النهايـة
               </label>
               <input
                 id={endTimeId}
@@ -225,7 +225,7 @@ export function AcademicCalendarForm({
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 text-surface-500 dark:border-surface-700 dark:bg-surface-800/50 dark:text-surface-400">
-            سيتم حفظ الموعد كحدث طوال اليوم ليظهر كموعد نهائي أو تذكير عام.
+            سيتم حفظ الموعـد كحدث طوال اليوم ليظهر كموعد نهائي أو تذكير عام.
           </div>
         )}
 
@@ -243,7 +243,7 @@ export function AcademicCalendarForm({
                 onClick={onDelete}
                 className="inline-flex items-center justify-center rounded-2xl border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-900/60 dark:text-red-300 dark:hover:bg-red-950/40"
               >
-                حذف الموعد
+                حذف الموعـد
               </button>
             ) : null}
           </div>
@@ -254,13 +254,13 @@ export function AcademicCalendarForm({
               onClick={onClose}
               className="inline-flex items-center justify-center rounded-2xl border border-surface-200 px-4 py-2.5 text-sm font-medium text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
             >
-              إلغاء
+              إلغـاء
             </button>
             <button
               type="submit"
               className="inline-flex items-center justify-center rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-400"
             >
-              {mode === "create" ? "حفظ الموعد" : "تحديث الموعد"}
+              {mode === "create" ? "حفظ الموعـد" : "تحديث الموعـد"}
             </button>
           </div>
         </div>

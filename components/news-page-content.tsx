@@ -154,10 +154,10 @@ export function NewsPageContent({ majorId, initialNews }: NewsPageContentProps) 
           </svg>
         </div>
         <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-          لا توجد أخبار حالياً
+          لا توجد أخبـار حالياً
         </p>
         <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-          سيتم نشر الأخبار والمستجدات هنا
+          سيتم نشر الأخبـار والمستجدات هنا
         </p>
       </motion.div>
     );
@@ -175,7 +175,7 @@ export function NewsPageContent({ majorId, initialNews }: NewsPageContentProps) 
             onClick={() => loadMore(LOAD_MORE_SIZE)}
             className="rounded-xl border border-surface-300 bg-white px-5 py-2.5 text-sm font-medium text-surface-600 shadow-sm transition-all hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-300 dark:hover:border-primary-700 dark:hover:bg-primary-950 dark:hover:text-primary-300"
           >
-            تحميل المزيد
+            تحميل المزيـد
           </button>
         </div>
       )}

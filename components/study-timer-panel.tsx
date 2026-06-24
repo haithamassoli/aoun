@@ -20,31 +20,31 @@ const SETTING_FIELD_CONFIG: Array<{
 }> = [
   {
     key: "workMinutes",
-    label: "دقائق العمل",
+    label: "دقائق العمـل",
     min: 1,
     max: STUDY_TIMER_LIMITS.workMinutes,
-    unit: "دقيقة",
+    unit: "دقيقـة",
   },
   {
     key: "shortBreakMinutes",
-    label: "الاستراحة القصيرة",
+    label: "الاستراحة القصـيرة",
     min: 1,
     max: STUDY_TIMER_LIMITS.shortBreakMinutes,
-    unit: "دقيقة",
+    unit: "دقيقـة",
   },
   {
     key: "longBreakMinutes",
-    label: "الاستراحة الطويلة",
+    label: "الاستراحة الطويـلة",
     min: 1,
     max: STUDY_TIMER_LIMITS.longBreakMinutes,
-    unit: "دقيقة",
+    unit: "دقيقـة",
   },
   {
     key: "sessionsPerCycle",
-    label: "جلسات لكل دورة",
+    label: "جلسـات لكل دورة",
     min: 1,
     max: STUDY_TIMER_LIMITS.sessionsPerCycle,
-    unit: "جلسة",
+    unit: "جلسـة",
   },
 ];
 
@@ -274,15 +274,15 @@ export function StudyTimerPanel() {
       >
         <div className="grid gap-3 grid-cols-3">
           <StudyTimerStat
-            label="التقدم"
+            label="التقـدم"
             value={`${completedSessions}/${settings.sessionsPerCycle}`}
           />
           <StudyTimerStat
-            label="اليوم"
+            label="اليـوم"
             value={formatStudyDuration(todayTotalMs)}
           />
           <StudyTimerStat
-            label="7 أيام"
+            label="7 أيـام"
             value={formatStudyDuration(rollingWeekTotalMs)}
           />
         </div>
@@ -339,10 +339,10 @@ function formatStudyDuration(durationMs: number) {
 function getPhaseLabel(phase: StudyTimerPhase) {
   switch (phase) {
     case "work":
-      return "جلسة عمل";
+      return "جلسة عمـل";
     case "shortBreak":
-      return "استراحة قصيرة";
+      return "استراحة قصـيرة";
     case "longBreak":
-      return "استراحة طويلة";
+      return "استراحة طويـلة";
   }
 }

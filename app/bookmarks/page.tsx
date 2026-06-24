@@ -16,18 +16,18 @@ export default function Page() {
   return (
     <div>
       <MobilePageHeaderMenu
-        title="المحفوظات"
-        subtitle="مواد ومصادر محفوظة محلياً على هذا الجهاز"
+        title="المحفوظـات"
+        subtitle="مواد ومصادر محفوظـة محلياً على هذا الجهاز"
       >
         <div className="public-elevated-surface rounded-[28px] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-            حفظ وتنظيم
+            حفـظ وتنظيم
           </p>
           <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
-            المحفوظات والمجموعات
+            المحفوظـات والمجموعات
           </h2>
           <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-            احفظ ما تحتاجه من مواد ومصادر، ثم رتبها في مجموعات للمذاكرة أو
+            احفظ ما تحتاجه من مواد ومصادر، ثم رتبها في مجموعـات للمذاكرة أو
             المتابعة السريعة.
           </p>
         </div>

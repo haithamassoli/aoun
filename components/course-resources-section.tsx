@@ -19,18 +19,18 @@ import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-but
 import { captureAnalyticsEvent } from "@/lib/analytics-events";
 
 const categoryConfig = {
-  course_intro: { label: "التعريف بالمادة", icon: "🧭" },
-  comprehensive_post: { label: "البوست الشامل", icon: "🧩" },
-  textbook: { label: "الكتاب", icon: "📘" },
-  previous_years: { label: "السنوات السابقة", icon: "🗂️" },
-  explanations_notebooks: { label: "الشروحات والدفاتر", icon: "📒" },
-  course_drive: { label: "درايف المادة", icon: "☁️" },
-  notes: { label: "ملاحظات", icon: "📝" },
-  exams: { label: "امتحانات", icon: "📋" },
-  videos: { label: "فيديوهات", icon: "🎬" },
-  summaries: { label: "ملخصات", icon: "📖" },
-  tips: { label: "نصائح", icon: "💡" },
-  other: { label: "أخرى", icon: "📎" },
+  course_intro: { label: "التعريف بالمـادة", icon: "🧭" },
+  comprehensive_post: { label: "البوست الشـامل", icon: "🧩" },
+  textbook: { label: "الكـتاب", icon: "📘" },
+  previous_years: { label: "السـنوات السابقة", icon: "🗂️" },
+  explanations_notebooks: { label: "الشـروحات والدفاتر", icon: "📒" },
+  course_drive: { label: "درايف المـادة", icon: "☁️" },
+  notes: { label: "ملاحظـات", icon: "📝" },
+  exams: { label: "امتحـانات", icon: "📋" },
+  videos: { label: "فيديوهـات", icon: "🎬" },
+  summaries: { label: "ملخـصات", icon: "📖" },
+  tips: { label: "نصائـح", icon: "💡" },
+  other: { label: "أخـرى", icon: "📎" },
 } as const;
 
 const categoryOrder: CategoryValue[] = [
@@ -50,9 +50,9 @@ const categoryOrder: CategoryValue[] = [
 
 const CATEGORY_OPTIONS = CATEGORIES.map((category) => ({
   value: category.value,
-  label: category.label,
+  label: categoryConfig[category.value].label,
 }));
-const REQUEST_CTA_COPY = "اطلب مصدر لهذه المادة او اقترح مصدر جديد";
+const REQUEST_CTA_COPY = "اطلب مصدر لهذه المـادة او اقترح مصدر جديد";
 
 type ResourceCategory = CategoryValue;
 type ResourceVote = "useful" | "not_useful";
@@ -182,29 +182,29 @@ function buildRequestFieldErrors(
 
 function getResourceRequestErrorMessage(error: unknown) {
   if (!(error instanceof Error)) {
-    return "تعذر إرسال الطلب. حاول مرة أخرى.";
+    return "تعذر إرسال الطـلب. حاول مرة أخرى.";
   }
 
   if (error.message.includes("RESOURCE_REQUEST_DUPLICATE")) {
-    return "تم إرسال هذا الطلب مسبقاً لهذه المادة.";
+    return "تم إرسال هذا الطـلب مسبقاً لهذه المادة.";
   }
 
   if (error.message.includes("RESOURCE_REQUEST_LIMIT_REACHED")) {
-    return "يمكنك إرسال 3 طلبات مفتوحة كحد أقصى لهذه المادة.";
+    return "يمكنك إرسال 3 طـلبات مفتوحة كحد أقصى لهذه المادة.";
   }
 
   if (
     error.message.includes("INVALID_URL") ||
     error.message.includes("INVALID_URL_PROTOCOL")
   ) {
-    return "الرابط المقترح غير صالح.";
+    return "الرابط المقـترح غير صالح.";
   }
 
   if (error.message.includes("INVALID_VISITOR_KEY")) {
-    return "تعذر تهيئة الطلب. أعد تحميل الصفحة وحاول مرة أخرى.";
+    return "تعذر تهيئة الطـلب. أعد تحميل الصفحة وحاول مرة أخرى.";
   }
 
-  return "تعذر إرسال الطلب. حاول مرة أخرى.";
+  return "تعذر إرسال الطـلب. حاول مرة أخرى.";
 }
 
 function ResourceCard({
@@ -395,12 +395,12 @@ function ResourceRequestCtaCard({
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-            هل تحتاج مصدراً إضافياً؟
+            هل تحتاج مصدراً إضافـياً؟
           </p>
           <p className="mt-1 text-sm leading-7 text-surface-600 dark:text-surface-300">
             {hasResources
-              ? "إذا كان هناك مصدر ناقص أو لديك اقتراح مفيد، أرسله مباشرة ليظهر في قائمة الطلبات لدى المساهمين."
-              : "هذه المادة لا تحتوي على مصادر حالياً. يمكنك طلب مصدر لها أو اقتراح رابط مناسب ليتم مراجعته وإضافته."}
+              ? "إذا كان هناك مصـدر ناقص أو لديك اقتراح مفيد، أرسله مباشرة ليظهر في قائمة الطلبات لدى المساهمين."
+              : "هذه المـادة لا تحتوي على مصادر حالياً. يمكنك طلب مصدر لها أو اقتراح رابط مناسب ليتم مراجعته وإضافته."}
           </p>
         </div>
 
@@ -521,7 +521,7 @@ export function CourseResourcesSection({
         vote,
       });
     } catch {
-      toast.show("تعذر تحديث التقييم. حاول مرة أخرى.", "error");
+      toast.show("تعذر تحديث التقـييم. حاول مرة أخرى.", "error");
     } finally {
       setPendingResourceIds((current) => {
         const next = new Set(current);
@@ -552,7 +552,7 @@ export function CourseResourcesSection({
     }
 
     if (!visitorKey) {
-      toast.show("تعذر تهيئة الطلب. أعد تحميل الصفحة وحاول مرة أخرى.", "error");
+      toast.show("تعذر تهيئة الطـلب. أعد تحميل الصفحة وحاول مرة أخرى.", "error");
       return;
     }
 
@@ -577,7 +577,7 @@ export function CourseResourcesSection({
         category: result.data.category || null,
         hasSuggestedUrl: Boolean(result.data.suggestedUrl.trim()),
       });
-      toast.show("تم إرسال الطلب بنجاح", "success");
+      toast.show("تم إرسال الطلب بنجـاح", "success");
       resetRequestForm();
     } catch (error) {
       toast.show(getResourceRequestErrorMessage(error), "error");
@@ -595,10 +595,10 @@ export function CourseResourcesSection({
             📚
           </div>
           <p className="text-lg font-medium text-surface-700 dark:text-surface-200">
-            لا توجد مصادر بعد
+            لا توجد مصـادر بعد
           </p>
           <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-            ستُضاف المصادر قريباً. ترقبوا التحديثات!
+            ستُضاف المصـادر قريباً. ترقبوا التحديثات!
           </p>
         </div>
       ) : (
@@ -613,7 +613,7 @@ export function CourseResourcesSection({
                   : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
               }`}
             >
-              كل المصادر ({resolvedResources.length})
+              كل المصـادر ({resolvedResources.length})
             </button>
             {categoryGroups.map((group) => (
               <button
@@ -639,7 +639,7 @@ export function CourseResourcesSection({
             >
               <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-surface-800 dark:text-surface-100 sm:text-xl">
                 <span className="text-xl">📊</span>
-                جميع المصادر
+                جميع المصـادر
                 <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-surface-500 dark:bg-surface-800 dark:text-surface-400">
                   {allResourcesByVotes.length}
                 </span>
@@ -705,13 +705,13 @@ export function CourseResourcesSection({
 
       <FormModal
         open={showRequestForm}
-        title="اطلب مصدراً أو اقترح مصدراً جديداً"
+        title="اطلب مصدراً أو اقترح مصدراً جديـداً"
         onClose={resetRequestForm}
       >
         <form onSubmit={handleSubmitResourceRequest} className="space-y-5">
           <div>
             <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-              نوع الطلب
+              نوع الطـلب
             </label>
             <select
               value={requestValues.kind}
@@ -739,8 +739,8 @@ export function CourseResourcesSection({
 
           <div>
             <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-              التصنيف
-              <span className="ms-1 text-surface-400">اختياري</span>
+              التصنـيف
+              <span className="ms-1 text-surface-400">اختيـاري</span>
             </label>
             <select
               value={requestValues.category}
@@ -752,7 +752,7 @@ export function CourseResourcesSection({
               }
               className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
             >
-              <option value="">اختر تصنيفاً إن رغبت</option>
+              <option value="">اختر تصنـيفاً إن رغبت</option>
               {CATEGORY_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -768,7 +768,7 @@ export function CourseResourcesSection({
 
           <div>
             <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-              تفاصيل الطلب
+              تفاصيل الطـلب
             </label>
             <textarea
               value={requestValues.note}
@@ -776,7 +776,7 @@ export function CourseResourcesSection({
                 updateRequestField("note", event.target.value)
               }
               rows={4}
-              placeholder="اكتب ما الذي تحتاجه أو ما الذي تقترحه لهذه المادة"
+              placeholder="اكتب ما الذي تحتاجه أو ما الذي تقترحه لهذه المـادة"
               className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100"
             />
             {requestErrors.note ? (
@@ -789,8 +789,8 @@ export function CourseResourcesSection({
           {requestValues.kind === "resource_suggestion" ? (
             <div>
               <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                الرابط المقترح
-                <span className="ms-1 text-surface-400">اختياري</span>
+                الرابط المقـترح
+                <span className="ms-1 text-surface-400">اختيـاري</span>
               </label>
               <input
                 type="url"
@@ -811,7 +811,7 @@ export function CourseResourcesSection({
           ) : null}
 
           <div className="rounded-2xl bg-surface-50 px-4 py-3 text-xs leading-6 text-surface-500 dark:bg-surface-800/80 dark:text-surface-300">
-            سيصل الطلب إلى قائمة داخلية لدى المساهمين في هذا التخصص، ولن يظهر
+            سيصل الطـلب إلى قائمة داخلية لدى المساهمين في هذا التخصص، ولن يظهر
             للعامة.
           </div>
 
@@ -821,14 +821,14 @@ export function CourseResourcesSection({
               onClick={resetRequestForm}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <button
               type="submit"
               disabled={isSubmittingRequest}
               className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
             >
-              {isSubmittingRequest ? "جارٍ الإرسال..." : "إرسال الطلب"}
+              {isSubmittingRequest ? "جارٍ الإرسـال..." : "إرسال الطـلب"}
             </button>
           </div>
         </form>

@@ -14,8 +14,8 @@ import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 
 const ROLE_OPTIONS = [
-  { value: "admin", label: "مدير" },
-  { value: "contributor", label: "مساهم" },
+  { value: "admin", label: "مديـر" },
+  { value: "contributor", label: "مساهـم" },
 ];
 
 type UserListItem = {
@@ -234,7 +234,7 @@ export default function AdminUsersPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -246,7 +246,7 @@ export default function AdminUsersPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         <span className="font-medium text-surface-900 dark:text-surface-50">
-          المستخدمون
+          المستخدمـون
         </span>
       </nav>
 
@@ -259,10 +259,10 @@ export default function AdminUsersPage() {
       >
         <div>
           <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-            إدارة المستخدمين
+            إدارة المستخدمـين
           </h1>
           <p className="text-sm text-surface-500 dark:text-surface-400">
-            {users ? `${users.length} مستخدم` : "جاري التحميل..."}
+            {users ? `${users.length} مستخـدم` : "جاري التحميـل..."}
           </p>
         </div>
         <button
@@ -283,13 +283,13 @@ export default function AdminUsersPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          إضافة مستخدم
+          إضافة مستخـدم
         </button>
       </motion.div>
 
       <FormModal
         open={showCreateForm}
-        title="إضافة مستخدم جديد"
+        title="إضافة مستخدم جديـد"
         onClose={() => {
           createForm.reset();
           setShowCreateForm(false);
@@ -303,25 +303,25 @@ export default function AdminUsersPage() {
           }}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormInput form={createForm} name="name" label="الاسم *" />
+            <FormInput form={createForm} name="name" label="الاسـم *" />
             <FormInput
               form={createForm}
               name="email"
-              label="البريد الإلكتروني *"
+              label="البريد الإلكترونـي *"
               type="email"
               dir="ltr"
             />
             <FormInput
               form={createForm}
               name="password"
-              label="كلمة المرور *"
+              label="كلمة المـرور *"
               type="password"
               dir="ltr"
             />
             <FormSelect
               form={createForm}
               name="role"
-              label="الدور *"
+              label="الـدور *"
               options={ROLE_OPTIONS}
             />
           </div>
@@ -335,12 +335,12 @@ export default function AdminUsersPage() {
                   disabled={!canSubmit || isSubmitting}
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
-                  {isSubmitting ? "جاري الإنشاء..." : "إنشاء مستخدم"}
+                  {isSubmitting ? "جاري الإنشـاء..." : "إنشاء مستخـدم"}
                 </button>
               )}
             </createForm.Subscribe>
             <p className="text-xs text-surface-500 dark:text-surface-400">
-              للمساهمين، قم بإضافة الصلاحيات بعد الإنشاء.
+              للمساهمين، قم بإضافة الصلاحيـات بعد الإنشاء.
             </p>
           </div>
         </form>
@@ -348,7 +348,7 @@ export default function AdminUsersPage() {
 
       <FormModal
         open={editingId !== null}
-        title="تعديل المستخدم"
+        title="تعديل المستخـدم"
         onClose={resetEditForm}
       >
         <form
@@ -359,18 +359,18 @@ export default function AdminUsersPage() {
           }}
         >
           <div className="grid gap-4 sm:grid-cols-3">
-            <FormInput form={editForm} name="name" label="الاسم *" />
+            <FormInput form={editForm} name="name" label="الاسـم *" />
             <FormInput
               form={editForm}
               name="email"
-              label="البريد الإلكتروني *"
+              label="البريد الإلكترونـي *"
               type="email"
               dir="ltr"
             />
             <FormSelect
               form={editForm}
               name="role"
-              label="الدور *"
+              label="الـدور *"
               options={ROLE_OPTIONS}
             />
           </div>
@@ -380,7 +380,7 @@ export default function AdminUsersPage() {
               onClick={resetEditForm}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <editForm.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
@@ -389,7 +389,7 @@ export default function AdminUsersPage() {
                   disabled={!canSubmit || isSubmitting}
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
-                  {isSubmitting ? "جاري الحفظ..." : "تحديث"}
+                  {isSubmitting ? "جاري الحـفظ..." : "تحـديث"}
                 </button>
               )}
             </editForm.Subscribe>
@@ -399,7 +399,7 @@ export default function AdminUsersPage() {
 
       <FormModal
         open={managingPermsFor !== null}
-        title={`صلاحيات: ${
+        title={`صلاحيـات: ${
           (users as UserListItem[] | undefined)?.find(
             (u) => u._id === managingPermsFor,
           )?.name ?? ""
@@ -413,7 +413,7 @@ export default function AdminUsersPage() {
               htmlFor={permissionSelectId}
               className="mb-2 block text-xs font-medium text-surface-700 dark:text-surface-300"
             >
-              إضافة صلاحية جديدة
+              إضافة صلاحية جديـدة
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <select
@@ -422,7 +422,7 @@ export default function AdminUsersPage() {
                 onChange={(e) => setSelectedMajorId(e.target.value)}
                 className="flex-1 rounded-lg border border-surface-300 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-100"
               >
-                <option value="">اختر تخصص...</option>
+                <option value="">اختر تخصصـا...</option>
                 {availableMajors.map((m) => (
                   <option key={m._id} value={m._id}>
                     {m.name} — {m.universityName}
@@ -448,7 +448,7 @@ export default function AdminUsersPage() {
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                إضافة
+                إضـافة
               </button>
             </div>
           </div>
@@ -457,7 +457,7 @@ export default function AdminUsersPage() {
           <div>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-medium text-surface-900 dark:text-surface-50">
-                الصلاحيات الحالية
+                الصلاحيات الحاليـة
               </h3>
               {userPermissions && userPermissions.length > 0 && (
                 <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-300">
@@ -488,7 +488,7 @@ export default function AdminUsersPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  جاري التحميل...
+                  جاري التحميـل...
                 </div>
               </div>
             ) : userPermissions.length === 0 ? (
@@ -507,10 +507,10 @@ export default function AdminUsersPage() {
                   />
                 </svg>
                 <p className="text-sm font-medium text-surface-600 dark:text-surface-400">
-                  لا توجد صلاحيات
+                  لا توجد صلاحيـات
                 </p>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-500">
-                  قم بإضافة صلاحية من الأعلى
+                  قم بإضافة صلاحية من الأعلـى
                 </p>
               </div>
             ) : (
@@ -582,7 +582,7 @@ export default function AdminUsersPage() {
       ) : users.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-            لا يوجد مستخدمون
+            لا يوجد مستخدمـون
           </p>
         </div>
       ) : (
@@ -612,7 +612,7 @@ export default function AdminUsersPage() {
                             : "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
                         }`}
                       >
-                        {u.role === "admin" ? "مدير" : "مساهم"}
+                        {u.role === "admin" ? "مديـر" : "مساهـم"}
                       </span>
                     </div>
                     <p className="text-xs text-surface-500 dark:text-surface-400">

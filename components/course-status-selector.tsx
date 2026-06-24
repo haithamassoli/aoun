@@ -13,6 +13,7 @@ type CourseStatusSelectorProps = {
 type CourseStatusOption = {
   value: CourseProgressStatus;
   label: string;
+  ariaLabel: string;
   compactLabel: string;
   dotClassName: string;
 };
@@ -27,26 +28,30 @@ type CourseStatusMenuProps = {
 export const courseStatusOptions: CourseStatusOption[] = [
   {
     value: "none",
-    label: "بدون حالة",
-    compactLabel: "بدون",
+    label: "بدون حـالة",
+    ariaLabel: "بدون حالة",
+    compactLabel: "بـدون",
     dotClassName: "bg-surface-400 dark:bg-surface-500",
   },
   {
     value: "in_progress",
-    label: "قيد الدراسة",
-    compactLabel: "قيد",
+    label: "قيد الدراسـة",
+    ariaLabel: "قيد الدراسة",
+    compactLabel: "قيـد",
     dotClassName: "bg-amber-500",
   },
   {
     value: "completed",
-    label: "مكتمل",
-    compactLabel: "مكتمل",
+    label: "مكـتمل",
+    ariaLabel: "مكتمل",
+    compactLabel: "مكـتمل",
     dotClassName: "bg-emerald-500",
   },
   {
     value: "hidden",
-    label: "مخفي من الخطة",
-    compactLabel: "مخفي",
+    label: "مخفي من الخـطة",
+    ariaLabel: "مخفي من الخطة",
+    compactLabel: "مخـفي",
     dotClassName: "bg-slate-500",
   },
 ];
@@ -126,10 +131,10 @@ export function CourseStatusSelector({
             type="button"
             role="radio"
             aria-checked={isActive}
-            aria-label={option.label}
+            aria-label={option.ariaLabel}
             onClick={() => onChange(option.value)}
             className={getButtonClassName(isActive, compact)}
-            title={option.label}
+            title={option.ariaLabel}
           >
             <span
               className={`h-2 w-2 shrink-0 rounded-full ${option.dotClassName}`}
@@ -219,6 +224,7 @@ export function CourseStatusMenu({
                 type="button"
                 role="menuitemradio"
                 aria-checked={isActive}
+                aria-label={option.ariaLabel}
                 className={getMenuItemClassName(isActive)}
                 onClick={() => {
                   onChange(option.value);

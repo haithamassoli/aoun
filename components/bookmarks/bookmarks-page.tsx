@@ -24,7 +24,7 @@ function formatSavedDate(timestamp: number) {
 }
 
 function getItemTypeLabel(item: BookmarkItem) {
-  return item.type === "course" ? "مادة" : "مصدر";
+  return item.type === "course" ? "مـادة" : "مصـدر";
 }
 
 function isItemInCollection(
@@ -41,17 +41,17 @@ function EmptyBookmarksState() {
         <BookmarkIcon />
       </div>
       <h2 className="mt-5 text-xl font-bold text-surface-900 dark:text-surface-50">
-        لا توجد محفوظات بعد
+        لا توجد محفوظـات بعد
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-surface-600 dark:text-surface-400">
-        احفظ المواد أو المصادر المهمة أثناء التصفح، وستظهر هنا على هذا الجهاز
+        احفظ المـواد أو المصادر المهمة أثناء التصفح، وستظهر هنا على هذا الجهاز
         فقط.
       </p>
       <Link
         href="/courses"
         className="mt-6 inline-flex items-center justify-center rounded-2xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
       >
-        ابدأ من بحث المواد
+        ابدأ من بحـث المواد
       </Link>
     </section>
   );
@@ -64,14 +64,14 @@ function BookmarkDestination({ item }: { item: BookmarkItem }) {
   if (item.external) {
     return (
       <a href={item.href} target="_blank" rel="noopener noreferrer" className={className}>
-        فتح المصدر
+        فتـح المصدر
       </a>
     );
   }
 
   return (
     <Link href={item.href} className={className}>
-      فتح
+      فتـح
     </Link>
   );
 }
@@ -107,7 +107,7 @@ function BookmarkCard({
             </p>
           ) : null}
           <p className="mt-3 text-xs text-surface-500 dark:text-surface-500">
-            حُفظ في {formatSavedDate(item.createdAt)}
+            حُفـظ في {formatSavedDate(item.createdAt)}
           </p>
         </div>
 
@@ -118,7 +118,7 @@ function BookmarkCard({
             onClick={() => removeBookmarkItem(item.key)}
             className="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-white px-3 py-2 text-xs font-semibold text-rose-600 transition-colors hover:border-rose-300 hover:bg-rose-50 dark:border-rose-900/70 dark:bg-surface-900 dark:text-rose-300 dark:hover:border-rose-800 dark:hover:bg-rose-950/30"
           >
-            إزالة
+            إزالـة
           </button>
         </div>
       </div>
@@ -126,7 +126,7 @@ function BookmarkCard({
       {collections.length > 0 ? (
         <div className="mt-4 border-t border-surface-100 pt-4 dark:border-surface-800">
           <p className="mb-2 text-xs font-semibold text-surface-600 dark:text-surface-300">
-            المجموعات
+            المجمـوعات
           </p>
           <div className="flex flex-wrap gap-2">
             {collections.map((collection) => {
@@ -217,13 +217,13 @@ export function BookmarksPage() {
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
       <header className="mb-6 hidden md:block">
         <p className="text-sm font-semibold text-primary-600 dark:text-primary-300">
-          محفوظات محلية
+          محفوظـات محلية
         </p>
         <h1 className="mt-2 text-3xl font-bold tracking-[-0.02em] text-surface-900 dark:text-surface-50">
-          المحفوظات والمجموعات
+          المحفوظـات والمجموعات
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-surface-600 dark:text-surface-400">
-          رتّب المواد والمصادر التي تحتاج الرجوع إليها بسرعة. تحفظ البيانات على
+          رتّب المـواد والمصادر التي تحتاج الرجوع إليها بسرعة. تحفظ البيانات على
           هذا الجهاز فقط وتدخل ضمن النسخ الاحتياطي المحلي.
         </p>
       </header>
@@ -240,7 +240,7 @@ export function BookmarksPage() {
                     {bookmarks.items.length}
                   </p>
                   <p className="mt-1 text-xs text-primary-700/80 dark:text-primary-300/80">
-                    محفوظة
+                    محفوظـة
                   </p>
                 </div>
                 <div className="rounded-xl bg-surface-50 px-3 py-3 dark:bg-surface-800">
@@ -248,7 +248,7 @@ export function BookmarksPage() {
                     {bookmarks.collections.length}
                   </p>
                   <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                    مجموعة
+                    مجمـوعة
                   </p>
                 </div>
               </div>
@@ -256,14 +256,14 @@ export function BookmarksPage() {
 
             <section className="rounded-2xl border border-surface-200 bg-white p-4 shadow-sm dark:border-surface-700 dark:bg-surface-900">
               <h2 className="text-sm font-bold text-surface-900 dark:text-surface-50">
-                إنشاء مجموعة
+                إنشاء مجمـوعة
               </h2>
               <form onSubmit={handleCreateCollection} className="mt-3 space-y-2">
                 <input
                   type="text"
                   value={collectionTitle}
                   onChange={(event) => setCollectionTitle(event.target.value)}
-                  placeholder="مثال: امتحانات قريبة"
+                  placeholder="مثال: امتحـانات قريبة"
                   className="h-11 w-full rounded-xl border border-surface-300 bg-white px-3 text-sm text-surface-900 outline-none transition-colors placeholder:text-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:border-surface-600 dark:bg-surface-950 dark:text-surface-100 dark:focus:ring-primary-900/30"
                 />
                 <button
@@ -271,14 +271,14 @@ export function BookmarksPage() {
                   disabled={collectionTitle.trim().length === 0}
                   className="w-full rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-surface-300 dark:disabled:bg-surface-700"
                 >
-                  إضافة مجموعة
+                  إضافة مجمـوعة
                 </button>
               </form>
             </section>
 
             <section className="rounded-2xl border border-surface-200 bg-white p-3 shadow-sm dark:border-surface-700 dark:bg-surface-900">
               <h2 className="px-2 pb-2 text-sm font-bold text-surface-900 dark:text-surface-50">
-                التصفية
+                التصفـية
               </h2>
               <div className="space-y-1">
                 <button
@@ -290,7 +290,7 @@ export function BookmarksPage() {
                       : "text-surface-600 hover:bg-surface-50 dark:text-surface-300 dark:hover:bg-surface-800"
                   }`}
                 >
-                  <span>كل المحفوظات</span>
+                  <span>كل المحفوظـات</span>
                   <span>{bookmarks.items.length}</span>
                 </button>
                 <button
@@ -302,7 +302,7 @@ export function BookmarksPage() {
                       : "text-surface-600 hover:bg-surface-50 dark:text-surface-300 dark:hover:bg-surface-800"
                   }`}
                 >
-                  <span>بدون مجموعة</span>
+                  <span>بدون مجمـوعة</span>
                   <span>{ungroupedCount}</span>
                 </button>
                 {bookmarks.collections.map((collection) => (
@@ -331,11 +331,11 @@ export function BookmarksPage() {
                   <h2 className="text-lg font-bold text-surface-900 dark:text-surface-50">
                     {activeCollection?.title ??
                       (activeFilter === "uncategorized"
-                        ? "بدون مجموعة"
-                        : "كل المحفوظات")}
+                        ? "بدون مجمـوعة"
+                        : "كل المحفوظـات")}
                   </h2>
                   <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                    {visibleItems.length} عنصر ظاهر
+                    {visibleItems.length} عنصـر ظاهر
                   </p>
                 </div>
                 {activeCollection ? (
@@ -344,7 +344,7 @@ export function BookmarksPage() {
                     onClick={handleDeleteActiveCollection}
                     className="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-white px-3 py-2 text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50 dark:border-rose-900/70 dark:bg-surface-900 dark:text-rose-300 dark:hover:bg-rose-950/30"
                   >
-                    حذف المجموعة
+                    حذف المجمـوعة
                   </button>
                 ) : null}
               </div>
@@ -363,10 +363,10 @@ export function BookmarksPage() {
             ) : (
               <div className="rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
                 <p className="text-base font-semibold text-surface-800 dark:text-surface-100">
-                  لا توجد عناصر هنا حالياً
+                  لا توجد عناصـر هنا حالياً
                 </p>
                 <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-                  غيّر التصفية أو أضف عناصر لهذه المجموعة من بطاقات المحفوظات.
+                  غيّر التصفـية أو أضف عناصر لهذه المجموعة من بطاقات المحفوظات.
                 </p>
               </div>
             )}

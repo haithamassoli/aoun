@@ -12,16 +12,16 @@ export default function NotFound() {
       <div className="text-center">
         <p className="text-6xl font-bold text-primary-600 dark:text-primary-400">404</p>
         <h1 className="mt-4 text-2xl font-bold text-surface-800 dark:text-surface-100">
-          الصفحة غير موجودة
+          الصفحة غير موجـودة
         </h1>
         <p className="mt-2 text-surface-500 dark:text-surface-400">
-          الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
+          الصفحة التي تبحث عنها غير موجـودة أو تم نقلها.
         </p>
         <Link
           href="/"
           className="mt-6 inline-block rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
         >
-          العودة للرئيسية
+          العودة للرئيسـية
         </Link>
       </div>
     </div>

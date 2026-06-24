@@ -54,17 +54,17 @@ const EMPTY_CUSTOM_COURSES: CustomCourseSummary[] = [];
 const COURSE_PROGRESS_STAT_ITEMS = [
   {
     key: "completed",
-    label: "مكتمل",
+    label: "مكـتمل",
     dotClassName: "bg-emerald-500",
   },
   {
     key: "in_progress",
-    label: "قيد الدراسة",
+    label: "قيد الدراسـة",
     dotClassName: "bg-amber-500",
   },
   {
     key: "none",
-    label: "لم يُبدأ",
+    label: "لم يُبـدأ",
     dotClassName: "bg-surface-300 dark:bg-surface-600",
   },
 ] as const;
@@ -79,27 +79,27 @@ type CourseStatusCounts = Record<CourseStatusFilter, number>;
 const baseStatusFilterOptions: StatusFilterOption[] = [
   {
     value: "all",
-    label: "الكل",
+    label: "الكـل",
     dotClassName: "bg-primary-500",
   },
   {
     value: "none",
-    label: "بدون حالة",
+    label: "بدون حـالة",
     dotClassName: "bg-surface-400 dark:bg-surface-500",
   },
   {
     value: "in_progress",
-    label: "قيد الدراسة",
+    label: "قيد الدراسـة",
     dotClassName: "bg-amber-500",
   },
   {
     value: "completed",
-    label: "مكتمل",
+    label: "مكـتمل",
     dotClassName: "bg-emerald-500",
   },
   {
     value: "hidden",
-    label: "مخفي من الخطة",
+    label: "مخفي من الخـطة",
     dotClassName: "bg-slate-500",
   },
 ];
@@ -189,7 +189,7 @@ function groupCoursesBySemester(courses: CourseListItem[]) {
         key,
         label:
           course.semesterName ??
-          formatCourseSemesterLabel(legacyKey, { emptyLabel: "مواد أخرى" })!,
+          formatCourseSemesterLabel(legacyKey, { emptyLabel: "مـواد أخرى" })!,
         marker: course.semesterId
           ? course.semesterOrder !== undefined
             ? String(course.semesterOrder)
@@ -436,7 +436,7 @@ function CourseProgressStats({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-surface-800 dark:text-surface-100">
-            تقدم الدراسة
+            تقدم الدراسـة
           </p>
         </div>
 
@@ -656,7 +656,7 @@ export function CoursesSearchSection({
     <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8  pb-10 pt-4 sm:py-8">
       <div className="mb-8 space-y-4">
         <h2 className="text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
-          الخطة الدراسية
+          الخطة الدراسـية
         </h2>
 
         {isStatusFilterReady && courses.length > 0 ? (
@@ -670,8 +670,8 @@ export function CoursesSearchSection({
         <div className="max-w-5xl space-y-3 md:flex md:items-start md:gap-3 md:space-y-0">
           <div className="w-full md:max-w-sm lg:max-w-lg">
             <PublicSearchInput
-              label="ابحث داخل مواد التخصص"
-              placeholder="مثال: برمجة كائنية"
+              label="ابحث داخل مـواد التخصص"
+              placeholder="مثال: برمجة كائنيـة"
               value={search.input}
               onChange={search.setInput}
             />
@@ -679,7 +679,7 @@ export function CoursesSearchSection({
 
           <div className="rounded-xl flex-1 border border-surface-200/80 bg-surface-50/80 p-3 dark:border-surface-700 dark:bg-surface-900 md:w-[320px] md:shrink-0 lg:w-[360px]">
             <p className="mb-2 text-xs font-medium text-surface-600 dark:text-surface-300">
-              فلترة حسب حالة الدراسة
+              فلترة حسب حالة الدراسـة
             </p>
             <div
               role="radiogroup"
@@ -728,29 +728,29 @@ export function CoursesSearchSection({
       ) : isNoResults ? (
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
-            لا توجد نتائج مطابقة
+            لا توجد نتائـج مطابقة
           </p>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            لم نعثر على مادة تطابق «{search.query}» داخل هذا التخصص.
+            لم نعثر على مـادة تطابق «{search.query}» داخل هذا التخصص.
           </p>
         </div>
       ) : isEmptyList ? (
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-surface-500 dark:text-surface-400">
-            لم تُضاف مواد بعد. ترقبوا التحديثات!
+            لم تُضاف مـواد بعد. ترقبوا التحديثات!
           </p>
         </div>
       ) : isNoFilterResults ? (
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
             {statusFilter === "all"
-              ? "تم إخفاء جميع المواد من الخطة"
-              : "لا توجد مواد بهذه الحالة حالياً"}
+              ? "تم إخفاء جميع المـواد من الخطة"
+              : "لا توجد مـواد بهذه الحالة حالياً"}
           </p>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
             {statusFilter === "all"
-              ? "اعرض المواد المخفية أو غيّر حالة بعض المواد لتظهر مجدداً."
-              : "غيّر فلتر الحالة لعرض مواد إضافية."}
+              ? "اعرض المـواد المخفية أو غيّر حالة بعض المواد لتظهر مجدداً."
+              : "غيّر فلتر الحـالة لعرض مواد إضافية."}
           </p>
         </div>
       ) : search.isEmpty ? (
@@ -782,13 +782,13 @@ export function CoursesSearchSection({
                         {semester.label}
                       </span>
                       <span className="block text-xs text-surface-500 dark:text-surface-400">
-                        {semester.courses.length} مادة
+                        {semester.courses.length} مـادة
                       </span>
                     </span>
                   </span>
 
                   <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-surface-200/80 bg-surface-50/80 px-2.5 py-1.5 text-xs font-medium text-surface-600 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-300">
-                    <span>{isCollapsed ? "عرض المواد" : "إخفاء المواد"}</span>
+                    <span>{isCollapsed ? "عرض المـواد" : "إخفاء المـواد"}</span>
                     <svg
                       className={`h-4 w-4 transition-transform duration-200 ${
                         isCollapsed ? "" : "rotate-180"
@@ -833,7 +833,7 @@ export function CoursesSearchSection({
       ) : (
         <div>
           <p className="mb-4 text-sm text-surface-500 dark:text-surface-400">
-            {filteredSearchedCourses.length} نتيجة بحث
+            {filteredSearchedCourses.length} نتيـجة بحث
           </p>
           <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
             {filteredSearchedCourses.map((course: CourseListItem) => (
@@ -844,7 +844,7 @@ export function CoursesSearchSection({
                 badge={
                   course.semesterName ??
                   formatCourseSemesterLabel(course.semester, {
-                    emptyLabel: "مواد أخرى",
+                    emptyLabel: "مـواد أخرى",
                   })
                 }
                 status={getStatus(course._id)}

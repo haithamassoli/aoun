@@ -76,10 +76,10 @@ export function UniversityQuickLinks({ links }: UniversityQuickLinksProps) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-600 dark:text-primary-300">
-            روابط سريعة
+            روابط سريـعة
           </p>
           <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-            روابط مهمة مرتبطة بهذه الجامعة.
+            روابط مهـمة مرتبطة بهذه الجامعة.
           </p>
         </div>
         <div

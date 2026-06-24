@@ -165,7 +165,7 @@ export default function AdminCoursesPage() {
   const semesterOptions =
     semesters?.map((semester: { _id: Id<"semesters">; name: string; order: number }) => ({
       value: semester._id,
-      label: `${semester.name} — ترتيب ${semester.order}`,
+      label: `${semester.name} — ترتـيب ${semester.order}`,
     })) ?? [];
 
   return (
@@ -178,7 +178,7 @@ export default function AdminCoursesPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -190,7 +190,7 @@ export default function AdminCoursesPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         <span className="font-medium text-surface-900 dark:text-surface-50">
-          المواد
+          المـواد
         </span>
       </nav>
 
@@ -203,10 +203,10 @@ export default function AdminCoursesPage() {
       >
         <div>
           <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-            إدارة المواد
+            إدارة المـواد
           </h1>
           <p className="text-sm text-surface-500 dark:text-surface-400">
-            {courses ? `${courses.length} مادة` : "جاري التحميل..."}
+            {courses ? `${courses.length} مـادة` : "جاري التحميـل..."}
           </p>
         </div>
         <button
@@ -230,13 +230,13 @@ export default function AdminCoursesPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          إضافة مادة
+          إضافة مـادة
         </button>
       </motion.div>
 
       <FormModal
         open={showForm}
-        title={editingId ? "تعديل المادة" : "إضافة مادة جديدة"}
+        title={editingId ? "تعديل المـادة" : "إضافة مادة جديـدة"}
         onClose={resetForm}
       >
         <form
@@ -250,9 +250,9 @@ export default function AdminCoursesPage() {
             <FormSelect
               form={form}
               name="majorId"
-              label="التخصص *"
+              label="التخصـص *"
               options={majorOptions}
-              placeholder="اختر التخصص"
+              placeholder="اختر التخصـص"
               disabled={!!editingId}
               onChangeCallback={(value) => {
                 setSelectedMajorId(value);
@@ -262,7 +262,7 @@ export default function AdminCoursesPage() {
             <FormInput
               form={form}
               name="name"
-              label="اسم المادة *"
+              label="اسم المـادة *"
               onChangeCallback={(val) => {
                 if (!editingId) form.setFieldValue("slug", generateSlug(val));
               }}
@@ -270,26 +270,26 @@ export default function AdminCoursesPage() {
             <FormInput
               form={form}
               name="slug"
-              label="الرابط (slug) *"
+              label="الرابـط (slug) *"
               dir="ltr"
             />
             <FormInput
               form={form}
               name="alias"
-              label="الاسم البديل (alias)"
-              placeholder="اسم بديل للبحث"
+              label="الاسم البديـل (alias)"
+              placeholder="اسم بديل للبحـث"
             />
             <FormInput
               form={form}
               name="courseCode"
-              label="رمز المادة"
+              label="رمز المـادة"
               dir="ltr"
               placeholder="CS101"
             />
             <FormInput
               form={form}
               name="credits"
-              label="الساعات المعتمدة *"
+              label="الساعات المعتمـدة *"
               type="number"
               min="1"
               step="1"
@@ -297,19 +297,19 @@ export default function AdminCoursesPage() {
             <FormSelect
               form={form}
               name="semesterId"
-              label="الفصل أو المستوى"
+              label="الفصل أو المستـوى"
               options={semesterOptions}
               placeholder={
                 selectedMajorId
-                  ? "بدون فصل"
-                  : "اختر التخصص أولاً"
+                  ? "بدون فصـل"
+                  : "اختر التخصص أولـاً"
               }
               disabled={!selectedMajorId}
             />
             <FormInput
               form={form}
               name="order"
-              label="الترتيب"
+              label="الترتـيب"
               type="number"
               min="0"
             />
@@ -320,7 +320,7 @@ export default function AdminCoursesPage() {
               onClick={resetForm}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
@@ -330,10 +330,10 @@ export default function AdminCoursesPage() {
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
                   {isSubmitting
-                    ? "جاري الحفظ..."
+                    ? "جاري الحـفظ..."
                     : editingId
-                      ? "تحديث"
-                      : "إضافة"}
+                      ? "تحـديث"
+                      : "إضـافة"}
                 </button>
               )}
             </form.Subscribe>
@@ -354,10 +354,10 @@ export default function AdminCoursesPage() {
       ) : courses.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-            لا توجد مواد
+            لا توجد مـواد
           </p>
           <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-            أضف مادة جديدة للبدء
+            أضف مادة جديدة للبـدء
           </p>
         </div>
       ) : (
@@ -403,7 +403,7 @@ export default function AdminCoursesPage() {
                       <div className="flex flex-wrap items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
                         <span>{course.majorName}</span>
                         <span>{course.universityName}</span>
-                        <span>{course.credits} ساعات</span>
+                        <span>{course.credits} ساعـات</span>
                         {semesterLabel && <span>{semesterLabel}</span>}
                         {course.alias && (
                           <span className="rounded bg-surface-100 px-1.5 py-0.5 dark:bg-surface-800">

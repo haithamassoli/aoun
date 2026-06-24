@@ -47,28 +47,28 @@ const CATEGORY_META: Record<
   }
 > = {
   exam: {
-    label: "امتحان",
+    label: "امتحـان",
     chipClassName:
       "border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300",
     softClassName:
       "from-red-50 via-white to-red-100/70 dark:from-red-950/30 dark:via-surface-900 dark:to-red-950/10",
   },
   registration: {
-    label: "تسجيل",
+    label: "تسجـيل",
     chipClassName:
       "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900/60 dark:bg-sky-950/40 dark:text-sky-300",
     softClassName:
       "from-sky-50 via-white to-sky-100/70 dark:from-sky-950/30 dark:via-surface-900 dark:to-sky-950/10",
   },
   add_drop: {
-    label: "سحب وإضافة",
+    label: "سحب وإضـافة",
     chipClassName:
       "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900/60 dark:bg-violet-950/40 dark:text-violet-300",
     softClassName:
       "from-violet-50 via-white to-violet-100/70 dark:from-violet-950/30 dark:via-surface-900 dark:to-violet-950/10",
   },
   project: {
-    label: "مشروع",
+    label: "مشـروع",
     chipClassName:
       "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300",
     softClassName:
@@ -241,7 +241,7 @@ export function AcademicCalendar() {
   const [storageState, setStorageState] =
     useState<AcademicCalendarStorageState>("ready");
   const [currentView, setCurrentView] = useState<PlannerView>("dayGridMonth");
-  const [currentRangeLabel, setCurrentRangeLabel] = useState("هذا الشهر");
+  const [currentRangeLabel, setCurrentRangeLabel] = useState("هذا الشهـر");
   const [dialogState, setDialogState] = useState<PlannerDialogState>({
     open: false,
   });
@@ -473,13 +473,13 @@ export function AcademicCalendar() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <p className="text-xs font-semibold tracking-[0.18em] text-surface-400 uppercase dark:text-surface-500">
-                    التقويم
+                    التقـويم
                   </p>
                   <h2 className="mt-1 text-2xl font-bold text-surface-950 dark:text-surface-50">
                     {currentRangeLabel}
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-7 text-surface-500 dark:text-surface-400">
-                    اضغط على أي يوم فارغ لإضافة موعد جديد، أو افتح أي موعد داخل
+                    اضغط على أي يوم فارغ لإضافة موعـد جديد، أو افتح أي موعد داخل
                     التقويم لتعديله أو حذفه بسرعة.
                   </p>
                 </div>
@@ -489,7 +489,7 @@ export function AcademicCalendar() {
                   onClick={() => openCreateDialog()}
                   className="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-400"
                 >
-                  إضافة موعد
+                  إضافة موعـد
                 </button>
               </div>
 
@@ -498,18 +498,18 @@ export function AcademicCalendar() {
                   <span className="font-semibold text-surface-900 dark:text-surface-50">
                     {events.length}
                   </span>{" "}
-                  إجمالي المواعيد
+                  إجمالي المواعـيد
                 </div>
                 <div className="rounded-full border border-surface-200 bg-surface-50 px-3 py-1.5 text-sm text-surface-600 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-300">
                   <span className="font-semibold text-surface-900 dark:text-surface-50">
                     {upcomingEvents.length}
                   </span>{" "}
-                  مواعيد قادمة
+                  مواعـيد قادمة
                 </div>
                 <div className="rounded-full border border-surface-200 bg-surface-50 px-3 py-1.5 text-sm text-surface-600 dark:border-surface-700 dark:bg-surface-800/80 dark:text-surface-300">
-                  أقرب موعد:
+                  أقرب موعـد:
                   <span className="mr-1 font-semibold text-surface-900 dark:text-surface-50">
-                    {nextEvent ? nextEvent.title : "لا يوجد"}
+                    {nextEvent ? nextEvent.title : "لا يوجـد"}
                   </span>
                 </div>
               </div>
@@ -521,21 +521,21 @@ export function AcademicCalendar() {
                     onClick={() => navigateCalendar("prev")}
                     className="rounded-full border border-surface-200 px-3 py-1.5 text-sm font-medium text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
                   >
-                    السابق
+                    السـابق
                   </button>
                   <button
                     type="button"
                     onClick={() => navigateCalendar("today")}
                     className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 transition hover:bg-primary-100 dark:border-primary-900/50 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:bg-primary-950/70"
                   >
-                    اليوم
+                    اليـوم
                   </button>
                   <button
                     type="button"
                     onClick={() => navigateCalendar("next")}
                     className="rounded-full border border-surface-200 px-3 py-1.5 text-sm font-medium text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
                   >
-                    التالي
+                    التـالي
                   </button>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -549,7 +549,7 @@ export function AcademicCalendar() {
                           : "text-surface-500 hover:text-surface-800 dark:text-surface-300 dark:hover:text-surface-100"
                       }`}
                     >
-                      شهري
+                      شهـري
                     </button>
                     <button
                       type="button"
@@ -560,7 +560,7 @@ export function AcademicCalendar() {
                           : "text-surface-500 hover:text-surface-800 dark:text-surface-300 dark:hover:text-surface-100"
                       }`}
                     >
-                      أسبوعي
+                      أسبـوعي
                     </button>
                   </div>
                 </div>
@@ -569,13 +569,13 @@ export function AcademicCalendar() {
               <div className="mt-4">
                 <p className="text-xs font-semibold tracking-[0.18em] text-surface-400 uppercase dark:text-surface-500">
                   {upcomingEvents.length > 0
-                    ? "أقرب المواعيد"
-                    : "ملاحظات سريعة"}
+                    ? "أقرب المواعـيد"
+                    : "ملاحظـات سريعة"}
                 </p>
 
                 {previewEvents.length === 0 ? (
                   <div className="mt-3 rounded-2xl border border-dashed border-surface-200 bg-surface-50/80 px-4 py-3 text-sm leading-7 text-surface-500 dark:border-surface-700 dark:bg-surface-800/50 dark:text-surface-400">
-                    لا توجد مواعيد بعد. أضف أول امتحان أو موعد تسليم ليظهر هنا
+                    لا توجد مواعـيد بعد. أضف أول امتحان أو موعد تسليم ليظهر هنا
                     الملخص السريع تلقائياً.
                   </div>
                 ) : (
@@ -594,7 +594,7 @@ export function AcademicCalendar() {
                             {CATEGORY_META[event.category].label}
                           </span>
                           <span className="text-xs text-surface-400 dark:text-surface-500">
-                            {event.allDay ? "طوال اليوم" : "بوقت محدد"}
+                            {event.allDay ? "طوال اليـوم" : "بوقت محـدد"}
                           </span>
                         </div>
                         <p className="mt-3 text-sm font-semibold text-surface-900 dark:text-surface-50">
@@ -613,18 +613,18 @@ export function AcademicCalendar() {
             {events.length === 0 ? (
               <div className="mt-5 rounded-[24px] border border-dashed border-surface-200 bg-surface-50 px-6 py-8 text-center dark:border-surface-700 dark:bg-surface-800/60">
                 <p className="text-lg font-semibold text-surface-800 dark:text-surface-100">
-                  لا توجد مواعيد بعد
+                  لا توجد مواعـيد بعد
                 </p>
                 <p className="mt-2 text-sm leading-7 text-surface-500 dark:text-surface-400">
                   ابدأ بإضافة أول امتحان أو موعد تسجيل، ثم راجع خطتك من العرض
-                  الشهري أو الأسبوعي حسب ما يناسبك.
+                  الشهـري أو الأسبوعي حسب ما يناسبك.
                 </p>
                 <button
                   type="button"
                   onClick={() => openCreateDialog()}
                   className="mt-5 inline-flex items-center justify-center rounded-full bg-surface-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-surface-800 dark:bg-surface-100 dark:text-surface-950 dark:hover:bg-white"
                 >
-                  أضف أول موعد
+                  أضف أول موعـد
                 </button>
               </div>
             ) : null}
@@ -653,7 +653,7 @@ export function AcademicCalendar() {
                   nowIndicator
                   allDaySlot
                   headerToolbar={false}
-                  moreLinkText={(count) => `+${count} مواعيد`}
+                  moreLinkText={(count) => `+${count} مواعـيد`}
                   dayHeaderFormat={{ weekday: "short" }}
                   eventTimeFormat={{
                     hour: "numeric",
@@ -706,10 +706,10 @@ export function AcademicCalendar() {
 
       <ConfirmDialog
         open={deleteTargetId !== null}
-        title="حذف الموعد؟"
+        title="حذف الموعـد؟"
         description="سيتم حذف هذا الموعد من التقويم المحلي نهائياً على هذا الجهاز."
-        confirmLabel="حذف"
-        cancelLabel="إلغاء"
+        confirmLabel="حـذف"
+        cancelLabel="إلغـاء"
         onCancel={() => setDeleteTargetId(null)}
         onConfirm={handleDeleteConfirmed}
       />

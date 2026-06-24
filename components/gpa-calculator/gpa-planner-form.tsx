@@ -141,9 +141,9 @@ export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
     <div className="space-y-6">
       {/* Info Banner */}
       <div className="rounded-xl border border-primary-200 bg-primary-50 p-4 text-sm text-primary-700 dark:border-primary-800 dark:bg-primary-950/30 dark:text-primary-300">
-        <p className="font-medium">كيف يعمل مخطط المعدل؟</p>
+        <p className="font-medium">كيف يعمل مخطط المعـدل؟</p>
         <p className="mt-1 text-xs opacity-80">
-          أدخل معدلك الحالي وعدد الساعات المعتمدة، ثم حدد هدفك والساعات المخططة
+          أدخل معدلـك الحالي وعدد الساعات المعتمدة، ثم حدد هدفك والساعات المخططة
           للفصل القادم — وسنخبرك بالمعدل المطلوب لتحقيق هدفك.
         </p>
       </div>
@@ -156,35 +156,35 @@ export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
         className="space-y-4"
       >
         <div className="rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-xs text-surface-500 dark:border-surface-700 dark:bg-surface-800/50 dark:text-surface-400">
-          المخطط يعتمد سلّم 4.20 كحد أعلى للمعدل مع دعم A+ افتراضياً.
+          المخطـط يعتمد سلّم 4.20 كحد أعلى للمعدل مع دعم A+ افتراضياً.
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {renderField(
             "currentGpa",
-            "المعدل التراكمي الحالي",
-            "مثال: 2.80",
+            "المعدل التراكمـي الحالي",
+            "مثـال: 2.80",
             maxGpa,
             0.01,
           )}
           {renderField(
             "currentCreditHours",
-            "الساعات المعتمدة الحالية",
-            "مثال: 60",
+            "الساعات المعتمـدة الحالية",
+            "مثـال: 60",
             undefined,
             0.25,
           )}
           {renderField(
             "targetGpa",
-            "المعدل المستهدف",
-            "مثال: 3.20",
+            "المعدل المستهـدف",
+            "مثـال: 3.20",
             maxGpa,
             0.01,
           )}
           {renderField(
             "plannedCreditHours",
-            "ساعات الفصل القادم",
-            "مثال: 18",
+            "ساعات الفصـل القادم",
+            "مثـال: 18",
             undefined,
             0.25,
           )}
@@ -194,7 +194,7 @@ export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
           type="submit"
           className="w-full rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 active:bg-primary-800"
         >
-          احسب المعدل المطلوب
+          احسب المعـدل المطلوب
         </button>
       </form>
 
@@ -208,7 +208,7 @@ export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
             }`}
           >
             <p className="mb-2 text-sm text-surface-500 dark:text-surface-400">
-              المعدل المطلوب في الفصل القادم
+              المعدل المطلوب في الفصـل القادم
             </p>
             {result.isAchievable ? (
               <>
@@ -218,7 +218,7 @@ export function GpaPlannerForm({ onCalculated }: GpaPlannerFormProps) {
                   {result.requiredGpa.toFixed(2)}
                 </span>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  من أصل {maxGpa.toFixed(2)}
+                  من أصـل {maxGpa.toFixed(2)}
                 </p>
               </>
             ) : (

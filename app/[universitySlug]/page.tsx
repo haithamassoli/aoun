@@ -69,8 +69,8 @@ export default async function UniversityPage({
         title={university.name}
         subtitle={
           majors.length > 0
-            ? `${majors.length} تخصص متاح`
-            : "لا توجد تخصصات حالياً"
+            ? `${majors.length} تخـصص متاح`
+            : "لا توجد تخصـصات حالياً"
         }
       >
         <div className="public-elevated-surface rounded-[28px] p-4">
@@ -93,15 +93,15 @@ export default async function UniversityPage({
 
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-                الجامعة
+                الجـامعة
               </p>
               <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
                 {university.name}
               </h2>
               <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
                 {majors.length > 0
-                  ? `${majors.length} تخصص متاح`
-                  : "لا توجد تخصصات حالياً"}
+                  ? `${majors.length} تخـصص متاح`
+                  : "لا توجد تخصـصات حالياً"}
               </p>
             </div>
           </div>
@@ -115,7 +115,7 @@ export default async function UniversityPage({
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             items={[
-              { label: "الرئيسية", href: "/" },
+              { label: "الرئيسـية", href: "/" },
               { label: university.name },
             ]}
           />
@@ -146,8 +146,8 @@ export default async function UniversityPage({
               </h1>
               <p className="mt-1 text-surface-500 dark:text-surface-400">
                 {majors.length > 0
-                  ? `${majors.length} تخصص متاح`
-                  : "لا توجد تخصصات حالياً"}
+                  ? `${majors.length} تخـصص متاح`
+                  : "لا توجد تخصـصات حالياً"}
               </p>
             </div>
           </motion.div>

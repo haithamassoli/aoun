@@ -517,7 +517,7 @@ export default function MajorCoursesPage() {
     return (
       <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
         <p className="text-sm text-surface-500 dark:text-surface-400">
-          التخصص غير موجود
+          التخصص غير موجـود
         </p>
       </div>
     );
@@ -527,7 +527,7 @@ export default function MajorCoursesPage() {
   const activeSemesters = (semesters ?? []) as SemesterListItem[];
   const semesterOptions = activeSemesters.map((semester) => ({
     value: semester._id,
-    label: `${semester.name} — ترتيب ${semester.order}`,
+    label: `${semester.name} — ترتـيب ${semester.order}`,
   }));
   const semesterCourseCounts = new Map<Id<"semesters">, number>();
   for (const course of baseCourses) {
@@ -573,7 +573,7 @@ export default function MajorCoursesPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -629,7 +629,7 @@ export default function MajorCoursesPage() {
                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              إعدادات التخصص
+              إعدادات التخصـص
             </button>
             <button
               type="button"
@@ -652,7 +652,7 @@ export default function MajorCoursesPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              إضافة مادة
+              إضافة مـادة
             </button>
           </div>
         ) : activeTab === "semesters" ? (
@@ -677,7 +677,7 @@ export default function MajorCoursesPage() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            إضافة فصل
+            إضافة فصـل
           </button>
         ) : activeTab === "news" ? (
           <button
@@ -701,14 +701,14 @@ export default function MajorCoursesPage() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            إضافة خبر
+            إضافة خبـر
           </button>
         ) : null}
       </motion.div>
 
       <FormModal
         open={showMajorLinkForm}
-        title="إعدادات التخصص"
+        title="إعدادات التخصـص"
         onClose={() => setShowMajorLinkForm(false)}
       >
         <form
@@ -740,16 +740,16 @@ export default function MajorCoursesPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                شجرة المسار الدراسي
+                شجرة المسـار الدراسي
               </h3>
             </div>
             <p className="text-xs text-surface-500 dark:text-surface-400">
-              رابط مخطط المواد والمتطلبات الدراسية للتخصص
+              رابط مخطط المواد والمتطلبات الدراسيـة للتخصص
             </p>
             <FormInput
               form={majorLinkForm}
               name="treeDiagramUrl"
-              label="رابط شجرة المسار"
+              label="رابط شجرة المسـار"
               placeholder="https://drive.google.com/..."
               dir="ltr"
             />
@@ -773,7 +773,7 @@ export default function MajorCoursesPage() {
                     d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                   />
                 </svg>
-                معاينة الرابط الحالي
+                معاينة الرابط الحالـي
               </a>
             )}
           </div>
@@ -800,11 +800,11 @@ export default function MajorCoursesPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                حسابات التواصل الاجتماعي
+                حسابات التواصل الاجتماعـي
               </h3>
             </div>
             <p className="text-xs text-surface-500 dark:text-surface-400">
-              روابط حسابات التخصص على منصات التواصل الاجتماعي
+              روابط حسابات التخصص على منصـات التواصل الاجتماعي
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <FormInput
@@ -831,7 +831,7 @@ export default function MajorCoursesPage() {
               <FormInput
                 form={majorLinkForm}
                 name="faculty"
-                label="الهيئة التدريسية"
+                label="الهيئة التدريسيـة"
                 placeholder="https://..."
                 dir="ltr"
               />
@@ -852,7 +852,7 @@ export default function MajorCoursesPage() {
               onClick={() => setShowMajorLinkForm(false)}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <majorLinkForm.Subscribe
               selector={(s) => [s.canSubmit, s.isSubmitting]}
@@ -884,7 +884,7 @@ export default function MajorCoursesPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         />
                       </svg>
-                      جاري الحفظ...
+                      جاري الحـفظ...
                     </>
                   ) : (
                     <>
@@ -901,7 +901,7 @@ export default function MajorCoursesPage() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      حفظ التغييرات
+                      حفظ التغييـرات
                     </>
                   )}
                 </button>
@@ -922,7 +922,7 @@ export default function MajorCoursesPage() {
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
           }`}
         >
-          المواد ({courses.length})
+          المـواد ({courses.length})
         </button>
         <button
           type="button"
@@ -933,7 +933,7 @@ export default function MajorCoursesPage() {
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
           }`}
         >
-          المستويات ({activeSemesters.length})
+          المستويـات ({activeSemesters.length})
         </button>
         <button
           type="button"
@@ -944,7 +944,7 @@ export default function MajorCoursesPage() {
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
           }`}
         >
-          <span>الأخبار</span>
+          <span>الأخبـار</span>
           {typeof newsCount === "number" && (
             <span
               className={`inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold ${
@@ -966,7 +966,7 @@ export default function MajorCoursesPage() {
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
           }`}
         >
-          <span>الطلبات</span>
+          <span>الطلبـات</span>
           {typeof openResourceRequests?.length === "number" ? (
             <span
               className={`inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold ${
@@ -988,7 +988,7 @@ export default function MajorCoursesPage() {
               : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
           }`}
         >
-          الإشعارات
+          الإشـعارات
         </button>
       </div>
 
@@ -997,7 +997,7 @@ export default function MajorCoursesPage() {
         <>
           <FormModal
             open={showForm}
-            title={editingId ? "تعديل المادة" : "إضافة مادة جديدة"}
+            title={editingId ? "تعديل المـادة" : "إضافة مادة جديـدة"}
             onClose={resetForm}
           >
             <form
@@ -1011,7 +1011,7 @@ export default function MajorCoursesPage() {
                 <FormInput
                   form={form}
                   name="name"
-                  label="اسم المادة *"
+                  label="اسم المـادة *"
                   onChangeCallback={(val) => {
                     if (!editingId)
                       form.setFieldValue("slug", generateSlug(val));
@@ -1020,7 +1020,7 @@ export default function MajorCoursesPage() {
                 <div className="relative">
                   <div className="mb-1.5 flex items-center gap-1.5">
                     <span className="text-xs font-medium text-surface-700 dark:text-surface-200">
-                      الرابط (slug) *
+                      الرابـط (slug) *
                     </span>
                     <button
                       type="button"
@@ -1067,18 +1067,18 @@ export default function MajorCoursesPage() {
                         </svg>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-primary-900 dark:text-primary-100">
-                            الرابط هو معرّف فريد للمادة في العنوان
+                            الرابط هو معرّف فريـد للمادة في العنوان
                           </p>
                           <div className="mt-2 space-y-1.5">
                             <p className="text-xs text-primary-700 dark:text-primary-300">
                               <span className="font-semibold">مثال:</span> إذا
-                              كان اسم المادة «عربي»
+                              كان اسم المـادة «عربي»
                             </p>
                             <p className="text-xs font-mono text-primary-600 dark:text-primary-400">
                               الرابط: aoun.assoli.site/just/[arabic]
                             </p>
                             <p className="mt-2 text-xs text-primary-700 dark:text-primary-300">
-                              يُستخدم في الرابط النهائي للمادة
+                              يُستخدم في الرابط النهائي للمـادة
                             </p>
                           </div>
                         </div>
@@ -1110,14 +1110,14 @@ export default function MajorCoursesPage() {
                 <FormInput
                   form={form}
                   name="courseCode"
-                  label="رمز المادة (اختياري)"
+                  label="رمز المـادة (اختياري)"
                   dir="ltr"
                   placeholder="E112"
                 />
                 <FormInput
                   form={form}
                   name="credits"
-                  label="الساعات المعتمدة *"
+                  label="الساعات المعتمـدة *"
                   type="number"
                   min="1"
                   step="1"
@@ -1125,14 +1125,14 @@ export default function MajorCoursesPage() {
                 <FormSelect
                   form={form}
                   name="semesterId"
-                  label="الفصل أو المستوى (اختياري)"
+                  label="الفصل أو المستـوى (اختياري)"
                   options={semesterOptions}
-                  placeholder="بدون فصل"
+                  placeholder="بدون فصـل"
                 />
                 <div className="relative">
                   <div className="mb-1.5 flex items-center gap-1.5">
                     <span className="text-xs font-medium text-surface-700 dark:text-surface-200">
-                      الأسماء البديلة (اختياري)
+                      الأسماء البديلـة (اختياري)
                     </span>
                     <button
                       type="button"
@@ -1179,18 +1179,18 @@ export default function MajorCoursesPage() {
                         </svg>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-primary-900 dark:text-primary-100">
-                            أسماء بديلة تساعد في البحث عن المادة
+                            أسماء بديلة تساعد في البحث عن المـادة
                           </p>
                           <div className="mt-2 space-y-1.5">
                             <p className="text-xs text-primary-700 dark:text-primary-300">
                               <span className="font-semibold">مثال:</span> إذا
-                              كان اسم المادة «calculus 101»
+                              كان اسم المـادة «calculus 101»
                             </p>
                             <p className="text-xs text-primary-600 dark:text-primary-400">
-                              الاسم البديل: كالكولس كالك تفاضل وتكامل رياضيات
+                              الاسم البديـل: كالكولس كالك تفاضل وتكامل رياضيات
                             </p>
                             <p className="mt-2 text-xs text-primary-700 dark:text-primary-300">
-                              يمكن للطلاب البحث بالاسم البديل للوصول للمادة
+                              يمكن للطلاب البحث بالاسم البديل للوصول للمـادة
                               بسهولة
                             </p>
                           </div>
@@ -1222,13 +1222,13 @@ export default function MajorCoursesPage() {
                     form={form}
                     name="alias"
                     label=""
-                    placeholder="اسماء بديلة للبحث"
+                    placeholder="اسماء بديلة للبحـث"
                   />
                 </div>
                 <div className="relative">
                   <div className="mb-1.5 flex items-center gap-1.5">
                     <span className="text-xs font-medium text-surface-700 dark:text-surface-200">
-                      الترتيب (اختياري)
+                      الترتـيب (اختياري)
                     </span>
                     <button
                       type="button"
@@ -1275,18 +1275,18 @@ export default function MajorCoursesPage() {
                         </svg>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-primary-900 dark:text-primary-100">
-                            رقم الترتيب يحدد موضع المادة في القائمة
+                            رقم الترتيب يحدد موضع المـادة في القائمة
                           </p>
                           <div className="mt-2 space-y-1.5">
                             <p className="text-xs text-primary-700 dark:text-primary-300">
                               <span className="font-semibold">مثال:</span>{" "}
-                              المواد ذات الترتيب الأقل تظهر أولاً
+                              المواد ذات الترتيب الأقل تظهر أولـاً
                             </p>
                             <p className="text-xs text-primary-600 dark:text-primary-400">
-                              ترتيب 0 → أول مادة، ترتيب 1 → ثاني مادة
+                              ترتيب 0 → أول مادة، ترتيب 1 → ثاني مـادة
                             </p>
                             <p className="mt-2 text-xs text-primary-700 dark:text-primary-300">
-                              يمكنك استخدامه لترتيب المواد حسب المستوى الدراسي
+                              يمكنك استخدامه لترتيب المواد حسب المستوى الدراسـي
                             </p>
                           </div>
                         </div>
@@ -1328,7 +1328,7 @@ export default function MajorCoursesPage() {
                   onClick={resetForm}
                   className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
                 >
-                  إلغاء
+                  إلغـاء
                 </button>
                 <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
                   {([canSubmit, isSubmitting]) => (
@@ -1338,10 +1338,10 @@ export default function MajorCoursesPage() {
                       className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                     >
                       {isSubmitting
-                        ? "جاري الحفظ..."
+                        ? "جاري الحـفظ..."
                         : editingId
-                          ? "تحديث"
-                          : "إضافة"}
+                          ? "تحـديث"
+                          : "إضـافة"}
                     </button>
                   )}
                 </form.Subscribe>
@@ -1359,8 +1359,8 @@ export default function MajorCoursesPage() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-2xl flex-1">
                   <PublicSearchInput
-                    label="ابحث داخل مواد التخصص"
-                    placeholder="مثال: برمجة كائنية أو E112"
+                    label="ابحث داخل مواد التخصـص"
+                    placeholder="مثال: برمجة كائنيـة أو E112"
                     value={search.input}
                     onChange={search.setInput}
                   />
@@ -1370,10 +1370,10 @@ export default function MajorCoursesPage() {
                   <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 dark:border-primary-800 dark:bg-primary-950/60 dark:text-primary-300">
                     <span className="h-2 w-2 rounded-full bg-primary-500" />
                     {search.isEmpty
-                      ? `${courses.length} مادة متاحة`
+                      ? `${courses.length} مادة متاحـة`
                       : isSearchLoading
-                        ? "جاري البحث..."
-                        : `${activeCourses.length} نتيجة`}
+                        ? "جاري البحـث..."
+                        : `${activeCourses.length} نتيجـة`}
                   </span>
                 </div>
               </div>
@@ -1399,10 +1399,10 @@ export default function MajorCoursesPage() {
                 </svg>
               </div>
               <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-                لا توجد مواد
+                لا توجد مـواد
               </p>
               <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-                أضف مادة جديدة للبدء
+                أضف مادة جديدة للبـدء
               </p>
             </div>
           ) : isSearchLoading ? (
@@ -1432,10 +1432,10 @@ export default function MajorCoursesPage() {
                 </svg>
               </div>
               <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-                لا توجد نتائج مطابقة
+                لا توجد نتائج مطابقـة
               </p>
               <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-                لم نعثر على مادة تطابق «{search.query}» داخل هذا التخصص.
+                لم نعثر على مادة تطابق «{search.query}» داخل هذا التخصـص.
               </p>
             </div>
           ) : (
@@ -1465,9 +1465,9 @@ export default function MajorCoursesPage() {
                             {course.name}
                           </h3>
                           <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
-                            <span>{course.credits} ساعات</span>
+                            <span>{course.credits} ساعـات</span>
                             {semesterLabel && <span>{semesterLabel}</span>}
-                            <span>{course.resourceCount} مصدر</span>
+                            <span>{course.resourceCount} مصـدر</span>
                           </div>
                         </div>
                       </div>
@@ -1508,7 +1508,7 @@ export default function MajorCoursesPage() {
         <>
           <FormModal
             open={showSemesterForm}
-            title={editingSemesterId ? "تعديل المستوى" : "إضافة مستوى جديد"}
+            title={editingSemesterId ? "تعديل المستـوى" : "إضافة مستوى جديـد"}
             onClose={resetSemesterForm}
           >
             <form
@@ -1521,10 +1521,10 @@ export default function MajorCoursesPage() {
             >
               <div className="rounded-2xl border border-primary-100 bg-primary-50/70 p-4 dark:border-primary-900 dark:bg-primary-950/30">
                 <h3 className="text-sm font-semibold text-primary-900 dark:text-primary-100">
-                  ترتيب المستويات يظهر في الخطة العامة
+                  ترتيب المستويات يظهر في الخطة العامـة
                 </h3>
                 <p className="mt-1 text-xs leading-5 text-primary-700 dark:text-primary-300">
-                  استخدم رقماً أقل لإظهار المستوى مبكراً، ثم اربط المواد
+                  استخدم رقماً أقل لإظهار المستوى مبكـراً، ثم اربط المواد
                   بالمستوى من نموذج المادة.
                 </p>
               </div>
@@ -1533,13 +1533,13 @@ export default function MajorCoursesPage() {
                 <FormInput
                   form={semesterForm}
                   name="name"
-                  label="اسم المستوى *"
-                  placeholder="مثال: المستوى الأول"
+                  label="اسم المستـوى *"
+                  placeholder="مثال: المستـوى الأول"
                 />
                 <FormInput
                   form={semesterForm}
                   name="order"
-                  label="الترتيب"
+                  label="الترتـيب"
                   type="number"
                   min="0"
                 />
@@ -1551,7 +1551,7 @@ export default function MajorCoursesPage() {
                   onClick={resetSemesterForm}
                   className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
                 >
-                  إلغاء
+                  إلغـاء
                 </button>
                 <semesterForm.Subscribe
                   selector={(s) => [s.canSubmit, s.isSubmitting]}
@@ -1563,10 +1563,10 @@ export default function MajorCoursesPage() {
                       className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                     >
                       {isSubmitting
-                        ? "جاري الحفظ..."
+                        ? "جاري الحـفظ..."
                         : editingSemesterId
-                          ? "تحديث"
-                          : "إضافة"}
+                          ? "تحـديث"
+                          : "إضـافة"}
                     </button>
                   )}
                 </semesterForm.Subscribe>
@@ -1601,10 +1601,10 @@ export default function MajorCoursesPage() {
                 </svg>
               </div>
               <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-                لا توجد مستويات بعد
+                لا توجد مستويات بعـد
               </p>
               <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-                أضف مستويات لترتيب المواد في الصفحة العامة.
+                أضف مستويات لترتيب المواد في الصفحة العامـة.
               </p>
             </div>
           ) : (
@@ -1632,7 +1632,7 @@ export default function MajorCoursesPage() {
                           {semester.name}
                         </h3>
                         <p className="text-xs text-surface-500 dark:text-surface-400">
-                          {courseCount} مادة مرتبطة
+                          {courseCount} مادة مرتبطـة
                         </p>
                       </div>
                     </div>
@@ -1694,7 +1694,7 @@ export default function MajorCoursesPage() {
         <>
           <FormModal
             open={showNewsForm}
-            title={editingNewsId ? "تعديل الخبر" : "إضافة خبر جديد"}
+            title={editingNewsId ? "تعديل الخبـر" : "إضافة خبر جديـد"}
             onClose={resetNewsForm}
           >
             <NewsForm
@@ -1748,10 +1748,10 @@ export default function MajorCoursesPage() {
                 </svg>
               </div>
               <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-                لا توجد طلبات مفتوحة
+                لا توجد طلبات مفتوحـة
               </p>
               <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-                ستظهر هنا طلبات المصادر الواردة من صفحات المواد في هذا التخصص.
+                ستظهر هنا طلبات المصادر الواردة من صفحات المواد في هذا التخصـص.
               </p>
             </div>
           ) : (
@@ -1770,14 +1770,14 @@ export default function MajorCoursesPage() {
                         {group.courseName}
                       </h2>
                       <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                        {group.requests.length} طلب مفتوح
+                        {group.requests.length} طلب مفتـوح
                       </p>
                     </div>
                     <Link
                       href={`/dashboard/major/${majorId}/course/${group.courseId}`}
                       className="inline-flex items-center justify-center rounded-xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-semibold text-surface-700 transition-colors hover:border-surface-300 hover:bg-surface-100 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-700"
                     >
-                      فتح صفحة المادة
+                      فتح صفحة المـادة
                     </Link>
                   </div>
 
@@ -1844,7 +1844,7 @@ export default function MajorCoursesPage() {
                               href={`/dashboard/major/${majorId}/course/${request.courseId}`}
                               className="inline-flex items-center justify-center rounded-xl border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-surface-700 transition-colors hover:border-surface-300 hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-200 dark:hover:border-surface-600 dark:hover:bg-surface-800"
                             >
-                              فتح صفحة المادة
+                              فتح صفحة المـادة
                             </Link>
                             <button
                               type="button"
@@ -1855,8 +1855,8 @@ export default function MajorCoursesPage() {
                               className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
                             >
                               {pendingRequestIds.has(request._id)
-                                ? "جارٍ التحديث..."
-                                : "تمت التلبية"}
+                                ? "جارٍ التحـديث..."
+                                : "تمت التلبيـة"}
                             </button>
                           </div>
                         </div>
@@ -1875,10 +1875,10 @@ export default function MajorCoursesPage() {
         <div className="rounded-2xl border border-surface-200 bg-white p-5 dark:border-surface-700 dark:bg-surface-900">
           <div className="mb-4">
             <h2 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-              إرسال إشعار مخصص
+              إرسال إشعار مخصـص
             </h2>
             <p className="mt-0.5 text-xs text-surface-500 dark:text-surface-400">
-              سيُرسل الإشعار لجميع المشتركين في هذا التخصص.
+              سيُرسل الإشعار لجميع المشتركين في هذا التخصـص.
             </p>
           </div>
           <SendNotificationForm
@@ -1890,14 +1890,14 @@ export default function MajorCoursesPage() {
 
       <ConfirmDialog
         open={pendingDeleteNews !== null}
-        title="تأكيد حذف الخبر"
+        title="تأكيد حذف الخبـر"
         description={
           pendingDeleteNews
-            ? `سيتم حذف خبر «${pendingDeleteNews.title}» من القائمة العامة ولوحة التحكم.`
+            ? `سيتم حذف خبر «${pendingDeleteNews.title}» من القائمة العامـة ولوحة التحكم.`
             : ""
         }
-        confirmLabel="تأكيد الحذف"
-        cancelLabel="إلغاء"
+        confirmLabel="تأكيد الحـذف"
+        cancelLabel="إلغـاء"
         isLoading={deletingNews !== null}
         onConfirm={handleNewsDelete}
         onCancel={() => {
@@ -1908,14 +1908,14 @@ export default function MajorCoursesPage() {
       />
       <ConfirmDialog
         open={pendingDeleteSemester !== null}
-        title="تأكيد حذف المستوى"
+        title="تأكيد حذف المستـوى"
         description={
           pendingDeleteSemester
-            ? `سيتم حذف فصل «${pendingDeleteSemester.name}» وإزالة ربطه من المواد المرتبطة به.`
+            ? `سيتم حذف فصل «${pendingDeleteSemester.name}» وإزالة ربطه من المواد المرتبطـة به.`
             : ""
         }
-        confirmLabel="تأكيد الحذف"
-        cancelLabel="إلغاء"
+        confirmLabel="تأكيد الحـذف"
+        cancelLabel="إلغـاء"
         isLoading={deletingSemester !== null}
         onConfirm={handleSemesterDelete}
         onCancel={() => {

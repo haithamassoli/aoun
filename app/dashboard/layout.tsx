@@ -42,19 +42,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <div className="rounded-2xl border border-surface-200 bg-white p-4 shadow-sm dark:border-surface-700 dark:bg-surface-900">
             <div className="mb-4 border-b border-surface-100 pb-4 dark:border-surface-800">
               <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                لوحة التحكم
+                لوحة التحكـم
               </p>
               <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                جاري تحميل بيانات الحساب...
+                جاري تحميل بيـانات الحساب...
               </p>
             </div>
 
             <nav className="space-y-1">
               <div className="rounded-xl bg-primary-50 px-3 py-2.5 text-sm font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-300">
-                الرئيسية
+                الرئيسـية
               </div>
               <div className="rounded-xl px-3 py-2.5 text-sm text-surface-500 dark:text-surface-400">
-                الإعدادات
+                الإعـدادات
               </div>
             </nav>
           </div>
@@ -97,7 +97,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <div className="mb-4 flex items-center justify-between border-b border-surface-100 pb-4 dark:border-surface-800">
             {isSidebarExpanded && (
               <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                لوحة التحكم
+                لوحة التحكـم
               </p>
             )}
             <button
@@ -182,7 +182,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                 />
               </svg>
-              {isSidebarExpanded && <span>الرئيسية</span>}
+               {isSidebarExpanded && <span>الرئيسـية</span>}
             </Link>
 
             {/* Admin links */}
@@ -197,31 +197,37 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   {
                     href: "/dashboard/admin/universities",
                     label: "الجامعات",
+                    displayLabel: "الجـامعات",
                     icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
                   },
                   {
                     href: "/dashboard/admin/majors",
                     label: "التخصصات",
+                    displayLabel: "التخصصـات",
                     icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
                   },
                   {
                     href: "/dashboard/admin/courses",
                     label: "المواد",
+                    displayLabel: "المـواد",
                     icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
                   },
                   {
                     href: "/dashboard/admin/resources",
                     label: "المصادر",
+                    displayLabel: "المصـادر",
                     icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
                   },
                   {
                     href: "/dashboard/admin/users",
                     label: "المستخدمون",
+                    displayLabel: "المستخدمـون",
                     icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
                   },
                   {
                     href: "/dashboard/admin/notifications",
                     label: "الإشعارات",
+                    displayLabel: "الإشـعارات",
                     icon: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
                   },
                 ].map((item) => {
@@ -253,7 +259,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         />
                       </svg>
                       {isSidebarExpanded && (
-                        <span className="truncate">{item.label}</span>
+                          <span className="truncate">{item.displayLabel}</span>
                       )}
                     </Link>
                   );
@@ -266,20 +272,20 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <div className="pt-2">
                 {isSidebarExpanded && (
                   <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500">
-                    التخصصات
+                    التخصصـات
                   </p>
                 )}
                 {majors === undefined ? (
                   <div
                     className={`py-2 text-xs text-surface-400 dark:text-surface-500 ${isSidebarExpanded ? "px-3 text-right" : "text-center"}`}
                   >
-                    {isSidebarExpanded ? "جاري التحميل..." : "..."}
+                    {isSidebarExpanded ? "جاري التحميـل..." : "..."}
                   </div>
                 ) : majors.length === 0 ? (
                   <div
                     className={`py-2 text-xs text-surface-400 dark:text-surface-500 ${isSidebarExpanded ? "px-3 text-right" : "text-center"}`}
                   >
-                    {isSidebarExpanded ? "لا توجد تخصصات" : "-"}
+                    {isSidebarExpanded ? "لا توجد تخصصـات" : "-"}
                   </div>
                 ) : (
                   majors.map((major: { _id: string; name: string }) => {
@@ -354,7 +360,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              {isSidebarExpanded && <span>الإعدادات</span>}
+              {isSidebarExpanded && <span>الإعـدادات</span>}
             </Link>
           </div>
 
@@ -384,7 +390,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
-              {isSidebarExpanded && <span>تسجيل الخروج</span>}
+              {isSidebarExpanded && <span>تسجيل الخـروج</span>}
             </button>
           </div>
         </div>

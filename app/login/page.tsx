@@ -41,13 +41,13 @@ export default function LoginPage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-16 items-center justify-center rounded-2xl bg-primary-600 text-2xl font-bold text-white">
-            عـون
+            عــون
           </div>
           <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
-            تسجيل الدخول
+            تسجيل الدخـول
           </h1>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            هذه الصفحة مخصصة للمشرفين والمساهمين الذين يرفعون المواد والموارد
+            هذه الصفحة مخصصة للمشرفين والمساهمين الذين يرفعون المـواد والموارد
             الدراسية إلى التطبيق
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function LoginPage() {
                     htmlFor="email"
                     className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
                   >
-                    البريد الإلكتروني
+                    البريد الإلكترونـي
                   </label>
                   <input
                     id="email"
@@ -114,7 +114,7 @@ export default function LoginPage() {
                     htmlFor="password"
                     className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
                   >
-                    كلمة المرور
+                    كلمة المـرور
                   </label>
                   <input
                     id="password"
@@ -172,10 +172,10 @@ export default function LoginPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                         />
                       </svg>
-                      جاري تسجيل الدخول...
+                      جاري تسجيل الدخـول...
                     </span>
                   ) : (
-                    "تسجيل الدخول"
+                    "تسجيل الدخـول"
                   )}
                 </button>
               )}
@@ -185,14 +185,14 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-surface-400 dark:text-surface-500">
-          ليس لديك حساب؟ تواصل مع مدير النظام عبر{" "}
+          ليس لديك حساب؟ تواصل مع مدير النظـام عبر{" "}
           <a
             href="https://wa.me/+962776193666"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-primary-600 hover:underline dark:text-primary-400"
           >
-            واتساب
+            واتسـاب
           </a>
           .
         </p>

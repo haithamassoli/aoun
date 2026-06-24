@@ -68,7 +68,7 @@ export function BookmarkToggleButton({
     >
       <BookmarkIcon filled={isSaved} />
       {showLabel ? (
-        <span>{isSaved ? "محفوظ" : "حفظ"}</span>
+        <span>{isSaved ? "محفـوظ" : "حـفظ"}</span>
       ) : null}
     </button>
   );

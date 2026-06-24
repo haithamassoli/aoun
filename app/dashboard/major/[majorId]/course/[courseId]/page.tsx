@@ -171,7 +171,7 @@ export default function CourseResourcesPage() {
     return (
       <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
         <p className="text-sm text-surface-500 dark:text-surface-400">
-          المادة غير موجودة
+          المادة غير موجـودة
         </p>
       </div>
     );
@@ -201,7 +201,7 @@ export default function CourseResourcesPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -249,7 +249,7 @@ export default function CourseResourcesPage() {
                 {course.courseCode}
               </span>
             )}
-            {resources.length} مصدر
+            {resources.length} مصـدر
           </p>
         </div>
         <button
@@ -272,7 +272,7 @@ export default function CourseResourcesPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          إضافة مصدر
+          إضافة مصـدر
         </button>
       </motion.div>
 
@@ -287,16 +287,16 @@ export default function CourseResourcesPage() {
           className="mb-6 rounded-2xl border border-primary-200 bg-primary-50/30 p-5 dark:border-primary-800 dark:bg-primary-950/30"
         >
           <h3 className="mb-4 text-sm font-semibold text-surface-800 dark:text-surface-100">
-            {editingId ? "تعديل المصدر" : "إضافة مصدر جديد"}
+            {editingId ? "تعديل المصـدر" : "إضافة مصدر جديـد"}
           </h3>
           <div className="space-y-4">
             {/* Title + Category row */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormInput form={form} name="title" label="عنوان المصدر *" />
+              <FormInput form={form} name="title" label="عنوان المصـدر *" />
               <FormSelect
                 form={form}
                 name="category"
-                label="التصنيف *"
+                label="التصنـيف *"
                 options={CATEGORY_OPTIONS}
               />
             </div>
@@ -304,7 +304,7 @@ export default function CourseResourcesPage() {
             {/* Type toggle */}
             <div>
               <label className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                نوع المصدر
+                نوع المصـدر
               </label>
               <div className="flex gap-2">
                 <button
@@ -329,7 +329,7 @@ export default function CourseResourcesPage() {
                       d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
                     />
                   </svg>
-                  رابط خارجي
+                  رابط خارجـي
                 </button>
                 <button
                   type="button"
@@ -353,7 +353,7 @@ export default function CourseResourcesPage() {
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  نص منسق
+                  نص منسـق
                 </button>
               </div>
             </div>
@@ -363,7 +363,7 @@ export default function CourseResourcesPage() {
               <FormInput
                 form={form}
                 name="url"
-                label="الرابط *"
+                label="الرابـط *"
                 type="url"
                 dir="ltr"
                 placeholder="https://..."
@@ -373,7 +373,7 @@ export default function CourseResourcesPage() {
                 {(field) => (
                   <div>
                     <label className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                      المحتوى *
+                      المحتـوى *
                     </label>
                     <TiptapEditor
                       content={field.state.value}
@@ -402,7 +402,7 @@ export default function CourseResourcesPage() {
               <FormInput
                 form={form}
                 name="order"
-                label="الترتيب"
+                label="الترتـيب"
                 type="number"
                 min="0"
               />
@@ -415,7 +415,7 @@ export default function CourseResourcesPage() {
               onClick={resetForm}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
@@ -425,10 +425,10 @@ export default function CourseResourcesPage() {
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
                   {isSubmitting
-                    ? "جاري الحفظ..."
+                    ? "جاري الحـفظ..."
                     : editingId
-                      ? "تحديث"
-                      : "إضافة"}
+                      ? "تحـديث"
+                      : "إضـافة"}
                 </button>
               )}
             </form.Subscribe>
@@ -447,7 +447,7 @@ export default function CourseResourcesPage() {
                 : "bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             }`}
           >
-            الكل ({resources.length})
+            الكـل ({resources.length})
           </button>
           {categoryGroups.map((group) => (
             <button
@@ -484,16 +484,16 @@ export default function CourseResourcesPage() {
             </svg>
           </div>
           <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-            لا توجد مصادر
+            لا توجد مصـادر
           </p>
           <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-            أضف مصدرا جديدا للبدء
+            أضف مصدرا جديدا للبـدء
           </p>
         </div>
       ) : filteredResources.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-sm text-surface-500 dark:text-surface-400">
-            لا توجد مصادر في هذا التصنيف
+            لا توجد مصادر في هذا التصنـيف
           </p>
         </div>
       ) : (
@@ -537,7 +537,7 @@ export default function CourseResourcesPage() {
                             : "bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400"
                         }`}
                       >
-                        {resource.type === "link" ? "رابط" : "نص منسق"}
+                        {resource.type === "link" ? "رابـط" : "نص منسـق"}
                       </span>
                     </div>
                     {resource.type === "link" && resource.url && (

@@ -16,18 +16,18 @@ export default function SettingsPage() {
   return (
     <div>
       <MobilePageHeaderMenu
-        title="الإعدادات"
-        subtitle="صدّر واستورد بياناتك المحلية المحفوظة على هذا الجهاز"
+        title="الإعـدادات"
+        subtitle="صدّر واستورد بياناتك المحلـية المحفوظة على هذا الجهاز"
       >
         <div className="public-elevated-surface rounded-[28px] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-            تفضيلات وبيانات
+            تفضـيلات وبيانات
           </p>
           <h2 className="mt-2 text-xl font-bold text-surface-900 dark:text-surface-50">
-            إدارة النسخ المحلية
+            إدارة النسخ المحلـية
           </h2>
           <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-            صدّر نسخة احتياطية من بياناتك أو استعد نسخة سابقة مع الحفاظ على
+            صدّر نسخة احتياطـية من بياناتك أو استعد نسخة سابقة مع الحفاظ على
             الوصول السريع للأدوات الأساسية.
           </p>
         </div>

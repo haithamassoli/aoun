@@ -80,7 +80,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
         ))}
       </div>
       <p className={`mt-1 text-xs ${textColors[strength]}`}>
-        قوة كلمة المرور: {labels[strength]}
+        قوة كلمة المـرور: {labels[strength]}
       </p>
     </div>
   );
@@ -142,10 +142,10 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-          الإعدادات
+          الإعـدادات
         </h1>
         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-          إدارة إعدادات حسابك
+          إدارة إعدادات حسـابك
         </p>
       </div>
 
@@ -169,10 +169,10 @@ export default function SettingsPage() {
           </div>
           <div>
             <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-              تغيير كلمة المرور
+              تغيير كلمة المـرور
             </p>
             <p className="text-xs text-surface-500 dark:text-surface-400">
-              يُنصح باستخدام كلمة مرور قوية وفريدة
+              يُنصح باستخدام كلمة مرور قويـة وفريدة
             </p>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function SettingsPage() {
           {/* Success */}
           {success && (
             <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-400">
-              تم تغيير كلمة المرور بنجاح
+              تم تغيير كلمة المرور بنجـاح
             </div>
           )}
 
@@ -198,7 +198,7 @@ export default function SettingsPage() {
               htmlFor="currentPassword"
               className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
             >
-              كلمة المرور الحالية
+              كلمة المرور الحاليـة
             </label>
             <div className="relative">
               <input
@@ -228,7 +228,7 @@ export default function SettingsPage() {
               htmlFor="newPassword"
               className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
             >
-              كلمة المرور الجديدة
+              كلمة المرور الجديـدة
             </label>
             <div className="relative">
               <input
@@ -257,7 +257,7 @@ export default function SettingsPage() {
               htmlFor="confirmPassword"
               className="mb-1.5 block text-sm font-medium text-surface-700 dark:text-surface-200"
             >
-              تأكيد كلمة المرور الجديدة
+              تأكيد كلمة المرور الجديـدة
             </label>
             <div className="relative">
               <input
@@ -317,10 +317,10 @@ export default function SettingsPage() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                   />
                 </svg>
-                جاري الحفظ...
+                جاري الحـفظ...
               </span>
             ) : (
-              "حفظ كلمة المرور الجديدة"
+              "حفظ كلمة المرور الجديـدة"
             )}
           </button>
         </form>

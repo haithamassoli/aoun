@@ -74,7 +74,7 @@ export function SendNotificationForm({
             htmlFor={targetMajorFieldId}
             className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
           >
-            الجهة المستهدفة
+            الجهة المستهدفـة
           </label>
           <select
             id={targetMajorFieldId}
@@ -82,7 +82,7 @@ export function SendNotificationForm({
             onChange={(e) => setSelectedMajorId(e.target.value)}
             className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2.5 text-sm text-surface-900 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-50"
           >
-            <option value="">جميع المشتركين</option>
+            <option value="">جميع المشتركـين</option>
             {(adminMajors as NotificationMajorOption[] | undefined)?.map((major) => (
               <option key={major._id} value={major._id}>
                 {major.name} — {major.universityName}
@@ -97,7 +97,7 @@ export function SendNotificationForm({
           htmlFor={titleId}
           className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
         >
-          عنوان الإشعار *
+          عنوان الإشعـار *
         </label>
         <input
           id={titleId}
@@ -105,7 +105,7 @@ export function SendNotificationForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          placeholder="عنوان الإشعار"
+          placeholder="عنوان الإشعـار"
           className="w-full rounded-xl border border-surface-300 bg-white px-3 py-2.5 text-sm text-surface-900 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-50 dark:placeholder-surface-500"
         />
       </div>
@@ -115,7 +115,7 @@ export function SendNotificationForm({
           htmlFor={bodyId}
           className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
         >
-          نص الإشعار *
+          نص الإشعـار *
         </label>
         <textarea
           id={bodyId}
@@ -123,7 +123,7 @@ export function SendNotificationForm({
           onChange={(e) => setBody(e.target.value)}
           required
           rows={3}
-          placeholder="نص الإشعار الذي سيظهر للمشتركين"
+          placeholder="نص الإشعار الذي سيظهر للمشتركـين"
           className="w-full resize-none rounded-xl border border-surface-300 bg-white px-3 py-2.5 text-sm text-surface-900 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-50 dark:placeholder-surface-500"
         />
       </div>
@@ -133,7 +133,7 @@ export function SendNotificationForm({
           htmlFor={urlId}
           className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
         >
-          الرابط (اختياري)
+          الرابـط (اختياري)
         </label>
         <input
           id={urlId}
@@ -152,7 +152,7 @@ export function SendNotificationForm({
         className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
       >
         {isSubmitting ? (
-          "جاري الإرسال..."
+          "جاري الإرسـال..."
         ) : (
           <>
             <svg
@@ -168,7 +168,7 @@ export function SendNotificationForm({
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
               />
             </svg>
-            إرسال الإشعار
+            إرسال الإشعـار
           </>
         )}
       </button>

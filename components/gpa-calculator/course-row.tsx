@@ -69,13 +69,13 @@ export function CourseRow({
             {/* Course Name */}
             <div className="col-span-2 sm:col-span-1">
               <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
-                اسم المادة (اختياري)
+                اسم المـادة (اختياري)
               </label>
               <input
                 type="text"
                 value={course.name ?? ""}
                 onChange={(e) => handleField("name", e.target.value)}
-                placeholder="مثال: رياضيات"
+                placeholder="مثال: رياضـيات"
                 className={inputCls}
               />
             </div>
@@ -83,7 +83,7 @@ export function CourseRow({
             {/* Credit Hours */}
             <div>
               <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
-                الساعات
+                الساعـات
               </label>
               <select
                 value={course.creditHours}
@@ -104,7 +104,7 @@ export function CourseRow({
             {allowGradeTypeChange && (
               <div>
                 <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
-                  نوع الدرجة
+                  نوع الدرجـة
                 </label>
                 <div className="overflow-hidden rounded-lg border border-surface-300 dark:border-surface-600">
                   <div className="flex">
@@ -132,7 +132,7 @@ export function CourseRow({
             {/* Grade Input */}
             <div>
               <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
-                الدرجة
+                الدرجـة
               </label>
               {course.gradeType === "letter" ? (
                 <select
@@ -140,7 +140,7 @@ export function CourseRow({
                   onChange={(e) => handleField("grade", e.target.value)}
                   className={`${inputCls}${!course.grade ? " border-red-300 dark:border-red-700" : ""}`}
                 >
-                  <option value="">اختر</option>
+                  <option value="">اختـر</option>
                   {letterGrades.map((g) => (
                     <option key={g} value={g}>
                       {g}

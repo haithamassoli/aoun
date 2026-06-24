@@ -19,7 +19,7 @@ interface GpaResultCardProps {
 export function GpaResultCard({
   result,
   scale,
-  title = "نتيجة الحساب",
+  title = "نتيجة الحسـاب",
 }: GpaResultCardProps) {
   const colors = getGpaColors(result.gpa);
   const label = getGpaLabel(result.gpa);
@@ -27,7 +27,7 @@ export function GpaResultCard({
   const maxGpa = getScaleMaxGpa(scale);
   const percentage = getResultPercentage(result, scale);
   const percentageLabel =
-    result.percentage !== undefined ? "النسبة الموزونة" : "النسبة المكافئة";
+    result.percentage !== undefined ? "النسبة الموزونـة" : "النسبة المكافئـة";
 
   return (
     <div
@@ -62,13 +62,13 @@ export function GpaResultCard({
           <p className="font-semibold text-surface-700 dark:text-surface-200">
             {result.totalCredits}
           </p>
-          <p>ساعة معتمدة</p>
+          <p>ساعة معتمـدة</p>
         </div>
         <div className="text-center">
           <p className="font-semibold text-surface-700 dark:text-surface-200">
             {result.totalPoints.toFixed(2)}
           </p>
-          <p>مجموع النقاط</p>
+          <p>مجموع النقـاط</p>
         </div>
       </div>
     </div>

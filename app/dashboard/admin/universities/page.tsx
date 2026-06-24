@@ -257,7 +257,7 @@ export default function AdminUniversitiesPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -269,7 +269,7 @@ export default function AdminUniversitiesPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         <span className="font-medium text-surface-900 dark:text-surface-50">
-          الجامعات
+          الجـامعات
         </span>
       </nav>
 
@@ -281,10 +281,10 @@ export default function AdminUniversitiesPage() {
       >
         <div>
           <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-            إدارة الجامعات
+            إدارة الجـامعات
           </h1>
           <p className="text-sm text-surface-500 dark:text-surface-400">
-            {universities ? `${universities.length} جامعة` : "جاري التحميل..."}
+            {universities ? `${universities.length} جامعـة` : "جاري التحميـل..."}
           </p>
         </div>
         <button
@@ -308,13 +308,13 @@ export default function AdminUniversitiesPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          إضافة جامعة
+          إضافة جامعـة
         </button>
       </motion.div>
 
       <FormModal
         open={showForm}
-        title={editingId ? "تعديل الجامعة" : "إضافة جامعة جديدة"}
+        title={editingId ? "تعديل الجامعـة" : "إضافة جامعة جديـدة"}
         onClose={resetForm}
       >
         <form
@@ -328,7 +328,7 @@ export default function AdminUniversitiesPage() {
             <FormInput
               form={form}
               name="name"
-              label="اسم الجامعة *"
+              label="اسم الجامعـة *"
               onChangeCallback={(value) => {
                 if (!editingId) form.setFieldValue("slug", generateSlug(value));
               }}
@@ -336,19 +336,19 @@ export default function AdminUniversitiesPage() {
             <FormInput
               form={form}
               name="slug"
-              label="الرابط (slug) *"
+              label="الرابـط (slug) *"
               dir="ltr"
             />
             <FormInput
               form={form}
               name="alias"
-              label="الاسم البديل (alias)"
-              placeholder="اسم بديل للبحث"
+              label="الاسم البديـل (alias)"
+              placeholder="اسم بديل للبحـث"
             />
             <FormInput
               form={form}
               name="logoUrl"
-              label="رابط الشعار (URL)"
+              label="رابط الشعـار (URL)"
               type="url"
               dir="ltr"
               placeholder="https://..."
@@ -356,7 +356,7 @@ export default function AdminUniversitiesPage() {
             <FormInput
               form={form}
               name="order"
-              label="الترتيب"
+              label="الترتـيب"
               type="number"
               min="0"
             />
@@ -366,10 +366,10 @@ export default function AdminUniversitiesPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h4 className="text-sm font-semibold text-surface-900 dark:text-surface-50">
-                  الروابط السريعة
+                  الروابط السريعـة
                 </h4>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  تظهر هذه الروابط في شريط الجامعة داخل صفحات الجامعة والتخصصات
+                  تظهر هذه الروابط في شريط الجامعة داخل صفحات الجامعة والتخصصـات
                   والمواد.
                 </p>
               </div>
@@ -391,7 +391,7 @@ export default function AdminUniversitiesPage() {
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                إضافة رابط
+                إضافة رابـط
               </button>
             </div>
 
@@ -409,7 +409,7 @@ export default function AdminUniversitiesPage() {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-xs font-medium text-surface-500 dark:text-surface-400">
-                          رابط #{index + 1}
+                          رابـط #{index + 1}
                         </p>
                         <div className="flex shrink-0 items-center gap-1">
                           <button
@@ -483,7 +483,7 @@ export default function AdminUniversitiesPage() {
                             htmlFor={titleInputId}
                             className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
                           >
-                            العنوان
+                            العنـوان
                           </label>
                           <input
                             id={titleInputId}
@@ -496,7 +496,7 @@ export default function AdminUniversitiesPage() {
                                 event.target.value,
                               )
                             }
-                            placeholder="مثال: خدمات الطالب"
+                            placeholder="مثال: خدمات الطـالب"
                             className={`w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none transition focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-surface-800 dark:text-surface-100 ${
                               rowErrors?.title
                                 ? "border-red-400 dark:border-red-600"
@@ -515,7 +515,7 @@ export default function AdminUniversitiesPage() {
                             htmlFor={urlInputId}
                             className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300"
                           >
-                            الرابط
+                            الرابـط
                           </label>
                           <input
                             id={urlInputId}
@@ -546,10 +546,10 @@ export default function AdminUniversitiesPage() {
             ) : (
               <div className="mt-4 rounded-2xl border border-dashed border-surface-200 bg-surface-50/80 px-4 py-6 text-center dark:border-surface-700 dark:bg-surface-950/50">
                 <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-                  لا توجد روابط سريعة بعد
+                  لا توجد روابط سريعـة بعد
                 </p>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  أضف روابط مثل الجدول الدراسي أو خدمات الطالب لكل جامعة.
+                  أضف روابط مثل الجدول الدراسي أو خدمـات الطالب لكل جامعة.
                 </p>
               </div>
             )}
@@ -561,7 +561,7 @@ export default function AdminUniversitiesPage() {
               onClick={resetForm}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -573,10 +573,10 @@ export default function AdminUniversitiesPage() {
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
                   {isSubmitting
-                    ? "جاري الحفظ..."
+                    ? "جاري الحـفظ..."
                     : editingId
-                      ? "تحديث"
-                      : "إضافة"}
+                      ? "تحـديث"
+                      : "إضـافة"}
                 </button>
               )}
             </form.Subscribe>
@@ -596,10 +596,10 @@ export default function AdminUniversitiesPage() {
       ) : universities.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-            لا توجد جامعات
+            لا توجد جامعـات
           </p>
           <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-            أضف جامعة جديدة للبدء
+            أضف جامعة جديدة للبـدء
           </p>
         </div>
       ) : (
@@ -630,7 +630,7 @@ export default function AdminUniversitiesPage() {
                       )}
                       {uni.quickLinks.length > 0 && (
                         <span className="rounded bg-primary-50 px-1.5 py-0.5 text-primary-700 dark:bg-primary-950/70 dark:text-primary-300">
-                          {uni.quickLinks.length} روابط سريعة
+                          {uni.quickLinks.length} روابط سريعـة
                         </span>
                       )}
                     </div>

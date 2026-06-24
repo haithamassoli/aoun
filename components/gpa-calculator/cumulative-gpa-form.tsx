@@ -192,7 +192,7 @@ function CumulativeGpaFormContent({
             {(field: GradeTypeField) => (
               <div>
                 <label className="mb-1 block text-sm font-medium text-surface-700 dark:text-surface-200">
-                  نوع الدرجة
+                  نوع الدرجـة
                 </label>
                 <select
                   value={field.state.value}
@@ -210,7 +210,7 @@ function CumulativeGpaFormContent({
                   ))}
                 </select>
                 <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                  النوع المختار سيُطبّق على جميع المواد في هذا النموذج.
+                  النـوع المختار سيُطبّق على جميع المواد في هذا النموذج.
                 </p>
               </div>
             )}
@@ -220,10 +220,10 @@ function CumulativeGpaFormContent({
         {/* Previous GPA */}
         <div className="rounded-xl border border-surface-200 bg-surface-50 p-4 dark:border-surface-700 dark:bg-surface-800/50">
           <h3 className="mb-3 text-sm font-semibold text-surface-700 dark:text-surface-200">
-            المعدل السابق (اختياري)
+            المعدل السابـق (اختياري)
           </h3>
           <p className="mb-3 text-xs text-surface-500 dark:text-surface-400">
-            عند إدخال المعدل السابق يجب إدخال الساعات السابقة معه.
+            عند إدخال المعدل السابق يجب إدخال الساعـات السابقة معه.
           </p>
           <div className="grid grid-cols-2 gap-3">
             <form.Field name="previousGpa">
@@ -232,7 +232,7 @@ function CumulativeGpaFormContent({
                 return (
                   <div>
                     <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
-                      المعدل التراكمي السابق
+                      المعدل التراكمـي السابق
                     </label>
                     <input
                       type="number"
@@ -265,7 +265,7 @@ function CumulativeGpaFormContent({
                 return (
                   <div>
                     <label className="mb-1 block text-xs text-surface-500 dark:text-surface-400">
-                      الساعات المعتمدة السابقة
+                      الساعات المعتمـدة السابقة
                     </label>
                     <input
                       type="number"
@@ -300,10 +300,10 @@ function CumulativeGpaFormContent({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-surface-700 dark:text-surface-200">
-              مواد الفصل الحالي
+              مواد الفصـل الحالي
             </h3>
             <span className="text-xs text-surface-500 dark:text-surface-400">
-              {courses.length} {courses.length === 1 ? "مادة" : "مواد"}
+              {courses.length} {courses.length === 1 ? "مـادة" : "مـواد"}
             </span>
           </div>
 
@@ -331,7 +331,7 @@ function CumulativeGpaFormContent({
             <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
-            إضافة مادة
+            إضافة مـادة
           </button>
         </div>
 
@@ -339,7 +339,7 @@ function CumulativeGpaFormContent({
           type="submit"
           className="w-full rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 active:bg-primary-800"
         >
-          احسب المعدل التراكمي
+          احسب المعـدل التراكمي
         </button>
       </form>
 
@@ -347,7 +347,7 @@ function CumulativeGpaFormContent({
         <GpaResultCard
           result={result}
           scale={scale}
-          title="المعدل التراكمي"
+          title="المعدل التراكمـي"
         />
       )}
     </div>

@@ -172,7 +172,7 @@ export default function AdminResourcesPage() {
           href="/dashboard"
           className="hover:text-primary-600 dark:hover:text-primary-400"
         >
-          لوحة التحكم
+          لوحة التحكـم
         </Link>
         <svg
           className="h-3.5 w-3.5 rotate-180"
@@ -184,7 +184,7 @@ export default function AdminResourcesPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         <span className="font-medium text-surface-900 dark:text-surface-50">
-          المصادر
+          المصـادر
         </span>
       </nav>
 
@@ -197,10 +197,10 @@ export default function AdminResourcesPage() {
       >
         <div>
           <h1 className="text-xl font-bold text-surface-900 dark:text-surface-50">
-            إدارة المصادر
+            إدارة المصـادر
           </h1>
           <p className="text-sm text-surface-500 dark:text-surface-400">
-            {resources ? `${resources.length} مصدر` : "جاري التحميل..."}
+            {resources ? `${resources.length} مصـدر` : "جاري التحميـل..."}
           </p>
         </div>
         <button
@@ -224,13 +224,13 @@ export default function AdminResourcesPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          إضافة مصدر
+          إضافة مصـدر
         </button>
       </motion.div>
 
       <FormModal
         open={showForm}
-        title={editingId ? "تعديل المصدر" : "إضافة مصدر جديد"}
+        title={editingId ? "تعديل المصـدر" : "إضافة مصدر جديـد"}
         onClose={resetForm}
       >
         <form
@@ -245,23 +245,23 @@ export default function AdminResourcesPage() {
               <FormSelect
                 form={form}
                 name="courseId"
-                label="المادة *"
+                label="المـادة *"
                 options={courseOptions}
-                placeholder="اختر المادة"
+                placeholder="اختر المـادة"
                 disabled={!!editingId}
               />
-              <FormInput form={form} name="title" label="عنوان المصدر *" />
+              <FormInput form={form} name="title" label="عنوان المصـدر *" />
               <FormSelect
                 form={form}
                 name="category"
-                label="التصنيف *"
+                label="التصنـيف *"
                 options={CATEGORY_OPTIONS}
               />
               <div className="w-32">
                 <FormInput
                   form={form}
                   name="order"
-                  label="الترتيب"
+                  label="الترتـيب"
                   type="number"
                   min="0"
                 />
@@ -271,7 +271,7 @@ export default function AdminResourcesPage() {
             {/* Type toggle */}
             <fieldset>
               <legend className="mb-2 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                نوع المصدر
+                نوع المصـدر
               </legend>
               <div className="flex gap-2">
                 <button
@@ -283,7 +283,7 @@ export default function AdminResourcesPage() {
                       : "border border-surface-300 bg-white text-surface-600 hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
                   }`}
                 >
-                  رابط خارجي
+                  رابط خارجـي
                 </button>
                 <button
                   type="button"
@@ -294,7 +294,7 @@ export default function AdminResourcesPage() {
                       : "border border-surface-300 bg-white text-surface-600 hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
                   }`}
                 >
-                  نص منسق
+                  نص منسـق
                 </button>
               </div>
             </fieldset>
@@ -303,7 +303,7 @@ export default function AdminResourcesPage() {
               <FormInput
                 form={form}
                 name="url"
-                label="الرابط *"
+                label="الرابـط *"
                 type="url"
                 dir="ltr"
                 placeholder="https://..."
@@ -313,7 +313,7 @@ export default function AdminResourcesPage() {
                 {(field) => (
                   <div>
                     <p className="mb-1 block text-xs font-medium text-surface-600 dark:text-surface-300">
-                      المحتوى *
+                      المحتـوى *
                     </p>
                     <TiptapEditor
                       ariaLabel="المحتوى"
@@ -345,7 +345,7 @@ export default function AdminResourcesPage() {
               onClick={resetForm}
               className="rounded-xl border border-surface-300 bg-white px-4 py-2 text-sm font-medium text-surface-600 transition-colors hover:bg-surface-50 dark:border-surface-600 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
             >
-              إلغاء
+              إلغـاء
             </button>
             <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
@@ -355,10 +355,10 @@ export default function AdminResourcesPage() {
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-50"
                 >
                   {isSubmitting
-                    ? "جاري الحفظ..."
+                    ? "جاري الحـفظ..."
                     : editingId
-                      ? "تحديث"
-                      : "إضافة"}
+                      ? "تحـديث"
+                      : "إضـافة"}
                 </button>
               )}
             </form.Subscribe>
@@ -379,10 +379,10 @@ export default function AdminResourcesPage() {
       ) : resources.length === 0 ? (
         <div className="rounded-2xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-            لا توجد مصادر
+            لا توجد مصـادر
           </p>
           <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-            أضف مصدرا جديدا للبدء
+            أضف مصدرا جديدا للبـدء
           </p>
         </div>
       ) : (
@@ -411,7 +411,7 @@ export default function AdminResourcesPage() {
                           : "bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400"
                       }`}
                     >
-                      {resource.type === "link" ? "رابط" : "نص منسق"}
+                      {resource.type === "link" ? "رابـط" : "نص منسـق"}
                     </span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 text-xs text-surface-500 dark:text-surface-400">

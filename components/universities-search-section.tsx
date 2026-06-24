@@ -47,13 +47,13 @@ export function UniversitiesSearchSection({
     <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <div className="mb-8 space-y-4">
         <h2 className="public-section-title text-center text-2xl font-bold text-surface-800 dark:text-surface-100 sm:text-3xl">
-          الجامعات
+          الجـامعات
         </h2>
 
         <div className="mx-auto max-w-2xl">
           <PublicSearchInput
-            label="ابحث عن الجامعة"
-            placeholder="مثال: الجامعة الأردنية"
+            label="ابحث عن الجـامعة"
+            placeholder="مثال: الجـامعة الأردنية"
             value={search.input}
             onChange={search.setInput}
           />
@@ -72,19 +72,19 @@ export function UniversitiesSearchSection({
       ) : isNoResults ? (
         <div className="mx-auto max-w-xl rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
-            لا توجد نتائج مطابقة
+            لا توجد نتائـج مطابقة
           </p>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            لم نعثر على جامعة تطابق «{search.query}».
+            لم نعثر على جـامعة تطابق «{search.query}».
           </p>
         </div>
       ) : isEmptyList ? (
         <div className="mx-auto max-w-xl rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
-            لا توجد جامعات متاحة حالياً
+            لا توجد جـامعات متاحة حالياً
           </p>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            سيتم عرض الجامعات هنا فور إضافتها.
+            سيتم عرض الجـامعات هنا فور إضافتها.
           </p>
         </div>
       ) : (

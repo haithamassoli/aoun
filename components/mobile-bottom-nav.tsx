@@ -153,31 +153,31 @@ export function MobileBottomNav() {
   const items: NavItem[] = [
     {
       href: "/",
-      label: "الرئيسية",
+      label: "الرئيسـية",
       isActive: (currentPath) => currentPath === "/",
       icon: <HomeIcon />,
     },
     {
       href: "/academic-planner",
-      label: "التقويم",
+      label: "التقويـم",
       isActive: (currentPath) => currentPath.startsWith("/academic-planner"),
       icon: <CalendarIcon />,
     },
     {
       href: "/courses",
-      label: "البحث",
+      label: "البـحث",
       isActive: (currentPath) => currentPath.startsWith("/courses"),
       icon: <SearchIcon />,
     },
     {
       href: "/gpa-calculator",
-      label: "المعدل",
+      label: "المعـدل",
       isActive: (currentPath) => currentPath.startsWith("/gpa-calculator"),
       icon: <CalculatorIcon />,
     },
     {
       href: "/focus",
-      label: "التركيز",
+      label: "التركـيز",
       isActive: (currentPath) => isFocusPath(currentPath),
       icon: <FocusIcon />,
     },

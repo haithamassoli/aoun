@@ -22,7 +22,7 @@ export function BookmarksNavLink({
       }
     >
       <BookmarkIcon />
-      {showLabel ? <span>المحفوظات</span> : null}
+      {showLabel ? <span>المحفـوظات</span> : null}
     </Link>
   );
 }

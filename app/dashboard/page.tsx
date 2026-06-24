@@ -39,10 +39,10 @@ export default function DashboardPage() {
           className="mb-6"
         >
           <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
-            لوحة التحكم
+            لوحة التحكـم
           </h1>
           <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-            مرحبا، {user.name}. لديك صلاحيات كاملة.
+            مرحبا، {user.name}. لديك صلاحيـات كاملة.
           </p>
         </motion.div>
 
@@ -60,10 +60,10 @@ export default function DashboardPage() {
         className="mb-6"
       >
         <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50">
-          لوحة التحكم
+          لوحة التحكـم
         </h1>
         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-          مرحبا، {user.name}. اختر تخصصا لإدارة محتواه.
+          مرحبا، {user.name}. اختر تخصصا لإدارة محتـواه.
         </p>
       </motion.div>
 
@@ -94,10 +94,10 @@ export default function DashboardPage() {
             </svg>
           </div>
           <p className="text-sm font-medium text-surface-700 dark:text-surface-200">
-            لا توجد تخصصات مخصصة لك
+            لا توجد تخصصات مخصصـة لك
           </p>
           <p className="mt-1 text-xs text-surface-400 dark:text-surface-500">
-            تواصل مع المدير لإضافة صلاحيات
+            تواصل مع المدير لإضافة صلاحيـات
           </p>
         </div>
       ) : (

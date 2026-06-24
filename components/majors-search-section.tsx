@@ -47,13 +47,13 @@ export function MajorsSearchSection({
     >
       <div className="mb-8 space-y-4">
         <h2 className="public-section-title text-xl font-bold text-surface-800 dark:text-surface-100 sm:text-2xl">
-          التخصصات
+          التخـصصات
         </h2>
 
         <div className="max-w-2xl">
           <PublicSearchInput
-            label="ابحث داخل تخصصات الجامعة"
-            placeholder="مثال: هندسة الحاسوب"
+            label="ابحث داخل تخصـصات الجامعة"
+            placeholder="مثال: هندسة الحاسـوب"
             value={search.input}
             onChange={search.setInput}
           />
@@ -72,16 +72,16 @@ export function MajorsSearchSection({
       ) : isNoResults ? (
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-base font-semibold text-surface-700 dark:text-surface-200">
-            لا توجد نتائج مطابقة
+            لا توجد نتائـج مطابقة
           </p>
           <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            لم نعثر على تخصص يطابق «{search.query}» داخل هذه الجامعة.
+            لم نعثر على تخـصص يطابق «{search.query}» داخل هذه الجامعة.
           </p>
         </div>
       ) : isEmptyList ? (
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center dark:border-surface-700 dark:bg-surface-900">
           <p className="text-surface-500 dark:text-surface-400">
-            لم تُضاف تخصصات بعد. ترقبوا التحديثات!
+            لم تُضاف تخصـصات بعد. ترقبوا التحديثات!
           </p>
         </div>
       ) : (
