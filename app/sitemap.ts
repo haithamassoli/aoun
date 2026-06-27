@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
 import { SITE_URL } from "@/lib/site-url";
+import { getCachedPublicSitemapUrls } from "@/lib/cached-public-data";
 
 const STATIC_PUBLIC_PATHS = [
   "/",
@@ -15,7 +14,7 @@ const STATIC_PUBLIC_PATHS = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let urls: { path: string }[] = [];
   try {
-    urls = await fetchQuery(api.sitemap.getAllPublicUrls);
+    urls = await getCachedPublicSitemapUrls();
   } catch {
     // Fallback: at minimum include the home page
     urls = [{ path: "/" }];

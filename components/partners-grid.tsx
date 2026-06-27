@@ -7,12 +7,17 @@ import { api } from "@/convex/_generated/api";
 type PartnerCard = {
   _id: string;
   name: string;
-  logoUrl: string;
+  logoUrl?: string | null;
   websiteUrl?: string;
 };
 
-export function PartnersGrid() {
-  const partners = useQuery(api.partners.list) as PartnerCard[] | undefined;
+export function PartnersGrid({
+  initialPartners,
+}: {
+  initialPartners: PartnerCard[];
+}) {
+  const livePartners = useQuery(api.partners.list) as PartnerCard[] | undefined;
+  const partners = livePartners ?? initialPartners;
 
   return (
     <div>
@@ -29,17 +34,7 @@ export function PartnersGrid() {
 
       {/* Grid */}
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {partners === undefined ? (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                key={i}
-                className="animate-pulse rounded-2xl border border-surface-200 bg-surface-100 p-6 dark:border-surface-700 dark:bg-surface-800"
-                style={{ height: 140 }}
-              />
-            ))}
-          </div>
-        ) : partners.length === 0 ? (
+        {partners.length === 0 ? (
           <p className="text-center text-surface-400 dark:text-surface-500">
             لا يوجد شركـاء حتى الآن
           </p>
@@ -49,14 +44,16 @@ export function PartnersGrid() {
               const card = (
                 <div className="public-elevated-surface public-interactive-card flex flex-col items-center gap-3 rounded-[1.6rem] p-2">
                   <div className="relative h-40 w-32">
-                    <Image
-                      src={partner.logoUrl}
-                      alt={partner.name}
-                      fill
-                      sizes="(min-width: 1024px) 8rem, (min-width: 640px) 33vw, 50vw"
-                      className="object-contain rounded-lg"
-                      unoptimized
-                    />
+                    {partner.logoUrl ? (
+                      <Image
+                        src={partner.logoUrl}
+                        alt={partner.name}
+                        fill
+                        sizes="(min-width: 1024px) 8rem, (min-width: 640px) 33vw, 50vw"
+                        className="object-contain rounded-lg"
+                        unoptimized
+                      />
+                    ) : null}
                   </div>
                   {/* <span className="text-center text-sm font-medium text-surface-700 dark:text-surface-300">
                     {partner.name}

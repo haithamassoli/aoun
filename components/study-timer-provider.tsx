@@ -6,6 +6,7 @@ import {
   useCallback,
   createContext,
   startTransition,
+  Suspense,
   useContext,
   useEffect,
   useMemo,
@@ -213,7 +214,7 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState(DEFAULT_STUDY_TIMER_SETTINGS);
   const [runtime, setRuntime] = useState(createIdleStudyTimerRuntime);
   const [history, setHistory] = useState<StudyTimerHistory>({});
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
   const [hasHydrated, setHasHydrated] = useState(false);
   const settingsRef = useRef(settings);
   const runtimeRef = useRef(runtime);
@@ -622,7 +623,9 @@ export function StudyTimerProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-      <FloatingStudyTimerPill />
+      <Suspense fallback={null}>
+        <FloatingStudyTimerPill />
+      </Suspense>
     </StudyTimerContext.Provider>
   );
 }

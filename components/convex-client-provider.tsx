@@ -8,14 +8,12 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export function ConvexClientProvider({
   children,
-  sessionToken,
 }: {
   children: ReactNode;
-  sessionToken: string | null;
 }) {
   return (
     <ConvexProvider client={convex}>
-      <AuthProvider sessionToken={sessionToken}>{children}</AuthProvider>
+      <AuthProvider>{children}</AuthProvider>
     </ConvexProvider>
   );
 }

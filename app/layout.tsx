@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HeaderAuth } from "@/components/header-auth";
-import { getSessionToken } from "@/app/actions/auth";
 import { PWARegister } from "@/components/pwa-register";
 import { PWAInstallBanner } from "@/components/pwa-install-banner";
 import { VisitorTracker } from "@/components/visitor-tracker";
@@ -104,13 +104,11 @@ export const viewport: Viewport = {
   themeColor: "#2563eb",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const sessionToken = await getSessionToken();
-
   return (
     <html
       lang="ar"
@@ -124,10 +122,14 @@ export default async function RootLayout({
           <PWARegister />
           <PWAInstallBanner />
           <ThemeProvider>
-            <ConvexClientProvider sessionToken={sessionToken}>
-              <VisitorTracker />
+            <ConvexClientProvider>
+              <Suspense fallback={null}>
+                <VisitorTracker />
+              </Suspense>
               <VisitorMilestoneCelebration />
-              <PublicShellChrome />
+              <Suspense fallback={null}>
+                <PublicShellChrome />
+              </Suspense>
               <div className="flex min-h-screen flex-col">
                 <header className="hidden border-b border-surface-200/80 bg-white/72 backdrop-blur-xl md:sticky md:top-0 md:z-50 md:block dark:border-surface-700/80 dark:bg-surface-950/72">
                   <nav
@@ -169,12 +171,16 @@ export default async function RootLayout({
                 <main className="flex-1 pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
                   <FocusAudioProvider>
                     <StudyTimerProvider>
-                      <PublicRouteFrame>{children}</PublicRouteFrame>
+                      <Suspense fallback={<>{children}</>}>
+                        <PublicRouteFrame>{children}</PublicRouteFrame>
+                      </Suspense>
                     </StudyTimerProvider>
                   </FocusAudioProvider>
                 </main>
 
-                <MobileBottomNav />
+                <Suspense fallback={null}>
+                  <MobileBottomNav />
+                </Suspense>
 
                 <footer className="hidden border-t border-surface-200 bg-surface-50 md:block dark:border-surface-700 dark:bg-surface-950">
                   <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

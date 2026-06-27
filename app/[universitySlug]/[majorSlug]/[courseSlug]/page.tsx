@@ -1,5 +1,3 @@
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import type { Metadata } from "next";
@@ -16,6 +14,13 @@ import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick
 import { socialPlatforms } from "@/lib/social-platforms";
 import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
 import { CATEGORIES, type CategoryValue } from "@/constant/resource-categories";
+import {
+  getCachedCourseByMajorAndSlug,
+  getCachedLatestNewsByMajor,
+  getCachedMajorByUniversityAndSlug,
+  getCachedResourcesByCourse,
+  getCachedUniversityBySlug,
+} from "@/lib/cached-public-data";
 
 type Params = {
   universitySlug: string;
@@ -46,19 +51,17 @@ export async function generateMetadata({
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
   const normalizedMajorSlug = decodeSlugParam(majorSlug);
   const normalizedCourseSlug = decodeSlugParam(courseSlug);
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getCachedUniversityBySlug(normalizedUniversitySlug);
   if (!university) return {};
-  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
-    universityId: university._id,
-    slug: normalizedMajorSlug,
-  });
+  const major = await getCachedMajorByUniversityAndSlug(
+    university._id,
+    normalizedMajorSlug,
+  );
   if (!major || major.universityId !== university._id) return {};
-  const course = await fetchQuery(api.courses.getByMajorAndSlug, {
-    majorId: major._id,
-    slug: normalizedCourseSlug,
-  });
+  const course = await getCachedCourseByMajorAndSlug(
+    major._id,
+    normalizedCourseSlug,
+  );
   if (!course || course.majorId !== major._id) return {};
   const title = `${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} — ${major.name} — ${university.name}`;
   const description = `مصادر أكاديمية لمادة ${course.name}${course.courseCode ? ` (${course.courseCode})` : ""} في تخصص ${major.name}، ${university.name}. ملخصات، امتحانات، وفيديوهات.`;
@@ -88,30 +91,24 @@ export default async function CoursePage({
   const normalizedMajorSlug = decodeSlugParam(majorSlug);
   const normalizedCourseSlug = decodeSlugParam(courseSlug);
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getCachedUniversityBySlug(normalizedUniversitySlug);
   if (!university) notFound();
-  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
-    universityId: university._id,
-    slug: normalizedMajorSlug,
-  });
+  const major = await getCachedMajorByUniversityAndSlug(
+    university._id,
+    normalizedMajorSlug,
+  );
   if (!major || major.universityId !== university._id) notFound();
-  const course = await fetchQuery(api.courses.getByMajorAndSlug, {
-    majorId: major._id,
-    slug: normalizedCourseSlug,
-  });
+  const course = await getCachedCourseByMajorAndSlug(
+    major._id,
+    normalizedCourseSlug,
+  );
   if (!course || course.majorId !== major._id) notFound();
   const canonicalUniversitySlug = university.slug;
   const canonicalMajorSlug = major.slug;
 
   const [resources, latestNews] = await Promise.all([
-    fetchQuery(api.resources.listByCourse, {
-      courseId: course._id,
-    }),
-    fetchQuery(api.news.getLatestByMajor, {
-      majorId: major._id,
-    }),
+    getCachedResourcesByCourse(course._id),
+    getCachedLatestNewsByMajor(major._id),
   ]);
   const resourceCards = (resources as CourseResourceRecord[]).map(
     (resource) => ({
