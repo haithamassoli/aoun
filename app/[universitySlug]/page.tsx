@@ -1,5 +1,3 @@
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { MajorsSearchSection } from "@/components/majors-search-section";
@@ -10,6 +8,10 @@ import * as motion from "motion/react-client";
 import { decodeSlugParam } from "@/lib/slug";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
+import {
+  getCachedMajorsByUniversity,
+  getCachedUniversityBySlug,
+} from "@/lib/cached-public-data";
 
 type Params = { universitySlug: string };
 
@@ -21,9 +23,7 @@ export async function generateMetadata({
   const { universitySlug } = await params;
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getCachedUniversityBySlug(normalizedUniversitySlug);
   if (!university) return {};
   const title = university.name;
   const description = `تصفح التخصصات والمواد الأكاديمية في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
@@ -51,14 +51,10 @@ export default async function UniversityPage({
   const { universitySlug } = await params;
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getCachedUniversityBySlug(normalizedUniversitySlug);
   if (!university) notFound();
 
-  const majors = await fetchQuery(api.majors.listByUniversity, {
-    universityId: university._id,
-  });
+  const majors = await getCachedMajorsByUniversity(university._id);
   const sortedMajors = majors.toSorted(
     (a: { order: number }, b: { order: number }) => a.order - b.order,
   );

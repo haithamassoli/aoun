@@ -8,9 +8,10 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { logoutAction } from "@/app/actions/auth";
+import { getSessionToken, logoutAction } from "@/app/actions/auth";
 
 type User = {
   _id: string;
@@ -33,43 +34,64 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-export function AuthProvider({
-  children,
-  sessionToken,
-}: {
-  children: ReactNode;
-  sessionToken: string | null;
-}) {
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const [sessionToken, setSessionToken] = useState<string | null | undefined>();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const currentUser = useQuery(api.auth.getCurrentUser, {
-    token: sessionToken ?? undefined,
-  });
+  useEffect(() => {
+    let isMounted = true;
 
-  const isLoading = currentUser === undefined;
+    getSessionToken()
+      .then((token) => {
+        if (isMounted) setSessionToken(token);
+      })
+      .catch(() => {
+        if (isMounted) setSessionToken(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const currentUser = useQuery(
+    api.auth.getCurrentUser,
+    sessionToken === undefined
+      ? "skip"
+      : {
+          token: sessionToken ?? undefined,
+        },
+  );
+
+  const isLoading = sessionToken === undefined || currentUser === undefined;
   const user = currentUser as User | null;
 
   const logout = useCallback(async () => {
     setIsLoggingOut(true);
     await logoutAction();
-    window.location.href = "/login";
-  }, []);
+    setSessionToken(null);
+    router.replace("/login");
+    router.refresh();
+  }, [router]);
 
   // Auto-logout when session is invalid (token exists but user is null)
   useEffect(() => {
     if (sessionToken && currentUser === null && !isLoggingOut) {
       logoutAction().then(() => {
-        window.location.href = "/login";
+        setSessionToken(null);
+        router.replace("/login");
+        router.refresh();
       });
     }
-  }, [sessionToken, currentUser, isLoggingOut]);
+  }, [sessionToken, currentUser, isLoggingOut, router]);
 
   return (
     <AuthContext.Provider
       value={{
         user: isLoggingOut ? null : user,
         isLoading: isLoggingOut ? false : isLoading,
-        sessionToken,
+        sessionToken: sessionToken ?? null,
         logout,
       }}
     >

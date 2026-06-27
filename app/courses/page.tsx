@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
 import { GlobalCoursesSearchPage } from "@/components/global-courses-search-page";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
+import { getCachedUniversities } from "@/lib/cached-public-data";
 
 type CoursesPageSearchParams = {
   q?: string | string[];
@@ -54,16 +53,10 @@ export default async function CoursesPage({
 }: {
   searchParams: Promise<CoursesPageSearchParams>;
 }) {
-  const resolvedSearchParams = await searchParams;
-
-  let universities: Awaited<
-    ReturnType<typeof fetchQuery<typeof api.universities.list>>
-  > = [];
-  try {
-    universities = await fetchQuery(api.universities.list);
-  } catch {
-    // Convex data may not be available yet in local development.
-  }
+  const [resolvedSearchParams, universities] = await Promise.all([
+    searchParams,
+    getCachedUniversities().catch(() => []),
+  ]);
 
   return (
     <>
