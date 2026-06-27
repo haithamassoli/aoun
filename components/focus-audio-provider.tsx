@@ -7,9 +7,9 @@ import {
   createContext,
   useContext,
   useEffect,
-  useEffectEvent,
   useRef,
   useState,
+  Suspense,
   type ReactNode,
 } from "react";
 import { Toast, useToast } from "@/components/toast";
@@ -87,9 +87,8 @@ function formatActiveSoundSummary(labels: string[]) {
 }
 
 export function FocusAudioProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const toast = useToast();
-  const initialPathnameRef = useRef(pathname);
+  const initialPathnameRef = useRef<string | null>(null);
   const lastStudentFacingRef = useRef<boolean | null>(null);
   const audioRefs = useRef<Partial<Record<FocusSoundId, HTMLAudioElement>>>({});
   const volumesRef = useRef(DEFAULT_FOCUS_SOUND_PREFERENCES.volumes);
@@ -196,7 +195,7 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const clearRuntimeSession = useEffectEvent(() => {
+  const clearRuntimeSession = () => {
     for (const id of runtimeEnabledSoundIdsRef.current) {
       const audio = audioRefs.current[id];
       if (!audio) {
@@ -210,9 +209,9 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
     replaceRuntimeEnabledSoundIds([]);
     setPlaybackStatus(createPlaybackStatusMap([]));
     setErrors(createErrorMap());
-  });
+  };
 
-  const restoreRuntimeSessionFromSavedPrefs = useEffectEvent(() => {
+  const restoreRuntimeSessionFromSavedPrefs = () => {
     for (const id of FOCUS_SOUND_IDS) {
       const audio = audioRefs.current[id];
       if (!audio) {
@@ -227,11 +226,12 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
     replaceRuntimeEnabledSoundIds(savedEnabledSoundIdsRef.current);
     setPlaybackStatus(createPlaybackStatusMap(savedEnabledSoundIdsRef.current));
     setErrors(createErrorMap());
-  });
+  };
 
   useEffect(() => {
     const preferences = loadFocusSoundPreferences();
-    const studentFacing = isStudentFacingPath(initialPathnameRef.current);
+    const initialPathname = initialPathnameRef.current ?? window.location.pathname;
+    const studentFacing = isStudentFacingPath(initialPathname);
     const initialRuntimeSoundIds = studentFacing
       ? preferences.lastEnabledSoundIds
       : [];
@@ -281,7 +281,9 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
     };
   }, [hasHydratedPrefs, savedEnabledSoundIds, volumes]);
 
-  useEffect(() => {
+  const handlePathnameChange = (pathname: string) => {
+    initialPathnameRef.current ??= pathname;
+
     if (!hasHydratedPrefs) {
       return;
     }
@@ -303,7 +305,7 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
     }
 
     lastStudentFacingRef.current = studentFacing;
-  }, [hasHydratedPrefs, pathname]);
+  };
 
   const toggleSound = (id: FocusSoundId) => {
     const isEnabled = runtimeEnabledSoundIdsRef.current.includes(id);
@@ -433,10 +435,29 @@ export function FocusAudioProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-      <FloatingFocusPlayer />
+      <Suspense fallback={null}>
+        <FocusAudioPathnameSync onPathnameChange={handlePathnameChange} />
+      </Suspense>
+      <Suspense fallback={null}>
+        <FloatingFocusPlayer />
+      </Suspense>
       <Toast toast={toast} />
     </FocusAudioContext.Provider>
   );
+}
+
+function FocusAudioPathnameSync({
+  onPathnameChange,
+}: {
+  onPathnameChange: (pathname: string) => void;
+}) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    onPathnameChange(pathname);
+  }, [onPathnameChange, pathname]);
+
+  return null;
 }
 
 export function useFocusAudio() {

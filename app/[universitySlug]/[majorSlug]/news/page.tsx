@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { fetchQuery } from "convex/nextjs";
 import * as motion from "motion/react-client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { NewsPageContent } from "@/components/news-page-content";
 import type { NewsWithAuthor } from "@/components/news-card";
-import { api } from "@/convex/_generated/api";
 import { NotificationToggle } from "@/components/notification-toggle";
 import { decodeSlugParam } from "@/lib/slug";
 import Link from "next/link";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
+import {
+  getMajorByUniversityAndSlug,
+  getNewsPageByMajor,
+  getPublicSitemapUrls,
+  getUniversityBySlug,
+} from "@/lib/public-data";
 
 const INITIAL_PAGE_SIZE = 8;
 
@@ -18,6 +23,23 @@ type Params = {
   universitySlug: string;
   majorSlug: string;
 };
+
+export async function generateStaticParams(): Promise<Params[]> {
+  try {
+    const urls = await getPublicSitemapUrls();
+    const params = urls.flatMap(({ path }) => {
+      const segments = path.split("/").filter(Boolean);
+      return segments.length === 3 && segments[2] === "news"
+        ? [{ universitySlug: segments[0], majorSlug: segments[1] }]
+        : [];
+    });
+    return params.length > 0
+      ? params
+      : [{ universitySlug: "_", majorSlug: "_" }];
+  } catch {
+    return [{ universitySlug: "_", majorSlug: "_" }];
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -27,17 +49,15 @@ export async function generateMetadata({
   const { universitySlug, majorSlug } = await params;
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
   const normalizedMajorSlug = decodeSlugParam(majorSlug);
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getUniversityBySlug(normalizedUniversitySlug);
   if (!university) {
     return {};
   }
 
-  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
-    universityId: university._id,
-    slug: normalizedMajorSlug,
-  });
+  const major = await getMajorByUniversityAndSlug(
+    university._id,
+    normalizedMajorSlug,
+  );
   if (!major || major.universityId !== university._id) {
     return {};
   }
@@ -61,7 +81,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function MajorNewsPage({
+async function MajorNewsContent({
   params,
 }: {
   params: Promise<Params>;
@@ -70,17 +90,15 @@ export default async function MajorNewsPage({
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
   const normalizedMajorSlug = decodeSlugParam(majorSlug);
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getUniversityBySlug(normalizedUniversitySlug);
   if (!university) {
     notFound();
   }
 
-  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
-    universityId: university._id,
-    slug: normalizedMajorSlug,
-  });
+  const major = await getMajorByUniversityAndSlug(
+    university._id,
+    normalizedMajorSlug,
+  );
   if (!major || major.universityId !== university._id) {
     notFound();
   }
@@ -88,13 +106,7 @@ export default async function MajorNewsPage({
   const canonicalMajorSlug = major.slug;
   const newsSummary = `${major.name} · ${university.name}`;
 
-  const initialNews = (await fetchQuery(api.news.listByMajor, {
-    majorId: major._id,
-    paginationOpts: {
-      cursor: null,
-      numItems: INITIAL_PAGE_SIZE,
-    },
-  })) as {
+  const initialNews = (await getNewsPageByMajor(major._id, INITIAL_PAGE_SIZE)) as {
     page: NewsWithAuthor[];
     isDone: boolean;
     continueCursor: string;
@@ -233,5 +245,17 @@ export default async function MajorNewsPage({
         </div>
       </section>
     </div>
+  );
+}
+
+export default function MajorNewsPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  return (
+    <Suspense fallback={null}>
+      <MajorNewsContent params={params} />
+    </Suspense>
   );
 }

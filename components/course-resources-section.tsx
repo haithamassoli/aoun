@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import * as motion from "motion/react-client";
 import { api } from "@/convex/_generated/api";
@@ -432,9 +432,7 @@ export function CourseResourcesSection({
   const [activeCategory, setActiveCategory] = useState<
     "all" | ResourceCategory
   >("all");
-  const [visitorKey] = useState<string | null>(() =>
-    typeof window === "undefined" ? null : getOrCreateVisitorKey(),
-  );
+  const [visitorKey, setVisitorKey] = useState<string | null>(null);
   const [pendingResourceIds, setPendingResourceIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -455,6 +453,14 @@ export function CourseResourcesSection({
   );
   const setVote = useMutation(api.resources.setVote);
   const submitResourceRequest = useMutation(api.resourceRequests.submitPublic);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setVisitorKey(getOrCreateVisitorKey());
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const resolvedResources = liveResources
     ? liveResources.map(mapLiveResourceToCourseResource)

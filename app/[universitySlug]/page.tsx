@@ -1,5 +1,4 @@
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { MajorsSearchSection } from "@/components/majors-search-section";
@@ -10,8 +9,26 @@ import * as motion from "motion/react-client";
 import { decodeSlugParam } from "@/lib/slug";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
+import {
+  getMajorsByUniversity,
+  getPublicSitemapUrls,
+  getUniversityBySlug,
+} from "@/lib/public-data";
 
 type Params = { universitySlug: string };
+
+export async function generateStaticParams(): Promise<Params[]> {
+  try {
+    const urls = await getPublicSitemapUrls();
+    const params = urls.flatMap(({ path }) => {
+      const segments = path.split("/").filter(Boolean);
+      return segments.length === 1 ? [{ universitySlug: segments[0] }] : [];
+    });
+    return params.length > 0 ? params : [{ universitySlug: "_" }];
+  } catch {
+    return [{ universitySlug: "_" }];
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -21,9 +38,7 @@ export async function generateMetadata({
   const { universitySlug } = await params;
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getUniversityBySlug(normalizedUniversitySlug);
   if (!university) return {};
   const title = university.name;
   const description = `تصفح التخصصات والمواد الأكاديمية في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
@@ -43,7 +58,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function UniversityPage({
+async function UniversityContent({
   params,
 }: {
   params: Promise<Params>;
@@ -51,14 +66,10 @@ export default async function UniversityPage({
   const { universitySlug } = await params;
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getUniversityBySlug(normalizedUniversitySlug);
   if (!university) notFound();
 
-  const majors = await fetchQuery(api.majors.listByUniversity, {
-    universityId: university._id,
-  });
+  const majors = await getMajorsByUniversity(university._id);
   const sortedMajors = majors.toSorted(
     (a: { order: number }, b: { order: number }) => a.order - b.order,
   );
@@ -161,5 +172,17 @@ export default async function UniversityPage({
         majors={sortedMajors}
       />
     </div>
+  );
+}
+
+export default function UniversityPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  return (
+    <Suspense fallback={null}>
+      <UniversityContent params={params} />
+    </Suspense>
   );
 }
