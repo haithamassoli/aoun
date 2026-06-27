@@ -44,7 +44,7 @@
     "@types/sanitize-html": "^2.16.0",
     "@types/web-push": "^3.6.4",
     "eslint": "^9.39.4",
-    "eslint-config-next": "16.3.0-canary.67",
+    "eslint-config-next": "16.3.0-preview.5",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3"
   },
