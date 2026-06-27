@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchQuery } from "convex/nextjs";
+import { Suspense } from "react";
 import { api } from "@/convex/_generated/api";
 import { GlobalCoursesSearchPage } from "@/components/global-courses-search-page";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
@@ -8,6 +9,15 @@ type CoursesPageSearchParams = {
   q?: string | string[];
   university?: string | string[];
   major?: string | string[];
+};
+
+export const instant = {
+  unstable_samples: [
+    {
+      cookies: [{ name: "aoun_session", value: null }],
+      searchParams: { major: null, q: null, university: null },
+    },
+  ],
 };
 
 function getSingleParam(value: string | string[] | undefined) {
@@ -85,14 +95,16 @@ export default async function CoursesPage({
         </div>
       </MobilePageHeaderMenu>
 
-      <GlobalCoursesSearchPage
-        universities={universities}
-        initialSearchParams={{
-          q: getSingleParam(resolvedSearchParams.q),
-          university: getSingleParam(resolvedSearchParams.university),
-          major: getSingleParam(resolvedSearchParams.major),
-        }}
-      />
+      <Suspense fallback={null}>
+        <GlobalCoursesSearchPage
+          universities={universities}
+          initialSearchParams={{
+            q: getSingleParam(resolvedSearchParams.q),
+            university: getSingleParam(resolvedSearchParams.university),
+            major: getSingleParam(resolvedSearchParams.major),
+          }}
+        />
+      </Suspense>
     </>
   );
 }

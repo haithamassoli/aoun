@@ -25,6 +25,11 @@ type CourseStatusFilter =
   | "hidden"
   | "none";
 
+export const instant = {
+  level: "warning",
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 function normalizeStatusFilter(
   value: string | string[] | undefined,
 ): CourseStatusFilter | undefined {

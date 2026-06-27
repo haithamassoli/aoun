@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { BookmarksPage } from "@/components/bookmarks/bookmarks-page";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 
+export const instant = {
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 export const metadata: Metadata = {
   title: "المحفوظات والمجموعات",
   description:

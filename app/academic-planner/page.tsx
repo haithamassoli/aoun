@@ -3,6 +3,10 @@ import * as motion from "motion/react-client";
 import { AcademicCalendar } from "@/components/academic-calendar/academic-calendar";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 
+export const instant = {
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 export const metadata: Metadata = {
   title: "التقويم",
   description:

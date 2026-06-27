@@ -1,18 +1,25 @@
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import * as motion from "motion/react-client";
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 import { UniversitiesSearchSection } from "@/components/universities-search-section";
 import { HomeLastMajorRedirect } from "@/components/home-last-major-redirect";
 import { HomeHero } from "@/components/home-hero";
+import { HomePageSkeleton } from "@/components/loading-shells";
 
 type PartnerCard = {
   _id: string;
   name: string;
   logoUrl?: string | null;
   websiteUrl?: string;
+};
+
+export const instant = {
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
 };
 
 export const metadata: Metadata = {
@@ -31,7 +38,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Home() {
+export default function Home() {
+  return (
+    <Suspense fallback={<HomePageSkeleton />}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+async function HomeContent() {
+  await connection();
+
   let universities: Awaited<
     ReturnType<typeof fetchQuery<typeof api.universities.list>>
   > = [];

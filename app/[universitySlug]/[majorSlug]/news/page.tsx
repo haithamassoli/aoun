@@ -14,6 +14,11 @@ import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick
 
 const INITIAL_PAGE_SIZE = 8;
 
+export const instant = {
+  level: "warning",
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 type Params = {
   universitySlug: string;
   majorSlug: string;

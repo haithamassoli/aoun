@@ -3,6 +3,10 @@ import { GpaCalculatorTabs } from "@/components/gpa-calculator/gpa-calculator-ta
 import * as motion from "motion/react-client";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 
+export const instant = {
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 export const metadata: Metadata = {
   title: "حاسبة المعدل",
   description:

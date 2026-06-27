@@ -13,6 +13,11 @@ import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick
 
 type Params = { universitySlug: string };
 
+export const instant = {
+  level: "warning",
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 export async function generateMetadata({
   params,
 }: {

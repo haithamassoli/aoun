@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { FocusSoundStudio } from "@/components/focus-sound-studio";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 
+export const instant = {
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 export const metadata: Metadata = {
   title: "مؤقت الدراسة وأصوات التركيز",
   description:

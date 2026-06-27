@@ -37,6 +37,11 @@ type CourseResourceRecord = {
   url?: string;
 };
 
+export const instant = {
+  level: "warning",
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 export async function generateMetadata({
   params,
 }: {

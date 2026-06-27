@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { LocalDataSettings } from "@/components/settings/local-data-settings";
 
+export const instant = {
+  unstable_samples: [{ cookies: [{ name: "aoun_session", value: null }] }],
+};
+
 export const metadata: Metadata = {
   title: "الإعدادات",
   description:
