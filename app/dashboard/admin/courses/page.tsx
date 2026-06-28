@@ -15,6 +15,10 @@ import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
 import { normalizeAlias } from "@/lib/alias";
 import { formatCourseSemesterLabel } from "@/lib/course-semester";
+import {
+  PUBLIC_CACHE_TAG_GROUPS,
+  revalidatePublicCache,
+} from "@/lib/public-cache";
 
 export default function AdminCoursesPage() {
   const { user, sessionToken } = useAuth();
@@ -71,6 +75,10 @@ export default function AdminCoursesPage() {
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.courses,
+          );
           toast.show("تم تحديث المادة بنجاح", "success");
         } else {
           await addCourse({
@@ -86,6 +94,10 @@ export default function AdminCoursesPage() {
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.courses,
+          );
           toast.show("تم إضافة المادة بنجاح", "success");
         }
         formApi.reset();
@@ -149,6 +161,10 @@ export default function AdminCoursesPage() {
         token: sessionToken,
         courseId: id as Id<"courses">,
       });
+      await revalidatePublicCache(
+        sessionToken,
+        PUBLIC_CACHE_TAG_GROUPS.courses,
+      );
       toast.show("تم حذف المادة", "success");
     } catch {
       toast.show("حدث خطأ أثناء الحذف", "error");

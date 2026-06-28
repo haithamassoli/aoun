@@ -13,6 +13,10 @@ import { universitySchema } from "@/lib/schemas";
 import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
+import {
+  PUBLIC_CACHE_TAG_GROUPS,
+  revalidatePublicCache,
+} from "@/lib/public-cache";
 
 type QuickLinkInput = {
   title: string;
@@ -128,6 +132,10 @@ export default function AdminUniversitiesPage() {
             alias: value.alias.trim() || undefined,
             quickLinks: normalizedQuickLinks,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.universities,
+          );
           toast.show("تم تحديث الجامعة بنجاح", "success");
         } else {
           await addUniversity({
@@ -139,6 +147,10 @@ export default function AdminUniversitiesPage() {
             alias: value.alias.trim() || undefined,
             quickLinks: normalizedQuickLinks,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.universities,
+          );
           toast.show("تم إضافة الجامعة بنجاح", "success");
         }
 
@@ -204,6 +216,10 @@ export default function AdminUniversitiesPage() {
         token: sessionToken,
         universityId: id as Id<"universities">,
       });
+      await revalidatePublicCache(
+        sessionToken,
+        PUBLIC_CACHE_TAG_GROUPS.universities,
+      );
       toast.show("تم حذف الجامعة", "success");
     } catch {
       toast.show("حدث خطأ أثناء الحذف", "error");

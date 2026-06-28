@@ -28,6 +28,10 @@ import { generateSlug, normalizeSlug } from "@/lib/slug";
 import { normalizeAlias } from "@/lib/alias";
 import { formatCourseSemesterLabel } from "@/lib/course-semester";
 import { REQUEST_KIND_LABELS, type RequestKind } from "@/lib/resource-requests";
+import {
+  PUBLIC_CACHE_TAG_GROUPS,
+  revalidatePublicCache,
+} from "@/lib/public-cache";
 
 type CourseListItem = {
   _id: Id<"courses">;
@@ -261,6 +265,10 @@ export default function MajorCoursesPage() {
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.courses,
+          );
           toast.show("تم تحديث المادة بنجاح", "success");
         } else {
           await addCourse({
@@ -276,6 +284,10 @@ export default function MajorCoursesPage() {
             order: Number(value.order) || 0,
             alias: normalizeAlias(value.alias) || undefined,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.courses,
+          );
           toast.show("تم إضافة المادة بنجاح", "success");
         }
         formApi.reset();
@@ -303,6 +315,10 @@ export default function MajorCoursesPage() {
             name: value.name.trim(),
             order: Number(value.order) || 0,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.courseDetails,
+          );
           toast.show("تم تحديث المستوى بنجاح", "success");
         } else {
           await addSemester({
@@ -311,6 +327,10 @@ export default function MajorCoursesPage() {
             name: value.name.trim(),
             order: Number(value.order) || 0,
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.courseDetails,
+          );
           toast.show("تم إضافة المستوى بنجاح", "success");
         }
 
@@ -347,6 +367,10 @@ export default function MajorCoursesPage() {
           treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
           socialLinks: buildSocialLinks(value),
         });
+        await revalidatePublicCache(
+          sessionToken,
+          PUBLIC_CACHE_TAG_GROUPS.majorDetails,
+        );
         toast.show("تم حفظ الروابط بنجاح", "success");
         setShowMajorLinkForm(false);
       } catch {
@@ -435,6 +459,10 @@ export default function MajorCoursesPage() {
         token: sessionToken,
         semesterId: pendingDeleteSemester._id,
       });
+      await revalidatePublicCache(
+        sessionToken,
+        PUBLIC_CACHE_TAG_GROUPS.courseDetails,
+      );
       toast.show("تم حذف المستوى وإزالة ربطه من المواد", "success");
     } catch {
       toast.show("حدث خطأ أثناء حذف المستوى", "error");

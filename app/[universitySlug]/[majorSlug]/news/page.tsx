@@ -10,6 +10,7 @@ import { decodeSlugParam } from "@/lib/slug";
 import Link from "next/link";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
+import { MajorNewsPageSkeleton } from "@/components/loading-shells";
 import {
   getMajorByUniversityAndSlug,
   getNewsPageByMajor,
@@ -254,7 +255,7 @@ export default function MajorNewsPage({
   params: Promise<Params>;
 }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<MajorNewsPageSkeleton />}>
       <MajorNewsContent params={params} />
     </Suspense>
   );

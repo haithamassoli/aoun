@@ -11,6 +11,7 @@ import { NotificationToggle } from "@/components/notification-toggle";
 import { decodeSlugParam } from "@/lib/slug";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
+import { MajorPageSkeleton } from "@/components/loading-shells";
 import { socialPlatforms } from "@/lib/social-platforms";
 import {
   getCoursesByMajor,
@@ -432,7 +433,7 @@ export default function MajorPage({
   searchParams: Promise<SearchParams>;
 }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<MajorPageSkeleton />}>
       <MajorContent params={params} searchParams={searchParams} />
     </Suspense>
   );

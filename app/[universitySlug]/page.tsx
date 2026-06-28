@@ -9,6 +9,7 @@ import * as motion from "motion/react-client";
 import { decodeSlugParam } from "@/lib/slug";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
+import { UniversityPageSkeleton } from "@/components/loading-shells";
 import {
   getMajorsByUniversity,
   getPublicSitemapUrls,
@@ -181,7 +182,7 @@ export default function UniversityPage({
   params: Promise<Params>;
 }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<UniversityPageSkeleton />}>
       <UniversityContent params={params} />
     </Suspense>
   );

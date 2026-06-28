@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import type { Metadata } from "next";
@@ -13,6 +14,7 @@ import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
 import { socialPlatforms } from "@/lib/social-platforms";
 import { BookmarkToggleButton } from "@/components/bookmarks/bookmark-toggle-button";
+import { CoursePageSkeleton } from "@/components/loading-shells";
 import { CATEGORIES, type CategoryValue } from "@/constant/resource-categories";
 import {
   getCourseByMajorAndSlug,
@@ -102,7 +104,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function CoursePage({
+async function CourseContent({
   params,
 }: {
   params: Promise<Params>;
@@ -495,5 +497,17 @@ export default async function CoursePage({
         />
       </section>
     </div>
+  );
+}
+
+export default function CoursePage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  return (
+    <Suspense fallback={<CoursePageSkeleton />}>
+      <CourseContent params={params} />
+    </Suspense>
   );
 }

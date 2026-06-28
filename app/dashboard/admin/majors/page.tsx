@@ -14,6 +14,10 @@ import { motion } from "motion/react";
 import { FormModal } from "@/components/form-modal";
 import { generateSlug, normalizeSlug } from "@/lib/slug";
 import { normalizeAlias } from "@/lib/alias";
+import {
+  PUBLIC_CACHE_TAG_GROUPS,
+  revalidatePublicCache,
+} from "@/lib/public-cache";
 
 type MajorListItem = {
   _id: string;
@@ -98,6 +102,10 @@ export default function AdminMajorsPage() {
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
             socialLinks: buildSocialLinks(value),
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.majors,
+          );
           toast.show("تم تحديث التخصص بنجاح", "success");
         } else {
           await addMajor({
@@ -110,6 +118,10 @@ export default function AdminMajorsPage() {
             treeDiagramUrl: value.treeDiagramUrl.trim() || undefined,
             socialLinks: buildSocialLinks(value),
           });
+          await revalidatePublicCache(
+            sessionToken,
+            PUBLIC_CACHE_TAG_GROUPS.majors,
+          );
           toast.show("تم إضافة التخصص بنجاح", "success");
         }
         formApi.reset();
@@ -159,6 +171,10 @@ export default function AdminMajorsPage() {
     setDeleting(id);
     try {
       await removeMajor({ token: sessionToken, majorId: id as Id<"majors"> });
+      await revalidatePublicCache(
+        sessionToken,
+        PUBLIC_CACHE_TAG_GROUPS.majors,
+      );
       toast.show("تم حذف التخصص", "success");
     } catch {
       toast.show("حدث خطأ أثناء الحذف", "error");
