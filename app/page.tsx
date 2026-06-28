@@ -1,5 +1,3 @@
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
 import type { Metadata } from "next";
 import * as motion from "motion/react-client";
 import Link from "next/link";
@@ -7,6 +5,11 @@ import Image from "next/image";
 import { UniversitiesSearchSection } from "@/components/universities-search-section";
 import { HomeLastMajorRedirect } from "@/components/home-last-major-redirect";
 import { HomeHero } from "@/components/home-hero";
+import {
+  getPublicPartners,
+  getPublicUniversities,
+  getPublicVisitorsTotal,
+} from "@/lib/public-data";
 
 type PartnerCard = {
   _id: string;
@@ -32,26 +35,22 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  let universities: Awaited<
-    ReturnType<typeof fetchQuery<typeof api.universities.list>>
-  > = [];
+  let universities: Awaited<ReturnType<typeof getPublicUniversities>> = [];
   try {
-    universities = await fetchQuery(api.universities.list);
+    universities = await getPublicUniversities();
   } catch {
     // Convex may not have data yet
   }
 
   let partners: PartnerCard[] = [];
   try {
-    partners = await fetchQuery(api.partners.list);
+    partners = await getPublicPartners();
   } catch {
     // Convex may not have data yet
   }
   let visitorsTotal: number | null = null;
   try {
-    const publicVisitors = await fetchQuery(
-      api.dashboard.getPublicVisitorsTotal,
-    );
+    const publicVisitors = await getPublicVisitorsTotal();
     visitorsTotal = publicVisitors.visitorsTotal;
   } catch {
     // Convex may not have data yet

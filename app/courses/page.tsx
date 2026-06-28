@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
+import { Suspense } from "react";
 import { GlobalCoursesSearchPage } from "@/components/global-courses-search-page";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
+import { getPublicUniversities } from "@/lib/public-data";
 
 type CoursesPageSearchParams = {
   q?: string | string[];
@@ -49,22 +49,36 @@ export async function generateMetadata({
   };
 }
 
-export default async function CoursesPage({
+async function CoursesSearch({
   searchParams,
 }: {
   searchParams: Promise<CoursesPageSearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-
-  let universities: Awaited<
-    ReturnType<typeof fetchQuery<typeof api.universities.list>>
-  > = [];
+  let universities: Awaited<ReturnType<typeof getPublicUniversities>> = [];
   try {
-    universities = await fetchQuery(api.universities.list);
+    universities = await getPublicUniversities();
   } catch {
     // Convex data may not be available yet in local development.
   }
 
+  return (
+    <GlobalCoursesSearchPage
+      universities={universities}
+      initialSearchParams={{
+        q: getSingleParam(resolvedSearchParams.q),
+        university: getSingleParam(resolvedSearchParams.university),
+        major: getSingleParam(resolvedSearchParams.major),
+      }}
+    />
+  );
+}
+
+export default async function CoursesPage({
+  searchParams,
+}: {
+  searchParams: Promise<CoursesPageSearchParams>;
+}) {
   return (
     <>
       <MobilePageHeaderMenu
@@ -85,14 +99,9 @@ export default async function CoursesPage({
         </div>
       </MobilePageHeaderMenu>
 
-      <GlobalCoursesSearchPage
-        universities={universities}
-        initialSearchParams={{
-          q: getSingleParam(resolvedSearchParams.q),
-          university: getSingleParam(resolvedSearchParams.university),
-          major: getSingleParam(resolvedSearchParams.major),
-        }}
-      />
+      <Suspense fallback={null}>
+        <CoursesSearch searchParams={searchParams} />
+      </Suspense>
     </>
   );
 }

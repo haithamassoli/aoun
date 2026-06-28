@@ -1,5 +1,4 @@
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { CoursesSearchSection } from "@/components/courses-search-section";
@@ -12,7 +11,15 @@ import { NotificationToggle } from "@/components/notification-toggle";
 import { decodeSlugParam } from "@/lib/slug";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { UniversityMobileQuickLinks } from "@/components/university-mobile-quick-links";
+import { MajorPageSkeleton } from "@/components/loading-shells";
 import { socialPlatforms } from "@/lib/social-platforms";
+import {
+  getCoursesByMajor,
+  getLatestNewsByMajor,
+  getMajorByUniversityAndSlug,
+  getPublicSitemapUrls,
+  getUniversityBySlug,
+} from "@/lib/public-data";
 
 type Params = { universitySlug: string; majorSlug: string };
 type SearchParams = {
@@ -24,6 +31,23 @@ type CourseStatusFilter =
   | "in_progress"
   | "hidden"
   | "none";
+
+export async function generateStaticParams(): Promise<Params[]> {
+  try {
+    const urls = await getPublicSitemapUrls();
+    const params = urls.flatMap(({ path }) => {
+      const segments = path.split("/").filter(Boolean);
+      return segments.length === 2
+        ? [{ universitySlug: segments[0], majorSlug: segments[1] }]
+        : [];
+    });
+    return params.length > 0
+      ? params
+      : [{ universitySlug: "_", majorSlug: "_" }];
+  } catch {
+    return [{ universitySlug: "_", majorSlug: "_" }];
+  }
+}
 
 function normalizeStatusFilter(
   value: string | string[] | undefined,
@@ -54,14 +78,12 @@ export async function generateMetadata({
   const { universitySlug, majorSlug } = await params;
   const normalizedUniversitySlug = decodeSlugParam(universitySlug);
   const normalizedMajorSlug = decodeSlugParam(majorSlug);
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getUniversityBySlug(normalizedUniversitySlug);
   if (!university) return {};
-  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
-    universityId: university._id,
-    slug: normalizedMajorSlug,
-  });
+  const major = await getMajorByUniversityAndSlug(
+    university._id,
+    normalizedMajorSlug,
+  );
   if (!major || major.universityId !== university._id) return {};
   const title = `${major.name} — ${university.name}`;
   const description = `الخطة الدراسية والمواد الأكاديمية لتخصص ${major.name} في ${university.name}. ملخصات، امتحانات، ومصادر مجانية.`;
@@ -81,7 +103,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function MajorPage({
+async function MajorContent({
   params,
   searchParams,
 }: {
@@ -96,25 +118,19 @@ export default async function MajorPage({
     resolvedSearchParams.status,
   );
 
-  const university = await fetchQuery(api.universities.getBySlug, {
-    slug: normalizedUniversitySlug,
-  });
+  const university = await getUniversityBySlug(normalizedUniversitySlug);
   if (!university) notFound();
-  const major = await fetchQuery(api.majors.getByUniversityAndSlug, {
-    universityId: university._id,
-    slug: normalizedMajorSlug,
-  });
+  const major = await getMajorByUniversityAndSlug(
+    university._id,
+    normalizedMajorSlug,
+  );
   if (!major || major.universityId !== university._id) notFound();
   const canonicalUniversitySlug = university.slug;
   const canonicalMajorSlug = major.slug;
 
   const [courses, latestNews] = await Promise.all([
-    fetchQuery(api.courses.listByMajor, {
-      majorId: major._id,
-    }),
-    fetchQuery(api.news.getLatestByMajor, {
-      majorId: major._id,
-    }),
+    getCoursesByMajor(major._id),
+    getLatestNewsByMajor(major._id),
   ]);
   const majorSocialLinks = socialPlatforms.flatMap((platform) => {
     const url = major.socialLinks?.[platform.key];
@@ -406,5 +422,19 @@ export default async function MajorPage({
         initialStatusFilter={initialStatusFilter}
       />
     </div>
+  );
+}
+
+export default function MajorPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<Params>;
+  searchParams: Promise<SearchParams>;
+}) {
+  return (
+    <Suspense fallback={<MajorPageSkeleton />}>
+      <MajorContent params={params} searchParams={searchParams} />
+    </Suspense>
   );
 }

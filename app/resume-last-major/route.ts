@@ -10,8 +10,6 @@ import {
   parseLastVisitedMajorCookie,
 } from "@/lib/student-progress";
 
-export const dynamic = "force-dynamic";
-
 function isSecureRequest(requestUrl: URL) {
   return requestUrl.protocol === "https:";
 }
