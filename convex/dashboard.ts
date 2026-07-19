@@ -101,14 +101,6 @@ const topPageEntry = v.object({
   uniqueVisitors: v.number(),
 });
 
-const topTransitionEntry = v.object({
-  fromPathname: v.string(),
-  fromLabel: v.string(),
-  toPathname: v.string(),
-  toLabel: v.string(),
-  count: v.number(),
-});
-
 const pageTypeTrafficEntry = v.object({
   pageType: v.string(),
   label: v.string(),
@@ -134,21 +126,20 @@ const adminDashboardAnalytics = v.object({
   visitorSeries: v.array(visitorSeriesEntry),
   pageViewSeries: v.array(pageViewSeriesEntry),
   topPages: v.array(topPageEntry),
-  topTransitions: v.array(topTransitionEntry),
   trafficByPageType: v.array(pageTypeTrafficEntry),
 });
 
 const AMMAN_TIME_ZONE = "Asia/Amman";
-const PUBLIC_VISITOR_STATIC_PATHS = new Set(["/", "/gpa-calculator"]);
+const PUBLIC_VISITOR_STATIC_PATHS = new Set([
+  "/academic-planner",
+  "/courses",
+  "/focus",
+  "/gpa-calculator",
+]);
 const STATIC_TRACKABLE_PAGE_LABELS: Record<
   string,
   { pageType: string; pageTypeLabel: string; label: string }
 > = {
-  "/": {
-    pageType: "home",
-    pageTypeLabel: "الرئيسية",
-    label: "الصفحة الرئيسية",
-  },
   "/gpa-calculator": {
     pageType: "tool",
     pageTypeLabel: "أدوات",
@@ -168,16 +159,6 @@ const STATIC_TRACKABLE_PAGE_LABELS: Record<
     pageType: "tool",
     pageTypeLabel: "أدوات",
     label: "وضع التركيز",
-  },
-  "/partners": {
-    pageType: "info",
-    pageTypeLabel: "تعريفية",
-    label: "الشركاء",
-  },
-  "/settings": {
-    pageType: "info",
-    pageTypeLabel: "تعريفية",
-    label: "الإعدادات",
   },
 };
 const ammanDateKeyFormatter = new Intl.DateTimeFormat("en-US", {
@@ -262,20 +243,20 @@ function shouldTrackVisitorPath(pathname: string) {
   }
 
   const segments = pathname.split("/").filter(Boolean);
-  if (segments.length < 1 || segments.length > 3) {
+  const [firstSegment] = segments;
+  if (segments.length !== 2) {
     return false;
   }
 
-  const [firstSegment] = segments;
-  if (
+  return !(
+    firstSegment === "bookmarks" ||
     firstSegment === "dashboard" ||
     firstSegment === "login" ||
-    firstSegment === "offline"
-  ) {
-    return false;
-  }
-
-  return true;
+    firstSegment === "news" ||
+    firstSegment === "offline" ||
+    firstSegment === "partners" ||
+    firstSegment === "settings"
+  );
 }
 
 type PathLookup = {
@@ -686,7 +667,9 @@ export const getAdminDashboardAnalytics = query({
     const visitorDailyStatsByDate = new Map<string, number>(
       visitorDailyStats.map((entry) => [entry.dateKey, entry.uniqueVisitors])
     );
-    const visitorPageViews = visitorPageViewBatches.flat();
+    const visitorPageViews = visitorPageViewBatches
+      .flat()
+      .filter((pageView) => shouldTrackVisitorPath(pageView.pathname));
     const activeUniversities = universities.filter(isNotDeleted);
     const activeMajors = majors.filter(isNotDeleted);
     const activeCourses = courses.filter(isNotDeleted);
@@ -710,16 +693,6 @@ export const getAdminDashboardAnalytics = query({
         pageTypeLabel: string;
         pageViews: number;
         uniqueVisitors: Set<string>;
-      }
-    >();
-    const transitionStats = new Map<
-      string,
-      {
-        fromPathname: string;
-        fromLabel: string;
-        toPathname: string;
-        toLabel: string;
-        count: number;
       }
     >();
     const pageTypeStats = new Map<
@@ -753,20 +726,6 @@ export const getAdminDashboardAnalytics = query({
       pageTypeEntry.pageViews += 1;
       pageTypeEntry.uniqueVisitors.add(pageView.visitorKey);
       pageTypeStats.set(pageMeta.pageType, pageTypeEntry);
-
-      if (pageView.referrerPath && pageView.referrerPath !== pageView.pathname) {
-        const referrerMeta = describePublicPath(pageView.referrerPath, pathLookup);
-        const transitionKey = `${pageView.referrerPath}->${pageView.pathname}`;
-        const transition = transitionStats.get(transitionKey) ?? {
-          fromPathname: pageView.referrerPath,
-          fromLabel: referrerMeta.label,
-          toPathname: pageView.pathname,
-          toLabel: pageMeta.label,
-          count: 0,
-        };
-        transition.count += 1;
-        transitionStats.set(transitionKey, transition);
-      }
     }
 
     return {
@@ -803,9 +762,6 @@ export const getAdminDashboardAnalytics = query({
           uniqueVisitors: stats.uniqueVisitors.size,
         }))
         .toSorted((left, right) => right.pageViews - left.pageViews)
-        .slice(0, 6),
-      topTransitions: Array.from(transitionStats.values())
-        .toSorted((left, right) => right.count - left.count)
         .slice(0, 6),
       trafficByPageType: Array.from(pageTypeStats.entries())
         .map(([pageType, stats]) => ({

@@ -1,6 +1,20 @@
 const STORAGE_NAMESPACE = "aoun:analytics";
 const STORAGE_VERSION = "v1";
-const RESERVED_SEGMENTS = new Set(["dashboard", "login", "offline"]);
+const TRACKABLE_STATIC_PATHS = new Set([
+  "/academic-planner",
+  "/courses",
+  "/focus",
+  "/gpa-calculator",
+]);
+const RESERVED_SEGMENTS = new Set([
+  "bookmarks",
+  "dashboard",
+  "login",
+  "news",
+  "offline",
+  "partners",
+  "settings",
+]);
 
 const VISITOR_ID_STORAGE_KEY = `${STORAGE_NAMESPACE}:visitor-id:${STORAGE_VERSION}`;
 
@@ -36,7 +50,7 @@ export function getOrCreateVisitorKey() {
 }
 
 export function isTrackableVisitorPath(pathname: string) {
-  if (pathname === "/" || pathname === "/gpa-calculator") {
+  if (TRACKABLE_STATIC_PATHS.has(pathname)) {
     return true;
   }
 
@@ -45,7 +59,7 @@ export function isTrackableVisitorPath(pathname: string) {
   }
 
   const segments = pathname.split("/").filter(Boolean);
-  if (segments.length < 1 || segments.length > 3) {
+  if (segments.length !== 2) {
     return false;
   }
 

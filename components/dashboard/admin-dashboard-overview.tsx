@@ -56,14 +56,6 @@ type TopPage = {
   uniqueVisitors: number;
 };
 
-type TopTransition = {
-  fromPathname: string;
-  fromLabel: string;
-  toPathname: string;
-  toLabel: string;
-  count: number;
-};
-
 type PageTypeTraffic = {
   pageType: string;
   label: string;
@@ -77,7 +69,6 @@ export type DashboardAnalytics = Record<MetricKey, number> & {
   visitorSeries: VisitorSeriesPoint[];
   pageViewSeries: PageViewSeriesPoint[];
   topPages: TopPage[];
-  topTransitions: TopTransition[];
   trafficByPageType: PageTypeTraffic[];
 };
 
@@ -438,89 +429,6 @@ function PageTypeList({
   );
 }
 
-function TransitionList({
-  transitions,
-  hasPageLevelData,
-}: {
-  transitions: TopTransition[];
-  hasPageLevelData: boolean;
-}) {
-  if (transitions.length === 0) {
-    return (
-      <EmptyState
-        title={
-          hasPageLevelData ? "لا توجد انتقالات كافية بعـد" : "بانتظار أول مسارات تنقـل"
-        }
-        description="عند تنقل الطلاب بين الصفحات العامة سيظهر هنا المسار الأكثر تكرارًا بوضـوح."
-      />
-    );
-  }
-
-  const maxCount = transitions[0]?.count ?? 1;
-
-  return (
-    <div className="space-y-3">
-      {transitions.map((transition, index) => {
-        const widthPercent = getPercent(transition.count, maxCount);
-
-        return (
-          <div
-            key={`${transition.fromPathname}-${transition.toPathname}`}
-            className="rounded-3xl border border-surface-200 bg-surface-50/70 p-4 dark:border-surface-700 dark:bg-surface-950/60"
-          >
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-                  <div className="min-w-0 rounded-2xl bg-white px-3 py-2 dark:bg-surface-900">
-                    <p className="text-[11px] text-surface-500 dark:text-surface-400">
-                      من
-                    </p>
-                    <p className="mt-0.5 truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
-                      {transition.fromLabel}
-                    </p>
-                  </div>
-                  <span className="hidden text-xs font-semibold text-surface-400 sm:block">
-                    إلى
-                  </span>
-                  <div className="min-w-0 rounded-2xl bg-white px-3 py-2 dark:bg-surface-900">
-                    <p className="text-[11px] text-surface-500 dark:text-surface-400">
-                      إلى
-                    </p>
-                    <p className="mt-0.5 truncate text-sm font-semibold text-surface-900 dark:text-surface-50">
-                      {transition.toLabel}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-2 truncate text-xs text-surface-500 dark:text-surface-400">
-                  {transition.fromPathname} / {transition.toPathname}
-                </p>
-              </div>
-              <div className="shrink-0 text-left">
-                <p
-                  className={`${firaCode.className} text-sm font-bold text-surface-900 dark:text-surface-50`}
-                >
-                  {formatNumber(transition.count)}
-                </p>
-                <p className="text-xs text-surface-500 dark:text-surface-400">
-                  انتقـال
-                </p>
-              </div>
-            </div>
-            <MeterBar
-              percent={widthPercent}
-              className={
-                index === 0
-                  ? "bg-emerald-600 dark:bg-emerald-400"
-                  : "bg-surface-500 dark:bg-surface-500"
-              }
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function TrafficChart({ series }: { series: PageViewSeriesPoint[] }) {
   return (
     <div className="h-[300px] w-full lg:h-[340px]">
@@ -617,16 +525,13 @@ export function AdminDashboardOverview({
           <Skeleton className="h-[520px] rounded-[30px] border border-surface-200 dark:border-surface-700" />
           <Skeleton className="h-[520px] rounded-[30px] border border-surface-200 dark:border-surface-700" />
         </div>
-        <Skeleton className="h-[360px] rounded-[30px] border border-surface-200 dark:border-surface-700" />
       </div>
     );
   }
 
   const series = analytics.pageViewSeries;
   const hasPageLevelData =
-    analytics.pageViewsTotal > 0 ||
-    analytics.topPages.length > 0 ||
-    analytics.topTransitions.length > 0;
+    analytics.pageViewsTotal > 0 || analytics.topPages.length > 0;
   const totalTrackedDays = series.length;
   const averageDailyViews = formatAverage(
     analytics.pageViewsTotal,
@@ -793,27 +698,10 @@ export function AdminDashboardOverview({
         </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.32, delay: 0.38 }}
-      >
-        <SectionFrame
-          eyebrow="مسارات التنقـل"
-          title="كيف ينتقل الطلاب بين الصفحـات؟"
-          description="استخدم هذه المسارات لمعرفة أين تحتاج روابط أو دعوات أو ترتيبًا أوضح داخل الصفحات العامـة."
-        >
-          <TransitionList
-            transitions={analytics.topTransitions}
-            hasPageLevelData={hasPageLevelData}
-          />
-        </SectionFrame>
-      </motion.div>
-
       {!hasPageLevelData &&
       analytics.visitorSeries.some((point) => point.uniqueVisitors > 0) ? (
         <div className="rounded-3xl border border-primary-200 bg-primary-50/70 px-4 py-3 text-sm leading-6 text-primary-800 dark:border-primary-900/60 dark:bg-primary-950/30 dark:text-primary-200">
-          بيانات الزوار اليومية القديمة ما زالت ظاهـرة. تفاصيل الصفحات والمسارات
+          بيانات الزوار اليومية القديمة ما زالت ظاهـرة. تفاصيل الصفحات
           ستبدأ بالظهور مع الزيارات الجديدة بعد تفعيل التتبع الأدق.
         </div>
       ) : null}
