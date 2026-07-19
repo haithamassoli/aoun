@@ -70,27 +70,6 @@ export const searchByUniversity = query({
   },
 });
 
-export const getBySlug = query({
-  args: { slug: v.string() },
-  returns: v.union(v.null(), majorDoc),
-  handler: async (ctx, args) => {
-    const slug = normalizeSlugLookup(args.slug);
-    const major = await ctx.db
-      .query("majors")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
-      .first();
-    if (major && major.deletedAt === undefined) {
-      return major;
-    }
-
-    const majors = await ctx.db.query("majors").collect();
-    const normalizedMatch = majors.find(
-      (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
-    );
-    return normalizedMatch ?? null;
-  },
-});
-
 export const getByUniversityAndSlug = query({
   args: {
     universityId: v.id("universities"),

@@ -307,27 +307,6 @@ export const searchGlobalPublic = query({
   },
 });
 
-export const getBySlug = query({
-  args: { slug: v.string() },
-  returns: v.union(v.null(), courseDoc),
-  handler: async (ctx, args) => {
-    const slug = normalizeSlugLookup(args.slug);
-    const course = await ctx.db
-      .query("courses")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
-      .first();
-    if (course && course.deletedAt === undefined) {
-      return await enrichCourse(ctx, course);
-    }
-
-    const courses = await ctx.db.query("courses").collect();
-    const normalizedMatch = courses.find(
-      (entry) => isNotDeleted(entry) && isSameSlug(entry.slug, slug),
-    );
-    return normalizedMatch ? await enrichCourse(ctx, normalizedMatch) : null;
-  },
-});
-
 export const getByMajorAndSlug = query({
   args: {
     majorId: v.id("majors"),

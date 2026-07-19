@@ -18,14 +18,14 @@ export const subscribe = mutation({
     const now = Date.now();
 
     if (existing) {
-      if (!existing.majorIds.includes(args.majorId)) {
-        await ctx.db.patch("pushSubscriptions", existing._id, {
-          majorIds: [...existing.majorIds, args.majorId],
-          p256dh: args.p256dh,
-          auth: args.auth,
-          updatedAt: now,
-        });
-      }
+      await ctx.db.patch("pushSubscriptions", existing._id, {
+        majorIds: existing.majorIds.includes(args.majorId)
+          ? existing.majorIds
+          : [...existing.majorIds, args.majorId],
+        p256dh: args.p256dh,
+        auth: args.auth,
+        updatedAt: now,
+      });
     } else {
       await ctx.db.insert("pushSubscriptions", {
         endpoint: args.endpoint,

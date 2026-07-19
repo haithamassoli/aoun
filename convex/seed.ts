@@ -448,6 +448,3 @@ export const clearAll = internalMutation({
     return `Cleared ${total} documents across all tables`;
   },
 });
-
-// ── Legacy alias (kept for backward compatibility) ────────────────────
-export const seedUniversities = seedAll;

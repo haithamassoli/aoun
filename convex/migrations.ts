@@ -1,4 +1,4 @@
-import { internalMutation, mutation } from "./_generated/server";
+import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import {
@@ -6,7 +6,7 @@ import {
   buildMajorSearchToken,
   buildCourseSearchToken,
 } from "./searchUtils";
-import { assertAdmin, authenticateUser, isNotDeleted } from "./helpers";
+import { isNotDeleted } from "./helpers";
 import {
   formatCourseSemesterLabel,
   normalizeCourseSemesterInput,
@@ -197,18 +197,15 @@ export const backfillCourseSemesterStrings = internalMutation({
   },
 });
 
-export const migrateCourseSemesters = mutation({
-  args: { token: v.string() },
+export const migrateCourseSemesters = internalMutation({
+  args: {},
   returns: v.object({
     createdSemesters: v.number(),
     updatedCourses: v.number(),
     clearedLegacySemesters: v.number(),
     skippedCourses: v.number(),
   }),
-  handler: async (ctx, args) => {
-    const user = await authenticateUser(ctx, args.token);
-    await assertAdmin(ctx, user._id);
-
+  handler: async (ctx) => {
     const [courses, semesters] = await Promise.all([
       ctx.db.query("courses").collect(),
       ctx.db.query("semesters").collect(),

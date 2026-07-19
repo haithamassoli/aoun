@@ -75,12 +75,6 @@ const resourceDoc = v.object({
   updatedAt: v.number(),
 });
 
-const analyticsTotals = v.object({
-  universitiesTotal: v.number(),
-  majorsTotal: v.number(),
-  coursesTotal: v.number(),
-});
-
 const publicVisitorsTotal = v.object({
   visitorsTotal: v.number(),
 });
@@ -544,29 +538,6 @@ export const updateMajorTreeDiagramUrl = mutation({
     });
 
     return null;
-  },
-});
-
-// ── Admin-only list queries ─────────────────────────────────────────
-
-export const getAdminAnalyticsTotals = query({
-  args: { token: v.string() },
-  returns: analyticsTotals,
-  handler: async (ctx, { token }) => {
-    const user = await authenticateUser(ctx, token);
-    await assertAdmin(ctx, user._id);
-
-    const [universities, majors, courses] = await Promise.all([
-      ctx.db.query("universities").collect(),
-      ctx.db.query("majors").collect(),
-      ctx.db.query("courses").collect(),
-    ]);
-
-    return {
-      universitiesTotal: universities.filter(isNotDeleted).length,
-      majorsTotal: majors.filter(isNotDeleted).length,
-      coursesTotal: courses.filter(isNotDeleted).length,
-    };
   },
 });
 
