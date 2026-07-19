@@ -574,11 +574,13 @@ export const getPublicVisitorsTotal = query({
   args: {},
   returns: publicVisitorsTotal,
   handler: async (ctx) => {
-    const visitorsTotal = (await ctx.db.query("visitorDailyVisits").collect())
-      .length;
+    const visitorDailyStats = await ctx.db.query("visitorDailyStats").collect();
 
     return {
-      visitorsTotal,
+      visitorsTotal: visitorDailyStats.reduce(
+        (total, entry) => total + entry.uniqueVisitors,
+        0
+      ),
     };
   },
 });
