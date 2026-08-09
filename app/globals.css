@@ -49,6 +49,10 @@ html {
   text-size-adjust: none;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-feature-settings: "salt" 1;
+}
+
 body {
   background: var(--color-surface-50);
   color: var(--color-surface-900);
