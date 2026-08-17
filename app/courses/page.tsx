@@ -4,6 +4,10 @@ import { GlobalCoursesSearchPage } from "@/components/global-courses-search-page
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 import { getPublicUniversities } from "@/lib/public-data";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 type CoursesPageSearchParams = {
   q?: string | string[];
   university?: string | string[];

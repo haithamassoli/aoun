@@ -23,6 +23,10 @@ import { SITE_URL } from "@/lib/site-url";
 import { STUDENT_TOOL_NAV_ITEMS } from "@/lib/student-tools-nav";
 import "./globals.css";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {

@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { BookmarksPage } from "@/components/bookmarks/bookmarks-page";
 import { MobilePageHeaderMenu } from "@/components/mobile-page-header-menu";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "المحفوظات والمجموعات",
   description:
