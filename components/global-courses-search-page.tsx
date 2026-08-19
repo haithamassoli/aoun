@@ -118,6 +118,7 @@ type GlobalCourseSearchResult = {
   slug: string;
   name: string;
   credits: number;
+  deliveryMode: "in_person" | "online";
   courseCode?: string;
   semesterId?: Id<"semesters">;
   semester?: string;
@@ -723,6 +724,15 @@ function GlobalCoursesSearchPageInner({
                             •
                           </span>
                           <span>{course.universityName}</span>
+                        </div>
+                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-surface-500 dark:text-surface-400">
+                          <span>{course.credits} ساعات</span>
+                          <span aria-hidden="true">·</span>
+                          <span>
+                            {course.deliveryMode === "online"
+                              ? "أونلاين"
+                              : "وجاهي"}
+                          </span>
                         </div>
                       </div>
                     </Link>

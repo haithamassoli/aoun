@@ -52,6 +52,7 @@ export default function AdminCoursesPage() {
       name: "",
       slug: "",
       credits: "3",
+      deliveryMode: "in_person" as "in_person" | "online",
       courseCode: "",
       semesterId: "",
       order: "0",
@@ -68,6 +69,7 @@ export default function AdminCoursesPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             credits: Number(value.credits),
+            deliveryMode: value.deliveryMode,
             courseCode: value.courseCode.trim() || undefined,
             semesterId: value.semesterId
               ? (value.semesterId as Id<"semesters">)
@@ -87,6 +89,7 @@ export default function AdminCoursesPage() {
             name: value.name.trim(),
             slug: normalizeSlug(value.slug),
             credits: Number(value.credits),
+            deliveryMode: value.deliveryMode,
             courseCode: value.courseCode.trim() || undefined,
             semesterId: value.semesterId
               ? (value.semesterId as Id<"semesters">)
@@ -129,6 +132,7 @@ export default function AdminCoursesPage() {
     name: string;
     slug: string;
     credits: number;
+    deliveryMode: "in_person" | "online";
     courseCode?: string;
     semesterId?: string;
     semester?: string;
@@ -142,6 +146,7 @@ export default function AdminCoursesPage() {
         name: course.name,
         slug: course.slug,
         credits: course.credits.toString(),
+        deliveryMode: course.deliveryMode,
         courseCode: course.courseCode ?? "",
         semesterId: course.semesterId ?? "",
         order: course.order.toString(),
@@ -312,6 +317,15 @@ export default function AdminCoursesPage() {
             />
             <FormSelect
               form={form}
+              name="deliveryMode"
+              label="نوع المـادة *"
+              options={[
+                { value: "in_person", label: "وجاهي" },
+                { value: "online", label: "أونلاين" },
+              ]}
+            />
+            <FormSelect
+              form={form}
               name="semesterId"
               label="الفصل أو المستـوى"
               options={semesterOptions}
@@ -384,6 +398,7 @@ export default function AdminCoursesPage() {
             name: string;
             slug: string;
             credits: number;
+            deliveryMode: "in_person" | "online";
             courseCode?: string;
             semester?: string;
             semesterId?: string;
@@ -420,6 +435,11 @@ export default function AdminCoursesPage() {
                         <span>{course.majorName}</span>
                         <span>{course.universityName}</span>
                         <span>{course.credits} ساعـات</span>
+                        <span>
+                          {course.deliveryMode === "online"
+                            ? "أونلاين"
+                            : "وجاهي"}
+                        </span>
                         {semesterLabel && <span>{semesterLabel}</span>}
                         {course.alias && (
                           <span className="rounded bg-surface-100 px-1.5 py-0.5 dark:bg-surface-800">
