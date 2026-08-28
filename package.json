@@ -25,7 +25,7 @@
     "bcryptjs": "^3.0.3",
     "convex": "^1.42.3",
     "motion": "^12.34.3",
-    "next": "16.3.1",
+    "next": "16.3.3",
     "next-themes": "^0.4.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -40,17 +40,17 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^26.0.0",
     "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.4",
+    "@types/react-dom": "19.2.5",
     "@types/sanitize-html": "^2.16.0",
     "@types/web-push": "^3.6.4",
-    "eslint": "10.8.1",
-    "eslint-config-next": "16.3.1",
+    "eslint": "10.9.1",
+    "eslint-config-next": "16.3.3",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3"
   },
   "overrides": {
     "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.4",
+    "@types/react-dom": "19.2.5",
     "postcss": "8.5.15",
     "ws": "8.21.0"
   }
