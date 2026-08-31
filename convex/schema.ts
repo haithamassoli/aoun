@@ -106,6 +106,9 @@ export default defineSchema({
     name: v.string(),
     slug: v.string(),
     credits: v.number(),
+    deliveryMode: v.optional(
+      v.union(v.literal("in_person"), v.literal("online")),
+    ),
     courseCode: v.optional(v.string()),
     semesterId: v.optional(v.id("semesters")),
     // Legacy migration field. New code writes semesterId; remove after all deployments run the migration.

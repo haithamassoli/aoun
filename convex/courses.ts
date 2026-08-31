@@ -9,6 +9,7 @@ import { buildCourseSearchToken, normalize } from "./searchUtils";
 import { normalizeCourseSemesterInput } from "../lib/course-semester";
 
 const semesterIdInput = v.optional(v.union(v.id("semesters"), v.null()));
+const deliveryMode = v.union(v.literal("in_person"), v.literal("online"));
 
 const courseDoc = v.object({
   _id: v.id("courses"),
@@ -17,6 +18,7 @@ const courseDoc = v.object({
   name: v.string(),
   slug: v.string(),
   credits: v.number(),
+  deliveryMode,
   courseCode: v.optional(v.string()),
   semesterId: v.optional(v.id("semesters")),
   semester: v.optional(v.string()),
@@ -33,6 +35,7 @@ const globalCourseSearchResultDoc = v.object({
   slug: v.string(),
   name: v.string(),
   credits: v.number(),
+  deliveryMode,
   courseCode: v.optional(v.string()),
   semesterId: v.optional(v.id("semesters")),
   semester: v.optional(v.string()),
@@ -50,6 +53,7 @@ const courseInput = v.object({
   name: v.string(),
   slug: v.string(),
   credits: v.number(),
+  deliveryMode: v.optional(deliveryMode),
   courseCode: v.optional(v.string()),
   semesterId: semesterIdInput,
   order: v.number(),
@@ -105,6 +109,7 @@ async function enrichCourse(ctx: QueryCtx, course: Doc<"courses">) {
     name: course.name,
     slug: course.slug,
     credits: course.credits,
+    deliveryMode: course.deliveryMode ?? "in_person",
     courseCode: course.courseCode,
     semester: normalizeCourseSemesterInput(
       (course as { semester?: string }).semester,
@@ -121,6 +126,7 @@ function makeCourseInsert(args: {
   name: string;
   slug: string;
   credits: number;
+  deliveryMode?: "in_person" | "online";
   courseCode?: string;
   semesterId?: Id<"semesters"> | null;
   order: number;
@@ -139,6 +145,7 @@ function makeCourseInsert(args: {
     name: args.name,
     slug: args.slug,
     credits: args.credits,
+    deliveryMode: args.deliveryMode ?? "in_person",
     courseCode: args.courseCode,
     semesterId: args.semesterId ?? undefined,
     order: args.order,
@@ -290,6 +297,7 @@ export const searchGlobalPublic = query({
           slug: course.slug,
           name: course.name,
           credits: course.credits,
+          deliveryMode: course.deliveryMode ?? "in_person",
           courseCode: course.courseCode,
           semesterId: semester?._id,
           semester: course.semester,
@@ -344,6 +352,7 @@ export const add = mutation({
     name: v.string(),
     slug: v.string(),
     credits: v.number(),
+    deliveryMode: v.optional(deliveryMode),
     courseCode: v.optional(v.string()),
     semesterId: semesterIdInput,
     order: v.number(),
@@ -373,6 +382,7 @@ export const add = mutation({
         name: args.name,
         slug: args.slug,
         credits: args.credits,
+        deliveryMode: args.deliveryMode,
         courseCode: args.courseCode,
         semesterId: args.semesterId,
         order: args.order,
@@ -426,6 +436,7 @@ export const bulkAddForMajor = internalMutation({
             name: course.name,
             slug: course.slug,
             credits: course.credits,
+            deliveryMode: course.deliveryMode,
             courseCode: course.courseCode,
             semesterId: course.semesterId,
             order: course.order,
@@ -446,6 +457,7 @@ export const update = mutation({
     name: v.optional(v.string()),
     slug: v.optional(v.string()),
     credits: v.optional(v.number()),
+    deliveryMode: v.optional(deliveryMode),
     courseCode: v.optional(v.string()),
     semesterId: semesterIdInput,
     order: v.optional(v.number()),
@@ -503,6 +515,7 @@ export const update = mutation({
       name: args.name,
       slug: args.slug,
       credits: args.credits,
+      deliveryMode: args.deliveryMode,
       courseCode: args.courseCode,
       order: args.order,
       alias: args.alias,

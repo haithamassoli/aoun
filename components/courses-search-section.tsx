@@ -31,6 +31,7 @@ type CourseListItem = {
   slug: string;
   name: string;
   credits: number;
+  deliveryMode: "in_person" | "online";
   courseCode?: string;
   semesterId?: Id<"semesters">;
   semester?: string;
@@ -339,6 +340,15 @@ function CourseCard({
                     {course.courseCode}
                   </p>
                 ) : null}
+                <p className="mt-1 flex flex-wrap gap-x-2 text-[11px] font-medium text-surface-500 dark:text-surface-400">
+                  <span>{course.credits} ساعات</span>
+                  <span aria-hidden="true">·</span>
+                  <span>
+                    {course.deliveryMode === "online"
+                      ? "أونلاين"
+                      : "وجاهي"}
+                  </span>
+                </p>
               </div>
             </div>
           </div>

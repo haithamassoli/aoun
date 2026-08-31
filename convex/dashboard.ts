@@ -9,6 +9,8 @@ import {
   isNotDeleted,
 } from "./helpers";
 
+const deliveryMode = v.union(v.literal("in_person"), v.literal("online"));
+
 const socialLinks = v.object({
   instagram: v.optional(v.string()),
   facebook: v.optional(v.string()),
@@ -37,6 +39,7 @@ const courseWithResourceCount = v.object({
   name: v.string(),
   slug: v.string(),
   credits: v.number(),
+  deliveryMode,
   courseCode: v.optional(v.string()),
   semesterId: v.optional(v.id("semesters")),
   semester: v.optional(v.string()),
@@ -441,6 +444,7 @@ export const getCoursesForMajor = query({
           name: course.name,
           slug: course.slug,
           credits: course.credits,
+          deliveryMode: course.deliveryMode ?? "in_person",
           courseCode: course.courseCode,
           semesterId: activeSemester?._id,
           semester: course.semester,
@@ -827,6 +831,7 @@ export const adminListCourses = query({
       name: v.string(),
       slug: v.string(),
       credits: v.number(),
+      deliveryMode,
       courseCode: v.optional(v.string()),
       semesterId: v.optional(v.id("semesters")),
       semester: v.optional(v.string()),
@@ -860,6 +865,7 @@ export const adminListCourses = query({
           name: course.name,
           slug: course.slug,
           credits: course.credits,
+          deliveryMode: course.deliveryMode ?? "in_person",
           courseCode: course.courseCode,
           semesterId: activeSemester?._id,
           semester: course.semester,
