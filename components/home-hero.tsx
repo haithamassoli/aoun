@@ -1,254 +1,66 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useReducedMotion,
-  useMotionValueEvent,
-} from "motion/react";
+import styles from "./home-hero.module.css";
+
 export function HomeHero({ visitorsTotal }: { visitorsTotal: number | null }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const prefersReducedMotion = useReducedMotion();
-  const [isHovered, setIsHovered] = useState(false);
-  // Smooth out the mouse movement
-  const springConfig = { damping: 25, stiffness: 150 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
-  useMotionValueEvent(smoothX, "change", (latest) => {
-    if (containerRef.current) {
-      containerRef.current.style.setProperty("--mouse-x", `${latest}px`);
-    }
-  });
-  useMotionValueEvent(smoothY, "change", (latest) => {
-    if (containerRef.current) {
-      containerRef.current.style.setProperty("--mouse-y", `${latest}px`);
-    }
-  });
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      const { left, top } = containerRef.current.getBoundingClientRect();
-      mouseX.set(e.clientX - left);
-      mouseY.set(e.clientY - top);
-    };
-    const handleMouseEnter = () => setIsHovered(true);
-    const handleMouseLeave = () => setIsHovered(false);
-    const container = containerRef.current;
-    if (container && !prefersReducedMotion) {
-      container.addEventListener("mousemove", handleMouseMove);
-      container.addEventListener("mouseenter", handleMouseEnter);
-      container.addEventListener("mouseleave", handleMouseLeave);
-      return () => {
-        container.removeEventListener("mousemove", handleMouseMove);
-        container.removeEventListener("mouseenter", handleMouseEnter);
-        container.removeEventListener("mouseleave", handleMouseLeave);
-      };
-    }
-  }, [mouseX, mouseY, prefersReducedMotion]);
-  // Floating animations for abstract objects
-  const floatAnimation1 = prefersReducedMotion
-    ? {}
-    : {
-        y: ["-4%", "4%"],
-        transition: {
-          duration: 4,
-          repeat: Infinity,
-          repeatType: "reverse" as const,
-          ease: "easeInOut" as const,
-        },
-      };
-  const floatAnimation2 = prefersReducedMotion
-    ? {}
-    : {
-        y: ["4%", "-4%"],
-        rotate: [0, 2, -1, 0],
-        transition: {
-          duration: 5,
-          repeat: Infinity,
-          repeatType: "reverse" as const,
-          ease: "easeInOut" as const,
-        },
-      };
-  const floatAnimation3 = prefersReducedMotion
-    ? {}
-    : {
-        y: ["-2%", "3%"],
-        x: ["-1%", "1%"],
-        transition: {
-          duration: 6,
-          repeat: Infinity,
-          repeatType: "reverse" as const,
-          ease: "easeInOut" as const,
-        },
-      };
   return (
-    <section
-      ref={containerRef}
-      className="relative overflow-hidden bg-surface-50 px-4 py-24 text-surface-900 dark:bg-[#020617] dark:text-white sm:px-6 sm:py-32 lg:px-8 border-b border-surface-200/50 dark:border-surface-800/50"
-    >
-      {/* --- Base Background & Grid --- */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.1)_0%,transparent_70%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.15)_0%,transparent_70%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('/assets/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-5 dark:opacity-10 pointer-events-none" />
-      {/* --- Spotlight Layer --- */}
-      {!prefersReducedMotion && (
-        <div
-          className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-500"
-          style={{ opacity: isHovered ? 1 : 0 }}
-        >
-          {/* We use CSS variables for the actual spotlight mask, so we don't trigger React renders */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(96, 165, 250, 0.12), transparent 40%)`,
-            }}
-          />
+    <section className={`${styles.hero} relative overflow-hidden border-b border-surface-200/60 bg-surface-50 px-4 py-12 text-surface-900 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-50 sm:px-6 sm:py-16`}>
+      <div className="relative mx-auto max-w-3xl text-center">
+        <div className="mx-auto mb-6 w-64 text-primary-600 dark:text-primary-400 sm:w-80" aria-hidden="true">
+          <svg viewBox="0 0 360 190" fill="none" className="block w-full" focusable="false" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <ellipse cx="174" cy="169" rx="98" ry="8" fill="currentColor" opacity=".06" stroke="none" />
+            <path className={styles.trail} d="M88 88C34 83 27 37 64 32C111 25 110 85 162 65S233 11 285 43" strokeDasharray="4 7" opacity=".35" />
+            <g className={styles.book}>
+              <path d="M76 98Q125 78 174 103Q223 78 272 98L267 155Q218 140 174 163Q130 140 81 155Z" fill="currentColor" fillOpacity=".12" />
+              <path d="M85 87Q134 75 174 99Q214 75 263 87V146Q213 135 174 158Q135 135 85 146Z" className={styles.paper} />
+              <path d="M174 100V157" opacity=".5" />
+              <g opacity=".4">
+                <path d="M99 105Q127 101 154 113M99 118Q127 114 154 126M99 131Q119 128 138 134" />
+                <path d="M194 113Q222 101 249 105M194 126Q222 114 249 118M210 134Q230 128 249 131" />
+              </g>
+              <path className={styles.page} d="M174 99Q197 66 239 65L250 124Q205 130 174 158Z" fill="currentColor" fillOpacity=".08" />
+              <path d="M222 139V158L215 153L208 164V143" fill="currentColor" stroke="none" />
+            </g>
+            <g className={styles.note}>
+              <rect x="51" y="58" width="37" height="46" rx="5" className={styles.paper} />
+              <path d="M60 70H78M60 78H73" opacity=".4" />
+              <path className={styles.check} pathLength="1" d="M61 89L66 94L77 84" />
+            </g>
+            <g className={styles.plane}>
+              <path d="M279 45L326 24L306 71L298 51Z" className={styles.paper} />
+              <path d="M298 51L326 24M298 51L296 64L303 59" />
+              <path d="M279 45L298 51L326 24Z" fill="currentColor" fillOpacity=".12" />
+            </g>
+            <g className={styles.spark} opacity=".6">
+              <path d="M121 34V46M115 40H127M292 106V116M287 111H297" />
+              <circle cx="39" cy="125" r="3" />
+              <circle cx="246" cy="30" r="2" fill="currentColor" stroke="none" />
+            </g>
+          </svg>
         </div>
-      )}
-      {/* --- Floating Abstract UI Elements --- */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        {/* Left Floating Card */}
-        <motion.div
-          animate={floatAnimation1}
-          className="absolute -left-12 top-20 hidden w-64 rounded-2xl border border-surface-200/40 bg-white/30 p-6 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-white/5 sm:block md:left-4 lg:left-[10%]"
-        >
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary-100/50 dark:bg-primary-900/50">
-              <svg
-                className="size-5 text-primary-600 dark:text-primary-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <div className="h-4 w-24 rounded-full bg-surface-200/50 dark:bg-surface-700/50" />
-          </div>
-          <div className="space-y-2">
-            <div className="h-2.5 w-full rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
-            <div className="h-2.5 w-4/5 rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
-            <div className="h-2.5 w-full rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
-          </div>
-        </motion.div>
-        {/* Right Floating Card */}
-        <motion.div
-          animate={floatAnimation2}
-          className="absolute -right-8 bottom-32 hidden w-56 rounded-2xl border border-surface-200/40 bg-white/30 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-white/5 sm:block md:right-8 lg:right-[15%]"
-        >
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-100/50 dark:bg-emerald-900/50">
-              <svg
-                className="size-4 text-emerald-600 dark:text-emerald-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="h-3 w-16 rounded-full bg-surface-200/50 dark:bg-surface-700/50" />
-          </div>
-          <div className="mt-6 flex items-center justify-between">
-            <div className="h-8 w-8 rounded-full bg-surface-200/40 dark:bg-surface-700/40" />
-            <div className="h-2 w-20 rounded-full bg-primary-200/50 dark:bg-primary-800/50" />
-          </div>
-        </motion.div>
-        {/* Center Top Glowing Node */}
-        <motion.div
-          animate={floatAnimation3}
-          className="absolute left-[60%] top-[10%] hidden size-32 rounded-full bg-primary-400/10 blur-3xl dark:bg-primary-600/20 md:block"
-        />
-      </div>
-      {/* --- Main Content --- */}
-      <div className="relative z-20 mx-auto max-w-4xl text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8 inline-flex items-center justify-center gap-2 rounded-full border border-primary-500/20 bg-primary-50/50 px-4 py-1.5 text-sm font-medium text-primary-600 backdrop-blur-md dark:border-primary-400/20 dark:bg-primary-950/30 dark:text-primary-300"
-        >
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75"></span>
-            <span className="relative inline-flex size-2 rounded-full bg-primary-500"></span>
-          </span>
+        <p className={`${styles.reveal} text-sm font-medium text-primary-600 dark:text-primary-400`}>
           المنصة الأكاديمية الأولــى
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl"
-        >
-          <span className="bg-gradient-to-br from-surface-900 to-surface-500 bg-clip-text text-transparent dark:from-white dark:to-surface-400">
+        </p>
+        <h1 className={`${styles.reveal} ${styles.title} mt-4 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl`}>
+          <span className="relative inline-block pb-4">
             عـــــون
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 200 16" fill="none" className="absolute bottom-0 left-0 w-full text-primary-500/60">
+              <path className={styles.underline} pathLength="1" d="M5 11Q80 0 195 7M43 14Q109 7 167 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+            </svg>
           </span>
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-surface-600 dark:text-surface-300 sm:text-xl"
-        >
-          منصة مجانية تجمع الملخصات، الامتحانات، والمصـادر الأكاديمية لطلاب
-          الجامعات الأردنية
-        </motion.p>
-        {/* <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-4 text-base font-medium text-primary-600 dark:text-primary-400"
-        >
-          اختر جامعتك وابدأ بتصفح المواد
-        </motion.p> */}
+        </h1>
+        <p className={`${styles.reveal} ${styles.description} mx-auto mt-5 max-w-xl text-lg leading-relaxed text-surface-600 dark:text-surface-300 sm:text-xl`}>
+          منصة مجانية تجمع الملخصات، الامتحانات، والمصـادر الأكاديمية لطلاب الجامعات الأردنية
+        </p>
+        <a href="#universities" className={`${styles.reveal} ${styles.action} mt-7 inline-flex min-h-11 items-center gap-3 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-500 dark:bg-primary-500 dark:hover:bg-primary-600`}>
+          اختر جامعتك وابدأ
+          <svg aria-hidden="true" focusable="false" className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 4V20M6 14L12 20L18 14" />
+          </svg>
+        </a>
         {visitorsTotal !== null && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{
-              duration: 0.6,
-              delay: 0.4,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="mx-auto mt-10 inline-flex items-center gap-3 rounded-2xl border border-surface-200/50 bg-white/40 px-5 py-3 text-sm font-medium text-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:scale-105 hover:bg-white/60 backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:text-white dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:hover:bg-white/10"
-          >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400">
-              <svg
-                className="size-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 20h5V18a4 4 0 00-5-3.874M17 20H7m10 0v-2c0-.653-.157-1.269-.436-1.813M7 20H2V18a4 4 0 015-3.874M7 20v-2c0-.653.157-1.269.436-1.813m0 0a5.002 5.002 0 019.128 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-            </span>
-            <div className="ml-1 flex flex-col items-start text-left">
-              <span className="text-xs text-surface-500 dark:text-surface-400">
-                إجمـالي الزوار
-              </span>
-              <span className="mt-0.5 text-base font-bold leading-none tabular-nums">
-                {visitorsTotal.toLocaleString()}
-              </span>
-            </div>
-          </motion.div>
+          <p className={`${styles.reveal} ${styles.visitors} mt-5 text-xs text-surface-500 dark:text-surface-400`}>
+            <span className="font-semibold tabular-nums text-surface-700 dark:text-surface-200">{visitorsTotal.toLocaleString()}</span>
+            {" "}إجمـالي الزوار
+          </p>
         )}
       </div>
     </section>

@@ -1,0 +1,73 @@
+.hero {
+  --hero-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.paper {
+  fill: var(--color-surface-50);
+}
+
+:global(.dark) .paper {
+  fill: var(--color-surface-950);
+}
+
+.action svg {
+  transition: transform 200ms var(--hero-ease);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: arrive 650ms var(--hero-ease) both;
+  }
+  .title { animation-delay: 80ms; }
+  .description { animation-delay: 160ms; }
+  .action { animation-delay: 240ms; }
+  .visitors { animation-delay: 320ms; }
+
+  .book { animation: arrive 900ms var(--hero-ease) both; }
+  .page {
+    transform-origin: 174px 128px;
+    animation: turn-page 1800ms var(--hero-ease) 200ms both;
+  }
+  .note { animation: note-in 1000ms var(--hero-ease) 250ms both; }
+  .plane { animation: take-flight 2200ms var(--hero-ease) 150ms both; }
+  .trail { --settled-opacity: .35; animation: arrive 1400ms var(--hero-ease) 450ms both; }
+  .spark {
+    --settled-opacity: .6;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: arrive 1000ms var(--hero-ease) 600ms both;
+  }
+  .underline, .check {
+    stroke-dasharray: 1;
+    animation: draw 1000ms var(--hero-ease) 600ms both;
+  }
+  .action:is(:hover, :focus-visible) svg { transform: translateY(3px); }
+  .action:active { scale: .98; }
+}
+
+@keyframes arrive {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: var(--settled-opacity, 1); transform: translateY(0); }
+}
+
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes turn-page {
+  from { transform: skewY(12deg) scaleX(.12); opacity: 0; }
+  to { transform: skewY(0) scaleX(1); opacity: 1; }
+}
+
+@keyframes note-in {
+  from { opacity: 0; transform: translate(20px, 24px) rotate(-8deg); }
+  to { opacity: 1; transform: translate(0, 0) rotate(0); }
+}
+
+@keyframes take-flight {
+  0% { opacity: 0; transform: translate(-130px, 65px); }
+  20% { opacity: 1; }
+  65% { transform: translate(-14px, -9px); }
+  100% { opacity: 1; transform: translate(0, 0); }
+}
