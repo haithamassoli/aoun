@@ -1,0 +1,1219 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>عون — Motion Reel</title>
+<style>
+@font-face{font-family:T;font-weight:300;src:url(/fonts/thmanyahsans-Light.woff2) format("woff2")}
+@font-face{font-family:T;font-weight:400;src:url(/fonts/thmanyahsans-Regular.woff2) format("woff2")}
+@font-face{font-family:T;font-weight:500;src:url(/fonts/thmanyahsans-Medium.woff2) format("woff2")}
+@font-face{font-family:T;font-weight:700;src:url(/fonts/thmanyahsans-Bold.woff2) format("woff2")}
+@font-face{font-family:T;font-weight:900;src:url(/fonts/thmanyahsans-Black.woff2) format("woff2")}
+:root{--p50:#eff6ff;--p100:#dbeafe;--p200:#bfdbfe;--p300:#93c5fd;--p400:#60a5fa;--p500:#3b82f6;--p600:#2563eb;--p700:#1d4ed8;--p800:#1e40af;--p950:#172554;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s700:#334155;--s800:#1e293b;--s900:#0f172a;--s950:#020617;--mono:"SF Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;overflow:hidden;width:100%;height:100%}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:var(--s950);color:#fff;font-family:T,system-ui,sans-serif;transform-origin:0 0;-webkit-font-smoothing:antialiased}
+.scene,.bw{position:absolute;inset:0;overflow:hidden;display:none}
+.fill{position:absolute;inset:0}
+.pt{position:absolute;left:0;top:0}
+.a{position:absolute}
+.nw{white-space:nowrap}
+.salt{font-feature-settings:"salt" 1}
+.ib{display:inline-block}
+.num{font-variant-numeric:tabular-nums;direction:ltr}
+.mono{font-family:var(--mono);direction:ltr;letter-spacing:.26em;white-space:pre;font-size:17px;font-weight:500}
+svg{display:block;overflow:visible}
+.bg-light{background:radial-gradient(ellipse 75% 60% at 50% -12%,rgba(191,219,254,.95),transparent 70%),linear-gradient(180deg,#fdfeff,var(--s50))}
+.bg-dark{background:radial-gradient(ellipse 75% 60% at 50% -12%,rgba(30,64,175,.5),transparent 70%),linear-gradient(180deg,#06102a,var(--s950))}
+.grid{background-image:linear-gradient(rgba(148,163,184,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.14) 1px,transparent 1px);background-size:80px 80px;background-position:0 60px}
+.dots{background-image:radial-gradient(rgba(148,163,184,.32) 1.3px,transparent 1.7px);background-size:40px 40px;background-position:0 20px}
+.fade-grid{-webkit-mask-image:radial-gradient(ellipse 60% 70% at 35% 50%,#000,transparent);mask-image:radial-gradient(ellipse 60% 70% at 35% 50%,#000,transparent)}
+
+/* shared UI */
+.card{position:absolute;background:#fff;border:1px solid var(--s200);border-radius:30px;color:var(--s900);box-shadow:0 60px 110px -60px rgba(15,23,42,.5),0 20px 40px -28px rgba(15,23,42,.3),inset 0 1px 0 #fff}
+.chip{display:inline-flex;align-items:center;padding:8px 22px 11px;border-radius:999px;font-size:24px;font-weight:700;background:var(--p50);color:var(--p700);border:1px solid var(--p100)}
+.dark .chip{background:rgba(37,99,235,.16);color:var(--p300);border-color:rgba(96,165,250,.28)}
+.ttl{display:flex;flex-direction:column;align-items:flex-start;width:660px}
+.ttl h2{margin-top:22px;font-size:112px;line-height:1.08;font-weight:900;color:var(--s900);font-feature-settings:"salt" 1;white-space:nowrap}
+.ttl p{margin-top:24px;font-size:34px;line-height:1.55;color:var(--s500);max-width:600px}
+.dark .ttl h2{color:#fff}.dark .ttl p{color:var(--s400)}
+
+/* A */
+.ring{position:absolute;left:0;top:0;border-radius:50%;border:2px solid rgba(147,197,253,.9)}
+.pa{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;background:var(--p300);box-shadow:0 0 14px 2px rgba(96,165,250,.8)}
+#dot{width:34px;height:34px;border-radius:50%;background:#fafbfd}
+
+/* B */
+.w{font-size:300px;font-weight:900;line-height:1.3}
+.msk{overflow:hidden;padding:0 80px}
+.echo{font-size:760px;font-weight:900;line-height:1;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.13)}
+.stroke{color:transparent;-webkit-text-stroke:3px var(--p400)}
+.lab{font-size:20px;opacity:.85}
+.kash{display:inline-block;position:relative;height:0;vertical-align:baseline}
+.kash i{position:absolute;left:-5px;right:-5px;background:currentColor}
+
+/* C */
+#cDrum{perspective:1500px;perspective-origin:960px 590px}
+.ci{font-size:136px;font-weight:900;white-space:nowrap;backface-visibility:hidden}
+.ci.fin{background:linear-gradient(90deg,#c4b5fd,#60a5fa 45%,#bfdbfe);-webkit-background-clip:text;background-clip:text;color:transparent}
+#cHi{height:38px;background:var(--p600);border-radius:4px}
+
+/* D */
+#dPanel{width:1000px;height:840px}
+.search{position:absolute;left:36px;top:104px;width:928px;height:86px;border-radius:24px;border:2px solid var(--s200);background:#fff;display:flex;align-items:center;gap:18px;padding:0 28px;font-size:34px;font-weight:500;color:var(--s900)}
+.search svg{color:var(--s400);flex:none}
+#dPh{color:var(--s400)}
+#dCaret{display:inline-block;width:3px;height:42px;background:var(--p600);border-radius:2px;margin-right:-12px}
+.fp{display:inline-block;padding:7px 22px 10px;border-radius:999px;font-size:22px;font-weight:700;border:1px solid var(--s200);color:var(--s600);background:#fff;margin-left:12px}
+.fp.on{background:var(--s900);border-color:var(--s900);color:#fff}
+.rc{position:absolute;left:36px;width:928px;height:118px;border-radius:22px;border:1px solid var(--s200);background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 30px;overflow:hidden;box-shadow:0 12px 26px -22px rgba(15,23,42,.35)}
+.rct{font-size:31px;font-weight:800;color:var(--s900)}
+.rcs{margin-top:6px;font-size:21px;color:var(--s500);display:flex;align-items:center;gap:10px}
+mark{background:var(--p100);color:var(--p800);border-radius:8px;padding:0 6px}
+.dm{padding:2px 12px 5px;border-radius:999px;font-size:19px;font-weight:700}
+.dm.in{background:#ecfdf5;color:#047857}.dm.on{background:#f5f3ff;color:#6d28d9}
+.rcl{display:flex;align-items:center;gap:16px;color:var(--s400)}
+.cnt{padding:6px 16px 9px;border-radius:999px;background:var(--s100);color:var(--s600);font-size:20px;font-weight:700}
+.rip{position:absolute;border-radius:50%;background:var(--p100);pointer-events:none}
+.sk{position:absolute;left:36px;width:928px;height:118px;border-radius:22px;border:1px solid var(--s100);background:linear-gradient(100deg,var(--s50) 30%,#fff 50%,var(--s50) 70%) 0 0/300% 100%}
+.sk i{position:absolute;right:30px;height:16px;border-radius:9px;background:var(--s200)}
+.rc>div{position:relative;z-index:1}
+#dMorph{border-radius:22px;border:1px solid var(--p300);background:#fff;box-shadow:0 24px 50px -30px rgba(37,99,235,.5)}
+#dCourse{left:36px;top:100px;width:928px;height:704px}
+.mc{display:inline-block;padding:6px 18px 9px;border-radius:999px;background:var(--s100);color:var(--s700);font-size:21px;font-weight:700;margin-left:10px}
+.tile{position:absolute;width:272px;height:172px;border-radius:24px;border:1px solid var(--s200);background:linear-gradient(180deg,#fff,var(--s50))}
+.tile .ti{position:absolute;right:22px;top:22px;width:60px;height:60px;border-radius:18px;display:grid;place-items:center}
+.tile b{position:absolute;right:24px;bottom:54px;font-size:28px;font-weight:800;color:var(--s900)}
+.tile span{position:absolute;right:24px;bottom:22px;font-size:20px;color:var(--s500)}
+.bm{position:absolute;left:32px;top:74px;width:70px;height:70px;border-radius:20px;border:1px solid var(--s200);display:grid;place-items:center;color:var(--s600)}
+.burst{position:absolute;left:35px;top:35px;width:3px;height:12px;margin:-6px 0 0 -1.5px;border-radius:2px;background:var(--p500)}
+
+/* E1 */
+.gc{display:flex;align-items:center;gap:16px;padding:12px 16px 12px 28px;border-radius:999px;background:#fff;border:1px solid var(--s200);box-shadow:0 24px 44px -26px rgba(15,23,42,.4);white-space:nowrap}
+.gc i{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:25px;font-weight:900;direction:ltr}
+.gc b{font-size:25px;font-weight:800;color:var(--s800)}
+.gc span{font-size:20px;color:var(--s400)}
+#e1N{font-size:156px;font-weight:900;color:var(--s900);line-height:1}
+#e1L{font-size:30px;color:var(--s500);font-weight:500}
+#e1M{padding:6px 20px 9px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:22px;font-weight:700}
+.spk{position:absolute;left:0;top:0;width:13px;height:13px;border-radius:50%}
+
+/* E2 */
+.wd{position:absolute;text-align:center;font-size:20px;font-weight:700;color:var(--s400)}
+.cell{position:absolute;border-radius:16px;background:var(--s50);border:1px solid var(--s200)}
+.dn{position:absolute;right:14px;top:9px;font-size:24px;font-weight:700;color:var(--s700)}
+.cell.dim .dn{color:var(--s300)}
+.cell.today .dn{right:8px;top:7px;width:42px;height:42px;border-radius:50%;background:var(--p600);color:#fff;display:grid;place-items:center;padding-bottom:3px}
+.ev{position:absolute;right:8px;left:8px;bottom:9px;border-radius:10px;padding:4px 6px 7px;font-size:17px;font-weight:800;white-space:nowrap;text-align:center;transform-origin:100% 50%}
+.sky{background:#e0f2fe;color:#0369a1}.vio{background:#ede9fe;color:#6d28d9}.rose{background:#ffe4e6;color:#be123c}.emr{background:#d1fae5;color:#047857}.amb{background:#fef3c7;color:#b45309}
+#e2Tg{display:flex;align-items:center;gap:14px;padding:16px 30px 19px;border-radius:999px;background:#fff;border:1px solid var(--s200);box-shadow:0 20px 40px -24px rgba(15,23,42,.4);font-size:26px;font-weight:800;color:var(--s800);white-space:nowrap}
+#e2Tg .ic{position:relative;width:34px;height:34px}
+#e2Tg .ic svg{position:absolute;inset:0}
+
+/* E3 */
+.rd{position:absolute;left:0;top:0;border-radius:2px;background:linear-gradient(180deg,transparent,rgba(147,197,253,.95))}
+.od{display:inline-block;height:150px;overflow:hidden;width:92px;text-align:center}
+.od span{display:block;height:150px}
+#e3D{display:flex;direction:ltr;font-size:150px;font-weight:800;line-height:150px;height:150px;color:#fff}
+#e3M{width:900px;height:190px;border-radius:30px;background:rgba(15,23,42,.72);border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 80px -40px rgba(0,0,0,.8)}
+.mx{position:absolute;display:flex;align-items:center;gap:16px;width:390px}
+.mxi{width:50px;height:50px;border-radius:16px;background:rgba(96,165,250,.14);color:var(--p300);display:grid;place-items:center;flex:none}
+.mxl{font-size:25px;font-weight:700;width:76px;color:var(--s200)}
+.mxt{position:relative;width:170px;height:8px;border-radius:9px;background:rgba(255,255,255,.1)}
+.mxf{position:absolute;right:0;top:0;bottom:0;border-radius:9px;background:linear-gradient(270deg,var(--p400),#a78bfa)}
+.mxk{position:absolute;top:-8px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 0 16px rgba(147,197,253,.8)}
+.eq{display:flex;align-items:flex-end;gap:4px;height:26px;margin-right:8px}
+.eq i{width:5px;border-radius:3px;background:var(--p400)}
+
+/* F */
+#fPlane{transform-style:preserve-3d;transform-origin:0 0}
+.ft{position:absolute;left:0;top:0;width:480px;height:270px;border-radius:14px;overflow:hidden;background:var(--s900);box-shadow:0 40px 80px -30px rgba(0,0,0,.7);outline:1px solid rgba(255,255,255,.1)}
+.ft>section{position:absolute;inset:auto;left:0;top:0;width:1920px;height:1080px;transform:scale(.25);transform-origin:0 0}
+.fl{font-size:156px;font-weight:900;line-height:1.2;text-shadow:0 12px 70px rgba(2,6,23,.9)}
+#fL2{background:linear-gradient(90deg,#a5b4fc,#60a5fa 50%,#e0f2fe);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 12px 50px rgba(2,6,23,.9))}
+
+/* G */
+.gb{position:absolute;left:0;top:0;border-radius:50%}
+#gTag{display:flex;gap:20px;font-size:58px;font-weight:500;color:#fff}
+#gTag span{display:inline-block}
+#gSub{font-size:32px;color:rgba(219,234,254,.75);font-weight:500}
+#gUrl{padding:14px 30px 16px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);font-size:24px;color:#fff;letter-spacing:.12em}
+#gSweep{background:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.4) 50%,transparent 58%);mix-blend-mode:overlay;width:3200px;left:-640px}
+
+/* overlays */
+.tt{position:absolute}
+#vig{background:radial-gradient(ellipse at 50% 50%,transparent 62%,rgba(2,6,23,.16) 100%)}
+#grain{opacity:.07;mix-blend-mode:overlay}
+#hud{mix-blend-mode:difference;color:#fff}
+.hk{position:absolute;width:26px;height:26px;border:0 solid rgba(255,255,255,.8)}
+#hBar{width:1180px;height:2px;background:rgba(255,255,255,.22)}
+#hBar i{position:absolute;right:auto;left:0;top:0;bottom:0;background:#fff}
+#flash{background:#fff;opacity:0}
+#fade{background:#000;opacity:0}
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- A · ignition -->
+  <section class="scene" id="A">
+    <div class="fill" id="aGlow" style="background:radial-gradient(circle at 50% 50%,rgba(37,99,235,.5),rgba(37,99,235,.1) 22%,transparent 46%)"></div>
+    <div class="fill grid" id="aGrid"></div>
+    <div class="fill" id="aFx"></div>
+    <div class="pt" id="aEdge" style="width:2400px;height:2400px;border-radius:50%;border:10px solid rgba(191,219,254,.55)"></div>
+    <div class="pt" id="aFlood" style="width:2400px;height:2400px;border-radius:50%;background:var(--p600)"></div>
+  </section>
+
+  <!-- B · kinetic type -->
+  <section class="scene" id="B">
+    <div class="bw" id="b0" style="background:var(--p600)">
+      <div class="pt echo nw salt" id="b0e">ملخصات</div>
+      <div class="pt msk" id="b0m"><div class="w nw salt" id="b0w">ملخصات</div></div>
+      <div class="pt mono lab" id="b0l" data-txt="01 — SUMMARIES"></div>
+    </div>
+    <div class="bw" id="b1" style="background:#fff;color:var(--p600)">
+      <div class="fill grid" style="opacity:.7"></div>
+      <div class="pt w nw salt" id="b1w">امتحانات</div>
+      <div class="pt mono lab" id="b1l" data-txt="02 — PAST EXAMS" style="color:var(--s500)"></div>
+    </div>
+    <div class="bw" id="b2" style="background:var(--s950)">
+      <div class="pt w nw salt stroke" id="b2s">شروحات</div>
+      <div class="pt w nw salt" id="b2w">شروحات</div>
+      <div class="pt mono lab" id="b2l" data-txt="03 — EXPLAINERS"></div>
+    </div>
+    <div class="bw" id="b3" style="background:var(--p600)">
+      <div class="fill" style="perspective:1200px"><div class="pt w nw salt" id="b3w" style="transform-origin:50% 25%;font-size:250px">فيديوهات</div></div>
+      <div class="pt" id="b3i"><svg viewBox="0 0 120 120" width="150" height="150"><circle cx="60" cy="60" r="60" fill="#fff"/><path d="M49 38 L84 60 L49 82Z" fill="#2563eb"/></svg></div>
+      <div class="pt mono lab" id="b3l" data-txt="04 — VIDEOS"></div>
+    </div>
+    <div class="bw" id="b4" style="background:#fff;color:var(--s950)">
+      <div class="fill dots" style="opacity:.7"></div>
+      <div class="pt nw" id="b4pre" style="font-size:96px;font-weight:300;color:var(--p600)">وكلها</div>
+      <div class="pt w nw salt" id="b4w"><span class="ib" id="b4a">مجـ</span><span class="kash" id="b4k"><i id="b4bar"></i></span><span class="ib" id="b4b">ـاناً</span></div>
+      <div class="pt mono lab" id="b4l" data-txt="05 — FREE FOR EVERY STUDENT" style="color:var(--s500)"></div>
+    </div>
+  </section>
+
+  <!-- C · reach -->
+  <section class="scene dark" id="C">
+    <div class="fill bg-dark"></div><div class="fill dots" style="opacity:.6"></div>
+    <div class="pt nw" id="cLead" style="font-size:70px;font-weight:500;color:var(--s400)">لطلاب</div>
+    <div class="pt" id="cHi"></div>
+    <div class="fill" id="cDrum"></div>
+    <div class="pt mono lab" id="cLab" data-txt="EVERY JORDANIAN UNIVERSITY" style="color:var(--s400)"></div>
+  </section>
+
+  <!-- D · search → course -->
+  <section class="scene" id="D">
+    <div class="fill bg-light"></div><div class="fill grid fade-grid" style="opacity:.6"></div>
+    <div class="pt ttl" id="dT1"><span class="chip">بحث المواد</span><h2>ابحث عن<br>أي مادة</h2><p>عبر كل الجامعات الأردنية، من صفحة واحدة</p></div>
+    <div class="pt ttl" id="dT2"><span class="chip">صفحة المادة</span><h2 style="font-size:96px">كل مصادرها<br>في مكان واحد</h2><p>ملخصات، امتحانات، فيديوهات ونصائح</p></div>
+    <div class="fill" style="perspective:2400px;perspective-origin:640px 540px">
+      <div class="card pt" id="dPanel">
+        <div class="a" style="right:36px;top:30px;font-size:32px;font-weight:900;color:var(--p600)">عــون</div>
+        <div class="a" style="left:36px;top:38px;display:flex;gap:12px;align-items:center">
+          <i style="width:34px;height:34px;border-radius:50%;background:var(--p100)"></i><i style="width:90px;height:14px;border-radius:9px;background:var(--s100)"></i><i style="width:70px;height:14px;border-radius:9px;background:var(--s100)"></i><i style="width:110px;height:14px;border-radius:9px;background:var(--s100)"></i>
+        </div>
+        <div class="search" id="dSearch"><span id="dSi"></span><span id="dQ"></span><i id="dCaret"></i><span id="dPh">ابحث عن مادة أو جامعة…</span></div>
+        <div class="a" id="dChips" style="right:36px;top:212px"><span class="fp on">الكل</span><span class="fp">وجاهي</span><span class="fp">أونلاين</span><span class="fp">3 ساعات</span></div>
+        <div class="pt" id="dMorph"></div>
+        <div id="dRes"></div>
+        <div class="a" id="dCourse"></div>
+        <div class="pt" id="dCur"></div>
+      </div>
+    </div>
+    <div class="fill" id="dOver" style="background:var(--p600)"></div>
+  </section>
+
+  <!-- E1 · GPA -->
+  <section class="scene" id="E1">
+    <div class="fill bg-light"></div><div class="fill dots fade-grid" style="opacity:.9"></div>
+    <div class="pt ttl" id="e1T"><span class="chip">حاسبة المعدل</span><h2>احسب<br>معدلك</h2><p>الفصلي والتراكمي، وتُحفظ النتائج على جهازك</p></div>
+    <svg class="pt" id="e1G" width="640" height="640" viewBox="-320 -320 640 640" style="filter:drop-shadow(0 40px 60px rgba(37,99,235,.18))">
+      <circle r="262" fill="#fff" stroke="var(--s200)" stroke-width="1"/>
+      <g id="e1Tk"></g>
+      <circle id="e1Trk" r="222" fill="none" stroke="var(--s100)" stroke-width="30" transform="rotate(-90)"/>
+      <circle id="e1Arc" r="222" fill="none" stroke="url(#gArc)" stroke-width="30" stroke-linecap="round" transform="rotate(-90)"/>
+    </svg>
+    <div class="pt num" id="e1N">0.00</div>
+    <div class="pt nw" id="e1L">المعدل التراكمي</div>
+    <div class="pt nw" id="e1M">4 مواد · 12 ساعة</div>
+    <div class="fill" id="e1Fx"></div>
+  </section>
+
+  <!-- E2 · planner -->
+  <section class="scene" id="E2">
+    <div class="fill bg-light"></div><div class="fill grid fade-grid" style="opacity:.5"></div>
+    <div class="pt ttl" id="e2T"><span class="chip">التقويم</span><h2>نظّم<br>فصلك</h2><p>الاختبارات والمشاريع ومواعيد التسجيل في مكان واحد</p></div>
+    <div class="card" id="e2C" style="left:110px;top:150px;width:1000px;height:790px">
+      <div class="a" style="right:36px;top:26px;font-size:40px;font-weight:900">أكتوبر 2026</div>
+      <div class="a" id="e2Nav" style="left:36px;top:30px;display:flex;gap:10px"></div>
+    </div>
+    <div class="card pt" id="e2N" style="width:470px;height:140px;border-radius:26px">
+      <div class="a" style="right:28px;top:26px;font-size:20px;color:var(--s500);font-weight:600">الحدث القادم</div>
+      <div class="a nw" style="right:28px;top:62px;font-size:27px;font-weight:800">امتحان أول · هياكل البيانات</div>
+      <div class="a" style="left:26px;top:22px;text-align:center"><div class="num" id="e2Cd" style="font-size:54px;font-weight:900;color:var(--p600);line-height:1.1">15</div><div style="font-size:19px;color:var(--s500);font-weight:600">يوماً</div></div>
+    </div>
+    <div class="pt" id="e2Tg"><span class="ic" id="e2Ic"></span><span>الوضع الليلي</span></div>
+    <div class="pt" id="e2Cur"></div>
+  </section>
+
+  <!-- E3 · focus -->
+  <section class="scene dark" id="E3">
+    <div class="fill bg-dark"></div>
+    <div class="pt" id="e3Bk1" style="width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,.28),transparent 65%)"></div>
+    <div class="pt" id="e3Bk2" style="width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.2),transparent 65%)"></div>
+    <div class="fill" id="e3Rain"></div>
+    <div class="pt ttl" id="e3T"><span class="chip">التركيز</span><h2>ركّز<br>أكثر</h2><p>مؤقت بومودورو وأصوات المطر والطبيعة للمذاكرة</p></div>
+    <svg class="pt" id="e3R" width="640" height="640" viewBox="-320 -320 640 640" style="filter:drop-shadow(0 0 30px rgba(96,165,250,.35))">
+      <g id="e3Tk"></g>
+      <circle r="230" fill="rgba(15,23,42,.72)" stroke="rgba(255,255,255,.08)" stroke-width="14"/>
+      <circle id="e3Arc" r="230" fill="none" stroke="url(#gArc2)" stroke-width="14" stroke-linecap="round" transform="rotate(-90)"/>
+    </svg>
+    <div class="pt" id="e3D"></div>
+    <div class="pt nw" id="e3S" style="font-size:27px;color:var(--s400);font-weight:600">جلسة تركيز · 1 من 4</div>
+    <div class="pt" id="e3M"></div>
+  </section>
+
+  <!-- F · the system -->
+  <section class="scene" id="F">
+    <div class="fill" style="background:radial-gradient(ellipse at 50% 50%,#0c1c44,var(--s950) 72%)"></div>
+    <div class="fill" style="perspective:2600px;perspective-origin:960px 540px"><div class="pt" id="fPlane"></div></div>
+    <div class="fill" id="fScrim" style="background:radial-gradient(ellipse 50% 38% at 50% 50%,rgba(2,6,23,.88),transparent)"></div>
+    <div class="pt nw salt fl" id="fL1">كل ما تحتاجه</div>
+    <div class="pt nw salt fl" id="fL2">في مكان واحد</div>
+  </section>
+
+  <!-- G · resolve -->
+  <section class="scene" id="G">
+    <div class="fill" style="background:var(--s950)"></div>
+    <div class="pt" id="gFlood" style="width:2700px;height:2700px;border-radius:50%;background:radial-gradient(circle at 50% 50%,#1f66f7 0%,#0a52df 24%,#024cd8 40%,#03389f 68%,#062266 100%)"></div>
+    <div class="fill" id="gBk"></div>
+    <div class="pt" id="gLogoW"><svg id="gLogo"></svg></div>
+    <div class="pt nw" id="gTag"></div>
+    <div class="pt nw" id="gSub">ملخصات · امتحانات · شروحات · فيديوهات</div>
+    <div class="pt mono" id="gUrl"></div>
+    <div class="fill" id="gSweep"></div>
+  </section>
+
+  <div class="fill" id="tiles"></div>
+  <div class="pt" id="dot"></div>
+  <div class="fill" id="vig"></div>
+  <div class="fill" id="grain"></div>
+  <div class="fill" id="hud">
+    <i class="hk" style="left:40px;top:40px;border-width:2px 0 0 2px"></i>
+    <i class="hk" style="right:40px;top:40px;border-width:2px 2px 0 0"></i>
+    <i class="hk" style="left:40px;bottom:40px;border-width:0 0 2px 2px"></i>
+    <i class="hk" style="right:40px;bottom:40px;border-width:0 2px 2px 0"></i>
+    <div class="pt mono" id="hB"></div><div class="pt mono" id="hS"></div>
+    <div class="pt mono" id="hT"></div><div class="pt mono" id="hG"></div>
+    <div class="pt" id="hBar"><i id="hBarF"></i></div>
+  </div>
+  <div class="fill" id="flash"></div>
+  <div class="fill" id="fade"></div>
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="gArc" x1="-222" y1="-222" x2="222" y2="222" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#60a5fa"/><stop offset=".5" stop-color="#2563eb"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+      <linearGradient id="gArc2" x1="-230" y1="-230" x2="230" y2="230" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#93c5fd"/><stop offset=".55" stop-color="#60a5fa"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+      <filter id="hbD" x="-20%" y="0%" width="140%" height="100%"><feGaussianBlur id="hbDg" stdDeviation="0 0"/></filter>
+      <filter id="hbE" x="-20%" y="0%" width="140%" height="100%"><feGaussianBlur id="hbEg" stdDeviation="0 0"/></filter>
+    </defs>
+  </svg>
+</div>
+
+<script>
+const DUR = 26;
+const URL_TXT = 'aoun.assoli.site';
+
+/* ───────────── motion toolkit ───────────── */
+const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const E = {
+  lin: t => t,
+  inCubic: t => t * t * t,
+  outCubic: t => 1 - (1 - t) ** 3,
+  inOutCubic: t => t < .5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2,
+  outQuart: t => 1 - (1 - t) ** 4,
+  inOutQuart: t => t < .5 ? 8 * t ** 4 : 1 - (-2 * t + 2) ** 4 / 2,
+  outExpo: t => t >= 1 ? 1 : 1 - 2 ** (-10 * t),
+  inExpo: t => t <= 0 ? 0 : 2 ** (10 * t - 10),
+  inOutExpo: t => t <= 0 ? 0 : t >= 1 ? 1 : t < .5 ? 2 ** (20 * t - 10) / 2 : (2 - 2 ** (-20 * t + 10)) / 2,
+  outBack: t => 1 + 2.70158 * (t - 1) ** 3 + 1.70158 * (t - 1) ** 2,
+  inBack: t => 2.70158 * t ** 3 - 1.70158 * t ** 2,
+};
+// eased progress of t through [a, b]
+const P = (t, a, b, e = E.outExpo) => e(clamp((t - a) / (b - a)));
+// closed-form damped spring 0→1 released at time a (f = Hz, z = damping ratio)
+const spring = (t, a, f = 3, z = .45) => {
+  const x = t - a;
+  if (x <= 0) return 0;
+  const w = 2 * Math.PI * f;
+  return 1 - Math.exp(-z * w * x) * Math.cos(w * Math.sqrt(1 - z * z) * x);
+};
+// decaying impulses (beat pulses)
+const hit = (t, times, k = 9) => times.reduce((s, b) => s + (t >= b ? Math.exp(-(t - b) * k) : 0), 0);
+const rng = seed => () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+
+const $ = s => document.getElementById(s);
+const h = (tag, cls, html, parent) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
+const setText = (el, s) => { if (el.textContent !== s) el.textContent = s; };
+const mask = (el, v) => { el.style.maskImage = v; el.style.webkitMaskImage = v; };
+const blurF = b => b > .15 ? `blur(${b.toFixed(2)}px)` : '';
+// place element: (x, y) is its anchor point (default centre)
+function T(el, x, y, o = {}) {
+  let s = `translate(${x}px,${y}px)`;
+  if (o.ax !== null) s += ` translate(${o.ax ?? -50}%,${o.ay ?? -50}%)`;
+  if (o.rx) s += ` rotateX(${o.rx}deg)`;
+  if (o.ry) s += ` rotateY(${o.ry}deg)`;
+  if (o.r) s += ` rotate(${o.r}deg)`;
+  const k = o.s ?? 1;
+  if (k !== 1 || o.sx || o.sy) s += ` scale(${k * (o.sx ?? 1)},${k * (o.sy ?? 1)})`;
+  el.style.transform = s;
+  if ('op' in o) el.style.opacity = clamp(o.op);
+  if ('blur' in o) el.style.filter = blurF(o.blur);
+}
+const GL = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#/+';
+// decode-style text reveal (Latin HUD labels only — never split Arabic)
+function scramble(txt, q, t) {
+  const n = txt.length, k = Math.floor(q * n), f = Math.floor(t * 30);
+  let s = '';
+  for (let i = 0; i < n; i++) s += i < k || txt[i] === ' ' ? txt[i] : i < k + 6 && q > 0 ? GL[(f * 7 + i * 13) % GL.length] : ' ';
+  return s;
+}
+const IC = {
+  search: 'M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z',
+  doc: 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z',
+  check: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  play: 'M21 12a9 9 0 11-18 0 9 9 0 0118 0zM15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z',
+  book: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
+  bulb: 'M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18',
+  cap: 'M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342',
+  bookmark: 'M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z',
+  sun: 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z',
+  moon: 'M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z',
+  drop: 'M12 3.5c3.2 4.1 5.25 7.1 5.25 9.75a5.25 5.25 0 01-10.5 0c0-2.65 2.05-5.65 5.25-9.75z',
+  tree: 'M12 21v-6m0 0l-2.5-2.5M12 15l2.5-2.5M12 3l6.5 10h-13L12 3z',
+  cup: 'M4.5 8.25h12v4.5a5.25 5.25 0 01-5.25 5.25h-1.5A5.25 5.25 0 014.5 12.75v-4.5zm12 1.5h1.25a2.5 2.5 0 010 5H16.5M8 3.75v1.5m3.5-1.5v1.5',
+  wave: 'M2.25 9c2.4-2 4.35-2 6.5 0s4.1 2 6.5 0 4.1-2 6.5 0M2.25 15c2.4-2 4.35-2 6.5 0s4.1 2 6.5 0 4.1-2 6.5 0',
+  chevL: 'M15.75 19.5L8.25 12l7.5-7.5',
+  chevR: 'M8.25 4.5l7.5 7.5-7.5 7.5',
+};
+const icon = (n, sz = 24, sw = 1.7) => `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"><path d="${IC[n]}"/></svg>`;
+const CURSOR = '<svg width="44" height="44" viewBox="0 0 24 24"><path d="M5.5 3.21V20.8L10.11 16.19L13.11 23.35L16.29 22.1L13.29 14.94L20.01 14.94L5.5 3.21Z" fill="#007AFF" stroke="#87cefa" stroke-width="1" stroke-linejoin="round"/></svg>';
+// Arabic plural agreement for counts (3–10 plural, 11+ singular accusative)
+const count = (n, one, few, many) => n === 1 ? `${one} واحد` : n <= 10 ? `${n} ${few}` : `${n} ${many}`;
+// quadratic bezier along eased u
+const bez = (a, c, b, u) => [(1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]];
+
+/* ───────────── build ───────────── */
+const R = {}; // element refs
+const scenes = [];
+const scene = (id, from, to, draw) => scenes.push({ el: $(id), from, to, draw });
+
+// A — particles + rings
+const aParts = [], aRings = [];
+function buildA() {
+  const r = rng(11);
+  for (let i = 0; i < 3; i++) aRings.push(h('div', 'ring', null, $('aFx')));
+  for (let i = 0; i < 40; i++) aParts.push({ el: h('i', 'pa', null, $('aFx')), a: r() * Math.PI * 2, r: 420 + r() * 700, t0: r() * .5, d: .8 + r() * .5, spin: (r() < .5 ? -1 : 1) * (1 + r() * 1.5) });
+}
+
+// C — cylinder of university names
+const cItems = [];
+function buildC() {
+  ['الجامعة الأردنية', 'جامعة اليرموك', 'الجامعة الهاشمية', 'جامعة العلوم والتكنولوجيا', 'الجامعات الأردنية']
+    .forEach((n, i, a) => cItems.push(h('div', 'pt ci' + (i === a.length - 1 ? ' fin' : ''), n, $('cDrum'))));
+}
+
+// D — search results + course page
+const QRY = 'هياكل البيانات', TY0 = 8.62, TYD = .062;
+const RESULTS = [
+  ['<mark>هياكل البيانات</mark>', 'الجامعة الأردنية', 'in', 32],
+  ['<mark>هياكل البيانات</mark> والخوارزميات', 'جامعة اليرموك', 'on', 51],
+  ['<mark>هياكل البيانات</mark>', 'جامعة العلوم والتكنولوجيا', 'in', 27],
+  ['مختبر <mark>هياكل البيانات</mark>', 'الجامعة الهاشمية', 'on', 14],
+];
+const TILES = [['ملخصات', 'doc', '#dbeafe', '#2563eb', 12], ['امتحانات سابقة', 'check', '#ffe4e6', '#e11d48', 8], ['فيديوهات', 'play', '#ede9fe', '#7c3aed', 15],
+  ['شروحات ودفاتر', 'book', '#fef3c7', '#d97706', 6], ['نصائح', 'bulb', '#d1fae5', '#059669', 9], ['الكتاب المقرر', 'cap', '#e0f2fe', '#0284c7', 1]];
+const dCards = [], dTiles = [], dBurst = [], dSk = [];
+let dHead = [];
+function buildD() {
+  $('dSi').innerHTML = icon('search', 36, 2);
+  RESULTS.forEach(([title, uni, mode, n], i) => {
+    const c = h('div', 'rc', `<i class="rip"></i><div><div class="rct">${title}</div><div class="rcs">${uni}<b>·</b>3 ساعات<b>·</b><span class="dm ${mode}">${mode === 'in' ? 'وجاهي' : 'أونلاين'}</span></div></div>
+      <div class="rcl"><span class="cnt">${count(n, 'مصدر', 'مصادر', 'مصدراً')}</span>${icon('chevL', 28, 2)}</div>`, $('dRes'));
+    c.style.top = 284 + i * 132 + 'px';
+    dCards.push(c);
+  });
+  for (let i = 0; i < 4; i++) { const k = h('div', 'sk', `<i style="top:34px;width:${300 - i * 30}px"></i><i style="top:66px;width:${200 + i * 20}px;opacity:.6"></i>`, $('dRes')); k.style.top = 284 + i * 132 + 'px'; dSk.push(k); }
+  const co = $('dCourse');
+  dHead = [
+    h('div', 'a', `<span style="font-size:22px;color:var(--s500);font-weight:600;display:flex;gap:8px;align-items:center">${icon('chevR', 22, 2)} نتائج البحث</span>`, co),
+    h('div', 'a nw', 'هياكل البيانات والخوارزميات', co),
+    h('div', 'a', '<span class="mc">جامعة اليرموك</span><span class="mc">3 ساعات</span><span class="mc" style="background:#f5f3ff;color:#6d28d9">أونلاين</span>', co),
+    h('div', 'a', '', co),
+    h('div', 'a nw', `المصادر <span style="font-size:22px;color:var(--s400);font-weight:600;margin-right:8px">${count(51, 'مصدر', 'مصادر', 'مصدراً')}</span>`, co),
+  ];
+  Object.assign(dHead[0].style, { right: '32px', top: '26px' });
+  Object.assign(dHead[1].style, { right: '32px', top: '64px', fontSize: '50px', fontWeight: 900 });
+  Object.assign(dHead[2].style, { right: '32px', top: '160px' });
+  Object.assign(dHead[3].style, { right: '32px', left: '32px', top: '230px', height: '1px', background: 'var(--s200)' });
+  Object.assign(dHead[4].style, { right: '32px', top: '252px', fontSize: '28px', fontWeight: 800 });
+  TILES.forEach(([name, ic, bg, fg, n], i) => {
+    const t = h('div', 'tile', `<div class="ti" style="background:${bg};color:${fg}">${icon(ic, 32, 1.8)}</div><b>${name}</b><span>${count(n, 'ملف', 'ملفات', 'ملفاً')}</span>`, co);
+    t.style.right = 32 + (i % 3) * 292 + 'px';
+    t.style.top = 308 + Math.floor(i / 3) * 192 + 'px';
+    dTiles.push(t);
+  });
+  const bm = h('div', 'bm', `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path id="dBmP" d="${IC.bookmark}" fill="#2563eb" fill-opacity="0"/></svg>`, co);
+  R.dBm = bm;
+  for (let i = 0; i < 8; i++) dBurst.push(h('i', 'burst', null, bm));
+  $('dCur').innerHTML = CURSOR;
+  $('e2Cur').innerHTML = CURSOR;
+}
+
+// E1 — gauge ticks, grade chips, sparkles
+const GRADES = [['A', 'هياكل البيانات', '#2563eb', [300, 230]], ['A-', 'قواعد البيانات', '#7c3aed', [905, 262]], ['B+', 'شبكات الحاسوب', '#0891b2', [280, 850]], ['A', 'الذكاء الاصطناعي', '#059669', [925, 815]]];
+const GPA = [0, 4, 3.85, 3.67, 3.75]; // running average of A, A-, B+, A (equal credit hours)
+const ABS = [13.52, 13.68, 13.84, 14.0]; // absorb start times
+const e1Chips = [], e1Spk = [];
+function buildE1() {
+  let tk = '';
+  for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, r1 = i % 4 ? 248 : 244; tk += `<line x1="${Math.sin(a) * r1}" y1="${-Math.cos(a) * r1}" x2="${Math.sin(a) * 254}" y2="${-Math.cos(a) * 254}" stroke="var(--s300)" stroke-width="${i % 4 ? 1.5 : 2.5}" stroke-linecap="round"/>`; }
+  $('e1Tk').innerHTML = tk;
+  GRADES.forEach(([g, name, col]) => e1Chips.push(h('div', 'pt gc', `<i style="background:${col}">${g}</i><div><b>${name}</b><br><span>3 ساعات</span></div>`, $('e1Fx'))));
+  const r = rng(5);
+  for (let i = 0; i < 24; i++) { const s = h('i', 'spk', null, $('e1Fx')); s.style.background = ['#60a5fa', '#8b5cf6', '#fbbf24', '#34d399'][i % 4]; e1Spk.push({ el: s, a: r() * Math.PI * 2, d: 90 + r() * 170, k: .5 + r() * .8 }); }
+}
+
+// E2 — calendar
+const e2Cells = [];
+function buildE2() {
+  const C = $('e2C'), CW = 124, CH = 112, G = 10;
+  $('e2Nav').innerHTML = ['chevR', 'chevL'].map(n => `<span style="width:52px;height:52px;border-radius:50%;border:1px solid var(--s200);display:grid;place-items:center;color:var(--s500)">${icon(n, 24, 2)}</span>`).join('');
+  ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'].forEach((d, c) => { const e = h('div', 'wd', d, C); Object.assign(e.style, { right: 36 + c * (CW + G) + 'px', top: '104px', width: CW + 'px' }); });
+  const EV = { 4: ['تعويضية', 'sky'], 8: ['تسليم مشروع', 'vio'], 13: ['امتحان أول', 'rose'], 15: ['موعد السحب', 'emr'], 20: ['كويز 2', 'amb'], 27: ['امتحان ثاني', 'rose'] };
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 7; c++) {
+    const i = r * 7 + c, day = i - 3, dim = day < 1, label = dim ? 27 + i : day; // Oct 1 2026 is a Thursday
+    const ev = !dim && EV[day];
+    const el = h('div', 'cell' + (dim ? ' dim' : '') + (dim && label === 28 ? ' today' : ''), `<span class="dn">${label}</span>` + (ev ? `<span class="ev ${ev[1]}">${ev[0]}</span>` : ''), C);
+    Object.assign(el.style, { right: 36 + c * (CW + G) + 'px', top: 146 + r * (CH + G) + 'px', width: CW + 'px', height: CH + 'px' });
+    e2Cells.push({ el, r, c, ev: el.querySelector('.ev'), today: dim && label === 28 });
+  }
+  $('e2Ic').innerHTML = icon('sun', 34, 1.8) + icon('moon', 34, 1.8);
+}
+
+// E3 — rain, ring ticks, odometer, mixer
+const drops = [], odo = [], mix = [];
+function buildE3() {
+  const r = rng(21);
+  for (let i = 0; i < 160; i++) {
+    const z = r(), el = h('i', 'rd', null, $('e3Rain'));
+    Object.assign(el.style, { height: 40 + z * 120 + 'px', width: 1 + z * 1.6 + 'px', opacity: .1 + z * .38 });
+    drops.push({ el, x0: r() * 2400, y0: r() * 1500, v: 900 + z * 1700 });
+  }
+  let tk = '';
+  for (let i = 0; i < 60; i++) { const a = i / 60 * Math.PI * 2, r1 = i % 5 ? 262 : 256; tk += `<line x1="${Math.sin(a) * r1}" y1="${-Math.cos(a) * r1}" x2="${Math.sin(a) * 272}" y2="${-Math.cos(a) * 272}" stroke="#fff" stroke-opacity=".18" stroke-width="2" stroke-linecap="round"/>`; }
+  $('e3Tk').innerHTML = tk;
+  const D = $('e3D');
+  [[600, 10], [60, 10], null, [10, 6], [1, 10]].forEach(spec => {
+    if (!spec) return h('span', null, ':', D).style.cssText = 'width:50px;text-align:center;opacity:.6;margin-top:-10px';
+    const od = h('span', 'od', null, D), strip = h('div', null, [...Array(spec[1]).keys(), 0].map(n => `<span>${n}</span>`).join(''), od);
+    odo.push({ strip, B: spec[0], N: spec[1] });
+  });
+  [['مطر', 'drop', .82], ['غابة', 'tree', .46], ['مقهى', 'cup', .3], ['أمواج', 'wave', .62]].forEach(([n, ic, v], i) => {
+    const row = h('div', 'mx', `<span class="mxi">${icon(ic, 26, 1.8)}</span><span class="mxl">${n}</span><span class="mxt"><i class="mxf"></i><i class="mxk"></i></span><span class="eq"><i></i><i></i><i></i><i></i></span>`, $('e3M'));
+    Object.assign(row.style, { right: (i % 2 ? 470 : 40) + 'px', top: (i < 2 ? 32 : 108) + 'px' });
+    mix.push({ v, f: row.querySelector('.mxf'), k: row.querySelector('.mxk'), eq: [...row.querySelectorAll('.eq i')] });
+  });
+}
+
+// E1→E2 tile wipe
+const tt = [];
+function buildTiles() {
+  const W = 160, H = 1080 / 7;
+  for (let r = 0; r < 7; r++) for (let c = 0; c < 12; c++) {
+    const el = h('div', 'tt', null, $('tiles'));
+    Object.assign(el.style, { left: c * W + 'px', top: r * H + 'px', width: W + 1 + 'px', height: H + 1 + 'px', background: (r + c) % 2 ? '#2563eb' : '#2a68ee' });
+    tt.push({ el, d: ((11 - c) + r) * .018 });
+  }
+}
+
+// G — logo from the real app icon, tagline, bokeh
+const LG = {};
+const gBk = [];
+async function buildG() {
+  const src = new DOMParser().parseFromString(await (await fetch('/public/icon.svg')).text(), 'image/svg+xml');
+  const [, body, nun, counter, sw1, sw2, dotP] = [...src.querySelectorAll('path')];
+  const p = (n, fill) => `<path d="${n.getAttribute('d')}" transform="${n.getAttribute('transform')}" fill="${fill ?? n.getAttribute('fill')}"/>`;
+  const svg = $('gLogo');
+  // traced icon paints the letter counter in the background colour — cut it out with a mask instead
+  svg.innerHTML = `<defs><mask id="lgCut" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024"><rect width="1024" height="1024" fill="#fff"/>${p(counter, '#000')}</mask></defs>
+    <g id="lgAll"><g mask="url(#lgCut)">${p(body, '#fff')}${p(nun, '#fff')}</g><g id="lgSw" style="transform-box:fill-box">${p(sw1)}${p(sw2)}</g></g><g id="lgDot" opacity="0">${p(dotP)}</g>`;
+  const G = $('G'); G.style.display = 'block';
+  const bb = $('lgAll').getBBox(), db = $('lgDot').getBBox();
+  const k = 880 / bb.width, pad = 12;
+  svg.setAttribute('viewBox', `${bb.x - pad} ${bb.y - pad} ${bb.width + pad * 2} ${bb.height + pad * 2}`);
+  svg.setAttribute('width', (bb.width + pad * 2) * k);
+  svg.setAttribute('height', (bb.height + pad * 2) * k);
+  Object.assign(LG, { k, cx: bb.x + bb.width / 2, cy: bb.y + bb.height / 2, h: bb.height * k, dx: db.x + db.width / 2, dy: db.y + db.height / 2, dd: Math.max(db.width, db.height) * k });
+  $('gTag').innerHTML = ['مصادر', 'أكاديمية', 'مجانية', 'للجامعات', 'الأردنية'].map(w => `<span>${w}</span>`).join('');
+  setText($('gUrl'), URL_TXT);
+  [[1650, 150, 150, 'rgba(244,114,182,.55)'], [250, 900, 110, 'rgba(191,219,254,.5)'], [110, 150, 620, 'rgba(255,255,255,.06)'], [1800, 930, 520, 'rgba(255,255,255,.05)'], [1480, 860, 36, 'rgba(255,255,255,.55)'], [420, 250, 22, 'rgba(255,255,255,.4)']]
+    .forEach(([x, y, d, c], i) => { const el = h('div', 'gb', null, $('gBk')); Object.assign(el.style, { width: d + 'px', height: d + 'px', background: c }); gBk.push({ el, x, y, i }); });
+}
+
+// HUD + grain
+function buildFx() {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const x = c.getContext('2d'), im = x.createImageData(256, 256), r = rng(3);
+  for (let i = 0; i < im.data.length; i += 4) { const v = r() * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+  x.putImageData(im, 0, 0);
+  $('grain').style.backgroundImage = `url(${c.toDataURL()})`;
+}
+
+// Measurements that depend on the loaded font
+const M = {};
+function measure() {
+  for (const s of scenes) s.el.style.display = 'block';
+  document.querySelectorAll('.bw').forEach(b => b.style.display = 'block');
+  // kashida stroke position: rasterise a tatweel and find its ink rows relative to the baseline
+  const cv = document.createElement('canvas'); cv.width = cv.height = 800;
+  const cx = cv.getContext('2d'); cx.font = '900 300px T'; cx.fillText('ـ', 200, 500);
+  const d = cx.getImageData(0, 0, 800, 800).data; let top = 1e9, bot = -1;
+  for (let y = 0; y < 800; y++) for (let i = 0; i < 800; i++) if (d[(y * 800 + i) * 4 + 3] > 127) { if (y < top) top = y; bot = y; }
+  M.kTop = top - 500; M.kH = bot - top + 1;
+  Object.assign($('b4bar').style, { top: M.kTop + 'px', height: M.kH + 'px' });
+  M.wV = $('b3w').offsetWidth;
+  M.wFin = cItems.at(-1).offsetWidth;
+  M.tgW = $('e2Tg').offsetWidth; M.tgH = $('e2Tg').offsetHeight;
+}
+
+// F — wall of frames: clones of earlier shots, captured by rendering those moments
+const TW = 480, TH = 270, TG = 40, FC = { x: 3 * (TW + TG) + TW / 2, y: 2 * (TH + TG) + TH / 2 };
+const fTiles = [];
+function buildWall() {
+  const shots = [['B', 2.3], ['D', 9.95], ['E2', 16.5], ['B', 2.8], ['E1', 14.45], ['C', 7.62], ['D', 12.45], ['B', 3.38], ['E3', 17.9], ['D', 9.2], ['B', 5.3], ['E1', 13.8], ['B', 3.9], ['E2', 15.9]];
+  const snap = (id, t) => {
+    render(t);
+    const c = $(id).cloneNode(true);
+    c.removeAttribute('id'); // inner ids stay so id-scoped styles apply; originals come first in the DOM, so $() still finds them
+    Object.assign(c.style, { display: 'block', transform: 'scale(.25)', filter: '', clipPath: '' });
+    return c;
+  };
+  const clones = shots.map(s => snap(...s)), focus = snap('E3', 18.86);
+  const r = rng(9);
+  let n = 0;
+  for (let row = 0; row < 5; row++) for (let col = 0; col < 6; col++) {
+    const isF = row === 2 && col === 3;
+    const el = h('div', 'ft', null, $('fPlane'));
+    el.appendChild(isF ? focus : clones[n++ % clones.length].cloneNode(true));
+    const x = col * (TW + TG), y = row * (TH + TG);
+    fTiles.push({ el, x, y, isF, d: Math.hypot(col - 3, row - 2), q0: r() * .22, spin: (r() - .5) * 160 });
+  }
+}
+
+/* ───────────── scenes ───────────── */
+// A · ignition — dot, grid bloom, gathering particles, beat rings, flood
+scene('A', 0, 2.06, t => {
+  const gr = 1700 * P(t, 0, 1.9, E.outCubic);
+  mask($('aGrid'), `radial-gradient(circle at 50% 50%,#000 ${gr * .3}px,transparent ${gr}px)`);
+  $('aGlow').style.opacity = P(t, .1, 1.4, E.outCubic) * (.55 + .45 * hit(t, [.5, 1, 1.5], 5));
+  aRings.forEach((el, i) => {
+    const b = .5 * (i + 1), q = P(t, b, b + 1.15, E.outCubic), d = 40 + q * 1150;
+    el.style.width = el.style.height = d + 'px';
+    T(el, 960, 540, { op: t < b ? 0 : .85 * (1 - q) });
+  });
+  aParts.forEach(p => {
+    const q = P(t, p.t0, p.t0 + p.d, E.inCubic), a = p.a + q * p.spin, r = p.r * (1 - q);
+    T(p.el, 960 + Math.cos(a) * r, 540 + Math.sin(a) * r, { s: 1 - .5 * q, op: P(t, p.t0, p.t0 + .3, E.lin) * (q < .96 ? 1 : 0) });
+  });
+  T($('aEdge'), 960, 540, { s: P(t, 1.72, 2.02, E.outQuart), op: 1 - P(t, 1.9, 2.05, E.lin) });
+  T($('aFlood'), 960, 540, { s: P(t, 1.74, 2.04, E.outQuart) });
+});
+
+// B · kinetic type — one word per beat, each with a different entrance
+function lab(el, u, x, y, t) { setText(el, scramble(el.dataset.txt, P(u, .04, .34, E.lin), t)); T(el, x, y, { op: P(u, 0, .08, E.lin) }); }
+const shake = (u, amp = 16) => u <= 0 ? [0, 0] : [Math.sin(u * 97) * amp * Math.exp(-u * 13), Math.cos(u * 71) * amp * Math.exp(-u * 13)];
+const BW = [[2, 2.5], [2.5, 3], [3, 3.5], [3.5, 4], [4, 6.06]];
+scene('B', 1.99, 6.03, t => {
+  BW.forEach(([a, b], i) => $('b' + i).style.display = t >= a && t < b ? 'block' : 'none');
+  if (t < 2.5) { // mask rise
+    const u = t - 2;
+    $('b0w').style.transform = `translateY(${(1 - P(u, 0, .34)) * 100}%) skewY(${(1 - P(u, 0, .4)) * -8}deg)`;
+    T($('b0m'), 960, 520, { s: 1 + u * .1 });
+    T($('b0e'), 1200 - u * 700, 560);
+    lab($('b0l'), u, 960, 790, t);
+  } else if (t < 3) { // zoom slam + shake
+    const u = t - 2.5, [sx, sy] = shake(u - .15);
+    T($('b1w'), 960 + sx, 520 + sy, { s: lerp(2.9, 1, P(u, 0, .22)) * (1 + u * .06), blur: 34 * (1 - P(u, 0, .17, E.outCubic)) });
+    lab($('b1l'), u, 960, 790, t);
+  } else if (t < 3.5) { // outline → fill wipe, right to left
+    const u = t - 3;
+    T($('b2s'), 960, 520, { s: 1.04 + u * .06 });
+    T($('b2w'), 960, 520, { s: 1.04 + u * .06 });
+    $('b2w').style.clipPath = `inset(0 0 0 ${100 - P(u, .08, .38, E.inOutCubic) * 100}%)`;
+    lab($('b2l'), u, 960, 790, t);
+  } else if (t < 4) { // 3D flip + play button
+    const u = t - 3.5, cx = 960 + 110;
+    T($('b3w'), cx, 520, { rx: -100 * (1 - spring(u, 0, 2.6, .5)) });
+    const ps = spring(u, .1, 3, .4);
+    T($('b3i'), cx - M.wV / 2 - 150, 520, { s: ps, r: (1 - ps) * -120 });
+    lab($('b3l'), u, 960, 790, t);
+  } else { // kashida stretch → dive into the stroke
+    const u = t - 4, K = $('b4k'), W = $('b4w');
+    const kw = 900 * spring(t, 4.5, 1.6, .5);
+    K.style.width = kw + 'px';
+    const w = W.offsetWidth, hh = W.offsetHeight;
+    const cx = K.offsetLeft + kw / 2, cy = K.offsetTop + M.kTop + M.kH / 2;
+    const s0 = .35 + .65 * spring(t, 4, 2.6, .45), z = P(t, 5.64, 6.0, E.inCubic), m = P(t, 5.56, 5.96, E.inOutCubic);
+    const tx0 = 960 - w / 2, ty0 = 560 - hh / 2;
+    W.style.transformOrigin = `${cx}px ${cy}px`;
+    W.style.transform = `translate(${tx0 + (960 - tx0 - cx) * m}px,${ty0 + (540 - ty0 - cy) * m}px) scale(${s0 * Math.exp(z * Math.log(90))})`;
+    const q = P(t, 5.44, 5.64, E.inCubic);
+    $('b4a').style.transform = `translateX(${q * 90}px)`; $('b4a').style.opacity = 1 - q; $('b4a').style.filter = blurF(q * 14);
+    $('b4b').style.transform = `translateX(${-q * 90}px)`; $('b4b').style.opacity = 1 - q; $('b4b').style.filter = blurF(q * 14);
+    const pi = P(u, .05, .45);
+    T($('b4pre'), tx0 + w - 30 + (1 - pi) * 60, ty0 + 40, { ax: -100, op: pi * (1 - q), blur: (1 - pi) * 10 });
+    lab($('b4l'), u - .9, 960, ty0 + hh + 10, t);
+    $('b4l').style.opacity = P(u, .9, 1, E.lin) * (1 - q);
+  }
+});
+
+// C · reach — university names on a 3D drum, landing on "الجامعات الأردنية"
+const HI_Y = 634;
+const cRoll = t => -1.2 + 5.2 * E.inOutCubic(clamp((t - 5.98) / 1.45));
+scene('C', 6.0, 8.3, t => {
+  const out = P(t, 7.66, 7.86, E.inCubic);
+  T($('cLead'), 960, 395 + (1 - P(t, 6.02, 6.5)) * 50 - out * 30, { op: P(t, 6.02, 6.3, E.lin) * (1 - out), blur: out * 8 });
+  const p = cRoll(t);
+  cItems.forEach((el, i) => {
+    const a = (i - p) * 34, vis = Math.abs(a) < 92;
+    el.style.display = vis ? '' : 'none';
+    if (!vis) return;
+    const land = i === 4 ? 1 + .06 * hit(t, [7.43], 9) : 1;
+    el.style.transform = `translate(960px,590px) translate(-50%,-50%) translateZ(-300px) rotateX(${-a}deg) translateZ(300px) scale(${land})`;
+    el.style.opacity = clamp(a < 0 ? 1 + a / 22 : 1 - a / 48) * (1 - out);
+    el.style.filter = blurF(Math.abs(a) * .12 + out * 10);
+  });
+  const hq = P(t, 7.36, 7.64), bw = M.wFin + 60;
+  $('cHi').style.width = bw * hq + 'px';
+  T($('cHi'), 960 + bw / 2, HI_Y, { ax: -100 });
+  lab($('cLab'), t - 6.3, 960, 820, t);
+  $('cLab').style.opacity = P(t, 6.3, 6.4, E.lin) * (1 - out);
+});
+
+// D · search → course page, in a tilted 3D panel
+const whipX = t => 1920 * E.inOutExpo(clamp((t - 12.7) / .36));
+function whipBlur(el, id, t, off = 0) {
+  const v = Math.abs(whipX(t + .003) - whipX(t - .003)) / .006, s = Math.min(150, v * .0065);
+  el.style.filter = s > .5 ? `url(#${id})` : '';
+  $(id + 'g').setAttribute('stdDeviation', `${s.toFixed(1)} 0`);
+}
+function ttl(el, t, tin, tout, x, y) {
+  T(el, x, y, { ax: -100 });
+  [...el.children].forEach((c, i) => {
+    const a = P(t, tin + i * .08, tin + i * .08 + .75), b = tout ? P(t, tout + i * .05, tout + i * .05 + .3, E.inCubic) : 0;
+    c.style.transform = `translate(${(1 - a) * 90}px,${-b * 40}px)`;
+    c.style.opacity = a * (1 - b);
+    c.style.filter = blurF((1 - a) * 14 + b * 10);
+  });
+}
+scene('D', 7.86, 13.08, t => {
+  const D = $('D');
+  if (t < 8.26) { // window grows out of the highlighter bar
+    const e = P(t, 7.88, 8.25, E.inOutExpo), bw = M.wFin + 60, x = 960 - bw / 2, y = HI_Y - 19;
+    D.style.clipPath = `inset(${y * (1 - e)}px ${(1920 - x - bw) * (1 - e)}px ${(1080 - y - 38) * (1 - e)}px ${x * (1 - e)}px round ${lerp(4, 0, e)}px)`;
+  } else D.style.clipPath = '';
+  $('dOver').style.opacity = 1 - P(t, 7.98, 8.32, E.outCubic);
+  const X = whipX(t);
+  D.style.transform = X ? `translateX(${X}px)` : '';
+  whipBlur(D, 'hbD', t);
+
+  ttl($('dT1'), t, 8.2, 10.88, 1800, 540);
+  ttl($('dT2'), t, 11.1, 0, 1800, 540);
+  $('dT2').style.display = t > 11 ? '' : 'none';
+
+  // camera
+  const ein = P(t, 8.02, 8.95), flat = P(t, 10.88, 11.65, E.inOutCubic), drift = Math.max(0, t - 8.95);
+  const rx = lerp(lerp(38, 12, ein) - drift * 1.5, 0, flat), ry = lerp(lerp(34, 16, ein) - drift * 2.2, 0, flat);
+  $('dPanel').style.transform = `translate(140px,${120 + (1 - ein) * 200}px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(${lerp(-1000, 0, ein)}px)`;
+  $('dPanel').style.opacity = P(t, 8.02, 8.35, E.lin);
+
+  // typing
+  const typed = clamp(Math.floor((t - TY0) / TYD) + 1, 0, QRY.length), foc = P(t, 8.45, 8.62, E.outCubic);
+  setText($('dQ'), QRY.slice(0, typed));
+  $('dPh').style.display = typed ? 'none' : '';
+  const S = $('dSearch'), so = P(t, 10.95, 11.2, E.inCubic);
+  S.style.borderColor = foc > .5 ? 'var(--p400)' : '';
+  S.style.boxShadow = `0 0 0 ${foc * 7}px rgba(191,219,254,${foc * .9})`;
+  S.style.opacity = 1 - so; S.style.transform = `translateY(${-so * 24}px)`;
+  const typing = t >= TY0 && t < TY0 + QRY.length * TYD + .12;
+  $('dCaret').style.opacity = t < 8.5 ? 0 : typing ? 1 : Math.floor((t - 8.5) * 2.4) % 2 ? 0 : 1;
+  [...$('dChips').children].forEach((c, i) => { const q = P(t, 9.42 + i * .045, 9.8 + i * .045); c.style.opacity = q * (1 - so); c.style.transform = `translateY(${(1 - q) * 16 - so * 24}px)`; c.style.display = 'inline-block'; });
+
+  // skeletons shimmer while typing, then hand over to the real rows
+  dSk.forEach((k, i) => { k.style.opacity = P(t, 8.5 + i * .06, 8.75 + i * .06, E.lin) * (1 - P(t, 9.5 + i * .075, 9.62 + i * .075, E.lin)); k.style.backgroundPosition = `${(1 - ((t * .9 + i * .08) % 1)) * 150}% 0`; });
+  // results cascade, hover, click
+  dCards.forEach((c, i) => {
+    const t0 = 9.56 + i * .075, sp = spring(t, t0, 2.3, .6);
+    let y = (1 - sp) * 70, s = .95 + .05 * sp, o = P(t, t0, t0 + .18, E.lin);
+    if (i === 1) {
+      const hv = P(t, 10.58, 10.74, E.outCubic);
+      y -= 5 * hv; s += .012 * hv;
+      c.style.borderColor = hv > .5 ? 'var(--p300)' : '';
+      c.style.boxShadow = hv ? `0 ${24 * hv}px ${50 * hv}px -26px rgba(37,99,235,${.5 * hv})` : '';
+      o *= 1 - P(t, 10.98, 11.1, E.lin);
+      const rq = P(t, 10.83, 11.3, E.outCubic), rip = c.firstChild, d = rq * 900;
+      Object.assign(rip.style, { width: d + 'px', height: d + 'px', left: 330 - d / 2 + 'px', top: 58 - d / 2 + 'px', opacity: t > 10.83 ? .7 * (1 - rq) : 0 });
+    } else {
+      const q = P(t, 10.9 + Math.abs(i - 1) * .04, 11.1 + Math.abs(i - 1) * .04, E.inCubic);
+      o *= 1 - q; y += q * 30;
+    }
+    c.style.transform = `translateY(${y}px) scale(${s})`;
+    c.style.opacity = o;
+  });
+  const mq = P(t, 10.96, 11.5), Mo = $('dMorph');
+  Mo.style.display = t >= 10.96 ? '' : 'none';
+  Object.assign(Mo.style, { left: '36px', top: lerp(412, 100, mq) - 5 * (1 - mq) + 'px', width: '928px', height: lerp(118, 704, mq) + 'px' });
+
+  // course page
+  $('dCourse').style.display = t >= 11.1 ? '' : 'none';
+  dHead.forEach((e, i) => { const q = P(t, 11.14 + i * .06, 11.7 + i * .06); e.style.opacity = q; e.style.transform = `translateY(${(1 - q) * 26}px)`; });
+  dTiles.forEach((e, i) => { const sp = spring(t, 11.36 + i * .07, 2.6, .5); e.style.opacity = P(t, 11.36 + i * .07, 11.5 + i * .07, E.lin); e.style.transform = `translateY(${(1 - sp) * 40}px) scale(${.8 + .2 * sp})`; });
+  const bq = P(t, 11.2, 11.5), bp = hit(t, [12.27], 7);
+  R.dBm.style.opacity = bq;
+  R.dBm.style.transform = `scale(${1 + .35 * bp * Math.cos((t - 12.27) * 30)})`;
+  R.dBm.style.borderColor = t > 12.27 ? 'var(--p300)' : '';
+  R.dBm.style.background = t > 12.27 ? 'var(--p50)' : '';
+  $('dBmP').setAttribute('fill-opacity', P(t, 12.27, 12.4, E.lin));
+  dBurst.forEach((b, i) => { const q = P(t, 12.27, 12.7, E.outCubic); b.style.transform = `rotate(${i * 45}deg) translateY(${-24 - q * 26}px) scaleY(${1 - q})`; b.style.opacity = t > 12.27 ? 1 - q : 0; });
+
+  // cursor
+  const c1 = P(t, 10.14, 10.78, E.inOutCubic), c2 = P(t, 11.8, 12.2, E.inOutCubic);
+  let [x, y] = bez([1080, 1000], [900, 520], [370, 470], c1);
+  if (c2 > 0) [x, y] = bez([370, 470], [220, 420], [68 + 36, 100 + 74 + 35], c2);
+  const press = t > 10.8 && t < 10.95 ? Math.sin((t - 10.8) / .15 * Math.PI) : t > 12.24 && t < 12.39 ? Math.sin((t - 12.24) / .15 * Math.PI) : 0;
+  T($('dCur'), x - 10, y - 6, { ax: null, s: 1 - .16 * press, op: P(t, 10.1, 10.3, E.lin) * (1 - P(t, 12.5, 12.65, E.lin)) });
+});
+
+// E1 · GPA — grade chips orbit in, get absorbed, the gauge integrates them
+const e1C = 2 * Math.PI * 222;
+scene('E1', 12.7, 14.97, t => {
+  const E1 = $('E1'), X = whipX(t) - 1920;
+  E1.style.transform = `translateX(${X}px)`;
+  whipBlur(E1, 'hbE', t);
+  ttl($('e1T'), t, 12.95, 0, 1800, 540);
+  const cx = 600, cy = 540;
+  T($('e1G'), cx, cy, { s: .85 + .15 * spring(t, 12.8, 1.8, .6) });
+  $('e1Trk').setAttribute('stroke-dasharray', e1C);
+  $('e1Trk').setAttribute('stroke-dashoffset', e1C * (1 - P(t, 12.85, 13.6, E.outCubic)));
+  let g = GPA[0];
+  ABS.forEach((a, i) => g = lerp(g, GPA[i + 1], P(t, a + .24, a + .6)));
+  const arr = ABS.map(a => a + .24), pulse = hit(t, arr, 8);
+  const arc = $('e1Arc');
+  arc.setAttribute('stroke-dasharray', e1C);
+  arc.setAttribute('stroke-dashoffset', e1C * (1 - g / 4));
+  arc.setAttribute('stroke-width', 30 + 10 * pulse);
+  arc.style.opacity = g > .01 ? 1 : 0;
+  T($('e1N'), cx, cy - 22, { s: 1 + .07 * pulse + .05 * hit(t, [14.3], 6), op: P(t, 12.95, 13.2, E.lin) });
+  setText($('e1N'), g.toFixed(2));
+  T($('e1L'), cx, cy + 78, { op: P(t, 13.05, 13.3, E.lin) });
+  const ms = spring(t, 14.34, 2.6, .5);
+  T($('e1M'), cx, cy + 140, { s: ms, op: P(t, 14.34, 14.45, E.lin) });
+  e1Chips.forEach((el, i) => {
+    const [px, py] = GRADES[i][3], sp = spring(t, 12.95 + i * .08, 2, .6), q = P(t, ABS[i], ABS[i] + .24, E.inCubic);
+    const fx = lerp(cx + (px - cx) * 1.9, px, sp) + Math.sin(t * 2.3 + i) * 5, fy = lerp(cy + (py - cy) * 1.9, py, sp) + Math.cos(t * 2 + i * 2) * 6;
+    T(el, lerp(fx, cx, q), lerp(fy, cy, q), { s: 1 - .75 * q, op: P(t, 12.95 + i * .08, 13.1 + i * .08, E.lin) * (1 - q), r: (1 - sp) * 12 });
+  });
+  const ea = (g / 4) * Math.PI * 2, ex = cx + Math.sin(ea) * 222, ey = cy - Math.cos(ea) * 222;
+  e1Spk.forEach(s => { const q = P(t, 14.3, 14.3 + s.k), d = s.d * q; T(s.el, ex + Math.cos(s.a) * d, ey + Math.sin(s.a) * d, { s: 1 - q, op: t > 14.3 ? 1 : 0 }); });
+});
+
+// E1 → E2 · diagonal tile wipe (starts at the top-right, the RTL reading start)
+function drawTiles(t) {
+  const on = t >= 14.48 && t < 15.47;
+  $('tiles').style.display = on ? '' : 'none';
+  if (!on) return;
+  tt.forEach(({ el, d }) => {
+    const a = P(t, 14.5 + d, 14.66 + d, E.outCubic), b = P(t, 14.98 + d, 15.14 + d, E.inCubic), s = a * (1 - b);
+    el.style.transform = `scale(${s})rotate(${(1 - a) * -90 + b * 90}deg)`;
+    el.style.borderRadius = (1 - s) * 50 + '%';
+  });
+}
+
+// E2 · planner — calendar cells ripple in, events drop, then the theme toggle
+const TGP = { x: 1800, y: 820 }, TGI = { x: 1800 - 47, y: 820 }; // button right edge / icon centre
+scene('E2', 14.95, 17.2, t => {
+  ttl($('e2T'), t, 15.02, 0, 1800, 450);
+  const ci = P(t, 14.96, 15.5);
+  $('e2C').style.transform = `translateY(${(1 - ci) * 60}px)`;
+  $('e2C').style.opacity = P(t, 14.96, 15.1, E.lin);
+  e2Cells.forEach(({ el, r, c, ev, today }) => {
+    const d = (c + r) * .035, q = spring(t, 15.02 + d, 2.4, .55);
+    el.style.transform = `translateY(${(1 - q) * 30}px) scale(${.75 + .25 * q})`;
+    el.style.opacity = P(t, 15.02 + d, 15.2 + d, E.lin);
+    if (today) el.style.boxShadow = `0 0 0 ${2 + 10 * hit(t, [15.7, 16.3], 4)}px rgba(96,165,250,${.25 + .3 * hit(t, [15.7, 16.3], 4)})`;
+  });
+  e2Cells.filter(c => c.ev).forEach(({ ev }, k) => { const q = spring(t, 15.62 + k * .1, 3, .45); ev.style.transform = `scale(${q})`; ev.style.opacity = P(t, 15.62 + k * .1, 15.7 + k * .1, E.lin); });
+  const nq = spring(t, 16.08, 2.2, .55);
+  T($('e2N'), 360, 945 + (1 - nq) * 90, { op: P(t, 16.08, 16.2, E.lin), r: (1 - nq) * -6 });
+  setText($('e2Cd'), String(Math.round(lerp(30, 15, P(t, 16.12, 16.6, E.outCubic)))));
+  // toggle + cursor
+  const tq = spring(t, 16.14, 2.4, .5), click = t >= 16.72, mq = P(t, 16.72, 16.95, E.outCubic);
+  T($('e2Tg'), TGP.x, TGP.y, { ax: -100, s: .8 + .2 * tq, op: P(t, 16.14, 16.26, E.lin) });
+  $('e2Tg').style.background = click ? 'var(--s900)' : '';
+  $('e2Tg').style.color = click ? '#fff' : '';
+  const [sun, moon] = $('e2Ic').children;
+  sun.style.transform = `rotate(${-90 * mq}deg) scale(${1 - mq})`;
+  moon.style.transform = `rotate(${90 * (1 - mq)}deg) scale(${mq})`;
+  sun.style.color = 'var(--p600)'; moon.style.color = '#fbbf24';
+  const cq = P(t, 16.28, 16.68, E.inOutCubic), [x, y] = bez([1500, 1160], [1600, 900], [TGI.x, TGI.y + 6], cq);
+  const press = t > 16.7 && t < 16.85 ? Math.sin((t - 16.7) / .15 * Math.PI) : 0;
+  T($('e2Cur'), x - 10, y - 6, { ax: null, s: 1 - .16 * press, op: P(t, 16.28, 16.4, E.lin) });
+});
+
+// E3 · focus — dark theme floods in from the toggle; rain, odometer timer, sound mixer
+scene('E3', 16.73, 18.9, t => {
+  const ox = TGI.x, oy = TGI.y;
+  $('E3').style.clipPath = t < 17.2 ? `circle(${2300 * P(t, 16.74, 17.2, E.inOutCubic)}px at ${ox}px ${oy}px)` : '';
+  const ro = P(t, 16.85, 17.4, E.lin);
+  drops.forEach(d => { const y = ((d.y0 + d.v * t) % 1500) - 220; T(d.el, d.x0 - y * .25, y, { ax: null, r: 14 }); });
+  $('e3Rain').style.opacity = ro;
+  T($('e3Bk1'), 600 + Math.sin(t * .8) * 60, 430 + Math.cos(t * .6) * 40);
+  T($('e3Bk2'), 1300 + Math.cos(t * .7) * 80, 700 + Math.sin(t * .9) * 50);
+  ttl($('e3T'), t, 16.98, 0, 1800, 520);
+  const cx = 600, cy = 440, C = 2 * Math.PI * 230;
+  const el = 94 * E.inOutCubic(clamp((t - 17.3) / 1.45)), rem = 1500 - el;
+  T($('e3R'), cx, cy, { s: .85 + .15 * spring(t, 16.92, 1.8, .6), op: P(t, 16.92, 17.1, E.lin) });
+  const arc = $('e3Arc');
+  arc.setAttribute('stroke-dasharray', C);
+  arc.setAttribute('stroke-dashoffset', C * (1 - (rem / 1500) * P(t, 16.95, 17.6, E.inOutCubic)));
+  // odometer: each digit rolls during the last second before it changes (ceil semantics)
+  const z = rem + 1;
+  odo.forEach(({ strip, B, N }) => {
+    let pos;
+    if (B === 1) pos = rem;
+    else { const base = Math.floor(z / B), u = z - base * B; pos = u < 1 ? base - 1 + E.inOutCubic(u) : base; }
+    strip.style.transform = `translateY(${-(((pos % N) + N) % N) * 150}px)`;
+  });
+  T($('e3D'), cx, cy - 16, { op: P(t, 17.0, 17.2, E.lin), s: .9 + .1 * P(t, 17.0, 17.4) });
+  T($('e3S'), cx, cy + 92, { op: P(t, 17.1, 17.3, E.lin) });
+  const mq = spring(t, 17.15, 2, .6);
+  T($('e3M'), cx, 865 + (1 - mq) * 80, { op: P(t, 17.15, 17.3, E.lin) });
+  mix.forEach((m, i) => {
+    const v = m.v * spring(t, 17.35 + i * .1, 1.6, .55);
+    m.f.style.width = v * 170 + 'px';
+    m.k.style.right = v * 170 - 12 + 'px';
+    m.eq.forEach((b, j) => b.style.height = 5 + 21 * v * Math.abs(Math.sin(t * (5 + j * 1.7) + i * 2 + j)) + 'px');
+  });
+});
+
+// F · the system — dolly back from the focus shot into a wall of every frame, then collapse to the dot
+scene('F', 18.86, 21.42, t => {
+  const e = P(t, 18.88, 19.75, E.inOutCubic), tilt = P(t, 18.95, 19.9, E.inOutCubic), k = P(t, 20.6, 21.3, E.inCubic);
+  const S = Math.exp(lerp(Math.log(4), Math.log(.8), e));
+  const ax = 48 * tilt, az = -26 * tilt - 5 * Math.max(0, t - 19.9) - 60 * k;
+  const pan = Math.max(0, t - 19.1) * 150, fx = FC.x - pan * .8, fy = FC.y + pan * .25;
+  $('fPlane').style.transform = `translate(960px,540px) rotateX(${ax}deg) rotateZ(${az}deg) scale(${S}) translate(${-fx}px,${-fy}px)`;
+  fTiles.forEach(f => {
+    const rise = f.isF ? 1 : P(t, 18.98 + f.d * .07, 19.6 + f.d * .07), q = P(t, 20.55 + f.q0, 21.3, E.inBack);
+    const x = lerp(f.x, fx - TW / 2, q), y = lerp(f.y, fy - TH / 2, q);
+    f.el.style.transform = `translate3d(${x}px,${y}px,${lerp(-700, 0, rise) + q * 300}px) rotate(${q * f.spin}deg) scale(${1 - q})`;
+    f.el.style.opacity = rise * (1 - P(t, 21.1, 21.3, E.lin));
+    f.el.style.borderRadius = 14 * P(t, 18.88, 19.2, E.lin) + 'px';
+  });
+  const c = P(t, 20.95, 21.32, E.inBack);
+  [[$('fL1'), 19.5, 460], [$('fL2'), 20.0, 640]].forEach(([el, t0, y]) => {
+    const q = P(t, t0, t0 + .35);
+    T(el, 960, lerp(y, 540, c), { s: lerp(1.4, 1, q) * (1 - c) + .001, op: P(t, t0, t0 + .12, E.lin), blur: (1 - q) * 18 });
+  });
+  $('fScrim').style.opacity = P(t, 19.4, 19.8, E.lin) * (1 - c);
+});
+
+// G · resolve — flood, logo written right-to-left, dot lands on the ن
+const LOGO = { x: 960, y: 450 };
+function logoXform(t) {
+  const s = lerp(1.12, 1, P(t, 22.0, 23.1)) * (1 + .025 * P(t, 22.9, 26, E.lin));
+  const jolt = t > 22.9 ? 12 * Math.exp(-(t - 22.9) * 9) * Math.sin((t - 22.9) * 34) : 0;
+  return { s, jolt };
+}
+scene('G', 21.42, 26.01, t => {
+  T($('gFlood'), 960, 540, { s: P(t, 21.96, 22.34) });
+  const { s, jolt } = logoXform(t), a = lerp(-18, 100, P(t, 22.04, 22.64, E.inOutCubic));
+  const L = $('gLogoW');
+  T(L, LOGO.x, LOGO.y + jolt, { s, op: t > 22.0 ? 1 : 0 });
+  mask($('gLogo'), `linear-gradient(to left,#000 ${a}%,transparent ${a + 18}%)`);
+  $('lgSw').style.transform = `translateX(${(1 - P(t, 22.22, 22.8)) * 70}px)`;
+  L.style.filter = `drop-shadow(0 20px 50px rgba(2,6,23,${.35 * P(t, 22.4, 23, E.lin)}))`; // on the wrapper, so the write-on mask can't clip it
+  gBk.forEach(b => { const q = spring(t, 22.2 + b.i * .08, 1.4, .6); T(b.el, b.x + Math.sin(t * .5 + b.i) * 30, b.y + Math.cos(t * .4 + b.i) * 24, { s: q, op: P(t, 22.2 + b.i * .08, 22.4 + b.i * .08, E.lin) }); });
+  const ty = LOGO.y + LG.h / 2 + 115;
+  T($('gTag'), 960, ty);
+  [...$('gTag').children].forEach((w, i) => { const q = P(t, 23.02 + i * .075, 23.55 + i * .075); w.style.transform = `translateY(${(1 - q) * 40}px)`; w.style.opacity = q; w.style.filter = blurF((1 - q) * 12); });
+  const sq = P(t, 23.5, 24.1);
+  T($('gSub'), 960, ty + 78 + (1 - sq) * 20, { op: sq });
+  const uq = spring(t, 24.0, 2.4, .5);
+  T($('gUrl'), 960, ty + 170, { s: .6 + .4 * uq, op: P(t, 24, 24.12, E.lin) });
+  $('gSweep').style.transform = `translateX(${lerp(-1800, 1800, P(t, 24.3, 25.2, E.inOutCubic))}px)`;
+});
+
+/* ───────────── globals ───────────── */
+function drawDot(t) {
+  const el = $('dot');
+  let on = true, x = 960, y = 540, s = 1, sx = 1, sy = 1, d = 34, glow = 0;
+  if (t < 1.95) {
+    s = spring(t, .1, 2.6, .38) * (1 + .5 * hit(t, [.5, 1, 1.5], 10));
+    const q = P(t, 1.42, 1.72, E.outCubic), r = P(t, 1.72, 1.9, E.inCubic);
+    sx = (1 + .45 * q) * (1 - .5 * r); sy = (1 - .4 * q) * (1 + 1.5 * r); s *= 1 - r;
+    glow = 1;
+  } else if (t >= 21.26) {
+    s = spring(t, 21.26, 3, .4);
+    const q = P(t, 21.72, 21.95, E.outCubic);
+    sx = 1 + .35 * q; sy = 1 - .35 * q; y += 8 * q;
+    glow = 1 - P(t, 21.95, 22.2, E.lin);
+    if (t >= 21.95) { // launch, fall, land on the ن
+      const { s: ls, jolt } = logoXform(t);
+      const tx = LOGO.x + (LG.dx - LG.cx) * LG.k * ls, tyy = LOGO.y + (LG.dy - LG.cy) * LG.k * ls + jolt;
+      if (t < 22.6) { y = lerp(548, -120, P(t, 21.95, 22.3, E.outCubic)); sx = .7; sy = 1.6; }
+      else {
+        const f = P(t, 22.6, 22.9, E.lin) ** 2; // gravity
+        x = tx; y = lerp(-80, tyy, f); d = lerp(34, LG.dd * ls, P(t, 22.6, 22.9, E.lin));
+        const land = t > 22.9 ? Math.exp(-(t - 22.9) * 8) * Math.cos((t - 22.9) * 38) : 0;
+        sx = t < 22.9 ? .8 : 1 + .3 * land; sy = t < 22.9 ? 1.35 : 1 - .3 * land;
+        if (t > 22.9) y = tyy + LG.dd * ls * .15 * land;
+      }
+    }
+  } else on = false;
+  el.style.display = on ? 'block' : 'none';
+  if (!on) return;
+  el.style.width = el.style.height = d + 'px';
+  el.style.boxShadow = glow ? `0 0 ${40 * glow}px rgba(96,165,250,${.7 * glow})` : '';
+  T(el, x, y, { s, sx, sy });
+}
+
+const HUD_SC = [[0, '00 · IGNITION'], [1.99, '01 · KINETIC TYPE'], [6, '02 · REACH'], [7.9, '03 · SEARCH'], [12.85, '04 · GPA'], [14.97, '05 · PLANNER'], [16.9, '06 · FOCUS'], [18.9, '07 · SYSTEM']];
+function drawHud(t) {
+  const H = $('hud'), op = P(t, .3, .8, E.lin) * (1 - P(t, 21.05, 21.3, E.lin));
+  H.style.display = op > 0 ? '' : 'none';
+  if (!op) return;
+  H.style.opacity = op * .8;
+  setText($('hB'), scramble('AOUN — MOTION REEL 2026', P(t, .35, 1.05, E.lin), t));
+  const [s0, lbl] = HUD_SC.findLast(([s]) => t >= s);
+  setText($('hS'), scramble(lbl, P(t, s0, s0 + .35, E.lin), t));
+  const f = Math.floor(t * 60);
+  setText($('hT'), `00:00:${String(Math.floor(t)).padStart(2, '0')}:${String(f % 60).padStart(2, '0')}`);
+  setText($('hG'), scramble('31.95°N 35.91°E · AMMAN', P(t, .5, 1.3, E.lin), t));
+  T($('hB'), 84, 58, { ax: 0 }); T($('hS'), 1836, 58, { ax: -100 });
+  T($('hT'), 84, 1022, { ax: 0 }); T($('hG'), 1836, 1022, { ax: -100 });
+  T($('hBar'), 960, 1022);
+  $('hBarF').style.width = t / DUR * 100 + '%';
+}
+
+function drawFx(t) {
+  const r = rng(Math.floor(t * 24) + 1);
+  $('grain').style.backgroundPosition = `${r() * 256 | 0}px ${r() * 256 | 0}px`;
+  $('flash').style.opacity = .3 * hit(t, [2.0], 16) + .45 * hit(t, [21.97], 10);
+  $('fade').style.opacity = P(t, 25.35, 25.98, E.inCubic);
+}
+
+function render(t) {
+  for (const s of scenes) {
+    const on = t >= s.from && t < s.to;
+    s.el.style.display = on ? 'block' : 'none';
+    if (on) s.draw(t);
+  }
+  drawTiles(t); drawDot(t); drawHud(t); drawFx(t);
+}
+
+/* ───────────── score (WebAudio, rendered offline, same timeline) ───────────── */
+async function renderAudio() {
+  const SR = 48000, ctx = new OfflineAudioContext(2, SR * DUR, SR), rnd = rng(77);
+  const mtof = m => 440 * 2 ** ((m - 69) / 12);
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -14; comp.knee.value = 10; comp.ratio.value = 3.5; comp.attack.value = .004; comp.release.value = .2;
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(.9, 0); master.gain.setValueAtTime(.9, 25.2); master.gain.linearRampToValueAtTime(0, 25.99);
+  comp.connect(master).connect(ctx.destination);
+  const gate = ctx.createGain(); // the breath of silence before the drop
+  gate.gain.setValueAtTime(1, 21.44); gate.gain.linearRampToValueAtTime(0, 21.48); gate.gain.setValueAtTime(0, 21.95); gate.gain.linearRampToValueAtTime(1, 21.962);
+  gate.connect(comp);
+  const verb = ctx.createConvolver();
+  { const n = SR * 2.8, b = ctx.createBuffer(2, n, SR); for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (rnd() * 2 - 1) * (1 - i / n) ** 3.5; } verb.buffer = b; }
+  const vOut = ctx.createGain(); vOut.gain.value = .5; verb.connect(vOut).connect(gate);
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = .9; // underwater during Focus
+  lp.frequency.setValueAtTime(18000, 0); lp.frequency.setValueAtTime(18000, 16.78); lp.frequency.exponentialRampToValueAtTime(480, 17.15); lp.frequency.setValueAtTime(480, 18.55); lp.frequency.exponentialRampToValueAtTime(18000, 19.02);
+  const music = ctx.createGain(); music.gain.value = .85; music.connect(lp).connect(gate);
+  const pump = ctx.createGain(); pump.connect(music);
+  const drums = ctx.createGain(); drums.gain.value = .9; drums.connect(gate);
+  const sfx = ctx.createGain(); sfx.gain.value = .75; sfx.connect(gate);
+  const send = (node, amt) => { const g = ctx.createGain(); g.gain.value = amt; node.connect(g).connect(verb); };
+  const nb = ctx.createBuffer(1, SR * 2, SR); { const d = nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = rnd() * 2 - 1; }
+  const env = (t, v, a, d) => { const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + d); return g; };
+  const osc = (type, f, t, d) => { const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; o.start(t); o.stop(t + d + .05); return o; };
+  const noise = (t, d, v, type, f, dest, q = .7) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const g = env(t, v, .002, d); s.connect(fl).connect(g).connect(dest); s.start(t, rnd() * 1.5); s.stop(t + d + .05); return g; };
+  const ducks = [];
+  const kick = (t, v = 1, len = .42) => {
+    const o = osc('sine', 165, t, len); o.frequency.setValueAtTime(165, t); o.frequency.exponentialRampToValueAtTime(52, t + .07); o.frequency.exponentialRampToValueAtTime(38, t + len);
+    o.connect(env(t, v, .002, len)).connect(drums);
+    noise(t, .018, v * .22, 'highpass', 3000, drums);
+    ducks.push(t);
+  };
+  const hat = (t, v = .16, d = .05) => noise(t, d, v, 'highpass', 8200, drums);
+  const clap = (t, v = .42) => { [0, .011, .023].forEach(o => noise(t + o, .03, v, 'bandpass', 1600, drums, 1.2)); send(noise(t + .03, .22, v * .7, 'bandpass', 1400, drums, .9), .35); };
+  const bass = (t, m, d = .2, v = .3) => {
+    const g = env(t, v, .004, d + .05), f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = 4; f.frequency.setValueAtTime(1400, t); f.frequency.exponentialRampToValueAtTime(180, t + d);
+    osc('sawtooth', mtof(m), t, d + .05).connect(f).connect(g);
+    const sg = ctx.createGain(); sg.gain.value = .9; osc('sine', mtof(m - 12), t, d + .05).connect(sg).connect(g);
+    g.connect(pump);
+  };
+  const pad = (t, d, notes, v = .05, att = .1, rel = .4, cut = 1800, dest = pump) => {
+    const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = .5; f.frequency.setValueAtTime(cut * .5, t); f.frequency.linearRampToValueAtTime(cut, t + Math.max(att, d * .6));
+    const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + att); g.gain.setValueAtTime(v, t + d); g.gain.exponentialRampToValueAtTime(.0005, t + d + rel);
+    f.connect(g).connect(dest); send(g, .45);
+    notes.forEach(m => [-9, 0, 9].forEach(dt => { const o = osc('sawtooth', mtof(m), t, d + rel); o.detune.value = dt; o.connect(f); }));
+  };
+  const pluck = (t, m, v = .16, d = .35, dest = sfx, wet = .3) => {
+    const g = env(t, v, .003, d); osc('triangle', mtof(m), t, d).connect(g);
+    const g2 = ctx.createGain(); g2.gain.value = .35; osc('sine', mtof(m + 12), t, d).connect(g2).connect(g);
+    g.connect(dest); send(g, wet);
+  };
+  const bell = (t, m, v = .12, d = 2) => [[1, 1], [2.01, .45], [3.03, .22], [4.2, .1]].forEach(([r, a]) => { const g = env(t, v * a, .003, d / Math.sqrt(r)); osc('sine', mtof(m) * r, t, d).connect(g).connect(sfx); send(g, .5); });
+  const click = (t, v = .25) => { noise(t, .012, v, 'bandpass', 4200, sfx, 2); const o = osc('sine', 1800, t, .05); o.frequency.exponentialRampToValueAtTime(900, t + .03); o.connect(env(t, v * .5, .001, .04)).connect(sfx); };
+  const key = (t, v = .14) => noise(t, .022, v, 'bandpass', 2400 + rnd() * 1600, sfx, 1.6);
+  const whoosh = (t, d, v = .3, f0 = 300, f1 = 4500) => {
+    const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true;
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = .9; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + d * .75); f.frequency.exponentialRampToValueAtTime(f1 * .6, t + d);
+    const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + d * .7); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    const p = ctx.createStereoPanner(); p.pan.setValueAtTime(-.7, t); p.pan.linearRampToValueAtTime(.7, t + d);
+    s.connect(f).connect(g).connect(p).connect(sfx); send(g, .25); s.start(t, rnd()); s.stop(t + d + .05);
+  };
+
+  // harmony: vi–IV–I–V, resolving to I on the logo
+  const CH = { F7: [[53, 57, 60, 64], 41], Am: [[52, 57, 60, 64], 45], F: [[53, 57, 60, 65], 41], C: [[52, 55, 60, 64], 48], G: [[50, 55, 59, 62], 43] };
+  const BARS = ['F7', 'Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'C'];
+  const at = t => CH[BARS[Math.min(12, Math.floor(t / 2))]];
+  pad(0, 1.9, CH.F7[0], .035, 1.5, .3, 900);
+  for (let b = 1; b <= 10; b++) pad(b * 2, b === 10 ? 1.46 : 2, CH[BARS[b]][0], b === 8 || b === 9 ? .065 : .045, .06, .35, 1900);
+  pad(21.96, 2.4, CH.C[0], .075, .01, 2.4, 3400);
+  pad(21.96, 2.4, CH.C[0].map(n => n + 12), .035, .01, 2.6, 5000);
+  // ignition pings + flood
+  [[.1, 81], [.5, 84], [1, 88], [1.5, 93]].forEach(([t, m]) => pluck(t, m, .14, .6, sfx, .6));
+  whoosh(1.62, .44, .32);
+  // drums
+  for (let t = 2; t < 17; t += .5) kick(t, t === 2 ? 1.1 : .95);
+  for (let t = 19; t < 20.5; t += .5) kick(t, .95);
+  for (let t = 20.5; t < 21.4; t += .25) kick(t, .8);
+  for (let t = 2.25; t < 17; t += .5) hat(t, .17, .07);
+  for (let t = 8; t < 16; t += .125) if ((t * 8) % 4) hat(t, .05);
+  for (let t = 19.25; t < 21.4; t += .5) hat(t, .17, .07);
+  for (let t = 2.5; t < 17; t += 1) clap(t);
+  clap(19.5); clap(20.5);
+  for (let t = 20.5; t < 21.45; t += .125) clap(t, .12 + (t - 20.5) * .35);
+  noise(2, 1.4, .22, 'highpass', 3500, sfx, .5);
+  for (let t = 2.25; t < 17; t += .5) bass(t, at(t)[1]);
+  for (let t = 19.25; t < 21.4; t += .5) bass(t, at(t)[1]);
+  ducks.sort((a, b) => a - b).forEach(t => { pump.gain.setValueAtTime(.3, t); pump.gain.setTargetAtTime(1, t + .02, .075); });
+  // arps: 16ths through Search, 8ths (underwater) through Focus
+  for (let t = 8; t < 16; t += .125) { const [n] = at(t), i = Math.round(t * 8) % 4; pluck(t, n[i] + 12, .045, .16, music, .2); }
+  for (let t = 17; t < 19; t += .25) { const [n] = at(t), i = Math.round(t * 4) % 4; pluck(t, n[i] + 24, .06, .5, music, .5); }
+  // kinetic type: chord stabs + slams, kashida "stretch"
+  [2, 2.5, 3, 3.5, 4].forEach(t => { pad(t, .1, at(t)[0].map(n => n + 12), .06, .004, .26, 5200, music); noise(t, .3, .16, 'lowpass', 1500, sfx); });
+  {
+    const t0 = 4.5, t1 = 5.4, n = 160, curve = new Float32Array(n);
+    for (let i = 0; i < n; i++) curve[i] = 170 + 540 * spring(t0 + (t1 - t0) * i / (n - 1), 4.5, 1.6, .5);
+    const o = osc('sawtooth', 170, t0, t1 - t0); o.frequency.setValueCurveAtTime(curve, t0, t1 - t0);
+    const lfo = osc('sine', 9, t0, t1 - t0), lg = ctx.createGain(); lg.gain.value = 9; lfo.connect(lg).connect(o.frequency);
+    const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 2400; f.Q.value = 5;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.11, t0 + .05); g.gain.setValueAtTime(.11, t1 - .3); g.gain.linearRampToValueAtTime(0, t1);
+    o.connect(f).connect(g).connect(sfx); send(g, .3);
+  }
+  whoosh(5.5, .55, .38, 200, 5000);
+  // reach: ratchet ticks as each name passes, landing chord
+  for (let t = 6, prev = cRoll(6); t < 7.5; t += .002) { const p = cRoll(t); if (Math.floor(p + .5) !== Math.floor(prev + .5)) pluck(t, 93, .06, .07); prev = p; }
+  pad(7.43, .18, CH.C[0].map(n => n + 12), .05, .004, .5, 4000, music);
+  whoosh(7.8, .5, .3);
+  // search
+  for (let i = 0; i < QRY.length; i++) key(TY0 + i * TYD);
+  [72, 74, 76, 79].forEach((m, i) => pluck(9.56 + i * .075, m, .11, .3));
+  whoosh(10.15, .6, .08, 600, 2500);
+  click(10.82, .35); whoosh(10.92, .45, .18);
+  [76, 79, 81, 84, 86, 88].forEach((m, i) => pluck(11.36 + i * .07, m, .07, .25));
+  click(12.25, .3); pluck(12.27, 88, .13, .4); pluck(12.33, 93, .09, .5);
+  whoosh(12.62, .48, .5, 150, 6500);
+  // GPA
+  ABS.forEach((a, i) => { whoosh(a, .26, .06, 800, 3000); pluck(a + .24, [81, 84, 86, 88][i], .14, .45); });
+  bell(14.3, 96, .07); [88, 91, 93, 96].forEach((m, i) => pluck(14.3 + i * .04, m, .05, .3));
+  // tile wipe + planner
+  for (let i = 0; i < 10; i++) click(14.5 + i * .04, .05);
+  whoosh(14.45, .6, .3);
+  [72, 76, 79, 84, 79, 88].forEach((m, i) => pluck(15.62 + i * .1, m, .09, .28));
+  pluck(16.1, 84, .08, .3);
+  click(16.72, .38); whoosh(16.72, .5, .25, 100, 1500);
+  // focus: rain from the app's own sound library
+  try {
+    const rain = await ctx.decodeAudioData(await (await fetch('/public/sounds/focus/rain.mp3')).arrayBuffer());
+    const s = ctx.createBufferSource(); s.buffer = rain; s.loop = true;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0, 16.75); g.gain.linearRampToValueAtTime(.6, 17.2); g.gain.setValueAtTime(.6, 18.6); g.gain.linearRampToValueAtTime(0, 19.3);
+    s.connect(g).connect(gate); s.start(16.75, 2); s.stop(19.4);
+  } catch (e) { console.warn('rain missing', e); }
+  bell(17.2, 84, .09, 2.5);
+  // system: word hits, dolly, riser, collapse
+  whoosh(18.78, .6, .3, 200, 3000);
+  [19.5, 20].forEach(t => pad(t, .12, at(t)[0].map(n => n + 12), .065, .004, .35, 5200, music));
+  {
+    const t0 = 19.9, t1 = 21.46, s = ctx.createBufferSource(); s.buffer = nb; s.loop = true;
+    const f = ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.setValueAtTime(300, t0); f.frequency.exponentialRampToValueAtTime(9000, t1);
+    const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.32, t1);
+    s.connect(f).connect(g).connect(sfx); s.start(t0); s.stop(t1 + .05);
+    const o = osc('sawtooth', 110, t0, t1 - t0); o.frequency.exponentialRampToValueAtTime(900, t1);
+    const of = ctx.createBiquadFilter(); of.type = 'bandpass'; of.frequency.value = 1200; of.Q.value = 2;
+    const og = ctx.createGain(); og.gain.setValueAtTime(.0001, t0); og.gain.exponentialRampToValueAtTime(.12, t1);
+    o.connect(of).connect(og).connect(sfx);
+  }
+  // resolve: impact, dot lands, tagline, URL
+  kick(21.97, 1.15, 1.3);
+  { const o = osc('sine', 60, 21.97, 2.2); o.frequency.exponentialRampToValueAtTime(34, 24); o.connect(env(21.97, .6, .005, 2.2)).connect(drums); }
+  send(noise(21.97, 2.6, .3, 'highpass', 2500, sfx, .5), .8);
+  noise(21.97, 1, .45, 'lowpass', 380, sfx);
+  bass(21.97, 36, 1.6, .3);
+  bell(22.9, 84, .16, 2.6); bell(22.9, 91, .09, 2.4); click(22.9, .2);
+  for (let i = 0; i < 5; i++) click(23.02 + i * .075, .06);
+  pluck(24, 88, .12, .5); bell(24.02, 96, .05, 2);
+  whoosh(24.3, .9, .08, 1200, 6000);
+
+  const buf = await ctx.startRendering(), L = buf.getChannelData(0), Rr = buf.getChannelData(1), n = L.length;
+  const dv = new DataView(new ArrayBuffer(44 + n * 4));
+  const str = (o, s) => [...s].forEach((c, i) => dv.setUint8(o + i, c.charCodeAt(0)));
+  str(0, 'RIFF'); dv.setUint32(4, 36 + n * 4, true); str(8, 'WAVE'); str(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 2, true);
+  dv.setUint32(24, SR, true); dv.setUint32(28, SR * 4, true); dv.setUint16(32, 4, true); dv.setUint16(34, 16, true); str(36, 'data'); dv.setUint32(40, n * 4, true);
+  for (let i = 0; i < n; i++) { dv.setInt16(44 + i * 4, clamp(L[i], -1, 1) * 32767, true); dv.setInt16(46 + i * 4, clamp(Rr[i], -1, 1) * 32767, true); }
+  const bytes = new Uint8Array(dv.buffer);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+/* ───────────── boot ───────────── */
+async function init() {
+  await Promise.all([300, 400, 500, 700, 900].map(w => document.fonts.load(`${w} 40px T`, 'عون')));
+  await document.fonts.ready;
+  buildA(); buildC(); buildD(); buildE1(); buildE2(); buildE3(); buildTiles(); buildFx();
+  await buildG();
+  measure();
+  buildWall();
+  render(0);
+}
+window.reelReady = init();
+
+if (!location.search.includes('capture')) { // browser preview: loops, or ?t=12.3 freezes a frame
+  const fit = () => { const s = Math.min(innerWidth / 1920, innerHeight / 1080); $('stage').style.transform = `translate(${(innerWidth - 1920 * s) / 2}px,${(innerHeight - 1080 * s) / 2}px) scale(${s})`; };
+  addEventListener('resize', fit);
+  window.reelReady.then(() => {
+    fit();
+    const q = new URLSearchParams(location.search).get('t'), t0 = performance.now();
+    const loop = () => { render(q != null ? +q : ((performance.now() - t0) / 1000) % DUR); if (q == null) requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>
