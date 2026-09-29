@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ShowreelButton } from "@/components/showreel-button";
 import { HeaderAuth } from "@/components/header-auth";
 import { PWARegister } from "@/components/pwa-register";
 import { PWAInstallBanner } from "@/components/pwa-install-banner";
@@ -167,6 +168,7 @@ export default function RootLayout({
                       </Link>
                       <HeaderAuth />
                       <BookmarksNavLink />
+                      <ShowreelButton />
                       <ThemeToggle />
                     </div>
                   </nav>
